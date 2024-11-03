@@ -1,9 +1,12 @@
 import React from 'react';
 import { Box, ThemeProvider } from '@mui/system';
-import { Typography, Button, CssBaseline } from '@mui/material';
+import { Typography, Button, CssBaseline, CardMedia } from '@mui/material';
 import theme from '../../style/LLTheme';
 import RegisterHeader from '../Register/RegisterHeader';
-import Bitcoin3D from '../../FRWAssets/image/Bitcoin3D.png';
+import appicon from '../../FRWAssets/image/appicon.png';
+import create from '../../FRWAssets/svg/create.svg';
+import importPng from '../../FRWAssets/svg/import.svg';
+import qr from '../../FRWAssets/svg/scanIcon.svg';
 import { Link } from 'react-router-dom';
 import IconFlow from '../../../components/iconfont/IconFlow';
 
@@ -17,7 +20,7 @@ const WelcomePage = () => {
           flexDirection: 'column',
           backgroundColor: 'info3.default',
           width: '100%',
-          height: '100%',
+          height: '100vh',
           justifyContent: 'center',
           alignItems: 'center',
         }}
@@ -28,6 +31,11 @@ const WelcomePage = () => {
 
         <Box
           className="welcomeBox"
+          sx={{
+            height: '460px',
+            backgroundColor: 'transparent',
+            marginBottom: '80px',
+          }}
         >
           <Box
             sx={{
@@ -35,18 +43,16 @@ const WelcomePage = () => {
               justifyContent: 'space-between',
               alignItems: 'flex-end',
               px: '60px',
-              marginBottom: '70px',
-              marginTop: '35px',
+              backgroundColor: '#222',
+              height: '380px',
+              width: '625px',
+              position: 'relative',
+              borderRadius: '24px'
             }}
           >
             <img
-              src={Bitcoin3D}
-              style={{
-                objectFit: 'contain',
-                width: '220px',
-                position: 'relative',
-                left: '-20px',
-              }}
+              src={appicon}
+              style={{ borderRadius: '24px', margin: '0', width: '368px', position: 'absolute', right: '0px', top: '0px' }}
             />
 
             <Box
@@ -54,20 +60,20 @@ const WelcomePage = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 marginBottom: '20px',
-                gap: '10px',
-                marginLeft:'15px'
+                position: 'absolute',
+                left: '-95px',
+                top: '18px',
+                width: '389px',
               }}
             >
               <Typography
                 variant="h4"
                 sx={{
-                  fontWeight: 'bold',
-                  fontSize: '36px',
-                  background:
-                    '-webkit-linear-gradient(135deg, #41CC5D  0%, #1CEB8A 100%)',
+                  fontWeight: '700',
+                  fontSize: '40px',
                   WebkitBackgroundClip: 'text',
-                  textTransform: 'uppercase',
-                  WebkitTextFillColor: 'transparent',
+                  color: '#fff',
+                  lineHeight: '56px'
                 }}
               >
                 {chrome.i18n.getMessage('Welcome_to_lilico')}
@@ -75,77 +81,171 @@ const WelcomePage = () => {
 
               <Typography
                 variant="body1"
-                sx={{ color: 'text.secondary', pt: '16px', fontSize: '16px', }}
+                sx={{ color: 'text.secondary', pt: '16px', fontSize: '16px', margin: '24px 0 44px' }}
               >
                 {/* {chrome.i18n.getMessage('appDescription')} {' '} */}
-                A crypto wallet on Flow built for
-                <Typography sx={{ color: 'primary.main', display: 'inline' }}>
-                  <span style={{ fontWeight: 600 }}> Explorers, Collectors</span> and
-                  <span style={{ fontWeight: 600 }}> Gamers</span>
+                {chrome.i18n.getMessage('A_crypto_wallet_on_Flow')}
+                <Typography sx={{ color: 'primary.light', display: 'inline' }}>
+                  <span> {chrome.i18n.getMessage('Explorers_Collectors_and_Gamers')}</span>
                 </Typography>
-
+                
               </Typography>
+
+
+              <Button
+                variant="contained"
+                color="primary"
+                component={Link}
+                to="/register"
+                size="large"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  width: '332px',
+                  height: '48px',
+                  borderRadius: '24px',
+                  textTransform: 'capitalize',
+                  marginBottom: '16px',
+                  paddingLeft: '32px'
+                }}
+              >
+                <CardMedia component="img" sx={{ marginRight: '8px', width: '18px', height: '18px' }} image={create} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: '600', fontSize: '14px' }}
+                  color="primary.contrastText"
+                >
+                  {chrome.i18n.getMessage('Create_a_new_wallet')}
+                </Typography>
+              </Button>
+
+
+              {/* <Button
+                variant="contained"
+                color="secondary"
+                component={Link}
+                to="/import"
+                size="large"
+                sx={{
+                  display: 'flex',
+                  width: '332px',
+                  height: '48px',
+                  borderRadius: '24px',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  textTransform: 'capitalize',
+                  marginBottom: '16px',
+                  border: '1px solid #E5E5E5',
+                  backgroundColor: 'transparent',
+                  paddingLeft: '32px'
+                }}
+              >
+                <CardMedia component="img" sx={{ marginRight: '8px', width: '18px', height: '18px' }} image={importPng} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    color: '#FFF',
+                    '&:hover': {
+                      color: 'background.paper'
+                    }
+                  }}
+                >
+                  {chrome.i18n.getMessage('Import_your_wallet')}
+                </Typography>
+              </Button> */}
+
+              <Button
+                variant="contained"
+                color="secondary"
+                component={Link}
+                to="/sync"
+                size="large"
+                sx={{
+                  display: 'flex',
+                  width: '332px',
+                  height: '48px',
+                  borderRadius: '24px',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  textTransform: 'capitalize',
+                  border: '1px solid #E5E5E5',
+                  marginBottom: '16px',
+                  backgroundColor: 'transparent',
+                  paddingLeft: '32px'
+                }}
+              >
+                <CardMedia component="img" sx={{ marginRight: '8px', width: '18px', height: '18px' }} image={qr} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    color: '#FFF',
+                    '&:hover': {
+                      color: 'background.paper'
+                    }
+                  }}
+                >
+                  {chrome.i18n.getMessage('Sync_with_Mobile_App')}
+                </Typography>
+              </Button>
+
+              <Button
+                variant="contained"
+                color="secondary"
+                component={Link}
+                to="/addressimport"
+                size="large"
+                sx={{
+                  display: 'flex',
+                  width: '332px',
+                  height: '69px',
+                  borderRadius: '120px',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textTransform: 'capitalize',
+                  border: '1px solid #E5E5E5',
+                  backgroundColor: 'transparent',
+                  flexDirection: 'column',
+                  paddingLeft: '32px',
+                  '&:hover': {
+                    color: 'background.paper'
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', alignItems: 'center'}}>
+                  <CardMedia component="img" sx={{ marginRight: '8px', width: '18px', height: '18px' }} image={importPng} />
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      color: '#FFF',
+                    }}
+                  >
+                    {chrome.i18n.getMessage('Import__Wallet')}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: '400',
+                    fontSize: '12px',
+                    color: 'rgba(255, 255, 255, 0.40)',
+
+                  }}
+                >
+                  {chrome.i18n.getMessage('Support_Flow_Wallet_Blocto')}
+                </Typography>
+              </Button>
             </Box>
           </Box>
 
           {/* <Box sx={{ flexGrow: 1 }} /> */}
 
-          <Box
-            sx={{
-              display: 'flex',
-              px: '40px',
-              pb: '40px',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: '24px',
-            }}
-          >
-            <Button
-              variant="contained"
-              color="secondary"
-              component={Link}
-              to="/import"
-              size="large"
-              sx={{
-                display: 'flex',
-                flexGrow: 1,
-                height: '64px',
-                borderRadius: '12px',
-                textTransform: 'capitalize',
-              }}
-            >
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: '600', fontSize: '20px' }}
-                color="background.paper"
-              >
-                {chrome.i18n.getMessage('Import_your_wallet')}
-              </Typography>
-            </Button>
-
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/register"
-              size="large"
-              sx={{
-                display: 'flex',
-                flexGrow: 1,
-                height: '64px',
-                borderRadius: '12px',
-                textTransform: 'capitalize',
-              }}
-            >
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: '600', fontSize: '20px' }}
-                color="primary.contrastText"
-              >
-                {chrome.i18n.getMessage('Create_a_new_wallet')}
-              </Typography>
-            </Button>
-          </Box>
         </Box>
 
         {/* <Button
@@ -161,9 +261,9 @@ const WelcomePage = () => {
             mt: '36px',
             boxShadow: '0px 24px 24px rgba(0,0,0,0.36)',
           }}
-          startIcon={
-            <QrCodeScannerRoundedIcon sx={{ color: 'primary.main' }} />
-          }
+          // startIcon={
+          //   <QrCodeScannerRoundedIcon sx={{ color: 'primary.main' }} />
+          // }
         >
           <Typography
             variant="subtitle1"

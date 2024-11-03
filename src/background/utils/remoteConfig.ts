@@ -44,6 +44,7 @@ class fetchRemoteConfig {
         const result = await openapi.sendRequest('GET', '/fetchFTList', {}, {}, baseURL)
         // fetch(`${baseURL}/fetchFTList`);
         // const result = await coins.json();
+        console.log(result,'result coins')
         this.coinState.result = result;
         this.coinState.expireTime = exp;
         return result
@@ -67,7 +68,7 @@ class fetchRemoteConfig {
     }
     if (expire < now.getTime()) {
       try {
-        const result = await openapi.nftCollectionList();
+        const result = await openapi.getNFTListFromGithub(network);
         // fetch(`${baseURL}/fetchNFTList`);
         // const result = await coins.json();
         this.nftState[network].result = result;
@@ -82,6 +83,33 @@ class fetchRemoteConfig {
     }
   }
 
+  async nftv2Collection () {
+    const network = await userWalletService.getNetwork();
+    const address = await userWalletService.getCurrentAddress();
+    const expire = this.nftState[network].expireTime;
+    const now = new Date();
+    const exp = 1000 * 60 * 60 * 1 + now.getTime();
+    let defaultNftList = testnetNftList;
+    if (network == 'mainnet') {
+      defaultNftList = mainnetNftList;
+    }
+    if (expire < now.getTime()) {
+      try {
+        const result = await openapi.getNFTV2CollectionList(address, network);
+        // fetch(`${baseURL}/fetchNFTList`);
+        // const result = await coins.json();
+        this.nftState[network].result = result;
+        this.nftState[network].expireTime = exp;
+        return result
+      } catch (err) {
+        console.error(err);
+        return defaultNftList;
+      }
+    } else {
+      return this.nftState[network].result;
+    }
+  }
+  
   async remoteConfig () {
     const expire = this.configState.expireTime;
     const now = new Date();

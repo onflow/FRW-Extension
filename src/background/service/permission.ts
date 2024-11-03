@@ -7,10 +7,11 @@ export interface ConnectedSite {
   origin: string;
   icon: string;
   name: string;
-  // chain: CHAINS_ENUM;
+  chain?: number;
   e?: number;
   isSigned: boolean;
   isTop: boolean;
+  isConnected?: boolean;
   order?: number;
 }
 
@@ -44,6 +45,7 @@ class PermissionService {
   sync = () => {
     if (!this.lruCache) return;
     this.store.dumpCache = this.lruCache.dump();
+    console.log('this.store.dumpCache ', this.store.dumpCache)
   };
 
   getWithoutUpdate = (key: string) => {
@@ -56,19 +58,20 @@ class PermissionService {
     origin: string,
     name: string,
     icon: string,
-    // defaultChain: CHAINS_ENUM,
+    defaultChain = 545,
     isSigned = false
   ) => {
+    console.log('origin ', origin)
     if (!this.lruCache) return;
-
     this.lruCache.set(origin, {
       origin,
       name,
       icon,
-      // chain: defaultChain,
+      chain: defaultChain,
       isSigned,
       isTop: false,
     });
+    console.log('lruCache ', this.lruCache)
     this.sync();
   };
 
@@ -97,7 +100,7 @@ class PermissionService {
     this.sync();
   };
 
-  hasPerssmion = (origin) => {
+  hasPermission = (origin) => {
     if (!this.lruCache) return;
     if (origin === INTERNAL_REQUEST_ORIGIN) return true;
 

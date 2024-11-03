@@ -7,7 +7,6 @@ import { Stack, Box, Typography, Divider, Accordion, AccordionSummary, Accordion
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import theme from 'ui/style/LLTheme';
 import * as fcl from '@onflow/fcl';
-import * as sdk from '@onflow/sdk'
 import {
   LLPrimaryButton,
   LLSecondaryButton,
@@ -88,22 +87,21 @@ const Confimation = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
     await setUserInfo(userResult);
   }
 
-  useEffect(() => {
-    getUserInfo();
-    const index = accountArgs.findIndex(item => item.value.includes('.jpg'));
-    console.log(' accountArgs ', accountArgs);
-    if (accountArgs[index]) {
-      setImage(accountArgs[index].value)
-      setAccountTitle(accountArgs[4].value)
-    }
-  }, [accountArgs])
+  // useEffect(() => {
+  //   getUserInfo();
+  //   const index = accountArgs.findIndex(item => item.value.includes('.jpg'));
+  //   console.log(' accountArgs ', data);
+  //   if (accountArgs[index]) {
+  //     setImage(accountArgs[index].value)
+  //     setAccountTitle(accountArgs[4].value)
+  //   }
+  // }, [accountArgs])
 
 
   const fetchTxInfo = async (cadence: string) => {
     // const account = await wallet.getCurrentAccount();
     const network = await wallet.getNetwork();
     const result = await wallet.openapi.getTransactionTemplate(cadence, network)
-    console.log('fetchTxInfo ->', result);
     if (result != null) {
       setAuditor(result)
       setExpanded(false)
@@ -134,7 +132,8 @@ const Confimation = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
     const newSignable: Signable = data.body;
     const hostname = data.config?.client?.hostname;
     hostname && setHost(hostname);
-    console.log('newSignable.cadence ==> ', newSignable['args'])
+    setImage(data.config.app.icon)
+    setAccountTitle(data.config.app.title)
     const firstLine = newSignable.cadence.trim().split('\n')[0];
 
     const isAccountLinking = firstLine.includes('#allowAccountLinking');
@@ -144,6 +143,7 @@ const Confimation = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
 
     }
     setSignable(newSignable);
+    getUserInfo();
 
     fetchTxInfo(newSignable.cadence);
   }
@@ -158,12 +158,12 @@ const Confimation = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
     setApproval(true);
     const signedMessage = await wallet.signMessage(signable.message);
 
-    console.log('signedMessage ->', opener, lilicoEnabled)
-    console.log('signedMessage ->', signedMessage)
+    // console.log('signedMessage ->', opener, lilicoEnabled)
+    // console.log('signedMessage ->', signedMessage)
     if (opener) {
       sendSignature(signable, signedMessage)
       const value = await sessionStorage.getItem('pendingRefBlockId')
-      console.log('pendingRefBlockId ->', value);
+      // console.log('pendingRefBlockId ->', value);
       if (value !== null) {
         return
       }

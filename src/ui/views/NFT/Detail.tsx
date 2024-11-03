@@ -8,17 +8,19 @@ import {
   Container,
   Box,
   IconButton,
-  Menu,
-  MenuItem
+  Button,
+  CardMedia
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { PostMedia, MatchMediaType } from '@/ui/utils/url';
 import { saveAs } from 'file-saver'
-import SendIcon from 'ui/FRWAssets/svg/send.svg';
+import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
+import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
 import fallback from 'ui/FRWAssets/image/errorImage.png';
-import { Link } from 'react-router-dom';
+import MoveNftConfirmation from './SendNFT/MoveNftConfirmation';
+import MovefromParent from './SendNFT/MovefromParent';
 
 const useStyles = makeStyles(() => ({
   pageContainer: {
@@ -28,7 +30,7 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'space-between',
     padding: 0,
     margin: 0,
-    display: 'flex', 
+    display: 'flex',
     flexDirection: 'column'
   },
   detailContainer: {
@@ -79,13 +81,24 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface NFTDetailState {
-    nft: any;
-    media: PostMedia;
-    index: number;
-    ownerAddress: any
+  nft: any;
+  media: PostMedia;
+  index: number;
+  ownerAddress: any
 }
 
 const Detail = () => {
+
+  const emptyContact = {
+    address: '',
+    contact_name: '',
+    avatar: '',
+    domain: {
+      domain_type: 0,
+      value: '',
+    }
+  };
+
   const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
@@ -93,42 +106,96 @@ const Detail = () => {
   const [nftDetail, setDetail] = useState<any>(null);
   const [metadata, setMetadata] = useState<any>(null);
   const [mediaLoading, setMediaLoading] = useState(true);
-  const [contractInfo, setContractInfo] = useState<any>(null);
+  const [collectionInfo, setInfo] = useState<any>(null);
   const [ownerAddress, setOwnerAddress] = useState<any>(null);
   const [media, setMedia] = useState<PostMedia | null>(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const [moveOpen, setMoveOpen] = useState<boolean>(false);
+  const [childActive, setChildActive] = useState<boolean>(false);
+  const [contactOne, setContactOne] = useState<any>(emptyContact);
+  const [contactTwo, setContactTwo] = useState<any>(emptyContact);
+  const [isAccessibleNft, setisAccessibleNft] = useState<any>(false);
+  const [canMoveChild, setCanMoveChild] = useState(true);
+
+  useEffect(() => {
+    const checkPermission = async () => {
+      const result = await usewallet.checkCanMoveChild();
+      setCanMoveChild(result);
+    };
+
+    checkPermission();
+  }, []);
+
+
+  useEffect(() => {
+    const savedState = localStorage.getItem('nftDetailState');
+    if (savedState) {
+      const nftDetail = JSON.parse(savedState);
+      setDetail(nftDetail.nft);
+      setMedia(nftDetail.media);
+      setOwnerAddress(nftDetail.ownerAddress);
+      setInfo(nftDetail.collectionInfo);
+      setMetadata(nftDetail.nft);
+      if (nftDetail.isAccessibleNft) {
+        setisAccessibleNft(nftDetail.isAccessibleNft)
+      }
+    }
+  }, []);
 
 
   const fetchNft = async () => {
-    const state = location.state as NFTDetailState
-    const NFT = state.nft
-    const media = state.media
-    const ownerAddress = state.ownerAddress
-    // console.log('state ===>', state, NFT, media, ownerAddress)
-    setDetail(NFT);
-    setMedia(media);
-    setOwnerAddress(ownerAddress);
-    const nft_metadata = NFT
-    setMetadata(nft_metadata);
-    // const metadata_titles = ['name', 'title', 'description', 'uri', 'image', 'media', 'mimeType', 'type']
-    // if (nft_metadata) {
-    //   const metadata_titles = ['name', 'title', 'description', 'image', 'mimeType', 'uri']
-    //   const filtered_metadata = nft_metadata
-    //     .filter((metadata) => !metadata_titles.includes(metadata.name))
-    //     .sort((a, b) => (a.value.length + a.name.length) - (b.value.length + b.name.length))
+    const childResp = await usewallet.checkUserChildAccount();
+    const userInfo = await usewallet.getUserInfo(false);
+    const currentAddress = await usewallet.getCurrentAddress();
+    const userWallets = await usewallet.getUserWallets();
+    const parentAddress = userWallets[0].blockchain[0].address;
+    const isChild = await usewallet.getActiveWallet();
+    const userTemplate = {
+      avatar: userInfo.avatar,
+      domain: {
+        domain_type: 0,
+        value: '',
+      }
+    };
 
-    //   setMetadata(filtered_metadata);
-    // }
-    const contractList = await usewallet.openapi.getAllNft();
-    await usewallet.setDashIndex(1);
-    const filteredCollections = returnFilteredCollections(contractList, NFT)
-    if (filteredCollections.length > 0) {
-      setContractInfo(filteredCollections[0])
+    let userOne, userTwo;
+
+    if (isChild) {
+      const wallet = childResp[currentAddress!];
+      userOne = {
+
+        avatar: wallet.thumbnail.url,
+        domain: {
+          domain_type: 0,
+          value: '',
+        },
+        address: currentAddress,
+        contact_name: wallet.name,
+      };
+      userTwo = {
+        ...userTemplate,
+        address: parentAddress,
+        contact_name: userInfo.nickname,
+      };
+    } else {
+      userOne = {
+        ...userTemplate,
+        address: currentAddress,
+        contact_name: userInfo.nickname,
+      };
+      userTwo = {
+        ...userTemplate,
+        address: parentAddress,
+        contact_name: userInfo.nickname,
+      };
+
     }
+    setContactOne(userOne);
+    setContactTwo(userTwo);
+
+    setChildActive(isChild ? true : false);
+
+
+    await usewallet.setDashIndex(1);
   }
 
   const replaceIPFS = (url: string | null): string => {
@@ -136,7 +203,7 @@ const Detail = () => {
       return ''
     }
 
-    const lilicoEndpoint = 'https://lilico.infura-ipfs.io/ipfs/'
+    const lilicoEndpoint = 'https://gateway.pinata.cloud/ipfs/'
 
     const replacedURL = url
       .replace('ipfs://', lilicoEndpoint)
@@ -150,13 +217,6 @@ const Detail = () => {
   useEffect(() => {
     fetchNft();
   }, []);
-
-  const returnFilteredCollections = (contractList, NFT) => {
-    console.log('contractList: ', contractList, NFT)
-    return contractList.filter(
-      (collection) => collection.name == NFT.collectionName
-    );
-  }
 
   const downloadImage = (image_url, title) => {
     saveAs(image_url, title) // Put your image url here.
@@ -176,7 +236,7 @@ const Detail = () => {
           width: '100%',
           maxWidth: '100%',
         }}>
-          <Typography color="text.secondary" variant="body1" sx={{width: '100%', maxWidth: '100%'}}>
+          <Typography color="text.secondary" variant="body1" sx={{ width: '100%', maxWidth: '100%' }}>
             {props.value}
           </Typography>
         </Box>
@@ -186,17 +246,17 @@ const Detail = () => {
 
   const createMetaBoxes = (props, index) => {
     if (props.value && typeof props.value === 'string')
-      return <MetaBox meta_id={props.name} name={props.name} value={props.value} key={props.name + index}/>;
+      return <MetaBox meta_id={props.name} name={props.name} value={props.value} key={props.name + index} />;
   };
 
 
   const getUri = () => {
     return (
       <>
-        {mediaLoading ? <div/> : (
+        {mediaLoading ? <div /> : (
           <div
             style={{
-              background:'#222222',
+              background: '#222222',
               height: '100%',
               width: '100%',
               borderRadius: '8px'
@@ -204,12 +264,12 @@ const Detail = () => {
           />
         )}
 
-        { media && (
+        {media && (
           media.image ?
             <img
               src={replaceIPFS(media.image)}
               className={classes.media}
-              onLoad={()=>setMediaLoading(true)}
+              onLoad={() => setMediaLoading(true)}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null; // prevents looping
                 currentTarget.src = fallback;
@@ -217,8 +277,8 @@ const Detail = () => {
             />
             :
             <>
-              <video loop autoPlay controls muted preload="auto" controlsList='noremoteplayback nofullscreen' onLoadedData={() => setMediaLoading(true)} 
-                style={{ margin: '0 auto', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px'}}>
+              <video loop autoPlay controls muted preload="auto" controlsList='noremoteplayback nofullscreen' onLoadedData={() => setMediaLoading(true)}
+                style={{ margin: '0 auto', width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}>
                 <source src={media.video} type="video/mp4" className={classes.media} />
               </video>
             </>)
@@ -231,10 +291,10 @@ const Detail = () => {
     return (
       <>
         {mediaLoading && <img src={replaceIPFS(media?.image || null)} className={classes.media} />}
-        <video loop autoPlay controls muted playsInline preload="auto" 
+        <video loop autoPlay controls muted playsInline preload="auto"
           controlsList='noremoteplayback nofullscreen'
           onLoadedData={() => setMediaLoading(false)}
-          style={{ visibility: mediaLoading ? 'hidden' : 'visible', width:'100%' }}
+          style={{ visibility: mediaLoading ? 'hidden' : 'visible', width: '100%' }}
         >
           <source src={media?.video || undefined} type="video/mp4" className={classes.media} />
         </video>
@@ -244,119 +304,170 @@ const Detail = () => {
 
   return (
     <StyledEngineProvider injectFirst>
-      <div className='page' style={{display: 'flex', flexDirection: 'column'}}>
+      <Box className='page' style={{ display: 'flex', position: 'relative', flexDirection: 'column' }}>
         <Box className={classes.iconbox}>
-          <IconButton onClick={()=> history.goBack()} className={classes.arrowback}>
+          <IconButton onClick={() => history.goBack()} className={classes.arrowback}>
             <ArrowBackIcon sx={{ color: 'icon.navi' }} />
           </IconButton>
-          {/* {
-            nftDetail && 
-            <>
-              <IconButton onClick={handleClick} className={classes.extendMore}>
-                <MoreHorizIcon sx={{ color: 'icon.navi'}} />
-              </IconButton>
-              <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                  'aria-labelledby': 'basic-button',
-                }}
-              >
-                <MenuItem onClick={handleClose}>
-                  <a href={'https://lilico.app/nft/' + ownerAddress +'/'+ nftDetail.contract.address +'/'+ nftDetail.contract.name + '?tokenId=' + nftDetail.id.tokenId} target="_blank">
-                Share
-                  </a>
-                </MenuItem>
-              </Menu>
-            </>
-          } */}
         </Box>
 
-        {nftDetail && 
-      <Container className={classes.pageContainer} sx={{width: '100%'}}>
-        <Box sx={{ padding: '10px 18px', justifyContent: 'center', backgroundColor: '#121212', display: 'flex', flexDirection: 'column', flexGrow: 1}}>
-          <Box className={classes.mediabox}>
-            { (media && media?.video != null) ? 
-              getMedia():
-              getUri()
-            }
-          </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-            <Box sx={{ flex: '1 0 auto' }}>
-              <Typography component="div" color="text.primary" variant="h6" sx={{maxWidth: '270px'}}>
-                { media?.title }
-              </Typography>
-
-              { contractInfo &&
-                <a href={contractInfo.official_website} target='_blank' >
-                  <Typography
-                    component="div"
-                    color="text.secondary"
-                    variant="body1"
-                    display='flex'
-                    flexDirection='row'
-                    alignItems='center'
-                  >
-                    <img src={contractInfo.logo} width='20px' style={{marginRight: '6px', borderRadius: '50%'}} />
-                    {contractInfo.name}
-                    <ArrowForwardOutlinedIcon sx={{ color: 'icon.navi', marginLeft: '6px', mt: 0, fontSize: '20px', padding: 0 }} />
+        {nftDetail &&
+          <Container className={classes.pageContainer} sx={{ width: '100%' }}>
+            <Box sx={{ padding: '10px 18px', justifyContent: 'center', backgroundColor: '#121212', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <Box className={classes.mediabox}>
+                {(media && media?.video != null) ?
+                  getMedia() :
+                  getUri()
+                }
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                <Box sx={{ flex: '1 0 auto' }}>
+                  <Typography component="div" color="text.primary" variant="h6" sx={{ maxWidth: '270px' }}>
+                    {media?.title}
                   </Typography>
-                </a>
-              }
-            </Box>
-            <Box sx={{ mt: 0, mr: 0, pr: 0, display: 'flex', gap: '8px', alignItems: 'center'}}>
-              <IconButton
-                sx={{
-                  backgroundColor: 'neutral2.main',
-                  p: '8px',
-                  aspectRatio: '1 / 1'
-                  // mr: '10px',
-                }}
-                onClick={() => downloadImage(media?.image || media?.video, media?.title || 'NFT')}
-              >
-                <SaveAltIcon color="primary" />
-              </IconButton>
 
-              { !(contractInfo?.contract_name === 'Domains' && media?.title?.includes('.meow')) &&
-                <IconButton 
-                  sx={{ backgroundColor: 'neutral2.main', p: '12px', aspectRatio: '1 / 1' }}
-                  onClick={() => history.push({
-                    pathname: '/dashboard/nft/send',
-                    state: {nft: nftDetail, media: media, contract: contractInfo}
-                  })}
-                >
-                  {/* <IosShareOutlinedIcon color="primary" /> */}
-                  <img src={SendIcon} style={{width: '20px', height: '20px'}}/>
-                </IconButton>
-              }
+                  {nftDetail &&
+                    <a href={nftDetail.externalURL} target='_blank' >
+                      <Typography
+                        component="div"
+                        color="text.secondary"
+                        variant="body1"
+                        display='flex'
+                        flexDirection='row'
+                        alignItems='center'
+                      >
+                        <img src={nftDetail.collectionSquareImage} width='20px' style={{ marginRight: '6px', borderRadius: '50%' }} />
+                        {nftDetail.collectionContractName}
+                        <ArrowForwardOutlinedIcon sx={{ color: 'icon.navi', marginLeft: '6px', mt: 0, fontSize: '20px', padding: 0 }} />
+                      </Typography>
+                    </a>
+                  }
+                </Box>
+                <Box sx={{ mt: 0, mr: 0, pr: 0, display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <IconButton
+                    sx={{
+                      backgroundColor: '#FFFFFF33',
+                      p: '8px',
+                      aspectRatio: '1 / 1'
+                      // mr: '10px',
+                    }}
+                    onClick={() => downloadImage(media?.image || media?.video, media?.title || 'NFT')}
+                  >
+                    <SaveAltIcon color="primary" />
+                  </IconButton>
+
+                </Box>
+              </Box>
             </Box>
-          </Box>
+
+            <Container className={classes.detailContainer}>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  gap: '10px',
+                  flexDirection: 'row',
+                  p: '10px 0',
+                  flexWrap: 'wrap',
+                  justifyContent: 'flex-start',
+                  maxWidth: '400px'
+                }}
+              >
+                {(metadata && metadata.traits) && metadata.traits.map(createMetaBoxes)}
+              </Box>
+
+              <Typography variant="body1" color="text.secondary" component="div" sx={{ mb: '90px' }}>
+                {media && media.description}
+              </Typography>
+            </Container>
+          </Container>
+        }
+
+        <Box sx={{ height: '42px', position: 'fixed', bottom: '32px', right: '18px' }}>
+          {!(nftDetail?.collectionContractName === 'Domains' && media?.title?.includes('.meow')) &&
+            <Button
+              sx={{
+                backgroundColor: '#FFFFFF33',
+                p: '12px',
+                color: '#fff',
+                borderRadius: '12px',
+                height: '42px',
+                fill: 'var(--Special-Color-White-2, rgba(255, 255, 255, 0.20))',
+                filter: 'drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.24))',
+                backdropFilter: 'blur(6px)'
+              }}
+              disabled={!isAccessibleNft}
+              onClick={() => history.push({
+                pathname: '/dashboard/nft/send/',
+                state: { nft: nftDetail, media: media, contract: nftDetail }
+              })}
+            >
+              {/* <IosShareOutlinedIcon color="primary" /> */}
+              <CardMedia image={SendIcon} sx={{ width: '20px', height: '20px', color: '#fff', marginRight: '8px' }} />
+              {chrome.i18n.getMessage('Send')}
+            </Button>
+          }
+          {canMoveChild &&
+            <Button
+              sx={{
+                backgroundColor: '#FFFFFF33',
+                p: '12px',
+                color: '#fff',
+                borderRadius: '12px',
+                height: '42px',
+                marginLeft: '8px',
+                fill: 'var(--Special-Color-White-2, rgba(255, 255, 255, 0.20))',
+                filter: 'drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.24))',
+                backdropFilter: 'blur(6px)'
+              }}
+              disabled={!isAccessibleNft}
+              onClick={() => setMoveOpen(true)}
+            >
+              {/* <IosShareOutlinedIcon color="primary" /> */}
+              <CardMedia image={DetailMove} sx={{ width: '20px', height: '20px', color: '#fff', marginRight: '8px' }} />
+              {chrome.i18n.getMessage('Move')}
+            </Button>
+          }
         </Box>
 
-        <Container className={classes.detailContainer}>
-          <Box
-            sx={{
-              display: 'inline-flex',
-              gap: '10px',
-              flexDirection: 'row',
-              p: '10px 0',
-              flexWrap: 'wrap',
-              justifyContent: 'flex-start',
-              maxWidth: '400px'
-            }}
-          >
-            {(metadata && metadata.traits) && metadata.traits.map(createMetaBoxes)}
-          </Box>
-
-          <Typography variant="body1" color="text.secondary" component="div" sx={{mb: '90px'}}>
-            {media && media.description}
-          </Typography>
-        </Container>
-      </Container>
+        {
+          moveOpen && (
+            childActive ? (
+              <MoveNftConfirmation
+                isConfirmationOpen={moveOpen}
+                data={{
+                  contact: contactTwo,
+                  userContact: contactOne,
+                  nft: nftDetail,
+                  contract: collectionInfo,
+                  media: media
+                }}
+                handleCloseIconClicked={() => setMoveOpen(false)}
+                handleCancelBtnClicked={() => setMoveOpen(false)}
+                handleAddBtnClicked={() => {
+                  setMoveOpen(false);
+                }}
+              />
+            ) : (
+              <MovefromParent
+                isConfirmationOpen={moveOpen}
+                data={{
+                  contact: contactTwo,
+                  userContact: contactOne,
+                  nft: nftDetail,
+                  contract: collectionInfo,
+                  media: media
+                }}
+                handleCloseIconClicked={() => setMoveOpen(false)}
+                handleCancelBtnClicked={() => setMoveOpen(false)}
+                handleAddBtnClicked={() => {
+                  setMoveOpen(false);
+                }}
+              />
+            )
+          )
         }
-      </div>
+
+      </Box>
     </StyledEngineProvider>
   );
 };

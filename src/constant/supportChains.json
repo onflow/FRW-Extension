@@ -1,0 +1,19 @@
+[
+  {
+     "id": "flow_evm_previewnet",
+     "community_id": 646,
+     "name": "Flow Previewnet",
+     "native_token": {
+       "id": "flow",
+       "symbol": "FLOW",
+       "logo": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/flow/logo.png",
+       "decimals": 18
+     },
+     "logo_url": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/flow/logo.png",
+     "white_logo_url": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/flow/logo.png",
+     "eip_1559": true,
+     "is_disabled": false,
+     "explorer_host": "https://eth.flowscan.io",
+     "need_estimate_gas": false
+   }
+ ]

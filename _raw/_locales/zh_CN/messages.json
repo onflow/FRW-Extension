@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "Flow Reference",
+    "message": "Flow Wallet",
     "description": "Application Name"
   },
   "appDescription": {
@@ -61,6 +61,12 @@
   "Account": {
     "message": "账户"
   },
+  "Acc__list": {
+    "message": "账户列表"
+  },
+  "Profile": {
+    "message": "账户"
+  },
   "Wallet": {
     "message": "钱包"
   },
@@ -77,7 +83,7 @@
     "message": "匿名模式"
   },
   "Other__Lilico__users__cannot__search__for__your__username": {
-    "message": "其他 Flow Reference 用户无法搜索到你的用户名。"
+    "message": "其他 Flow Wallet 用户无法搜索到你的用户名。"
   },
   "Private__Key": {
     "message": "私钥"
@@ -131,7 +137,7 @@
     "message": "免费"
   },
   "Lilico__domain": {
-    "message": "Flow Reference 域名"
+    "message": "Flow Wallet 域名"
   },
   "Edit__Address": {
     "message": "编辑地址"
@@ -146,7 +152,7 @@
     "message": "列表为空"
   },
   "No__results__found": {
-    "message": "没有发现任何结果!"
+    "message": "没有发现任何结果！"
   },
   "Link": {
     "message": "链接"
@@ -184,17 +190,20 @@
   "Testnet": {
     "message": "测试网"
   },
-  "Sandboxnet": {
+  "Crescendo": {
     "message": "沙盒网"
+  },
+  "Previewnet": {
+    "message": "预览网"
   },
   "Transaction__Monitor": {
     "message": "交易监测"
   },
-  "Flowscan": {
-    "message": "Flowscan"
+  "Flowdiver": {
+    "message": "Flowdiver"
   },
   "Flow__view__source": {
-    "message": "Flow view source"
+    "message": "f.dnz.dev"
   },
   "Public__Key": {
     "message": "公钥"
@@ -236,7 +245,7 @@
     "message": "您确认要重置钱包吗？"
   },
   "Removing__the__wallet__from__Lilico__does__not__remove__the__wallet__from__Flow__blockchain": {
-    "message": "从 Flow Reference 删除钱包并不意味着从Flow区块链上删除钱包。你可以使用你的助记词或云端硬盘备份再次导入你的钱包。"
+    "message": "从 Flow Wallet 删除钱包并不意味着从Flow区块链上删除钱包。你可以使用你的助记词或云端硬盘备份再次导入你的钱包。"
   },
   "Reset": {
     "message": "重置"
@@ -254,13 +263,13 @@
     "message": "确认密码"
   },
   "Change__111e__Password": {
-    "message": "修改111e密码"
+    "message": "修改 111e 密码"
   },
   "Security": {
     "message": "安全性"
   },
   "Allow__lilico__to__pay__the__gas__fee": {
-    "message": "允许 Flow Reference 为我的所有交易支付矿工费。"
+    "message": "允许 Flow Wallet 为我的所有交易支付矿工费。"
   },
   "This__feature__has__been__disabled__temporarily": {
     "message": "此功能已被暂时禁用"
@@ -274,59 +283,59 @@
   "Coin": {
     "message": "钱币"
   },
-  "Exec_Transaction":{
-    "message":"执行交易"
+  "Exec_Transaction": {
+    "message": "执行交易"
   },
-  "View_more_transactions":{
-    "message":"查看更多交易"
+  "View_more_transactions": {
+    "message": "查看更多交易"
   },
-  "No_activity_yet":{
-    "message":"还没有活动"
+  "No_activity_yet": {
+    "message": "还没有活动"
   },
-  "Activity":{
-    "message":"活动"
+  "Activity": {
+    "message": "活动"
   },
-  "Coins":{
-    "message":"钱币"
+  "Coins": {
+    "message": "钱币"
   },
-  "Search_to_find_more_users":{
-    "message":"搜索查找更多用户"
+  "Search_to_find_more_users": {
+    "message": "搜索查找更多用户"
   },
-  "Search_Address0x_or_Flow_domain":{
-    "message":"搜索，地址(0x)或Flow域名"
+  "Search_Address0x_or_Flow_domain": {
+    "message": "搜索，地址(0x)或Flow域名"
   },
-  "Search_the_ID":{
-    "message":"搜索ID："
+  "Search_the_ID": {
+    "message": "搜索ID："
   },
-  "Sorry_we_could_not_find_any_accounts_Please_try_again":{
-    "message":"对不起，我们无法找到任何账户。请再试一次。"
+  "Sorry_we_could_not_find_any_accounts_Please_try_again": {
+    "message": "对不起，我们无法找到任何账户。请再试一次。"
   },
-  "Send_to":{
-    "message":"发送至"
+  "Send_to": {
+    "message": "发送至"
   },
-  "Invalid_address_in":{
-    "message":"无效地址"
+  "Invalid_address_in": {
+    "message": "无效地址"
   },
-  "Transaction_created":{
-    "message":"创建交易"
+  "Transaction_created": {
+    "message": "创建交易"
   },
-  "Your_address_is_currently_processing_another_transaction":{
-    "message":"您的地址目前正在处理另一项交易"
+  "Your_address_is_currently_processing_another_transaction": {
+    "message": "您的地址目前正在处理另一项交易"
   },
-  "Sending":{
-    "message":" 正在发送..."
+  "Sending": {
+    "message": " 正在发送..."
   },
-  "Confirmation":{
-    "message":"确认"
+  "Confirmation": {
+    "message": "确认"
   },
-  "Processing":{
-    "message":"处理中"
+  "Processing": {
+    "message": "处理中"
   },
-  "Insufficient_balance":{
-    "message":"余额不足"
+  "Insufficient_balance": {
+    "message": "余额不足"
   },
-  "on_Flow_the_balance_cant_less_than_0001_FLOW":{
-    "message":"余额不能少于0.001 FLOW"
+  "on_Flow_the_balance_cant_less_than_0001_FLOW": {
+    "message": "余额不能少于0.001 FLOW"
   },
   "Approve": {
     "message": "通过"
@@ -335,7 +344,7 @@
     "message": "脚本"
   },
   "lilico__covers__this__gas__fee__for__you": {
-    "message": "Flow Reference 为你支付这笔矿工费"
+    "message": "Flow Wallet 为你支付这笔矿工费"
   },
   "SIGN__MESSAGE": {
     "message": "签署信息"
@@ -359,7 +368,7 @@
     "message": "二维码"
   },
   "Shown__your__QR__code__to__receive__transactions": {
-    "message": "显示你的二维码以接收交易。"
+    "message": "扫描二维码将资产发送到这个 FLOW 账户。"
   },
   "Make__sure__you__are__using__the__correct__network": {
     "message": "确保你使用的是正确的网络。只发送测试网资产到这个存款地址。"
@@ -368,16 +377,16 @@
     "message": "你应该知道的事情"
   },
   "Free__lilico__domain__help__you__find__each__other__easier__on__chain": {
-    "message": "免费的 Flow Reference 域名帮助你在链上更容易找到对方。"
+    "message": "免费的 Flow Wallet 域名帮助你在链上更容易找到对方。"
   },
   "An__Inbox__system__will__help__you__send__tokens__and__NFT__to__your__friend__without__enable__vault": {
-    "message": "一个收件箱系统将帮助你发送代币和NFT给你的朋友，而不需要初始化资源。"
+    "message": "一个收件箱系统将帮助你发送代币和 NFT 给你的朋友，而不需要初始化资源。"
   },
   "Anonymous__mode__will__be__affected__others__can__find__your__address__by__your__domain": {
     "message": "匿名模式将受到影响，其他人可以通过你的域名找到你的地址。"
   },
   "Search__PlaceHolder": {
-    "message": "搜索地址(0x)或者flow域名"
+    "message": "搜索地址 (0x) 或者 flow 域名"
   },
   "Submission_error": {
     "message": "提交错误"
@@ -416,7 +425,7 @@
     "message": "出错了，请稍后再试"
   },
   "Recovery__phrases__word__count__must__be__12__or__24__words": {
-    "message": "恢复短语字数必须是12或24个单词"
+    "message": "恢复短语字数必须是 12 或 24 个单词"
   },
   "Mnemonic__phrase__is__invalid": {
     "message": "助记词无效"
@@ -425,7 +434,7 @@
     "message": "助记词"
   },
   "This__is__the__12__or__24__word__phrase__you__were__given": {
-    "message": "这是你第一次创建钱包时得到的12或24个单词的短语。也可以是您从别处生成的。"
+    "message": "这是你第一次创建钱包时得到的 12 或 24 个单词的短语。也可以是您从别处生成的。"
   },
   "Weak": {
     "message": "弱"
@@ -443,7 +452,7 @@
     "message": "未知"
   },
   "At__least__8__characters": {
-    "message": "至少8个字符"
+    "message": "至少 8 个字符"
   },
   "Your__address__is__currently__processing": {
     "message": "您的地址目前正在处理另一项交易"
@@ -452,10 +461,10 @@
     "message": "交易创建"
   },
   "Search__Address__or__Flow__domain": {
-    "message": "搜索，地址(0x)或Flow域名"
+    "message": "搜索，地址 (0x) 或 Flow 域名"
   },
   "Search__the__ID": {
-    "message": "搜索D: "
+    "message": "搜索 D: "
   },
   "Sorry__we__could__not__find__any__accounts": {
     "message": "对不起，我们无法找到任何账户。请再试一次。"
@@ -479,7 +488,7 @@
     "message": "添加专辑"
   },
   "Seach__NFT__Collection": {
-    "message": "查询NFT专辑"
+    "message": "查询 NFT 专辑"
   },
   "COLLECTION__LIST": {
     "message": "专辑列表"
@@ -488,7 +497,7 @@
     "message": "启用"
   },
   "Enable__NFT__Collection": {
-    "message": "启用NFT专辑"
+    "message": "启用 NFT 专辑"
   },
   "Change__Address": {
     "message": "改变地址"
@@ -509,13 +518,13 @@
     "message": "仅用于测试目的（主网）。"
   },
   "Showing__NFT__under": {
-    "message": "显示以下地址的NFT："
+    "message": "显示以下地址的 NFT："
   },
   "Launch__My__Wallet": {
     "message": "启动我的钱包"
   },
   "Start__exploring__with__Lilico__now": {
-    "message": "现在就开始与 Flow Reference 探索吧"
+    "message": "现在就开始与 Flow Wallet 探索吧"
   },
   "all__set": {
     "message": "一切就绪"
@@ -524,10 +533,10 @@
     "message": "你已"
   },
   "Flow_Core": {
-    "message": "Flow Reference"
+    "message": "Flow Wallet"
   },
   "Lilico": {
-    "message": "Flow Reference"
+    "message": "Flow Wallets"
   },
   "and__Pin": {
     "message": "并固定"
@@ -560,7 +569,7 @@
     "message": "选择你的"
   },
   "Your__username__will__be__used__to__send__and__receive": {
-    "message": "你的用户名将用于与你在 Flow Reference 的朋友发送和接收代币。"
+    "message": "你的用户名将用于与你在 Flow Wallet 的朋友发送和接收代币。"
   },
   "Okay__I__have__saved__it__properly": {
     "message": "好的，我已经妥善保存了"
@@ -614,16 +623,19 @@
     "message": "服务条款"
   },
   "Lilico__uses__this__password__to__protect__your__recovery__phrase": {
-    "message": "Flow Reference 使用此密码来保护您的助记词。"
+    "message": "Flow Wallet 使用此密码来保护您的助记词。"
   },
   "I__agree__to__Lilico": {
-    "message": "我同意 Flow Reference 的"
+    "message": "我同意 Flow Wallet 的"
   },
   "Welcome__Back": {
     "message": "欢迎回来，"
   },
+  "Welcome__Back__import": {
+    "message": "欢迎回来 "
+  },
   "Use__the__same__Google__Drive__password": {
-    "message": "使用相同的云端硬盘密码来保护 Flow Reference 的钱包"
+    "message": "使用相同的云端硬盘密码来保护 Flow Wallet 的钱包"
   },
   "Please__enter__your__password__to__decrypt": {
     "message": "请输入密码，解密你的钱包备份。"
@@ -635,7 +647,7 @@
     "message": "解密密码不正确，请再试。"
   },
   "The__decrypt__password__should__be__8__characters__long": {
-    "message": "解密密码应至少有8个字符长。"
+    "message": "解密密码应至少有 8 个字符长。"
   },
   "We__ve__found": {
     "message": "我们已经找到"
@@ -650,13 +662,13 @@
     "message": "检查"
   },
   "Write__down__this__phrase__in__this__exact__order__and__keep__them__safe": {
-    "message": "按照这个确切的顺序写下这些短语，并确保将它们保存在安全的地方!"
+    "message": "按照这个确切的顺序写下这些短语，并确保将它们保存在安全的地方！"
   },
   "Please_select_the_word_one_by_one_refering_to_its_order": {
-    "message": "请按照顺序逐一选择正确助记词."
+    "message": "请按照顺序逐一选择正确助记词。"
   },
   "Please__notice__that__If__you__lose__you__can__not__access": {
-    "message": "请注意，如果你失去了助记词，你将永远无法访问你的账户。"
+    "message": "如果您丢失了助记词，您将无法重新访问您的帐户。"
   },
   "Choose_provider": {
     "message": "选择购买平台"
@@ -667,200 +679,200 @@
   "Please_restart_your_browser": {
     "message": "请重启浏览器"
   },
-  "If_you_keep_seeing_this_spinner":{
+  "If_you_keep_seeing_this_spinner": {
     "message": "如果加载条不消失的话"
   },
   "Incorrect_recovery_phrases_please_try_again": {
-    "message": "助记词不正确，请重试."
+    "message": "助记词不正确，请重试。"
   },
   "Recovery_phrases_word_count_must_be_12_or_24_words": {
-    "message": "助记词的字数必须是12或24个字"
+    "message": "助记词的字数必须是 12 或 24 个字"
   },
-  "Allset":{
-    "message":"一切就绪"
+  "Allset": {
+    "message": "一切就绪"
   },
-  "You_can_start_experiencing_Lilico_now":{
-    "message":"你现在就可以开始体验 Flow Reference 了!"
+  "You_can_start_experiencing_Lilico_now": {
+    "message": "你现在就可以开始体验 Flow Wallet 了!"
   },
-  "Back_up":{
-    "message":"备份"
+  "Back_up": {
+    "message": "备份"
   },
-  "Back_up_your_wallet_to_Google_Drive_for_easy_access":{
-    "message":"将你的钱包备份到云端硬盘，方便使用。"
+  "Back_up_your_wallet_to_Google_Drive_for_easy_access": {
+    "message": "将你的钱包备份到云端硬盘，方便使用。"
   },
-  "Recommend":{
-    "message":"推荐"
+  "Recommend": {
+    "message": "推荐"
   },
-  "to_back_up_your_wallet":{
-    "message":"备份你的钱包"
+  "to_back_up_your_wallet": {
+    "message": "备份你的钱包"
   },
-  "Backup_failed_you_may_still_conduct_backup_inside_extension":{
-    "message":"备份失败，你仍然可以在应用中进行备份。"
+  "Backup_failed_you_may_still_conduct_backup_inside_extension": {
+    "message": "备份失败，你仍然可以在应用中进行备份。"
   },
-  "Creating_back_up":{
-    "message":"创建..."
+  "Creating_back_up": {
+    "message": "创建..."
   },
-  "Connect_and_Back_up":{
-    "message":"连接并备份"
+  "Connect_and_Back_up": {
+    "message": "连接并备份"
   },
-  "Maybe_Next_Time":{
-    "message":"下次吧"
+  "Maybe_Next_Time": {
+    "message": "下次吧"
   },
-  "Sounds_good":{
-    "message":"听起来不错!"
+  "Sounds_good": {
+    "message": "听起来不错!"
   },
-  "Copy":{
-    "message":"复制"
+  "Copy": {
+    "message": "复制"
   },
-  "I_agree_to_the":{
-    "message":"我同意 Flow Reference 钱包的"
+  "I_agree_to_the": {
+    "message": "我同意 Flow Wallet 钱包的"
   },
-  "of_Lilico_Wallet":{
-    "message":""
+  "of_Lilico_Wallet": {
+    "message": ""
   },
-  "Login":{
-    "message":"登录"
+  "Login": {
+    "message": "登录"
   },
-  "Reset_Your":{
-    "message":"重制您的"
+  "Reset_Your": {
+    "message": "重制您的"
   },
-  "Enter_the_12_or_24_word_recovery_phrase_given_when_you_first_created_your_wallet":{
-    "message":"Enter the 12 or 24 word recovery phrase given when you first created your wallet. "
+  "Enter_the_12_or_24_word_recovery_phrase_given_when_you_first_created_your_wallet": {
+    "message": "Enter the 12 or 24 word recovery phrase given when you first created your wallet. "
   },
-  "Enter_your_recovery_phrase_using_spaces_to_separate_each_word":{
-    "message":"Enter your recovery phrase, using spaces to separate each wordEnter your recovery phrase"
+  "Enter_your_recovery_phrase_using_spaces_to_separate_each_word": {
+    "message": "Enter your recovery phrase, using spaces to separate each wordEnter your recovery phrase"
   },
-  "Go_to_flow_faucet_to_get_some_tokens":{
-    "message":"Go to flow faucet to get some tokens"
+  "Go_to_flow_faucet_to_get_some_tokens": {
+    "message": "前往 flow faucet 来获取虚拟币"
   },
-  "Claim_Testnet":{
-    "message":"Claim Testnet "
+  "Claim_Testnet": {
+    "message": "领取 Testnet "
   },
-  "tokens":{
-    "message":" tokens"
+  "tokens": {
+    "message": " 虚拟币"
   },
-  "Binance":{
-    "message":"Binance"
+  "Binance": {
+    "message": "Binance"
   },
-  "Kraken":{
-    "message":"Kraken"
+  "Kraken": {
+    "message": "Kraken"
   },
-  "Coinbase":{
-    "message":"Coinbase"
+  "Coinbase": {
+    "message": "Coinbase"
   },
-  "Kucoin":{
-    "message":"Kucoin"
+  "Kucoin": {
+    "message": "Kucoin"
   },
-  "Huobi":{
-    "message":"火币"
+  "Huobi": {
+    "message": "火币"
   },
-  "Recent_Price":{
-    "message":"当前价格"
+  "Recent_Price": {
+    "message": "当前价格"
   },
-  "Data_from":{
-    "message":"数据来自"
+  "Data_from": {
+    "message": "数据来自"
   },
-  "1D":{
-    "message":"一天"
+  "1D": {
+    "message": "一天"
   },
-  "1W":{
-    "message":"一周"
+  "1W": {
+    "message": "一周"
   },
-  "1M":{
-    "message":"一个月"
+  "1M": {
+    "message": "一个月"
   },
-  "3M":{
-    "message":"三个月"
+  "3M": {
+    "message": "三个月"
   },
-  "1Y":{
-    "message":"一年"
+  "1Y": {
+    "message": "一年"
   },
-  "All":{
-    "message":"全部"
+  "All": {
+    "message": "全部"
   },
-  "Earn_More_Flow":{
-    "message":"启动 Flow Port"
+  "Earn_More_Flow": {
+    "message": "启动 Flow Port"
   },
-  "Stake_tokens_and_earn_rewards":{
-    "message":"质押代币并获得奖励"
+  "Stake_tokens_and_earn_rewards": {
+    "message": "质押代币并获得奖励"
   },
-  "USD":{
-    "message":"美元"
+  "USD": {
+    "message": "美元"
   },
-  "Deposit":{
-    "message":"存入"
+  "Deposit": {
+    "message": "存入"
   },
-  "Enable_token":{
-    "message":"启用代币"
+  "Enable_token": {
+    "message": "启用代币"
   },
-  "Working_on_it":{
-    "message":"正在进行中..."
+  "Working_on_it": {
+    "message": "正在进行中..."
   },
-  "Add_Token":{
-    "message":"添加代币"
+  "Add_Token": {
+    "message": "添加代币"
   },
-  "Search_Token":{
-    "message":"搜索代币"
+  "Search_Token": {
+    "message": "搜索代币"
   },
-  "unlocked":{
-    "message":"已解锁"
+  "unlocked": {
+    "message": "已解锁"
   },
-  "Enter":{
-    "message":"输入"
+  "Enter": {
+    "message": "输入"
   },
-  "Unlock_Wallet":{
-    "message":"解锁钱包"
+  "Unlock_Wallet": {
+    "message": "解锁钱包"
   },
-  "Forgot_password":{
-    "message":"忘记密码？"
+  "Forgot_password": {
+    "message": "无法登录"
   },
-  "Welcome_to_lilico":{
-    "message":"欢迎来到 Flow Reference"
+  "Welcome_to_lilico": {
+    "message": "欢迎来到 Flow Wallet"
   },
-  "Flow":{
-    "message":"Flow"
+  "Flow": {
+    "message": "Flow"
   },
-  "Import_your_wallet":{
-    "message":"导入你的钱包"
+  "Import_your_wallet": {
+    "message": "导入你的钱包"
   },
-  "Create_a_new_wallet":{
-    "message":"创建一个新的钱包"
+  "Create_a_new_wallet": {
+    "message": "创建一个新的钱包"
   },
-  "Feature_Coming_Soon":{
-    "message":"功能即将推出"
+  "Feature_Coming_Soon": {
+    "message": "功能即将推出"
   },
-  "Are_you_sure_you_want_to_delete_your_backup":{
-    "message":"你确定要删除你的备份吗？"
+  "Are_you_sure_you_want_to_delete_your_backup": {
+    "message": "你确定要删除你的备份吗？"
   },
-  "This_will_remove_this_google_backup_You_will_not_import_this_wallet_via_Google_backup":{
-    "message":"这将删除这个谷歌备份。你将不能通过谷歌备份导入这个钱包。"
+  "This_will_remove_this_google_backup_You_will_not_import_this_wallet_via_Google_backup": {
+    "message": "这将删除这个谷歌备份。你将不能通过谷歌备份导入这个钱包。"
   },
-  "Your_lilico_domain_will_look_like":{
-    "message":"你的 Flow Reference 域名将为："
+  "Your_lilico_domain_will_look_like": {
+    "message": "你的 Flow Wallet 域名将为："
   },
-  "Go":{
-    "message":"跳转"
+  "Go": {
+    "message": "跳转"
   },
-  "Sorry":{
-    "message":"抱歉,"
+  "Sorry": {
+    "message": "抱歉,"
   },
-  "we_couldnt_find_any_address_linked_to_your_recovery_phrase":{
-    "message":"我们无法找到任何与您的助记词相关的地址。"
+  "we_couldnt_find_any_address_linked_to_your_recovery_phrase": {
+    "message": "我们无法找到任何与您的助记词相关的地址。"
   },
-  "Please_try_your_recovery_phrase_again_or_create_a_new_account":{
-    "message":"请再次尝试你的助记词或创建一个新的帐户"
+  "Please_try_your_recovery_phrase_again_or_create_a_new_account": {
+    "message": "请再次尝试你的助记词或创建一个新的帐户"
   },
-  "with_current_recovery_phrase":{
-    "message":"用当前的助记词"
+  "with_current_recovery_phrase": {
+    "message": "用当前的助记词"
   },
-  "Try__again":{
-    "message":"再次尝试"
+  "Try__again": {
+    "message": "再次尝试"
   },
-  "Create_a_new_account":{
-    "message":"创建一个新账户"
+  "Create_a_new_account": {
+    "message": "创建一个新账户"
   },
-  "This_will_remove_any_existing_wallets_and_replace_them_with_new_wallets_Make_sure_you_have_your_recovery_phrase_backed_up":{
-    "message":"这将删除任何现有的钱包，并以新的钱包取代它们。"
+  "This_will_remove_any_existing_wallets_and_replace_them_with_new_wallets_Make_sure_you_have_your_recovery_phrase_backed_up": {
+    "message": "这将删除任何现有的钱包，并以新的钱包取代它们。"
   },
   "This__username__is__reserved__Please__contact": {
     "message": "此用户名已被保留。如有任何疑问，请联系"
@@ -958,56 +970,349 @@
   "AddressBook": {
     "message": "通讯录"
   },
-  "Unlink_Confirmation":{
-    "message":"取消链接确认"
+  "Unlink_Confirmation": {
+    "message": "取消链接确认"
   },
-  "Things_you_should_know":{
-    "message":"你应该知道的事情"
+  "Things_you_should_know": {
+    "message": "你应该知道的事情"
   },
-  "Linked_Account":{
-    "message":"关联账户"
+  "Linked_Account": {
+    "message": "关联账户"
   },
-  "Wallet_List":{
-    "message":"钱包列表"
+  "Wallet_List": {
+    "message": "钱包列表"
   },
-  "Account_Linking":{
-    "message":"子账户关联"
+  "Account_Linking": {
+    "message": "子账户关联"
   },
-  "This_App_would_like_to":{
-    "message":"这个应用程序想要"
+  "This_App_would_like_to": {
+    "message": "这个应用程序想要"
   },
-  "Linked_Successful":{
-    "message":"链接成功"
+  "Linked_Successful": {
+    "message": "链接成功"
   },
-  "Linking_Child_Account":{
-    "message":"正在关联子账户"
+  "Linking_Child_Account": {
+    "message": "正在关联子账户"
   },
-  "Try_Our_Mobile_APP":{
-    "message":"下载手机钱包"
+  "Try_Our_Mobile_APP": {
+    "message": "下载手机钱包"
   },
   "Reset_Wallet": {
     "message": "重置钱包"
   },
-  "Unlink_Message":{
+  "Unlink_Message": {
     "message": "解除这个账户的链接，主钱包将不再有任何对这个链接账户的访问。"
   },
-  "Edit_Linked_Account":{
+  "Edit_Linked_Account": {
     "message": "编辑关联账户"
   },
-  "Accessible":{
+  "Accessible": {
     "message": "可访问"
   },
-  "Collected":{
+  "Collected": {
     "message": "已收集"
   },
-  "Hide_Empty_collection":{
+  "Hide_Empty_collection": {
     "message": "隐藏空专辑"
   },
-  "Inaccessible":{
+  "Inaccessible": {
     "message": "不可访问"
   },
-  
   "No_linked": {
     "message": "关联账户"
+  },
+  "Import_Existing": {
+    "message": "导入现有账户"
+  },
+  "Create_New_Account": {
+    "message": "创建新账户"
+  },
+  "Accounts": {
+    "message": "账户"
+  },
+  "Import": {
+    "message": "导入"
+  },
+  "Choose_an_account_you_want_to_import": {
+    "message": "选择一个要导入的账户"
+  },
+  "Accounts_Found_on_Chain": {
+    "message": "链上找到的账户"
+  },
+  "Support_Flow_Wallet_and_private_key": {
+    "message": "支持 Flow 钱包、Blocto、助记词、Json和私钥"
+  },
+  "Import_Address": {
+    "message": "导入地址"
+  },
+  "Please_import_or_register_a_new_key": {
+    "message": "请导入新密钥，或返回并登录。"
+  },
+  "Publickey_already_exist": {
+    "message": "公钥已存在"
+  },
+  "Do_you_wish_to_go": {
+    "message": "您是否想回去注册一个账户？"
+  },
+  "No_Account_found": {
+    "message": "未找到账户"
+  },
+  "Please_enter_your_private_key": {
+    "message": "请输入您的私钥"
+  },
+  "This_is_the_private_key_you": {
+    "message": "这是您被给予的私钥"
+  },
+  "Private__is__invalid": {
+    "message": "私钥无效"
+  },
+  "Open_your_Flow_Reference_on_Mobil": {
+    "message": "打开您的Flow Wallet移动应用并扫描二维码以同步您的钱包。同步您的Flow Wallets可以使您的Flow帐户在您的Flow Wallet应用程序中使用。"
+  },
+  "Sync_": {
+    "message": "同步"
+  },
+  "Note_Your_recovery_phrase_will_not": {
+    "message": "注意：您的恢复短语不会经过 Flow Wallet 的服务器。它是端对端加密的，我们无法阅读。"
+  },
+  "Scan_Successfully": {
+    "message": "扫描成功"
+  },
+  "Sync_in_Process": {
+    "message": "同步进行中..."
+  },
+  "Scan_QR_Code_with_Mobile": {
+    "message": "用移动应用扫描二维码"
+  },
+  "Sync_with_Mobile_App": {
+    "message": "与移动应用同步"
+  },
+  "Import_Other_Wallets": {
+    "message": "导入钱包"
+  },
+  "Support_Flow_Wallet_Blocto": {
+    "message": "支持 keystore、Google Drive 和原始密钥"
+  },
+  "A_crypto_wallet_on_Flow": {
+    "message": "Flow 上的加密钱包适用于"
+  },
+  "Explorers_Collectors_and_Gamers": {
+    "message": "探索者、收藏家和游戏玩家"
+  },
+  "Keystore": {
+    "message": "密钥库"
+  },
+  "Seed_Phrase": {
+    "message": "助记词"
+  },
+  "Private_Key": {
+    "message": "私钥"
+  },
+  "You_can_import_the": {
+    "message": "从另一个钱包（例如：Blocto）粘贴Json内容"
+  },
+  "Enter_password_for_json_file": {
+    "message": "输入 json 文件的密码"
+  },
+  "Enter_your_flow_address": {
+    "message": "输入您的 Flow 地址（可选）"
+  },
+  "Enter_your_Private_key": {
+    "message": "输入您的私钥"
+  },
+  "Import_12_or_24_words": {
+    "message": "导入 12 或 24 个用空格分隔的单词"
+  },
+  "OK": {
+    "message": "OK"
+  },
+  "We_cant_find": {
+    "message": "我们无法在 Flow 上找到您使用此密钥的地址，或者密钥无效。请检查您的输入并重试。"
+  },
+  "Add_account": {
+    "message": "添加账户"
+  },
+  "Private__key_valid": {
+    "message": "私钥有效"
+  },
+  "Are__you__sure__you__want__to__restore__your__wallet": {
+    "message": "您确定要恢复您的钱包吗？"
+  },
+  "Thie_wallet_will_try_and_restore": {
+    "message": "钱包将尝试在导入新账户后恢复本地保存的任何现有账户。"
+  },
+  "Reset_Restore_your_wallet": {
+    "message": "重置/恢复您的钱包。"
+  },
+  "Restore": {
+    "message": "恢复"
+  },
+  "Having_trouble": {
+    "message": "登录有困难吗？"
+  },
+  "Reset_my_wallet": {
+    "message": "重置钱包"
+  },
+  "If_you_have_your_recovery_phrase": {
+    "message": "如果您有助记词或私钥，您可以重置并恢复您的帐户。"
+  },
+  "Retrieve_local_sensitive_data": {
+    "message": "检索本地敏感数据"
+  },
+  "It_seem_like_something_wrong": {
+    "message": "您的本地数据似乎有问题，您可以使用密码检索您的本地敏感数据。"
+  },
+  "Forget_Password": {
+    "message": "忘记密码"
+  },
+  "If_you_forgot_your_password": {
+    "message": "如果您忘记了密码，您将需要重置您的钱包并导入您的恢复短语或私钥以重新获得对您的钱包的访问权限。"
+  },
+  "Step_1": {
+    "message": "步骤 1"
+  },
+  "Step_2": {
+    "message": "步骤 2"
+  },
+  "Step_3": {
+    "message": "步骤 3"
+  },
+  "Import_Recovery_Phrase_or_Private_Key": {
+    "message": "导入恢复短语或私钥"
+  },
+  "Regain_Access_to_Your_Wallet": {
+    "message": "重新获得对您的钱包的访问"
+  },
+  "Reset_Your_Wallet": {
+    "message": "重置您的钱包"
+  },
+  "Confirm_to_reset_Wallet": {
+    "message": "确认重置钱包"
+  },
+  "This_action_will_remove": {
+    "message": "此操作将删除所有包括私钥在内的本地数据。请确保您的私钥已备份。"
+  },
+  "Reveal_Private_Key": {
+    "message": "揭示私钥"
+  },
+  "Save_your_Private_Key": {
+    "message": "保存您的私钥"
+  },
+  "Here_is_your_local_private_key": {
+    "message": "这是您的本地私钥，请备份您的钥匙，并重新导入私钥以重新获得对您的钱包的访问。"
+  },
+  "Loading": {
+    "message": "加载中..."
+  },
+  "Application": {
+    "message": "应用程序"
+  },
+  "IP_Address": {
+    "message": "IP地址"
+  },
+  "Location": {
+    "message": "位置"
+  },
+  "Date": {
+    "message": "日期"
+  },
+  "Link_Flow_Reference_Wallet_Mobile_by_Scanning": {
+    "message": "通过扫描二维码链接流参考钱包手机"
+  },
+  "Current_Sessions": {
+    "message": "当前会话"
+  },
+  "Active_Sessions": {
+    "message": "活跃会话"
+  },
+  "Online": {
+    "message": "在线"
+  },
+  "Wallet_Confirmation": {
+    "message": "钱包确认"
+  },
+  "Sync_Mobile_Device": {
+    "message": "同步移动设备"
+  },
+  "Link_Mobile_Device": {
+    "message": "连接移动设备"
+  },
+  "Desktop_Device": {
+    "message": "桌面设备"
+  },
+  "Mobile_Device": {
+    "message": "移动设备"
+  },
+  "Scan_QR_code_to_active": {
+    "message": "扫描二维码激活您的移动设备"
+  },
+  "lease_allow_the_camera_permission": {
+    "message": "请通过右上角扩展视图的网页权限设置允许使用摄像头权限。"
+  },
+  "Allow": {
+    "message": "允许"
+  },
+  "to_connect": {
+    "message": "连接吗？"
+  },
+  "Devices": {
+    "message": "设备"
+  },
+  "Move": {
+    "message": "移动"
+  },
+  "multi_vm": {
+    "message": "EVM 账户"
+  },
+  "main_wallet": {
+    "message": "主账户"
+  },
+  "edit_wallet": {
+    "message": "编辑钱包"
+  },
+  "move_tokens": {
+    "message": "转移代币"
+  },
+  "move_assets": {
+    "message": "转移资产"
+  },
+  "select_collection": {
+    "message": "选择收藏"
+  },
+  "select": {
+    "message": "选择"
+  },
+  "collection": {
+    "message": "收藏"
+  },
+  "Cannot_move_more": {
+    "message": "不能移动超过9个NFT"
+  },
+  "manage_multi_assets_seamlessly": {
+    "message": "无缝管理复数虚拟资产"
+  },
+  "path_to_enable": {
+    "message": "启用路径到"
+  },
+  "EVM_on_flow": {
+    "message": "Flow上的EVM"
+  },
+  "enable_the_path_to_evm_on_flow": {
+    "message": "启用路径到Flow上的EVM"
+  },
+  "Would_you_like_to_move": {
+    "message": "您是否想要将您的资产转移到"
+  },
+  "lowercaseaccount": {
+    "message": "账户"
+  },
+  "balance": {
+    "message": "余额"
+  },
+  "import_account": {
+    "message": "导入账户"
+  },
+  "Import__Profile": {
+    "message": "导入账户"
   }
 }

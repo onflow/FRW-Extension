@@ -1,9 +1,15 @@
 import { Method } from 'axios';
-import { createPersistStore } from 'background/utils';
+import { createPersistStore, getScripts } from 'background/utils';
 import { getPeriodFrequency } from '../../utils';
 import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from 'consts';
 import dayjs from 'dayjs';
-
+import {
+  TokenListProvider,
+  Strategy,
+  ENV,
+  TokenInfo,
+} from 'flow-native-token-registry';
+import log from 'loglevel';
 import {
   getAuth,
   signInWithCustomToken,
@@ -11,8 +17,10 @@ import {
   indexedDBLocalPersistence,
   signInAnonymously,
   onAuthStateChanged,
+  updateProfile,
 } from '@firebase/auth';
 import { initializeApp, getApp } from 'firebase/app';
+import { getInstallations, getId } from 'firebase/installations';
 import { Unsubscribe } from '@firebase/util';
 import {
   AccountKey,
@@ -26,6 +34,7 @@ import {
   TokenModel,
   NFTModel,
   StorageInfo,
+  DeviceInfo,
 } from './networkModel';
 import fetchConfig from 'background/utils/remoteConfig';
 // import { getRemoteConfig, fetchAndActivate, getValue } from 'firebase/remote-config';
@@ -34,6 +43,7 @@ import {
   getFirbaseConfig,
   getFirbaseFunctionUrl,
 } from 'background/utils/firebaseConfig';
+import { findKeyAndInfo } from 'background/utils';
 import {
   userWalletService,
   coinListService,
@@ -45,6 +55,14 @@ import {
 } from './index';
 import * as fcl from '@onflow/fcl';
 import { storage } from '@/background/webapi';
+// import { userInfo } from 'os';
+import {
+  fclMainnetConfig,
+  fclTestnetConfig,
+} from '../fclConfig';
+
+import { walletController } from '../controller';
+// import userWallet from './userWallet';
 // const axios = axiosOriginal.create({ adapter })
 
 export interface OpenApiConfigValue {
@@ -58,8 +76,6 @@ export interface OpenApiStore {
   config: Record<string, OpenApiConfigValue>;
 }
 
-const maxRPS = 100;
-
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -72,6 +88,7 @@ const auth = getAuth(app);
 // const remoteConfig = getRemoteConfig(app);
 
 const remoteFetch = fetchConfig;
+const pricesMap = {};
 
 const waitForAuthInit = async () => {
   let unsubscribe: Promise<Unsubscribe>;
@@ -95,7 +112,21 @@ onAuthStateChanged(auth, (user) => {
     // User is signed out
     console.log('User is signed out');
   }
+
+  fclSetup();
 });
+
+const fclSetup = async () => {
+  const network = await userWalletService.getNetwork();
+  switch (network) {
+    case 'mainnet':
+      await fclMainnetConfig();
+      break;
+    case 'testnet':
+      await fclTestnetConfig();
+      break;
+  }
+};
 
 const dataConfig: Record<string, OpenApiConfigValue> = {
   check_username: {
@@ -119,9 +150,14 @@ const dataConfig: Record<string, OpenApiConfigValue> = {
     params: [],
   },
   create_flow_sandbox_address: {
-    path: '/v1/user/address/sandboxnet',
+    path: '/v1/user/address/crescendo',
     method: 'post',
     params: [],
+  },
+  create_flow_network_address: {
+    path: '/v1/user/address/network',
+    method: 'post',
+    params: ['account_key', 'network'],
   },
   login: {
     path: '/v1/login',
@@ -132,6 +168,22 @@ const dataConfig: Record<string, OpenApiConfigValue> = {
     path: '/v2/login',
     method: 'post',
     params: ['public_key', 'signature'],
+  },
+  loginv3: {
+    path: '/v3/login',
+    method: 'post',
+    params: ['signature', 'account_key', 'device_info'],
+  },
+  importKey: {
+    path: '/v3/import',
+    method: 'post',
+    params: [
+      'username',
+      'account_key',
+      'device_info',
+      'backup_info',
+      'address',
+    ],
   },
   coin_map: {
     path: '/v1/coin/map',
@@ -293,6 +345,41 @@ const dataConfig: Record<string, OpenApiConfigValue> = {
     method: 'get',
     params: [],
   },
+  device_list: {
+    path: '/v1/user/device',
+    method: 'get',
+    params: [],
+  },
+  key_list: {
+    path: '/v1/user/keys',
+    method: 'get',
+    params: [],
+  },
+  add_device: {
+    path: '/v1/user/device',
+    method: 'put',
+    params: ['device_info', 'wallet_id', 'wallettest_id '],
+  },
+  add_device_v3: {
+    path: '/v3/user/device',
+    method: 'put',
+    params: ['device_info', 'wallet_id', 'wallettest_id '],
+  },
+  get_location: {
+    path: '/v1/user/location',
+    method: 'get',
+    params: [],
+  },
+  sync_device: {
+    path: '/v3/sync',
+    method: 'post',
+    params: ['account_key', 'device_info '],
+  },
+  check_import: {
+    path: '/v3/checkimport',
+    method: 'get',
+    params: ['key'],
+  },
 };
 
 class OpenApiService {
@@ -318,6 +405,8 @@ class OpenApiService {
       },
       fromStorage: false, // Debug only
     });
+
+    await fclSetup();
   };
 
   checkAuthStatus = async () => {
@@ -437,7 +526,107 @@ class OpenApiService {
         return 'flowusd';
       case PriceProvider.kucoin:
         return 'flowusdt';
+      default:
+        return '';
     }
+  };
+
+  getTokenPrices = async () => {
+
+
+    const tokenPriceMap = await storage.getExpiry('pricesMap');
+    if (tokenPriceMap) {
+      return tokenPriceMap;
+    } else {
+      let data: any = [];
+      try {
+        const response = await this.sendRequest(
+          'GET',
+          `/api/prices`,
+          {},
+          {},
+          WEB_NEXT_URL
+        );
+        data = response.data || [];  // Ensure data is set to an empty array if response.data is undefined
+      } catch (error) {
+        console.error('Error fetching prices:', error);
+        data = [];  // Set data to empty array in case of an error
+      }
+
+      if (pricesMap && pricesMap['FLOW']) {
+        return pricesMap;
+      }
+      data.map((d) => {
+        const { rateToUSD, contractName, contractAddress } = d;
+        const key = contractName.toLowerCase() + '' + contractAddress.toLowerCase();
+        pricesMap[key] = rateToUSD.toFixed(8);
+      });
+      await storage.setExpiry('pricesMap', pricesMap, 300000); // 5 minutes in milliseconds
+      return pricesMap;
+    }
+
+  };
+
+  getTokenEvmPrices = async () => {
+
+
+    const tokenPriceMap = await storage.getExpiry('evmPrice');
+    if (tokenPriceMap) {
+      return tokenPriceMap;
+    } else {
+      let data: any = [];
+      try {
+        const response = await this.sendRequest(
+          'GET',
+          `/api/prices`,
+          {},
+          {},
+          WEB_NEXT_URL
+        );
+        data = response.data || [];  // Ensure data is set to an empty array if response.data is undefined
+      } catch (error) {
+        console.error('Error fetching prices:', error);
+        data = [];  // Set data to empty array in case of an error
+      }
+
+      data.map((d) => {
+        if (d.evmAddress) {
+          const { rateToUSD, evmAddress } = d;
+          const key = evmAddress.toLowerCase();
+          pricesMap[key] = rateToUSD.toFixed(5);
+
+        } else {
+          const { rateToUSD, symbol } = d;
+          const key = symbol.toUpperCase();
+          pricesMap[key] = rateToUSD.toFixed(5);
+
+        }
+      });
+      await storage.setExpiry('evmPrice', pricesMap, 300000); // 5 minutes in milliseconds
+      return pricesMap;
+    }
+
+  };
+
+  getPricesBySymbol = async (symbol: string, data) => {
+    const key = symbol.toUpperCase();
+    return data[key];
+  };
+
+  getPricesByAddress = async (symbol: string, data) => {
+    const key = symbol.toLowerCase();
+    return data[key];
+  };
+
+
+  getPricesByKey = async (symbol: string, data) => {
+    const key = symbol.toLowerCase();
+    return data[key];
+  };
+
+  getPricesByEvmaddress = async (address: string, data) => {
+    const key = address.toLowerCase();
+    return data[key];
   };
 
   getTokenPair = (token: string, provider: PriceProvider): string | null => {
@@ -451,10 +640,7 @@ class OpenApiService {
     }
   };
 
-  getTokenPrice = async (
-    token: string,
-    provider = PriceProvider.binance
-  ): Promise<CheckResponse> => {
+  getTokenPrice = async (token: string, provider = PriceProvider.binance) => {
     const config = this.store.config.crypto_flow;
     const pair = this.getTokenPair(token, provider);
     if (!pair) {
@@ -543,6 +729,7 @@ class OpenApiService {
       }
     );
     await this._signWithCustom(data.data.custom_token);
+    await storage.set('currentId', data.data.id);
     return data;
   };
 
@@ -567,6 +754,7 @@ class OpenApiService {
     }
     if (replaceUser) {
       await this._signWithCustom(result.data.custom_token);
+      await storage.set('currentId', result.data.id);
     }
     return result;
   };
@@ -588,6 +776,80 @@ class OpenApiService {
     }
     if (replaceUser) {
       await this._signWithCustom(result.data.custom_token);
+      await storage.set('currentId', result.data.id);
+    }
+    return result;
+  };
+
+  loginV3 = async (
+    account_key: any,
+    device_info: any,
+    signature: string,
+    replaceUser = true
+  ): Promise<SignInResponse> => {
+    const config = this.store.config.loginv3;
+    const result = await this.sendRequest(
+      config.method,
+      config.path,
+      {},
+      { account_key, device_info, signature }
+    );
+    if (!result.data) {
+      throw new Error('NoUserFound');
+    }
+    if (replaceUser) {
+      await this._signWithCustom(result.data.custom_token);
+      await storage.set('currentId', result.data.id);
+    }
+    return result;
+  };
+
+  proxyKey = async (
+    token: any,
+    userId: any,
+  ) => {
+    if (token) {
+      await this._signWithCustom(token);
+      await storage.set('currentId', userId);
+    }
+    return;
+  };
+
+  proxytoken = async () => {
+    // Default options are marked with *
+
+    const app = getApp(process.env.NODE_ENV!);
+
+    // Wait for firebase auth to complete
+    await waitForAuthInit();
+
+    await signInAnonymously(auth);
+    const anonymousUser = await getAuth(app).currentUser;
+    const idToken = await anonymousUser?.getIdToken();
+    return idToken;
+  }
+
+  importKey = async (
+    account_key: any,
+    device_info: any,
+    username: string,
+    backup_info: any,
+    address: string,
+    replaceUser = true
+  ): Promise<SignInResponse> => {
+    const config = this.store.config.importKey;
+    const result = await this.sendRequest(
+      config.method,
+      config.path,
+      {},
+      { username, address, account_key, device_info, backup_info }
+    );
+    if (!result.data) {
+      throw new Error('NoUserFound');
+    }
+    if (replaceUser) {
+      await this._signWithCustom(result.data.custom_token);
+      await storage.set('currentId', result.data.id);
     }
     return result;
   };
@@ -609,6 +871,7 @@ class OpenApiService {
     return data;
   };
 
+  //todo check data
   userWalletV2 = async () => {
     const config = this.store.config.user_wallet_v2;
     const data = await this.sendRequest(config.method, config.path);
@@ -624,6 +887,23 @@ class OpenApiService {
   createFlowSandboxAddress = async () => {
     const config = this.store.config.create_flow_sandbox_address;
     const data = await this.sendRequest(config.method, config.path);
+    return data;
+  };
+
+  createFlowNetworkAddress = async (
+    account_key: AccountKey,
+    network: string
+  ) => {
+    const config = this.store.config.create_flow_network_address;
+    const data = await this.sendRequest(
+      config.method,
+      config.path,
+      {},
+      {
+        account_key,
+        network,
+      }
+    );
     return data;
   };
 
@@ -668,6 +948,40 @@ class OpenApiService {
     return data;
   };
 
+  signProposer = async (transaction, message: string) => {
+    const messages = {
+      envelope_message: message,
+    };
+    const config = this.store.config.sign_payer;
+    const baseURL = getFirbaseFunctionUrl();
+    // 'http://localhost:5001/lilico-dev/us-central1'
+    const data = await this.sendRequest(
+      'POST',
+      '/signAsProposer',
+      {},
+      { transaction, message: messages },
+      baseURL
+    );
+    // (config.method, config.path, {}, { transaction, message: messages });
+    return data;
+  };
+
+  getProposer = async () => {
+
+    const config = this.store.config.sign_payer;
+    const baseURL = getFirbaseFunctionUrl();
+    // 'http://localhost:5001/lilico-dev/us-central1'
+    const data = await this.sendRequest(
+      'GET',
+      '/getProposer',
+      {},
+      {},
+      baseURL
+    );
+    // (config.method, config.path, {}, { transaction, message: messages });
+    return data;
+  };
+
   sendTransaction = async (transaction): Promise<SendTransactionResponse> => {
     const config = this.store.config.send_transaction;
     const data = await this.sendRequest(
@@ -705,43 +1019,28 @@ class OpenApiService {
     return data;
   };
 
-  getNFTListV2 = async (address: string, offset: number, limit: number) => {
-    const alchemyAPI = (await storage.get('alchemyAPI')) || false;
-    const config = alchemyAPI
-      ? this.store.config.nft_list_v2
-      : this.store.config.nft_list_lilico_v2;
-    const data = await this.sendRequest(config.method, config.path, {
-      address,
-      offset,
-      limit,
-    });
-    return data;
-  };
+  // getNFTListV2 = async (address: string, offset: number, limit: number) => {
+  //   const alchemyAPI = (await storage.get('alchemyAPI')) || false;
+  //   const config = alchemyAPI
+  //     ? this.store.config.nft_list_v2
+  //     : this.store.config.nft_list_lilico_v2;
+  //   const data = await this.sendRequest(config.method, config.path, {
+  //     address,
+  //     offset,
+  //     limit,
+  //   });
+  //   return data;
+  // };
 
-  getNFTCollectionV2 = async (address: string) => {
-    // const alchemyAPI = await storage.get('alchemyAPI') || false
-    const config = this.store.config.nft_collections_lilico_v2;
-    const data = await this.sendRequest(config.method, config.path, {
-      address,
-    });
-    return data;
-  };
+  // getNFTCollectionV2 = async (address: string) => {
+  //   // const alchemyAPI = await storage.get('alchemyAPI') || false
+  //   const config = this.store.config.nft_collections_lilico_v2;
+  //   const data = await this.sendRequest(config.method, config.path, {
+  //     address,
+  //   });
+  //   return data;
+  // };
 
-  getSingleCollectionV2 = async (
-    address: string,
-    contract: string,
-    offset: number
-  ) => {
-    // const alchemyAPI = await storage.get('alchemyAPI') || false
-    const config = this.store.config.nft_collections_single_v2;
-    const data = await this.sendRequest(config.method, config.path, {
-      address,
-      contractName: contract,
-      offset,
-      limit: 24,
-    });
-    return data;
-  };
 
   getNFTMetadata = async (
     address: string,
@@ -858,537 +1157,131 @@ class OpenApiService {
   };
 
   checkChildAccount = async (address: string) => {
+    const script = await getScripts('hybridCustody', 'checkChildAccount');
     const result = await fcl.query({
-      cadence: `
-      import HybridCustody from 0xHybridCustody
-
-      pub fun main(parent: Address): [Address] {
-        let acct = getAuthAccount(parent)
-        let manager = acct.borrow<&HybridCustody.Manager>(from: HybridCustody.ManagerStoragePath)
-            ?? panic("manager not found")
-        return manager.getChildAddresses()
-    }
-
-    `,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
     return result;
   };
 
   queryAccessible = async (address: string, childAccount: string) => {
+    const script = await getScripts('hybridCustody', 'checkChildAccount');
+
     const result = await fcl.query({
-      cadence: `
-      import HybridCustody from 0xHybridCustody
-      import MetadataViews from 0xMetadataViews
-      import FungibleToken from 0xFungibleToken
-      import NonFungibleToken from 0xNonFungibleToken
-
-      pub struct CollectionDisplay {
-        pub let name: String
-        pub let squareImage: String
-        pub let mediaType: String
-
-        init(name: String, squareImage: String, mediaType: String) {
-          self.name = name
-          self.squareImage = squareImage
-          self.mediaType = mediaType
-        }
-      }
-
-      pub struct NFTCollection {
-        pub let id: String
-        pub let path: String
-        pub let display: CollectionDisplay?
-        pub let idList: [UInt64]
-
-        init(id:String, path: String, display: CollectionDisplay?, idList: [UInt64]) {
-          self.id = id
-          self.path = path
-          self.display = display
-          self.idList = idList
-        }
-      }
-
-      pub fun getDisplay(address: Address, path: StoragePath): CollectionDisplay? {
-        let account = getAuthAccount(address)
-        let resourceType = Type<@AnyResource>()
-        let vaultType = Type<@FungibleToken.Vault>()
-        let collectionType = Type<@NonFungibleToken.Collection>()
-        let metadataViewType = Type<@AnyResource{MetadataViews.ResolverCollection}>()
-        var item: CollectionDisplay? =  nil
-
-          if let type = account.type(at: path) {
-            let isResource = type.isSubtype(of: resourceType)
-            let isNFTCollection = type.isSubtype(of: collectionType)
-            let conformedMetadataViews = type.isSubtype(of: metadataViewType)
-
-            var tokenIDs: [UInt64] = []
-            if isNFTCollection && conformedMetadataViews {
-              if let collectionRef = account.borrow<&{MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(from: path) {
-                tokenIDs = collectionRef.getIDs()
-
-                // TODO: move to a list
-                if tokenIDs.length > 0 
-                && path != /storage/RaribleNFTCollection 
-                && path != /storage/ARTIFACTPackV3Collection
-                && path != /storage/ArleeScene {
-                  let resolver = collectionRef.borrowViewResolver(id: tokenIDs[0]) 
-                  if let display = MetadataViews.getNFTCollectionDisplay(resolver) {
-                    item = CollectionDisplay(
-                      name: display.name,
-                      squareImage: display.squareImage.file.uri(),
-                      mediaType: display.squareImage.mediaType
-                    )
-                  }
-                }
-              }
-            }
-          }
-
-        return item
-      }
-
-      pub fun main(parent: Address, childAccount: Address): [NFTCollection] {
-          let manager = getAuthAccount(parent).borrow<&HybridCustody.Manager>(from: HybridCustody.ManagerStoragePath) ?? panic ("manager does not exist")
-
-          // Address -> Collection Type -> ownedNFTs
-
-          let providerType = Type<Capability<&{NonFungibleToken.Provider}>>()
-          let collectionType: Type = Type<@{NonFungibleToken.CollectionPublic}>()
-
-          // Iterate through child accounts
-
-          let acct = getAuthAccount(childAccount)
-          let foundTypes: [Type] = []
-          let nfts: {String: [UInt64]} = {}
-          let collectionList: [NFTCollection] = []
-          let childAcct = manager.borrowAccount(addr: childAccount) ?? panic("child account not found")
-          
-          // get all private paths
-          acct.forEachPrivate(fun (path: PrivatePath, type: Type): Bool {
-              // Check which private paths have NFT Provider AND can be borrowed
-              if !type.isSubtype(of: providerType){
-                  return true
-              }
-              if let cap = childAcct.getCapability(path: path, type: Type<&{NonFungibleToken.Provider}>()) {
-                  let providerCap = cap as! Capability<&{NonFungibleToken.Provider}> 
-
-                  if !providerCap.check(){
-                      // if this isn't a provider capability, exit the account iteration function for this path
-                      return true
-                  }
-                  foundTypes.append(cap.borrow<&AnyResource>()!.getType())
-              }
-              return true
-          })
-
-          // iterate storage, check if typeIdsWithProvider contains the typeId, if so, add to nfts
-          acct.forEachStored(fun (path: StoragePath, type: Type): Bool {
-
-              if foundTypes == nil {
-                  return true
-              }
-
-              for idx, value in foundTypes {
-                  let value = foundTypes!
-
-                  if value[idx] != type {
-                      continue
-                  } else {
-                      if type.isInstance(collectionType) {
-                          continue
-                      }
-                      if let collection = acct.borrow<&{NonFungibleToken.CollectionPublic}>(from: path) { 
-                          nfts.insert(key: type.identifier, collection.getIDs())
-                          collectionList.append(
-                            NFTCollection(
-                              id: type.identifier,
-                              path: path.toString(),
-                              display: getDisplay(address: childAccount, path: path),
-                              idList: collection.getIDs()
-                            )
-                          )
-                      }
-                      continue
-                  }
-              }
-              return true
-          })
-
-          return collectionList
-      }
-
-    `,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address), arg(childAccount, t.Address)],
     });
     return result;
   };
 
   queryAccessibleFt = async (address: string, childAccount: string) => {
+    const script = await getScripts('hybridCustody', 'getAccessibleCoinInfo');
+
     const result = await fcl.query({
-      cadence: `
-      import HybridCustody from 0xHybridCustody
-      import MetadataViews from 0xMetadataViews
-      import FungibleToken from 0xFungibleToken
-      import NonFungibleToken from 0xNonFungibleToken
-
-      pub struct TokenInfo {
-        pub let id: String
-        pub let balance: UFix64
-
-        init(id: String, balance: UFix64) {
-          self.id = id
-          self.balance = balance
-        }
-      }
-
-      pub fun main(parent: Address, childAddress: Address): [TokenInfo] {
-          let manager = getAuthAccount(parent).borrow<&HybridCustody.Manager>(from: HybridCustody.ManagerStoragePath) ?? panic ("manager does not exist")
-
-          var typeIdsWithProvider: {Address: [Type]} = {}
-
-          var coinInfoList: [TokenInfo] = []
-          let providerType = Type<Capability<&{FungibleToken.Provider}>>()
-          let vaultType: Type = Type<@FungibleToken.Vault>()
-
-          // Iterate through child accounts
-
-              let acct = getAuthAccount(childAddress)
-              let foundTypes: [Type] = []
-              let vaultBalances: {String: UFix64} = {}
-              let childAcct = manager.borrowAccount(addr: childAddress) ?? panic("child account not found")
-              // get all private paths
-              acct.forEachPrivate(fun (path: PrivatePath, type: Type): Bool {
-                  // Check which private paths have NFT Provider AND can be borrowed
-                  if !type.isSubtype(of: providerType){
-                      return true
-                  }
-                  if let cap = childAcct.getCapability(path: path, type: Type<&{FungibleToken.Provider}>()) {
-                      let providerCap = cap as! Capability<&{FungibleToken.Provider}> 
-
-                      if !providerCap.check(){
-                          // if this isn't a provider capability, exit the account iteration function for this path
-                          return true
-                      }
-                      foundTypes.append(cap.borrow<&AnyResource>()!.getType())
-                  }
-                  return true
-              })
-              typeIdsWithProvider[childAddress] = foundTypes
-
-              // iterate storage, check if typeIdsWithProvider contains the typeId, if so, add to vaultBalances
-              acct.forEachStored(fun (path: StoragePath, type: Type): Bool {
-
-                  if typeIdsWithProvider[childAddress] == nil {
-                      return true
-                  }
-
-                  for key in typeIdsWithProvider.keys {
-                      for idx, value in typeIdsWithProvider[key]! {
-                          let value = typeIdsWithProvider[key]!
-
-                          if value[idx] != type {
-                              continue
-                          } else {
-                              if type.isInstance(vaultType) {
-                                  continue
-                              }
-                              if let vault = acct.borrow<&FungibleToken.Vault>(from: path) { 
-                                  coinInfoList.append(
-                                    TokenInfo(id: type.identifier, balance: vault.balance)
-                                  )
-                              }
-                              continue
-                          }
-                      }
-                  }
-                  return true
-              })
-          
-          return coinInfoList
-      }
-
-    `,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address), arg(childAccount, t.Address)],
     });
     return result;
   };
 
   checkChildAccountMeta = async (address: string) => {
-    const result = await fcl.query({
-      cadence: `
-      import HybridCustody from 0xHybridCustody
-      import MetadataViews from 0xMetadataViews
-
-      pub fun main(parent: Address): {Address: AnyStruct} {
-        let acct = getAuthAccount(parent)
-        let m = acct.borrow<&HybridCustody.Manager>(from: HybridCustody.ManagerStoragePath)
-            ?? panic("manager not found")
-        var data: {Address: AnyStruct} = {}
-        for address in m.getChildAddresses() {
-            let c = m.borrowAccount(addr: address) ?? panic("child not found")
-            let d = c.resolveView(Type<MetadataViews.Display>())
-            data.insert(key: address, d)
-        }
-        return data
+    const script = await getScripts('hybridCustody', 'getChildAccountMeta');
+    try {
+      const res = await fcl.query({
+        cadence: script,
+        args: (arg, t) => [arg(address, t.Address)],
+      });
+      return res;
+    } catch (err) {
+      return null;
     }
-
-    `,
-      args: (arg, t) => [arg(address, t.Address)],
-    });
-    return result;
   };
 
   checkChildAccountNFT = async (address: string) => {
+    const script = await getScripts('hybridCustody', 'getAccessibleChildAccountNFTs');
+
     const result = await fcl.query({
-      cadence: `
-      import NonFungibleToken from 0xNonFungibleToken
-      import MetadataViews from 0xMetadataViews
-      import LinkedAccounts from 0xChildAccount
-
-      /// Custom struct to make interpretation of NFT & Collection data easy client side
-      pub struct NFTData {
-          pub let name: String
-          pub let description: String
-          pub let thumbnail: String
-          pub let resourceID: UInt64
-          pub let ownerAddress: Address?
-          pub let collectionName: String?
-          pub let collectionDescription: String?
-          pub let collectionURL: String?
-          pub let collectionStoragePathIdentifier: String
-          pub let collectionPublicPathIdentifier: String?
-
-          init(
-              name: String,
-              description: String,
-              thumbnail: String,
-              resourceID: UInt64,
-              ownerAddress: Address?,
-              collectionName: String?,
-              collectionDescription: String?,
-              collectionURL: String?,
-              collectionStoragePathIdentifier: String,
-              collectionPublicPathIdentifier: String?
-          ) {
-              self.name = name
-              self.description = description
-              self.thumbnail = thumbnail
-              self.resourceID = resourceID
-              self.ownerAddress = ownerAddress
-              self.collectionName = collectionName
-              self.collectionDescription = collectionDescription
-              self.collectionURL = collectionURL
-              self.collectionStoragePathIdentifier = collectionStoragePathIdentifier
-              self.collectionPublicPathIdentifier = collectionPublicPathIdentifier
-          }
-      }
-
-      /// Helper function that retrieves data about all publicly accessible NFTs in an account
-      ///
-      pub fun getAllViewsFromAddress(_ address: Address): [NFTData] {
-          // Get the account
-          let account: AuthAccount = getAuthAccount(address)
-          // Init for return value
-          let data: [NFTData] = []
-          // Assign the types we'll need
-          let collectionType: Type = Type<@{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>()
-          let displayType: Type = Type<MetadataViews.Display>()
-          let collectionDisplayType: Type = Type<MetadataViews.NFTCollectionDisplay>()
-          let collectionDataType: Type = Type<MetadataViews.NFTCollectionData>()
-
-          // Iterate over each public path
-          account.forEachStored(fun (path: StoragePath, type: Type): Bool {
-              // Check if it's a Collection we're interested in, if so, get a reference
-              if type.isSubtype(of: collectionType) {
-                  if let collectionRef = account.borrow<&{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(from: path) {
-                      // Iterate over the Collection's NFTs, continuing if the NFT resolves the views we want
-                      for id in collectionRef.getIDs() {
-                          let resolverRef: &{MetadataViews.Resolver} = collectionRef.borrowViewResolver(id: id)
-                          if let display = resolverRef.resolveView(displayType) as! MetadataViews.Display? {
-                              let collectionDisplay = resolverRef.resolveView(collectionDisplayType) as! MetadataViews.NFTCollectionDisplay?
-                              let collectionData = resolverRef.resolveView(collectionDataType) as! MetadataViews.NFTCollectionData?
-                              // Build our NFTData struct from the metadata
-                              let nftData = NFTData(
-                                  name: display.name,
-                                  description: display.description,
-                                  thumbnail: display.thumbnail.uri(),
-                                  resourceID: resolverRef.uuid,
-                                  ownerAddress: resolverRef.owner?.address,
-                                  collectionName: collectionDisplay?.name,
-                                  collectionDescription: collectionDisplay?.description,
-                                  collectionURL: collectionDisplay?.externalURL?.url,
-                                  collectionStoragePathIdentifier: path.toString(),
-                                  collectionPublicPathIdentifier: collectionData?.publicPath?.toString()
-                              )
-                              // Add it to our data
-                              data.append(nftData)
-                          }
-                      }
-                  }
-              }
-              return true
-          })
-          return data
-      }
-
-      /// Script that retrieve data about all publicly accessible NFTs in an account and any of its
-      /// child accounts
-      ///
-      /// Note that this script does not consider accounts with exceptionally large collections 
-      /// which would result in memory errors. To compose a script that does cover accounts with
-      /// a large number of sub-accounts and/or NFTs within those accounts, see example 5 in
-      /// the NFT Catalog's README: https://github.com/dapperlabs/nft-catalog and adapt for use
-      /// with LinkedAccounts.Collection
-      ///
-      pub fun main(address: Address): {Address: [NFTData]} {
-          let allNFTData: {Address: [NFTData]} = {}
-          
-          // Add all retrieved views to the running mapping indexed on address
-          allNFTData.insert(key: address, getAllViewsFromAddress(address))
-          
-          /* Iterate over any child accounts */ 
-          //
-          // Get reference to LinkedAccounts.Collection if it exists
-          if let collectionRef = getAccount(address).getCapability<&LinkedAccounts.Collection{LinkedAccounts.CollectionPublic}>(
-                  LinkedAccounts.CollectionPublicPath
-              ).borrow() {
-              // Iterate over each linked account in LinkedAccounts.Collection
-              for childAddress in collectionRef.getLinkedAccountAddresses() {
-                  if !allNFTData.containsKey(childAddress) {
-                      // Insert the NFT metadata for those NFTs in each child account
-                      // indexing on the account's address
-                      allNFTData.insert(key: childAddress, getAllViewsFromAddress(childAddress))
-                  }
-              }
-          }
-          return allNFTData 
-      }
-
-    `,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
+    console.log(result, 'check child nft info result----=====')
     return result;
   };
 
   getFlownsInbox = async (domain: string, root = 'meow') => {
+    const script = await getScripts('domain', 'getFlownsInbox');
+
     const detail = await fcl.query({
-      cadence: `
-      import Flowns from 0xFlowns
-      import Domains from 0xDomains
-      
-      pub fun getDetail(nameHash: String): Domains.DomainDetail? {
-        let address = Domains.getRecords(nameHash) ?? panic("Domain not exist")
-        let account = getAccount(address)
-        let collectionCap = account.getCapability<&{Domains.CollectionPublic}>(Domains.CollectionPublicPath)
-        let collection = collectionCap.borrow()!
-        var detail: Domains.DomainDetail? = nil
-
-        let id = Domains.getDomainId(nameHash)
-        if id != nil && !Domains.isDeprecated(nameHash: nameHash, domainId: id!) {
-          let domain = collection.borrowDomain(id: id!)
-          detail = domain.getDetail()
-        }
-
-        return detail
-      }
-      
-      pub fun main(name: String, root: String) : Domains.DomainDetail? {
-        let prefix = "0x"
-        let rootHahsh = Flowns.hash(node: "", lable: root)
-        let nameHash = prefix.concat(Flowns.hash(node: rootHahsh, lable: name))
-        return getDetail(nameHash: nameHash)
-      }
-    `,
+      cadence: script,
       args: (arg, t) => [arg(domain, t.String), arg(root, t.String)],
     });
     return detail;
   };
 
   getFlownsAddress = async (domain: string, root = 'fn') => {
-    const address = await fcl.query({
-      cadence: `
-      import Flowns from 0xFlowns
-      import Domains from 0xDomains
+    const script = await getScripts('basic', 'getFlownsAddress');
 
-      pub fun main(name: String, root: String) : Address? {
-        let prefix = "0x"
-        let rootHahsh = Flowns.hash(node: "", lable: root)
-        let namehash = prefix.concat(Flowns.hash(node: rootHahsh, lable: name))
-        var address = Domains.getRecords(namehash)
-        return address
-      }
-    `,
+    const address = await fcl.query({
+      cadence: script,
       args: (arg, t) => [arg(domain, t.String), arg(root, t.String)],
     });
     return address;
   };
 
+
+  getAccountMinFlow = async (address: string) => {
+    const script = await getScripts('basic', 'getAccountMinFlow');
+
+    const minFlow = await fcl.query({
+      cadence: script,
+      args: (arg, t) => [arg(address, t.Address)],
+    });
+    return minFlow;
+  };
+
+
+
   getFlownsDomainsByAddress = async (address: string) => {
+    const script = await getScripts('basic', 'getFlownsDomainsByAddress');
+
     const domains = await fcl.query({
-      cadence: `
-      import Domains from 0xDomains
-      // address: Flow address
-      pub fun main(address: Address): [Domains.DomainDetail] {
-        let account = getAccount(address)
-        let collectionCap = account.getCapability<&{Domains.CollectionPublic}>(Domains.CollectionPublicPath)
-        let collection = collectionCap.borrow()!
-        let domains:[Domains.DomainDetail] = []
-        let ids = collection.getIDs()
-
-        for id in ids {
-          let domain = collection.borrowDomain(id: id)
-          let detail = domain.getDetail()
-          domains.append(detail)
-        }
-
-        return domains
-      }
-    `,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
     return domains;
   };
 
   getFindAddress = async (domain: string) => {
+    const script = await getScripts('basic', 'getFindAddress');
+
     const address = await fcl.query({
-      cadence: `
-      import FIND from 0xFind
-      //Check the status of a fin user
-      pub fun main(name: String) : Address? {
-          let status=FIND.status(name)
-          return status.owner
-      }
-    `,
+      cadence: script,
       args: (arg, t) => [arg(domain, t.String)],
     });
     return address;
   };
 
   getFindDomainByAddress = async (domain: string) => {
-    const address = await fcl.query({
-      cadence: `
-      import FIND from 0xFind
+    const script = await getScripts('basic', 'getFindDomainByAddress');
 
-      pub fun main(address: Address) : String?{
-        return FIND.reverseLookup(address)
-      }
-    `,
+    const address = await fcl.query({
+      cadence: script,
       args: (arg, t) => [arg(domain, t.Address)],
     });
     return address;
   };
 
-  getTransaction = async (address: string, limit: number, offset: number) => {
-    const config = this.store.config.account_transaction;
-    const data = await this.sendRequest(config.method, config.path, {
-      address,
-      limit,
-      offset,
-    });
+  // getTransaction = async (address: string, limit: number, offset: number) => {
+  //   const config = this.store.config.account_transaction;
+  //   const data = await this.sendRequest(config.method, config.path, {
+  //     address,
+  //     limit,
+  //     offset,
+  //   });
 
-    return data;
-  };
+  //   return data;
+  // };
 
   getTransfers = async (address: string, after = '', limit: number) => {
     const config = this.store.config.get_transfers;
@@ -1401,12 +1294,67 @@ class OpenApiService {
     return data;
   };
 
+
+
+  getEVMTransfers = async (address: string, after = '', limit: number) => {
+    const data = await this.sendRequest(
+      'GET',
+      `/api/evm/${address}/transactions`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
   getManualAddress = async () => {
     const config = this.store.config.manual_address;
     const data = await this.sendRequest(config.method, config.path, {});
 
     return data;
   };
+
+  deviceList = async () => {
+    const config = this.store.config.device_list;
+    const data = await this.sendRequest(config.method, config.path, {});
+
+    return data;
+  };
+
+  keyList = async () => {
+    const config = this.store.config.key_list;
+    const data = await this.sendRequest(config.method, config.path, {});
+
+    return data;
+  };
+
+  getLocation = async () => {
+    const config = this.store.config.get_location;
+    const data = await this.sendRequest(config.method, config.path, {});
+
+    return data;
+  };
+
+  addDevice = async (params) => {
+    const config = this.store.config.add_device_v3;
+    const data = await this.sendRequest(config.method, config.path, {}, params);
+
+    return data;
+  };
+
+  synceDevice = async (params) => {
+    const config = this.store.config.sync_device;
+    const data = await this.sendRequest(config.method, config.path, {}, params);
+
+    return data;
+  };
+
+  getInstallationId = async () => {
+    const installations = await getInstallations(app);
+    const id = await getId(installations);
+    return id;
+  };
+
   searchUser = async (keyword: string) => {
     const config = this.store.config.search_user;
     const data = await this.sendRequest(config.method, config.path, {
@@ -1416,10 +1364,35 @@ class OpenApiService {
     return data;
   };
 
-  getTokenInfo = async (name: string): Promise<TokenModel | undefined> => {
+  checkImport = async (key: string) => {
+    const config = this.store.config.check_import;
+    const data = await this.sendRequest(config.method, config.path, {
+      key,
+    });
+
+    return data;
+  };
+
+  getTokenInfo = async (name: string, network = ''): Promise<TokenInfo | undefined> => {
     // FIX ME: Get defaultTokenList from firebase remote config
-    const coins = await remoteFetch.flowCoins();
-    return coins.find(
+    if (!network) {
+      network = await userWalletService.getNetwork();
+    }
+    const tokens = await this.getTokenListFromGithub(network);
+    // const coins = await remoteFetch.flowCoins();
+    return tokens.find(
+      (item) => item.symbol.toLowerCase() == name.toLowerCase()
+    );
+  };
+
+  getEvmTokenInfo = async (name: string, network = ''): Promise<TokenInfo | undefined> => {
+    // FIX ME: Get defaultTokenList from firebase remote config
+    if (!network) {
+      network = await userWalletService.getNetwork();
+    }
+    const tokens = await this.getEvmListFromGithub(network);
+    // const coins = await remoteFetch.flowCoins();
+    return tokens.find(
       (item) => item.symbol.toLowerCase() == name.toLowerCase()
     );
   };
@@ -1446,34 +1419,38 @@ class OpenApiService {
     // FIX ME: Get defaultTokenList from firebase remote config
     const tokenList = await remoteFetch.nftCollection();
 
-    console.log('getNFTCollectionInfo -->', contract_name, tokenList);
     // const network = await userWalletService.getNetwork();
     return tokenList.find((item) => item.id === contract_name);
   };
 
-  getSwapInfo = async (
-  ): Promise<boolean> => {
-    remoteFetch.remoteConfig().then((res) => {
-
-      console.log('getNFTCollectionInfo -->', res);
-      return res.features.swap;
-    }).catch((err) => {
-
-      console.log('getNFTCollectionInfo -->', err);
-    });
+  getSwapInfo = async (): Promise<boolean> => {
+    remoteFetch
+      .remoteConfig()
+      .then((res) => {
+        return res.features.swap;
+      })
+      .catch((err) => {
+        console.log('getNFTCollectionInfo -->', err);
+      });
     return false;
   };
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  getAllTokenInfo = async (fiterNetwork = true): Promise<TokenModel[]> => {
-    const list = await remoteFetch.flowCoins();
+  getAllTokenInfo = async (fiterNetwork = true): Promise<TokenInfo[]> => {
     const network = await userWalletService.getNetwork();
-    return fiterNetwork ? list.filter((item) => item.address[network]) : list;
+    const list = await this.getTokenListFromGithub(network);
+    return fiterNetwork ? list.filter((item) => item.address) : list;
   };
 
   getAllNft = async (fiterNetwork = true): Promise<NFTModel[]> => {
     const list = await remoteFetch.nftCollection();
+    // const network = await userWalletService.getNetwork();
+    return list;
+  };
+
+  getAllNftV2 = async (fiterNetwork = true): Promise<NFTModel[]> => {
+    const list = await remoteFetch.nftv2Collection();
     // const network = await userWalletService.getNetwork();
     return list;
   };
@@ -1508,17 +1485,10 @@ class OpenApiService {
   };
 
   getStorageInfo = async (address: string): Promise<StorageInfo> => {
+    const script = await getScripts('basic', 'getStorageInfo');
+
     const result = await fcl.query({
-      cadence: `
-        pub fun main(addr: Address): {String: UInt64} {
-          let acct = getAccount(addr)
-          let ret: {String: UInt64} = {}
-          ret["capacity"] = acct.storageCapacity
-          ret["used"] = acct.storageUsed
-          ret["available"] = acct.storageCapacity - acct.storageUsed
-          return ret
-        }
-    `,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
 
@@ -1529,26 +1499,13 @@ class OpenApiService {
     };
   };
 
-  getTokenBalanceWithModel = async (address: string, token: TokenModel) => {
+  getTokenBalanceWithModel = async (address: string, token: TokenInfo) => {
+    const script = await getScripts('basic', 'getTokenBalanceWithModel');
     const network = await userWalletService.getNetwork();
-    const cadence = `
-    import FungibleToken from 0xFungibleToken
-    import <Token> from <TokenAddress>
-
-    pub fun main(address: Address): UFix64 {
-      let account = getAccount(address)
-
-      let vaultRef = account
-        .getCapability(<TokenBalancePath>)
-        .borrow<&<Token>.Vault{FungibleToken.Balance}>()
-        ?? panic("Could not borrow Balance capability")
-
-      return vaultRef.balance
-    }
-  `
-      .replaceAll('<Token>', token.contract_name)
-      .replaceAll('<TokenBalancePath>', token.storage_path.balance)
-      .replaceAll('<TokenAddress>', token.address[network]);
+    const cadence = script
+      .replaceAll('<Token>', token.contractName)
+      .replaceAll('<TokenBalancePath>', token.path.balance)
+      .replaceAll('<TokenAddress>', token.address);
     const balance = await fcl.query({
       cadence: cadence,
       args: (arg, t) => [arg(address, t.Address)],
@@ -1557,42 +1514,157 @@ class OpenApiService {
     return balance;
   };
 
-  getEnabledTokenList = async () => {
-    const tokenList = await remoteFetch.flowCoins();
-    const address = await userWalletService.getCurrentAddress();
-    const network = await userWalletService.getNetwork();
-    const tokens = tokenList.filter((token) => token.address[network]);
-    const values = await this.isTokenListEnabled(address, tokens, network);
-    // const data = values.map((value, index) => ({isEnabled: value, token: tokenList[index]}))
-    return values
-      .map((value, index) => {
-        if (value) {
-          return tokens[index];
-        }
-      })
-      .filter((item) => item);
+  getTokenListFromGithub = async (network: string) => {
+    const childType = await userWalletService.getActiveWallet();
+    let chainType = 'flow'
+    if (childType === 'evm') {
+      chainType = 'evm';
+    }
+    const gitToken = await storage.getExpiry(`GitTokenList${network}${chainType}`);
+    // const gitToken = null
+    if (gitToken) {
+      return gitToken;
+    } else {
+      let response
+      if (process.env.NODE_ENV === 'production') {
+        response = await fetch(
+          `https://raw.githubusercontent.com/Outblock/token-list-jsons/outblock/jsons/${network}/${chainType}/default.json`
+        );
+      } else if (process.env.NODE_ENV !== 'production' && childType !== 'evm' && (network === 'testnet' || network === 'mainnet')) {
+        response = await fetch(
+          `https://raw.githubusercontent.com/Outblock/token-list-jsons/outblock/jsons/${network}/${chainType}/dev.json`
+        );
+      } else if (process.env.NODE_ENV !== 'production' && childType === 'evm') {
+        response = await fetch(
+          `https://raw.githubusercontent.com/Outblock/token-list-jsons/outblock/jsons/${network}/${chainType}/default.json`
+        );
+      } else {
+        response = await fetch(
+          `https://raw.githubusercontent.com/Outblock/token-list-jsons/outblock/jsons/${network}/${chainType}/default.json`
+        );
+      }
+      const res = await response.json();
+      const { tokens = {} } = res;
+      const hasFlowToken = tokens.some(token => token.symbol.toLowerCase() === 'flow');
+      if (!hasFlowToken) {
+        tokens.push({
+          name: 'Flow',
+          address: '0x4445e7ad11568276',
+          contractName: 'FlowToken',
+          path: {
+            balance: '/public/flowTokenBalance',
+            receiver: '/public/flowTokenReceiver',
+            vault: '/storage/flowTokenVault',
+          },
+          logoURI:
+            'https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.1654653399040a61.FlowToken/logo.svg',
+          decimals: 8,
+          symbol: 'flow',
+        })
+      }
+      storage.setExpiry(`GitTokenList${network}${chainType}`, tokens, 600000);
+      return tokens;
+    }
   };
 
-  isTokenStorageEnabled = async (address: string, token: TokenModel) => {
+  getEvmListFromGithub = async (network: string) => {
+    const chainType = 'evm'
+
+    const gitToken = await storage.getExpiry(`GitTokenList${network}${chainType}`);
+    // const gitToken = null
+    if (gitToken) {
+      return gitToken;
+    } else {
+      const response = await fetch(
+        `https://raw.githubusercontent.com/Outblock/token-list-jsons/outblock/jsons/${network}/${chainType}/default.json`
+      );
+      const res = await response.json();
+      const { tokens = {} } = res;
+      storage.setExpiry(`GitTokenList${network}${chainType}`, tokens, 600000);
+      return tokens;
+    }
+  };
+
+  getNFTListFromGithub = async (network: string) => {
+    const childType = await userWalletService.getActiveWallet();
+    let chainType = 'flow'
+    if (childType === 'evm') {
+      chainType = 'evm';
+    }
+    const gitToken = await storage.getExpiry(`GitNFTList${network}${chainType}`);
+    if (gitToken && gitToken.length > 0) {
+      return gitToken;
+    } else {
+      const response = await fetch(
+        `https://raw.githubusercontent.com/Outblock/token-list-jsons/outblock/jsons/${network}/flow/nfts.json`
+      );
+      const res = await response.json();
+      const { data = {} } = res;
+      storage.setExpiry(`GitNFTList${network}${chainType}`, data, 600000);
+      return data;
+    }
+  };
+
+  getEnabledTokenList = async (network = '') => {
+    // const tokenList = await remoteFetch.flowCoins();
+    if (!network) {
+      network = await userWalletService.getNetwork();
+    }
+    const address = await userWalletService.getCurrentAddress();
+
+    const tokenList = await this.getTokenListFromGithub(network);
+    let values;
+    const isChild = await userWalletService.getActiveWallet();
+    try {
+      if (isChild && isChild !== 'evm') {
+        values = await this.isLinkedAccountTokenListEnabled(address);
+      } else if (!isChild) {
+        values = await this.isTokenListEnabled(address);
+      }
+    } catch (error) {
+      console.error(`Error isTokenListEnabled token:`);
+      values = {}
+    }
+
+    const tokenItems: TokenInfo[] = [];
+    const tokenMap = {};
+    if (isChild !== 'evm') {
+      tokenList.forEach((token) => {
+        const tokenId = `A.${token.address.slice(2)}.${token.contractName}`;
+        // console.log(tokenMap,'tokenMap',values)
+        if (values[tokenId] == true) {
+          tokenMap[token.name] = token;
+        }
+      });
+
+    }
+
+    // const data = values.map((value, index) => ({isEnabled: value, token: tokenList[index]}))
+    // return values
+    //   .map((value, index) => {
+    //     if (value) {
+    //       return tokens[index];
+    //     }
+    //   })
+    //   .filter((item) => item);
+
+    Object.keys(tokenMap).map((key, idx) => {
+      const item = tokenMap[key];
+      tokenItems.push(item);
+    });
+    return tokenItems;
+  };
+
+  // todo
+  isTokenStorageEnabled = async (address: string, token: TokenInfo) => {
     const network = await userWalletService.getNetwork();
-    const cadence = `
-    import FungibleToken from 0xFungibleToken
-    import <Token> from <TokenAddress>
-    
-    pub fun main(address: Address) : Bool {
-       let receiver: Bool = getAccount(address)
-       .getCapability<&<Token>.Vault{FungibleToken.Receiver}>(<TokenReceiverPath>)
-       .check()
-       let balance: Bool = getAccount(address)
-        .getCapability<&<Token>.Vault{FungibleToken.Balance}>(<TokenBalancePath>)
-        .check()
-        return receiver && balance
-     }
-  `
-      .replaceAll('<Token>', token.contract_name)
-      .replaceAll('<TokenBalancePath>', token.storage_path.balance)
-      .replaceAll('<TokenReceiverPath>', token.storage_path.receiver)
-      .replaceAll('<TokenAddress>', token.address[network]);
+    const script = await getScripts('basic', 'isTokenStorageEnabled');
+
+    const cadence = script
+      .replaceAll('<Token>', token.contractName)
+      .replaceAll('<TokenBalancePath>', token.path.balance)
+      .replaceAll('<TokenReceiverPath>', token.path.receiver)
+      .replaceAll('<TokenAddress>', token.address);
 
     const isEnabled = await fcl.query({
       cadence: cadence,
@@ -1602,130 +1674,35 @@ class OpenApiService {
     return isEnabled;
   };
 
-  isTokenListEnabled = async (
-    address: string,
-    allTokens: TokenModel[],
-    network
-  ) => {
-    const tokens = allTokens;
-
-    const tokenImports = tokens
-      .map((token) =>
-        'import <Token> from <TokenAddress>'
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address[network])
-      )
-      .join('\r\n');
-
-    const tokenFunctions = tokens
-      .map((token) =>
-        `
-      pub fun check<Token>Vault(address: Address) : Bool {
-        let receiver: Bool = getAccount(address)
-        .getCapability<&<Token>.Vault{FungibleToken.Receiver}>(<TokenReceiverPath>)
-        .check()
-        let balance: Bool = getAccount(address)
-         .getCapability<&<Token>.Vault{FungibleToken.Balance}>(<TokenBalancePath>)
-         .check()
-         return receiver && balance
-      }
-      `
-          .replaceAll('<TokenBalancePath>', token.storage_path.balance)
-          .replaceAll('<TokenReceiverPath>', token.storage_path.receiver)
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address[network])
-      )
-      .join('\r\n');
-
-    const tokenCalls = tokens
-      .map((token) =>
-        `
-      check<Token>Vault(address: address)
-      `.replaceAll('<Token>', token.contract_name)
-      )
-      .join(',');
-
-    const cadence = `
-      import FungibleToken from 0xFungibleToken
-      <TokenImports>
-
-      <TokenFunctions>
-
-      pub fun main(address: Address) : [Bool] {
-        return [<TokenCall>]
-      }
-    `
-      .replaceAll('<TokenFunctions>', tokenFunctions)
-      .replaceAll('<TokenImports>', tokenImports)
-      .replaceAll('<TokenCall>', tokenCalls);
-
+  isTokenListEnabled = async (address: string) => {
+    const script = await getScripts('ft', 'isTokenListEnabled');
     const isEnabledList = await fcl.query({
-      cadence: cadence,
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
     return isEnabledList;
   };
 
-  getTokenListBalance = async (address: string, allTokens: [TokenModel]) => {
-    const network = await userWalletService.getNetwork();
 
-    const tokens = allTokens.filter((token) => token.address[network]);
-
-    const tokenImports = tokens
-      .map((token) =>
-        'import <Token> from <TokenAddress>'
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address[network])
-      )
-      .join('\r\n');
-
-    const tokenFunctions = tokens
-      .map((token) =>
-        `
-      pub fun check<Token>Balance(address: Address) : UFix64 {
-        let account = getAccount(address)
-
-        let vaultRef = account
-          .getCapability(<TokenBalancePath>)
-          .borrow<&<Token>.Vault{FungibleToken.Balance}>()
-          ?? panic("Could not borrow Balance capability")
-
-        return vaultRef.balance
-      }
-      `
-          .replaceAll('<TokenBalancePath>', token.storage_path.balance)
-          .replaceAll('<TokenReceiverPath>', token.storage_path.receiver)
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address[network])
-      )
-      .join('\r\n');
-
-    const tokenCalls = tokens
-      .map((token) =>
-        `
-      check<Token>Balance(address: address)
-      `.replaceAll('<Token>', token.contract_name)
-      )
-      .join(',');
-
-    const cadence = `
-      import FungibleToken from 0xFungibleToken
-      <TokenImports>
-
-      <TokenFunctions>
-
-      pub fun main(address: Address) : [UFix64] {
-        return [<TokenCall>]
-      }
-    `
-      .replaceAll('<TokenFunctions>', tokenFunctions)
-      .replaceAll('<TokenImports>', tokenImports)
-      .replaceAll('<TokenCall>', tokenCalls);
-
-    const balanceList = await fcl.query({
-      cadence: cadence,
+  isLinkedAccountTokenListEnabled = async (address: string) => {
+    const script = await getScripts('ft', 'isLinkedAccountTokenListEnabled');
+    const isEnabledList = await fcl.query({
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
+    return isEnabledList;
+  };
+
+  getTokenListBalance = async (address: string, allTokens: TokenInfo[]) => {
+    const network = await userWalletService.getNetwork();
+
+    const tokens = allTokens.filter((token) => token.address);
+    const script = await getScripts('ft', 'getTokenListBalance');
+    const balanceList = await fcl.query({
+      cadence: script,
+      args: (arg, t) => [arg(address, t.Address)],
+    });
+
     return balanceList;
   };
 
@@ -1736,91 +1713,104 @@ class OpenApiService {
     return await googleSafeHostService.getBlockList(hosts, forceCheck);
   };
 
-  getEnabledNFTList = async (nftData) => {
-    const address = await userWalletService.getCurrentAddress();
-    const requestLength = 50;
-    const promises: any[] = [];
-    for (let i = 0; i < nftData.length; i += requestLength) {
-      const requestList = nftData.slice(i, i + requestLength);
-      promises.push(this.checkNFTListEnabledNew(address, requestList));
-    }
+  getEnabledNFTList = async () => {
 
-    const promiseResult = await Promise.all(promises);
-    const values: any[] = promiseResult.flat();
+    const address = await userWalletService.getCurrentAddress();
+
+
+    const promiseResult = await this.checkNFTListEnabledNew(address);
+    console.log(promiseResult, 'promiseResult');
 
     // const network = await userWalletService.getNetwork();
     // const notEmptyTokenList = tokenList.filter(value => value.address[network] !== null && value.address[network] !== '' )
     // const data = values.map((value, index) => ({isEnabled: value, token: tokenList[index]}))
-    const result = values
-      .map((value, index) => {
-        if (value) {
-          return nftData[index];
-        }
-        return null;
-      })
-      .filter((item) => item);
-    return result;
+    const resultArray = Object.entries(promiseResult)
+      .filter(([_, value]) => value === true)  // Only keep entries with a value of true
+      .map(([key, _]) => {
+        const [prefix, address, contractName] = key.split('.');
+        return {
+          address: `0x${address}`,
+          contract_name: contractName
+        };
+      });
+    console.log(promiseResult, 'values', resultArray);
+
+    return resultArray;
   };
 
-  checkNFTListEnabledNew = async (
-    address: string,
-    allTokens
-  ): Promise<NFTModel[]> => {
-    const tokenImports = allTokens
-      .map((token) =>
-        'import <Token> from <TokenAddress>'
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address)
-      )
-      .join('\r\n');
-    const tokenFunctions = allTokens
-      .map((token) =>
-        `
-      pub fun check<Token>Vault(address: Address) : Bool {
-        let account = getAccount(address)
 
-        let vaultRef = account
-        .getCapability<&{NonFungibleToken.CollectionPublic}>(<TokenCollectionPublicPath>)
-        .check()
 
-        return vaultRef
-      }
-      `
-          .replaceAll('<TokenCollectionPublicPath>', token.path.public_path)
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address)
-      )
-      .join('\r\n');
 
-    const tokenCalls = allTokens
-      .map((token) =>
-        `
-      check<Token>Vault(address: address)
-      `.replaceAll('<Token>', token.contract_name)
-      )
-      .join(',');
+  checkNFTListEnabledNew = async (address: string) => {
+    const script = await getScripts('nft', 'checkNFTListEnabled');
+    console.log('script checkNFTListEnabledNew ', script)
 
-    const cadence = `
-      import NonFungibleToken from 0xNonFungibleToken
-      <TokenImports>
-
-      <TokenFunctions>
-
-      pub fun main(address: Address) : [Bool] {
-        return [<TokenCall>]
-      }
-    `
-      .replaceAll('<TokenFunctions>', tokenFunctions)
-      .replaceAll('<TokenImports>', tokenImports)
-      .replaceAll('<TokenCall>', tokenCalls);
-
-    const enabledList = await fcl.query({
-      cadence: cadence,
+    const isEnabledList = await fcl.query({
+      cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
-
-    return enabledList;
+    return isEnabledList;
   };
+
+  // checkNFTListEnabledNew = async (
+  //   address: string,
+  //   allTokens
+  // ): Promise<NFTModel[]> => {
+  //   const tokenImports = allTokens
+  //     .map((token) =>
+  //       'import <Token> from <TokenAddress>'
+  //         .replaceAll('<Token>', token.contract_name)
+  //         .replaceAll('<TokenAddress>', token.address)
+  //     )
+  //     .join('\r\n');
+  //   const tokenFunctions = allTokens
+  //     .map((token) =>
+  //       `
+  //     pub fun check<Token>Vault(address: Address) : Bool {
+  //       let account = getAccount(address)
+
+  //       let vaultRef = account
+  //       .getCapability<&{NonFungibleToken.CollectionPublic}>(<TokenCollectionPublicPath>)
+  //       .check()
+
+  //       return vaultRef
+  //     }
+  //     `
+  //         .replaceAll('<TokenCollectionPublicPath>', token.path.public_path)
+  //         .replaceAll('<Token>', token.contract_name)
+  //         .replaceAll('<TokenAddress>', token.address)
+  //     )
+  //     .join('\r\n');
+
+  //   const tokenCalls = allTokens
+  //     .map((token) =>
+  //       `
+  //     check<Token>Vault(address: address)
+  //     `.replaceAll('<Token>', token.contract_name)
+  //     )
+  //     .join(',');
+
+  //   const cadence = `
+  //     import NonFungibleToken from 0xNonFungibleToken
+  //     <TokenImports>
+
+  //     <TokenFunctions>
+
+  //     pub fun main(address: Address) : [Bool] {
+  //       return [<TokenCall>]
+  //     }
+  //   `
+  //     .replaceAll('<TokenFunctions>', tokenFunctions)
+  //     .replaceAll('<TokenImports>', tokenImports)
+  //     .replaceAll('<TokenCall>', tokenCalls);
+
+  //   const enabledList = await fcl.query({
+  //     cadence: cadence,
+  //     args: (arg, t) => [arg(address, t.Address)],
+  //   });
+
+  //   return enabledList;
+  // };
 
   checkNFTListEnabled = async (
     address: string,
@@ -2094,14 +2084,20 @@ class OpenApiService {
   };
 
   nftCatalog = async () => {
-    const { data } = await this.sendRequest('GET', `api/nft/collections`, {}, {}, 'https://lilico.app/')
-    return data
-  };
-
-  nftCatalogList = async (address: string, limit: any, offset: any) => {
     const { data } = await this.sendRequest(
       'GET',
-      `/api/nft/list?address=${address}&limit=${limit}&offset=${offset}`,
+      'api/nft/collections',
+      {},
+      {},
+      'https://lilico.app/'
+    );
+    return data;
+  };
+
+  cadenceScripts = async (network: string) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/scripts?network=${network}`,
       {},
       {},
       WEB_NEXT_URL
@@ -2109,10 +2105,32 @@ class OpenApiService {
     return data;
   };
 
-  nftCatalogCollections = async (address: string) => {
+  cadenceScriptsV2 = async () => {
     const { data } = await this.sendRequest(
       'GET',
-      `/api/nft/id?address=${address}`,
+      `/api/v2/scripts`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  nftCatalogList = async (address: string, limit: any, offset: any, network: string) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v2/nft/list?address=${address}&limit=${limit}&offset=${offset}&network=${network}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  nftCatalogCollections = async (address: string, network: string) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v2/nft/id?address=${address}&network=${network}`,
       {},
       {},
       WEB_NEXT_URL
@@ -2124,11 +2142,12 @@ class OpenApiService {
     address: string,
     contractName: string,
     limit: any,
-    offset: any
+    offset: any,
+    network: string
   ) => {
     const { data } = await this.sendRequest(
       'GET',
-      `/api/nft/collectionList?address=${address}&limit=${limit}&offset=${offset}&collectionIdentifier=${contractName}`,
+      `/api/v2/nft/collectionList?address=${address}&limit=${limit}&offset=${offset}&collectionIdentifier=${contractName}&network=${network}`,
       {},
       {},
       WEB_NEXT_URL
@@ -2136,20 +2155,178 @@ class OpenApiService {
     return data;
   };
 
-  nftCollectionApiPaging = async (address: string, contractName: string, limit: any, offset: any, network: string) => {
-    const { data } = await this.sendRequest('GET', `/api/storage/${network}/nft?address=${address}&limit=${limit}&offset=${offset}&path=${contractName}`, {}, {}, "https://lilico.app")
-    return data
+  nftCollectionApiPaging = async (
+    address: string,
+    contractName: string,
+    limit: any,
+    offset: any,
+    network: string
+  ) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/storage/${network}/nft?address=${address}&limit=${limit}&offset=${offset}&path=${contractName}`,
+      {},
+      {},
+      'https://lilico.app'
+    );
+    return data;
   };
 
-  nftCollectionInfo = async (address: string, contractName: string, limit: any, offset: any, network: string) => {
-    const { data } = await this.sendRequest('GET', `/api/storage/${network}/nft/collection?address=${address}&path=${contractName}`, {}, {}, "https://lilico.app")
-    return data
+  nftCollectionInfo = async (
+    address: string,
+    contractName: string,
+    limit: any,
+    offset: any,
+    network: string
+  ) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/storage/${network}/nft/collection?address=${address}&path=${contractName}`,
+      {},
+      {},
+      'https://lilico.app'
+    );
+    return data;
   };
 
   nftCollectionList = async () => {
     const { data } = await this.sendRequest(
       'GET',
       '/api/nft/collections',
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  evmFTList = async () => {
+    const { data } = await this.sendRequest(
+      'GET',
+      '/api/evm/fts',
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  getEvmFT = async (address: string, network: string) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v3/evm/${address}/fts?network=${network}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+
+  getEvmFTPrice = async () => {
+    const gitPrice = await storage.getExpiry(`EVMPrice`);
+
+    if (gitPrice) {
+      return gitPrice;
+    } else {
+      const { data } = await this.sendRequest(
+        'GET',
+        `/api/prices`,
+        {},
+        {},
+        WEB_NEXT_URL
+      );
+      storage.setExpiry(`EVMPrice`, data, 6000);
+      return data;
+    }
+  };
+
+  evmNFTList = async () => {
+    const { data } = await this.sendRequest(
+      'GET',
+      '/api/evm/nfts',
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  getEvmNFT = async (address: string, network: string) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/evm/${address}/nfts?network=${network}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  EvmNFTcollectionList = async (address: string, collectionIdentifier: string, limit = 24, offset = 0) => {
+    const network = await userWalletService.getNetwork();
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v3/evm/nft/collectionList?network=${network}&address=${address}&collectionIdentifier=${collectionIdentifier}&limit=${limit}&offset=${offset}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+
+  EvmNFTID = async (address: string) => {
+    const network = await userWalletService.getNetwork();
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v3/evm/nft/id?network=${network}&address=${address}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+
+  EvmNFTList = async (address: string, limit = 24, offset = 0) => {
+    const network = await userWalletService.getNetwork();
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v3/evm/nft/list?network=${network}&address=${address}&limit=${limit}&offset=${offset}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  getNFTCadenceList = async (address: string, network = 'mainnet', offset = 0, limit = 5) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v2/nft/id?network=${network}&address=${address}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  getNFTCadenceCollection = async (address: string, network = 'mainnet', identifier, offset = 0, limit = 24) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v2/nft/collectionList?network=${network}&address=${address}&offset=${offset}&limit=${limit}&collectionIdentifier=${identifier}`,
+      {},
+      {},
+      WEB_NEXT_URL
+    );
+    return data;
+  };
+
+  getNFTV2CollectionList = async (address: string, network = 'mainnet',) => {
+    const { data } = await this.sendRequest(
+      'GET',
+      `/api/v2/nft/collections?network=${network}&address=${address}`,
       {},
       {},
       WEB_NEXT_URL
@@ -2187,6 +2364,100 @@ class OpenApiService {
     );
 
     return response.json();
+  };
+
+
+  putDeviceInfo = async (walletData) => {
+    try {
+      const testnetId = walletData.find(
+        (item) => item.chain_id === 'testnet'
+      )?.id;
+      const mainnetId = walletData.find(
+        (item) => item.chain_id === 'mainnet'
+      )?.id;
+      const installationId = await this.getInstallationId();
+      // console.log('location ', userlocation);
+
+      await this.addDevice({
+        wallet_id: mainnetId ? mainnetId.toString() : '',
+        wallettest_id: testnetId ? testnetId.toString() : '',
+        device_info: {
+          device_id: installationId,
+          district: '',
+          name: 'FRW Chrome Extension',
+          type: '2',
+          user_agent: 'Chrome',
+        },
+      });
+    } catch (error) {
+      console.error('Error while adding device:', error);
+      return;
+    }
+  };
+
+  freshUserInfo = async (currentWallet, keys, pubKTuple, wallet, isChild) => {
+    const loggedInAccounts = (await storage.get('loggedInAccounts')) || [];
+
+    if (!isChild) {
+      await storage.set('keyIndex', '');
+      await storage.set('hashAlgo', '');
+      await storage.set('signAlgo', '');
+      await storage.set('pubKey', '');
+
+      const { P256, SECP256K1 } = pubKTuple;
+
+      const keyInfoA = findKeyAndInfo(keys, P256.pubK);
+      const keyInfoB = findKeyAndInfo(keys, SECP256K1.pubK);
+      const keyInfo = keyInfoA ||
+        keyInfoB || {
+        index: 0,
+        signAlgo: keys.keys[0].signAlgo,
+        hashAlgo: keys.keys[0].hashAlgo,
+        publicKey: keys.keys[0].publicKey,
+      };
+      await storage.set('keyIndex', keyInfo.index);
+      await storage.set('signAlgo', keyInfo.signAlgo);
+      await storage.set('hashAlgo', keyInfo.hashAlgo);
+      await storage.set('pubKey', keyInfo.publicKey);
+
+
+      wallet['address'] = currentWallet.address;
+      wallet['pubKey'] = keyInfo.publicKey;
+      wallet['hashAlgo'] = keyInfo.hashAlgo;
+      wallet['signAlgo'] = keyInfo.signAlgo;
+      wallet['weight'] = keys.keys[0].weight;
+
+      log.log('wallet is this:', wallet);
+
+      const accountIndex = loggedInAccounts.findIndex(
+        (account) => account.username === wallet.username
+      );
+
+      if (accountIndex === -1) {
+        loggedInAccounts.push(wallet);
+      } else {
+        loggedInAccounts[accountIndex] = wallet;
+      }
+      await storage.set('loggedInAccounts', loggedInAccounts);
+    }
+
+
+    log.log('Updated loggedInAccounts:', loggedInAccounts);
+    const otherAccounts = loggedInAccounts
+      .filter((account) => account.username !== wallet.username)
+      .map((account) => {
+        const indexInLoggedInAccounts = loggedInAccounts.findIndex(
+          (loggedInAccount) => loggedInAccount.username === account.username
+        );
+        return { ...account, indexInLoggedInAccounts };
+      })
+      .slice(0, 2);
+
+    log.log('otherAccounts with index:', otherAccounts);
+    // await setOtherAccounts(otherAccounts);
+    // await setUserInfo(wallet);
+    // await setLoggedIn(loggedInAccounts);
+    return { otherAccounts, wallet, loggedInAccounts };
   };
 }
 

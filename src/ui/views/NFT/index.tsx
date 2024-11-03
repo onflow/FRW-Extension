@@ -21,9 +21,11 @@ const NFTTab = () => {
   const [isAddAddressOpen, setIsAddAddressOpen] = useState<boolean>(false);
   const [nftCount, setCount] = useState<number>(0);
   const [accessible, setAccessible] = useState<any>([]);
+  const [activeCollection, setActiveCollection] = useState<any>([]);
   const [isActive, setIsActive] = useState(true);
   const gridRef = useRef<any>(null);
   const listRef = useRef<any>(null);
+  const [childType, setChildType] = useState<string>('');
 
   useEffect(() => {
     fetchPreferedTab();
@@ -38,9 +40,16 @@ const NFTTab = () => {
   const loadNFTs = async () => {
     const isChild = await wallet.getActiveWallet();
     const address = await wallet.getCurrentAddress();
+    setAddress(address);
     // const flowCoins = fetchRemoteConfig.flowCoins();
-    // console.log(flowCoins);
     if (isChild) {
+      setChildType(isChild);
+      
+
+      const parentaddress = await wallet.getMainWallet();
+
+      const activec = await wallet.getChildAccountAllowTypes(parentaddress, address!);
+      setActiveCollection(activec)
       const nftResult = await wallet.checkAccessibleNft(address);
       if (nftResult) {
         setAccessible(nftResult);
@@ -49,16 +58,7 @@ const NFTTab = () => {
     } else {
       setIsActive(true);
     }
-
-    if (process.env.NODE_ENV !== 'production') {
-      const value = await storage.get('ExampleNFTAddreess') || '0xa3897cee18b350ea';
-      setAddress(value);
-      if (value === '0xa3897cee18b350ea') {
-        await storage.set('ExampleNFTAddreess', value);
-      }
-    } else {
-      setAddress(address);
-    }
+    // setAddress(address);
   }
 
   const fetchPreferedTab = async () => {
@@ -150,52 +150,54 @@ const NFTTab = () => {
           </Tooltip>
 
           <TabsListStyle
-            sx={{ backgroundColor: 'rgb(250, 250, 250, 0.24)', width: '120px', height: '36px', padding:'0px' }}>
+            sx={{ backgroundColor: 'rgb(250, 250, 250, 0.24)', width: '120px', height: '36px', padding: '0px' }}>
             <StyledTab sx={
               {
                 zIndex: 12,
-                backgroundColor:'rgba(250, 250, 250, 0)',
+                backgroundColor: 'rgba(250, 250, 250, 0)',
                 '&:focus': { backgroundColor: '#000000', color: '#FFFFFF', padding: '2px 13px' }
               }
             }>{chrome.i18n.getMessage('Grid')}</StyledTab>
             <StyledTab sx={
               {
                 zIndex: 12,
-                backgroundColor:'rgba(250, 250, 250, 0)',
+                backgroundColor: 'rgba(250, 250, 250, 0)',
                 '&:focus': { backgroundColor: '#000000', color: '#FFFFFF', padding: '2px 13px' },
               }
             }>{chrome.i18n.getMessage('List')}</StyledTab>
           </TabsListStyle>
-          <Box component='span'>
-            <Button
-              component={Link}
-              to='/dashboard/nested/add_list'
-              variant='contained'
-              color='secondary'
-              sx={{
-                width: '46px',
-                height: '35px',
-                borderRadius: '12px',
-                minWidth: '46px',
-                padding: '6px 9px',
-                zIndex: 12,
-                opacity: '0.24',
-              }}
-            >
-              <Typography color='#111111'
+          {!childType &&
+            <Box component='span'>
+              <Button
+                component={Link}
+                to='/dashboard/nested/add_list'
+                variant='contained'
+                color='secondary'
                 sx={{
-                  fontWeight: '600',
-                  fontSize: '0.875rem',
-                  textTransform: 'none'
+                  width: '46px',
+                  height: '35px',
+                  borderRadius: '12px',
+                  minWidth: '46px',
+                  padding: '6px 9px',
+                  zIndex: 12,
+                  opacity: '0.24',
                 }}
               >
-                {chrome.i18n.getMessage('Add')}
-              </Typography>
-            </Button>
-          </Box>
+                <Typography color='#111111'
+                  sx={{
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    textTransform: 'none'
+                  }}
+                >
+                  {chrome.i18n.getMessage('Add')}
+                </Typography>
+              </Button>
+            </Box>
+          }
         </Box>
 
-        {process.env.NODE_ENV !== 'production' &&
+        {process.env.NODE_ENV === 'produssction' &&
           <Box
             sx={{
               display: 'flex',
@@ -257,7 +259,8 @@ const NFTTab = () => {
             data={{ ownerAddress: address }}
             ref={gridRef}
             accessible={accessible}
-            isActive= {isActive}
+            isActive={isActive}
+            activeCollection={activeCollection}
           />
         </TabPanelStyle>
         <TabPanelStyle value={1} sx={{ width: '100%' }}>
@@ -266,7 +269,8 @@ const NFTTab = () => {
             data={{ ownerAddress: address }}
             ref={listRef}
             accessible={accessible}
-            isActive= {isActive}
+            isActive={isActive}
+            activeCollection={activeCollection}
           />
         </TabPanelStyle>
       </Tabs>

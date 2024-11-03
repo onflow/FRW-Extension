@@ -16,12 +16,10 @@ const theme: SystemTheme = createTheme({
         '.welcomeBox': {
           display: 'flex',
           flexDirection: 'column',
-          width: 720,
+          width: '625px',
           height: 'auto',
           borderRadius: '24px',
-          marginTop:'80px',
-          boxShadow: '0px 24px 24px rgba(0,0,0,0.36)',
-          background: '#222222',
+          marginTop:'0px',
         },
         // ... other global classes or element selectors
       },
@@ -44,7 +42,7 @@ const theme: SystemTheme = createTheme({
       main:'#FF8A00',
       light:'#FF8A0029',
     },
-    sandboxnet:{
+    crescendo:{
       main:'#CCAF21',
       light:'#CCAF2129'
     },
@@ -64,6 +62,7 @@ const theme: SystemTheme = createTheme({
     primary: {
       // light: will be calculated from palette.primary.main,
       main: '#41CC5D',
+      light:'#FFFFFF',
       // dark: will be calculated from palette.primary.main,
       // contrastText: will be calculated to contrast with palette.primary.main
       contrastText: '#000000CC',

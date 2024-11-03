@@ -15,30 +15,28 @@ interface NoStakeProps {
   hasSetup: boolean;
   loading: boolean;
   handleClick: () => void;
+  amount: number;
 }
 
 const NoStake = (props: NoStakeProps) => {
   const usewallet = useWallet();
   const [apr, setApr] = useState<any>(0);
-
   const getApy = async () => {
     const result = await usewallet.getApr();
-    console.log('apr: ', result);
     setApr(result);
   };
 
   useEffect(() => {
     getApy();
-    console.log(nodeList);
   }, []);
 
   return (
     <Box className="page"
       sx={{
-        position:'relative',
-        width:'100%',
-        overflow:'hidden',
-        height:'487px',
+        position: 'relative',
+        width: '100%',
+        overflow: 'hidden',
+        height: '487px',
         background: '#121212'
       }}
     >
@@ -49,8 +47,8 @@ const NoStake = (props: NoStakeProps) => {
             flexDirection: 'column',
             width: '100%',
             height: '490px',
-            paddingBottom:'20px',
-            overflow:'auto',
+            paddingBottom: '20px',
+            overflow: 'auto',
           }}
         >
           <LLHeader title="Stakes" help={false}></LLHeader>
@@ -165,7 +163,7 @@ const NoStake = (props: NoStakeProps) => {
                 }}
                 variant="body2"
               >
-                Stake Flow
+                Stake FLOW
               </Typography>
             </Box>
           </Box>
@@ -219,7 +217,7 @@ const NoStake = (props: NoStakeProps) => {
                 >
                   Earn Rewards{' '}
                 </Typography>{' '}
-                when you stake your Flow
+                when you stake your FLOW
               </Typography>
             </Box>
 
@@ -255,7 +253,7 @@ const NoStake = (props: NoStakeProps) => {
                 variant="overline"
                 color="text.primary"
               >
-                Earn up to{' '}
+                Earn rewards every week, up to{' '}
                 <Typography
                   sx={{ fontSize: '12px' }}
                   display="inline"
@@ -304,7 +302,7 @@ const NoStake = (props: NoStakeProps) => {
                   color="#00B881"
                   sx={{ fontSize: '12px' }}
                 >
-                  Flow
+                  FLOW
                 </Typography>{' '}
                 you receive{' '}
                 <Typography
@@ -312,17 +310,17 @@ const NoStake = (props: NoStakeProps) => {
                   color="#00B881"
                   sx={{ fontSize: '12px' }}
                 >
-                  Flow
+                  FLOW 
                 </Typography>
-                . You can{' '}
+                {' '}as a reward. Your rewards are liquid and can be can{' '}
                 <Typography
                   color="#00B881"
                   display="inline"
                   sx={{ fontSize: '12px' }}
                 >
-                  trade
+                  traded
                 </Typography>{' '}
-                this liquid asset at any time.
+                at any time.
               </Typography>
             </Box>
             <Box
@@ -357,7 +355,7 @@ const NoStake = (props: NoStakeProps) => {
                 variant="overline"
                 color="text.primary"
               >
-                You start earning{' '}
+                You'll start earning rewards{' '}
                 <Typography
                   sx={{ fontSize: '12px' }}
                   display="inline"
@@ -399,13 +397,13 @@ const NoStake = (props: NoStakeProps) => {
                 variant="overline"
                 color="text.primary"
               >
-                Rewards are automatically credited to your deposit every few{' '}
+                Rewards are automatically deposited to your account every{' '}
                 <Typography
                   display="inline"
                   color="#00B881"
                   sx={{ fontSize: '12px' }}
                 >
-                  days
+                  week
                 </Typography>
                 .
               </Typography>
@@ -426,9 +424,17 @@ const NoStake = (props: NoStakeProps) => {
                 />
               ) : (
                 <LLPrimaryButton
-                  label= {props.hasSetup ? "Let's Stake" : ( props.loading ? 'Setting up ...': 'Setup Stake') }
+                  label={
+                    props.amount < 50
+                      ? 'Require 50 Flow to start staking'
+                      : props.hasSetup
+                        ? "Let's Stake"
+                        : props.loading
+                          ? 'Setting up ...'
+                          : 'Setup Stake'
+                  }
                   onClick={props.handleClick}
-                  disabled={props.loading}
+                  disabled={props.loading || props.amount < 50}
                   sx={{
                     borderRadius: '14px',
                     height: '50px',
@@ -438,6 +444,7 @@ const NoStake = (props: NoStakeProps) => {
                     textTransform: 'none !important',
                   }}
                 />
+
               )}
             </Box>
           </Box>

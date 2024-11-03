@@ -13,27 +13,62 @@
     "useUnknownInCatchVariables": false,
     "resolveJsonModule": true,
     "paths": {
-      "utils": ["./src/utils"],
-      "@/*": ["./src/*"],
-      "ui/*": ["./src/ui/*"],
-      "background/*": ["./src/background/*"],
-      "consts": ["./src/constant/index"],
-      "consts/*": ["./src/constant/*"],
-      "assets": ["./src/ui/assets"],
-      "changeLogs": ["./changeLogs"],
-      "react": [ "./node_modules/@types/react"]
+      "utils": [
+        "./src/utils"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "ui/*": [
+        "./src/ui/*"
+      ],
+      "background/*": [
+        "./src/background/*"
+      ],
+      "consts": [
+        "./src/constant/index"
+      ],
+      "consts/*": [
+        "./src/constant/*"
+      ],
+      "assets": [
+        "./src/ui/assets"
+      ],
+      "changeLogs": [
+        "./changeLogs"
+      ],
+      "react": [
+        "./node_modules/@types/react"
+      ]
     },
-    "lib":[
+    "lib": [
       "ES2021.String",
       "dom"
     ],
-    "types": ["chrome", "node", "react", "react-dom", "jest"],
+    "types": [
+      "chrome",
+      "node",
+      "react",
+      "react-dom",
+      "jest"
+    ],
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "plugins": [{ "transform": "typescript-transform-paths", "afterDeclarations": true }],
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ],
     "outDir": "./dist"
   },
-  "exclude": ["./node_modules"],
-  "include": ["src", "__tests__"]
+  "exclude": [
+    "./node_modules",
+    "src/ui/utils/modules"
+  ],
+  "include": [
+    "src",
+    "__tests__"
+  ]
 }

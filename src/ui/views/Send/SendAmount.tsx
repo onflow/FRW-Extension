@@ -41,9 +41,9 @@ const SendAmount = () => {
     price: 0,
     change24h: 0,
     total: 0,
-    icon:'',
+    icon: '',
   }
-  
+
   const history = useHistory();
   const location = useLocation<ContactState>();
   const usewallet = useWallet();
@@ -53,18 +53,26 @@ const SendAmount = () => {
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
   const [exceed, setExceed] = useState(false);
   const [amount, setAmount] = useState<string | undefined>(undefined);
-  const [secondAmount, setSecondAmount] = useState('0.0')
+  const [secondAmount, setSecondAmount] = useState('0.0');
   const [validated, setValidated] = useState<any>(null);
   const [userInfo, setUser] = useState<Contact>(userContact);
   const [network, setNetwork] = useState('mainnet');
   const [coinInfo, setCoinInfo] = useState<CoinItem>(empty);
   const [isLoading, setLoading] = useState<boolean>(false);
+  const [childType, setChildType] = useState<string>('');
+  const [minAmount, setMinAmount] = useState<any>(0);
 
   const setUserWallet = async () => {
     // const walletList = await storage.get('userWallet');
     setLoading(true);
     const token = await usewallet.getCurrentCoin();
-    const wallet = await usewallet.getCurrentWallet();
+    let wallet
+    if (childType === 'evm') {
+      wallet = await usewallet.getEvmWallet();
+    } else {
+      wallet = await usewallet.getCurrentWallet();
+    }
+    console.log('wallet ', wallet)
     const network = await usewallet.getNetwork();
     setNetwork(network);
     setCurrentCoin(token);
@@ -73,17 +81,52 @@ const SendAmount = () => {
     const coinList = await usewallet.getCoinList()
     setCoinList(coinList);
     const coinInfo = coinList.find(coin => coin.unit.toLowerCase() === token.toLowerCase());
+    console.log('coinInfo ', coinInfo)
+
     setCoinInfo(coinInfo!);
-
     const info = await usewallet.getUserInfo(false);
-    userContact.address = withPrefix(wallet.address) || '';
-    userContact.avatar = info.avatar;
-    userContact.contact_name = info.username;
-    setUser(userContact);
+    const isChild = await usewallet.getActiveWallet();
+    console.log('isChild ', info, isChild)
+    if (isChild) {
+      if (isChild !== 'evm') {
+        const childResp = await usewallet.checkUserChildAccount();
+        const cwallet = childResp[wallet.address!];
+        userContact.avatar = cwallet.thumbnail.url;
+        userContact.contact_name = cwallet.name;
 
+      }
+      userContact.address = withPrefix(wallet.address!) || '';
+      if (isChild === 'evm') {
+        userContact.avatar = '';
+        userContact.contact_name = 'evm';
+
+      }
+    } else {
+      userContact.address = withPrefix(wallet.address) || '';
+      userContact.avatar = info.avatar;
+      userContact.contact_name = info.username;
+    }
+    setUserMinAmount();
+    setUser(userContact);
   };
 
+  const setUserMinAmount = async () => {
+    try {
+      // Try fetching the min amount from the API
+      const minAmount = await usewallet.openapi.getAccountMinFlow(userContact.address);
+      setMinAmount(minAmount);
+    } catch (error) {
+      // If there's an error, set the min amount to 0.001
+      console.error('Error fetching min amount:', error);
+      setMinAmount(0.001);
+    }
+  };
+
+
   const checkAddress = async () => {
+    const child = await usewallet.getActiveWallet();
+    setChildType(child);
+
     //wallet controller api
     try {
       const address = withPrefix(location.state.contact.address);
@@ -100,31 +143,34 @@ const SendAmount = () => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
-  const updateCoinInfo =() => {
+  const updateCoinInfo = () => {
     const coin = coinList.find(coin => coin.unit.toLowerCase() === currentCoin.toLowerCase());
-    if (coin){
+    if (coin) {
       setCoinInfo(coin);
     }
   };
 
   useEffect(() => {
-    setUserWallet();
     checkAddress();
-  },[])
+  }, [])
+
+  useEffect(() => {
+    setUserWallet();
+  }, [childType])
 
   useEffect(() => {
     updateCoinInfo();
-  },[currentCoin])
+  }, [currentCoin])
 
   return (
     <div className="page">
       <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <LLHeader title= {chrome.i18n.getMessage('Send_to')} help={true} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap:'10px',  px: '16px'}}>
+          <LLHeader title={chrome.i18n.getMessage('Send_to')} help={true} />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', px: '16px' }}>
             <Box>
-              <Box sx={{zIndex: 999, backgroundColor: '#121212'}}>
-                <LLContactCard contact={location.state.contact} hideCloseButton={false} isSend={true}/>
+              <Box sx={{ zIndex: 999, backgroundColor: '#121212' }}>
+                <LLContactCard contact={location.state.contact} hideCloseButton={false} isSend={true} />
               </Box>
               <Presets.TransitionSlideUp>
                 {validated !== null && (
@@ -154,57 +200,59 @@ const SendAmount = () => {
               </Presets.TransitionSlideUp>
             </Box>
 
-            <Typography variant="body1"           
+            <Typography variant="body1"
               sx={{
                 alignSelf: 'start',
                 fontSize: '14px',
               }}>
               {chrome.i18n.getMessage('Transfer__Amount')}
             </Typography>
-            {coinInfo.unit && 
-              <TransferAmount 
+            {(coinInfo.unit && minAmount) &&
+              <TransferAmount
                 coinList={coinList}
-                amount={amount} 
+                amount={amount}
                 setAmount={setAmount}
                 secondAmount={secondAmount}
                 setSecondAmount={setSecondAmount}
                 exceed={exceed}
                 setExceed={setExceed}
                 coinInfo={coinInfo}
-                setCurrentCoin={setCurrentCoin} />
+                setCurrentCoin={setCurrentCoin}
+                minAmount={minAmount}
+              />
             }
 
-            { coinInfo.unit && 
-                <>
-                  <Typography variant="body1"           
+            {coinInfo.unit &&
+              <>
+                <Typography variant="body1"
+                  sx={{
+                    alignSelf: 'start',
+                    fontSize: '14px',
+                  }}>
+                  {chrome.i18n.getMessage('Available__Balance')}
+                </Typography>
+
+                <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <CardMedia sx={{ width: '18px', height: '18px' }} image={coinInfo.icon} />
+                  <Typography variant="body1"
                     sx={{
                       alignSelf: 'start',
-                      fontSize: '14px',
+                      fontSize: '15px',
                     }}>
-                    {chrome.i18n.getMessage('Available__Balance')}
+                    {
+                      (Math.round(coinInfo.balance * 100) / 100).toFixed(2) + ' ' + coinInfo.unit.toUpperCase() + ' ≈ ' + '$ ' + coinInfo.total
+                    }
                   </Typography>
-
-                  <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <CardMedia sx={{ width:'18px', height:'18px'}} image={coinInfo.icon} />
-                    <Typography variant="body1"           
-                      sx={{
-                        alignSelf: 'start',
-                        fontSize: '15px',
-                      }}>
-                      {
-                        (Math.round(coinInfo.balance * 100) / 100).toFixed(2) + ' ' + coinInfo.unit.toUpperCase() + ' ≈ ' + '$ ' + coinInfo.total
-                      }
-                    </Typography>
-                  </Box>
-                </>
+                </Box>
+              </>
             }
           </Box>
 
-          <Box sx={{flexGrow: 1 }}/>
+          <Box sx={{ flexGrow: 1 }} />
 
-          <Box sx={{display: 'flex', gap:'8px', mx: '18px', mb: '35px', mt:'10px'}}>
+          <Box sx={{ display: 'flex', gap: '8px', mx: '18px', mb: '35px', mt: '10px' }}>
             <Button
-            // onClick={() => {}}
+              onClick={history.goBack}
               variant="contained"
               // @ts-expect-error custom color
               color="neutral"
@@ -226,7 +274,7 @@ const SendAmount = () => {
             </Button>
 
             <Button
-              onClick={() => {setConfirmationOpen(true)}}
+              onClick={() => { setConfirmationOpen(true) }}
               // disabled={true}
               variant="contained"
               color="success"
@@ -248,16 +296,18 @@ const SendAmount = () => {
               </Typography>
             </Button>
           </Box>
-
-          <TransferConfirmation
-            isConfirmationOpen={isConfirmationOpen}
-            data={{contact: location.state.contact, amount: amount, secondAmount: secondAmount, userContact: userInfo, tokenSymbol: currentCoin, coinInfo: coinInfo}}
-            handleCloseIconClicked={() => setConfirmationOpen(false)}
-            handleCancelBtnClicked={() => setConfirmationOpen(false)}
-            handleAddBtnClicked={() => {
-              setConfirmationOpen(false);
-            }}
-          />
+          {validated
+            &&
+            <TransferConfirmation
+              isConfirmationOpen={isConfirmationOpen}
+              data={{ contact: location.state.contact, amount: amount, secondAmount: secondAmount, userContact: userInfo, tokenSymbol: currentCoin, coinInfo: coinInfo, childType }}
+              handleCloseIconClicked={() => setConfirmationOpen(false)}
+              handleCancelBtnClicked={() => setConfirmationOpen(false)}
+              handleAddBtnClicked={() => {
+                setConfirmationOpen(false);
+              }}
+            />
+          }
 
         </Box>
       </ThemeProvider>

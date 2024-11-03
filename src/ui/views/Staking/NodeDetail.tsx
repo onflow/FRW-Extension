@@ -613,7 +613,6 @@ const NodeDetail = () => {
             </Typography>
           </Button>
           <Button
-            // disabled={true}
             onClick={() => 
               history.push({
                 pathname: `/dashboard/unstake/page/${nodeid}/${delegateid}`})

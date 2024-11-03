@@ -1,4 +1,3 @@
-
 export interface CheckResponse {
   unique: boolean;
   username: string;
@@ -10,6 +9,7 @@ export enum PriceProvider {
   huobi = 'huobi',
   coinbase = 'coinbase-pro',
   kucoin = 'kucoin',
+  increment = 'increment',
 }
 
 export interface TokenModel {
@@ -29,7 +29,7 @@ export interface NFTModel {
   contract_name: string;
   logo: string | null;
   banner: string | null;
-  official_website: string  | null;
+  official_website: string | null;
   marketplace: string | null;
   description: string | null;
   path: NFTPath;
@@ -49,19 +49,19 @@ export interface SecureCadenceCompatible {
 
 export interface FlowNetworkModel {
   mainnet: string | null;
-  testnet:  string | null;
+  testnet: string | null;
 }
 
 export interface FlowTokenStoragePath {
-  balance: string,
+  balance: string;
   vault: string;
-  receiver: string,
+  receiver: string;
 }
 
 export enum FlowNetwork {
   mainnet = 'mainnet',
   testnet = 'testnet',
-  sandboxnet = 'sandboxnet',
+  crescendo = 'crescendo',
 }
 
 export enum Period {
@@ -70,7 +70,7 @@ export enum Period {
   oneMonth = '1M',
   threeMonth = '3M',
   oneYear = '1Y',
-  all = 'All'
+  all = 'All',
 }
 
 export enum PeriodFrequency {
@@ -79,7 +79,7 @@ export enum PeriodFrequency {
   oneHour = 3600,
   oneDay = 86400,
   threeDay = 259200,
-  oneWeek = 604800
+  oneWeek = 604800,
 }
 
 export interface Contact {
@@ -96,7 +96,8 @@ export interface Contact {
 export enum FlowDomain {
   find = 0,
   flowns = 1,
-  meow = 2
+  meow = 2,
+  none = 999,
 }
 
 export interface NFTData {
@@ -169,6 +170,7 @@ export interface BlockchainResponse {
   chain_id: string;
   coins: Array<string>;
   id: number;
+  icon: string;
 }
 
 interface Thumbnail {
@@ -306,8 +308,8 @@ export interface TransactionItem {
   hash: string;
   time: number;
   interaction: string;
-  amount:number;
-  error?:string;
+  amount: number;
+  error?: string;
 }
 
 export interface ContractRecord {
@@ -323,5 +325,33 @@ export interface TransactionRecord {
   hash: string;
   time: number;
   interaction: string;
-  amount:number;
+  amount: number;
+}
+
+export interface DeviceInfoRequest {
+  device_id: string;
+  ip: string;
+  name: string;
+  type: string;
+  user_agent: string;
+
+  continent?: string;
+  continentCode?: string;
+  country?: string;
+  countryCode?: string;
+  regionName?: string;
+  city?: string;
+  district?: string;
+  zip?: string;
+  lat?: number;
+  lon?: number;
+  timezone?: string;
+  currency?: string;
+  isp?: string;
+  org?: string;
+}
+
+export interface DeviceInfo {
+  account_key: AccountKey;
+  device_info: DeviceInfoRequest;
 }

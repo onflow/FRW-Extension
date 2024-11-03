@@ -55,7 +55,7 @@ const Swap = () => {
     'address': {
       'mainnet': '0x1654653399040a61',
       'testnet': '0x7e60df042a9c0868',
-      'sandboxnet': '0x0661ab7d6696a460'
+      'crescendo': '0x7e60df042a9c0868',
     },
     'contract_name': 'FlowToken',
     'storage_path': {
@@ -210,7 +210,6 @@ const Swap = () => {
       const token1Address = `A.${token1.address[network].slice(2)}.${token1.contract_name}`
       try {
         const result = await usewallet.openapi.swapEstimate(network,token0Address,token1Address,amount);
-        console.log(result)
         let price : any = result.data.tokenOutAmount / parseFloat(result.data.tokenInAmount);
         price = (Math.round(price * 1000) / 1000).toFixed(3)
         setPrice(price);
@@ -417,7 +416,6 @@ const Swap = () => {
 
             <Button
               onClick={() => {setConfirmationOpen(true)}}
-              // disabled={true}
               variant="contained"
               color="success"
               size="large"

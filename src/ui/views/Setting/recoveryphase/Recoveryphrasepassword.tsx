@@ -39,6 +39,12 @@ const Recoveryphrasepassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isMatch, setMatch] = useState(false);
 
+  const handleKeyDown = (event) => {
+    if (event.key === ' ' || event.keyCode === 32) {
+      event.preventDefault();
+    }
+  };
+
   const verify = async () => {
     setMatch(false);
 
@@ -127,7 +133,7 @@ const Recoveryphrasepassword = () => {
             onChange={(event) => {
               setConfirmPassword(event.target.value);
             }}
-            // onKeyDown={handleKeyDown}
+            onKeyDown={handleKeyDown}
           />
 
           <Presets.TransitionSlideUp>

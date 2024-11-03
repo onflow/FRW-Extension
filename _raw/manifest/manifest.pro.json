@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_appName__",
   "short_name": "__MSG_appName__",
-  "version": "2.0.1",
+  "version": "2.5.19",
   "default_locale": "en",
   "description": "__MSG_appDescription__",
   "icons": {
@@ -24,9 +24,9 @@
       "128": "images/icon-128.png"
     },
     "default_popup": "popup.html",
-    "default_title": "Flow Reference"
+    "default_title": "Flow Wallet"
   },
-  "author": "https://core.flow.com/",
+  "author": "https://wallet.flow.com/",
   "background": {
     "service_worker": "sw.js"
   },
@@ -44,26 +44,44 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self';"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self' 'wasm-unsafe-eval';"
   },
   "permissions": [
     "storage",
     "activeTab",
     "tabs",
     "notifications",
-    "identity"
+    "identity",
+    "camera",
+    "*://*/*"
   ],
   "web_accessible_resources": [
     {
-      "resources": [ "user-media-permission.html" ],
-      "matches": ["<all_urls>"]
-      }, 
+      "resources": [
+        "node_modules/@trustwallet/wallet-core/dist/lib/wallet-core.wasm",
+        "pageProvider.js",
+        "user-media-permission.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    },
     {
-      "resources": [ "script.js" ],
-      "matches": ["<all_urls>"]
-    },{
-      "resources": ["index.html"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "script.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    },
+    {
+      "resources": [
+        "index.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
-  ]
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiAg0/l7X/jtVam5W+Ihmi5IH8rf+Atjk19hcooq0/tidIXqtzi0qznypsLp4qYgofqmVGdzHr/V6EWEL4e/PDP6EL3NzKsx4Iya71Yr/qzqIJd+Rsa4ps0eGw7RH4Fy69rZLhUfZIzkyGMiiBYNVWQ8tcqivEJTgDAg9BS25rC7WA9siuaLRBMq2BEpw4Uekq7UNz8wh6d6T7qriKzlE+5EFEICxVy21nCQJAGjDuqf/ZMsYMSt728l3RwXdh6W/z8T/94GkLdZrMrwDmKFTKl1RgvqDKr0jCj9ns8UYir2ySB1NRCKl6G6filGw5XtjuthpRQQlNHNNhrENDNaIfwIDAQAB"
 }

@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useWallet } from 'ui/utils';
 import { Box, ThemeProvider } from '@mui/system';
 import { Button, Typography, CssBaseline, CardMedia } from '@mui/material';
 import theme from '../../style/LLTheme';
 import AllSetIcon from 'ui/FRWAssets/svg/allset.svg';
 
 const AllSet = ({ handleClick }) => {
+  const wallets = useWallet();
+
+  const loadScript = async () => {
+
+    await wallets.getCadenceScripts();
+  }
+
+  useEffect(() => {
+    loadScript();
+  }, []);
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

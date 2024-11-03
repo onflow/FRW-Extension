@@ -87,7 +87,7 @@ const useStyles = makeStyles(() => ({
   nftname: {
     color: '#E6E6E6',
     fontSize: '14px',
-    fontWeight:'700'
+    fontWeight: '700'
   },
   nftprice: {
     color: '#808080',
@@ -96,7 +96,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 
-const GridView = ({ data, accessible, blockList, index, ownerAddress }) => {
+const GridView = ({ data, accessible, blockList, index, ownerAddress, isAccessibleNft = true, fromLinked = false, collectionInfo }) => {
   const classes = useStyles();
   const [loaded, setLoaded] = useState(false);
   const [isAccessible, setAccessible] = useState(true);
@@ -118,6 +118,12 @@ const GridView = ({ data, accessible, blockList, index, ownerAddress }) => {
     }
   }
 
+
+  const navigateWithState = (data, media, index, ownerAddress, isAccessibleNft) => {
+    const state = { nft: data, media: media, index: index, ownerAddress: ownerAddress, isAccessibleNft, collectionInfo };
+    localStorage.setItem('nftDetailState', JSON.stringify(state));
+  }
+
   useEffect(() => {
     fecthMedia();
   }, [])
@@ -137,7 +143,7 @@ const GridView = ({ data, accessible, blockList, index, ownerAddress }) => {
       return ''
     }
 
-    const lilicoEndpoint = 'https://lilico.infura-ipfs.io/ipfs/'
+    const lilicoEndpoint = 'https://gateway.pinata.cloud/ipfs/'
 
     const replacedURL = url
       .replace('ipfs://', lilicoEndpoint)
@@ -189,33 +195,36 @@ const GridView = ({ data, accessible, blockList, index, ownerAddress }) => {
     <Card className={classes.card} elevation={0}>
       <CardActionArea component={Link}
         className={classes.actionarea}
-        to={{ pathname: `/dashboard/nested/nftdetail/${index}`, state: { nft: data, media: media, index: index, ownerAddress: ownerAddress } }}
+        to={{ pathname: `/dashboard/nested/${fromLinked ? 'linkednftdetail' : 'nftdetail'}/${index}`, state: { nft: data, media: media, index: index, ownerAddress: ownerAddress } }}
+        onClick={() => navigateWithState(data, media, index, ownerAddress, isAccessibleNft)}
       >
         <CardMedia className={classes.cardmedia}>
           {getUri()}
         </CardMedia>
         <CardContent className={classes.content}>
-          <Typography className={classes.nftname}>{TilteWordWrapped(media?.title) || ''}</Typography>
-          {!isAccessible &&
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '67px',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                color: 'neutral.text',
-                marginTop: '2px',
-                fontSize: '10px',
-                fontFamily: 'Inter, sans-serif',
-                backgroundColor: 'neutral1.light'
-              }}
-            >
-              {chrome.i18n.getMessage('Inaccessible')}
-            </Box>
-          }
+          <Typography className={classes.nftname}>{TilteWordWrapped(media?.title) || ''}
+            {!isAccessibleNft &&
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  color: 'neutral.text',
+                  marginTop: '2px',
+                  fontSize: '10px',
+                  fontFamily: 'Inter, sans-serif',
+                  backgroundColor: 'neutral1.light'
+                }}
+              >
+                {chrome.i18n.getMessage('Inaccessible')}
+              </Box>
+
+            }
+          </Typography>
           {/* <Typography className={classes.nftprice}>{props.price}</Typography> */}
+
         </CardContent>
       </CardActionArea>
     </Card>

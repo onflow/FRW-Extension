@@ -1,11 +1,35 @@
 import { nanoid } from 'nanoid';
 import { Message } from 'utils';
+import { v4 as uuid } from 'uuid';
+
 const channelName = nanoid();
+
+
+const injectProviderScript = async (isDefaultWallet) => {
+  // Set local storage variables
+  await localStorage.setItem('frw:channelName', channelName);
+  await localStorage.setItem('frw:isDefaultWallet', isDefaultWallet);
+  await localStorage.setItem('frw:uuid', uuid());
+
+  console.log(localStorage.getItem('frw:channelName'));
+
+  const container = document.head || document.documentElement;
+  const scriptElement = document.createElement('script');
+  scriptElement.id = "injectedScript";
+  scriptElement.setAttribute('src', chrome.runtime.getURL('pageProvider.js'));
+
+  container.insertBefore(scriptElement, container.children[0]);
+
+  return scriptElement;
+};
+
+
+injectProviderScript(true); // Initial call to check and inject if needed
+
 
 const initListener = (channelName: string) => {
   const { BroadcastChannelMessage, PortMessage } = Message;
   const pm = new PortMessage().connect();
-
   const bcm = new BroadcastChannelMessage(channelName).listen((data) =>
     pm.request(data)
   );
@@ -43,7 +67,7 @@ function injectScript(file_path, tag) {
   script.setAttribute('type', 'text/javascript')
   script.setAttribute('src', file_path)
   node.appendChild(script)
-  chrome.runtime.sendMessage({type: 'LILICO:CS:LOADED',})
+  chrome.runtime.sendMessage({ type: 'LILICO:CS:LOADED', })
 }
 
 injectScript(chrome.runtime.getURL('script.js'), 'body')
@@ -68,7 +92,7 @@ const extMessageHandler = (msg, sender) => {
   if (msg.f_type && msg.f_type === 'PollingResponse') {
     window &&
       window.postMessage(
-        JSON.parse(JSON.stringify({...msg, type: 'FCL:VIEW:RESPONSE'} || {})),
+        JSON.parse(JSON.stringify({ ...msg, type: 'FCL:VIEW:RESPONSE' } || {})),
         '*'
       )
   }
@@ -76,7 +100,7 @@ const extMessageHandler = (msg, sender) => {
   if (msg.data?.f_type && msg.data?.f_type === 'PreAuthzResponse') {
     window &&
       window.postMessage(
-        JSON.parse(JSON.stringify({...msg, type: 'FCL:VIEW:RESPONSE'} || {})),
+        JSON.parse(JSON.stringify({ ...msg, type: 'FCL:VIEW:RESPONSE' } || {})),
         '*'
       )
   }
@@ -98,14 +122,15 @@ const extMessageHandler = (msg, sender) => {
   return true;
 }
 
+
 /**
  * Fired when a message is sent from either an extension process or another content script.
  */
 chrome.runtime.onMessage.addListener(extMessageHandler);
 
-const wakeup = function(){
-  setTimeout(function(){
-    chrome.runtime.sendMessage('ping', function(){
+const wakeup = function () {
+  setTimeout(function () {
+    chrome.runtime.sendMessage('ping', function () {
       return false;
     });
     wakeup();

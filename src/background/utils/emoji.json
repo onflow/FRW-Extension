@@ -1,0 +1,64 @@
+{
+  "emojis": [
+    {
+      "emoji": "🐨",
+      "name": "Koala",
+      "bgcolor": "#DFCFC8"
+    },
+    {
+      "emoji": "🦁",
+      "name": "Lion",
+      "bgcolor": "#FFA600"
+    },
+    {
+      "emoji": "🐼",
+      "name": "Panda",
+      "bgcolor": "#F4F3F3"
+    },
+    {
+      "emoji": "🦋",
+      "name": "Butterfly",
+      "bgcolor": "#36A5F8"
+    },
+    {
+      "emoji": "🐲",
+      "name": "Dragon",
+      "bgcolor": "#AEE676"
+    },
+    {
+      "emoji": "🐧",
+      "name": "Penguin",
+      "bgcolor": "#FFCB6C"
+    },
+    {
+      "emoji": "🍒",
+      "name": "Cherries",
+      "bgcolor": "#FED5DB"
+    },
+    {
+      "emoji": "🍑",
+      "name": "Peach",
+      "bgcolor": "#FBB06B"
+    },
+    {
+      "emoji": "🌰",
+      "name": "Chestnut",
+      "bgcolor": "#EBCA84"
+    },
+    {
+      "emoji": "🍋",
+      "name": "Lemon",
+      "bgcolor": "#FFF06A"
+    },
+    {
+      "emoji": "🥥",
+      "name": "Coconut",
+      "bgcolor": "#BB9665"
+    },
+    {
+      "emoji": "🥑",
+      "name": "Avocado",
+      "bgcolor": "#B2C45C"
+    }
+  ]
+}

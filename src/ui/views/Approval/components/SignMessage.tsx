@@ -12,6 +12,9 @@ import {
   LLSecondaryButton,
 } from 'ui/FRWComponent';
 import './github-dark-dimmed.css';
+
+import { storage } from '@/background/webapi';
+
 interface ConnectProps {
   params: any;
   // onChainChange(chain: CHAINS_ENUM): void;
@@ -61,8 +64,10 @@ const SignMessage = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
     }
 
     setApproval(true);
-    const address = await wallet.getCurrentAddress()
-    const keyIndex = 0
+    const address = await wallet.getCurrentAddress();
+    
+    const ki = await storage.get('keyIndex');
+    const keyIndex = Number(ki);
 
     const decode = Buffer.from(message, 'hex').toString('utf8')
     const finalMessage = prependUserDomainTag(message)

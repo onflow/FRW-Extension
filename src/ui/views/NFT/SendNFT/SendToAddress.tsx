@@ -18,13 +18,14 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
 import { useHistory, useLocation } from 'react-router-dom';
 import AddressBookList from '../../Send/AddressBookList';
+import AccountsList from '../../Send/AccountsList';
 import SearchList from '../../Send/SearchList';
 import RecentList from '../../Send/RecentList';
 import { Contact } from 'background/service/networkModel';
 import { isEmpty } from 'lodash';
 import { makeStyles } from '@mui/styles';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { withPrefix } from '@/ui/utils/address';
+import { withPrefix, isValidEthereumAddress } from '@/ui/utils/address';
 import SendNFTConfirmation from './SendNFTConfirmation';
 import { MatchMedia } from '@/ui/utils/url';
 import IconAbout from '../../../../components/iconfont/IconAbout';
@@ -33,7 +34,7 @@ import { LLHeader } from '@/ui/FRWComponent';
 export enum SendPageTabOptions {
   Recent = 'Recent',
   AddressBook = 'AddressBook',
-  // Accounts = 'Accounts',
+  Accounts = 'Accounts',
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -85,7 +86,7 @@ interface TabPanelProps {
 let searchResult = {
   address: '',
   contact_name: '',
-  avatar:'',
+  avatar: '',
   domain: {
     domain_type: 0,
     value: '',
@@ -120,6 +121,7 @@ interface NFTDetailState {
   nft: any;
   media: MatchMedia;
   index: number;
+  linked?: string;
 }
 
 const SendToAddress = () => {
@@ -155,15 +157,16 @@ const SendToAddress = () => {
   const [contractInfo, setContractInfo] = useState<any>(null);
   const [nftDetail, setDetail] = useState<any>(null);
   const [media, setMedia] = useState<MatchMedia | null>(null);
+  const state = location.state as NFTDetailState;
 
   const fetchAddressBook = async () => {
     try {
       const response = await wallet.getAddressBook();
       let recent = await wallet.getRecent();
       if (recent) {
-        recent.forEach((c)=>{
-          response.forEach((s)=>{
-            if(c.address === s.address && c.contact_name === s.contact_name){
+        recent.forEach((c) => {
+          response.forEach((s) => {
+            if (c.address === s.address && c.contact_name === s.contact_name) {
               c.type = 1;
             }
           })
@@ -194,23 +197,44 @@ const SendToAddress = () => {
     await wallet.setDashIndex(1);
     const info = await wallet.getUserInfo(false);
     const currentWallet = await wallet.getCurrentWallet();
-    userContact.address = withPrefix(currentWallet.address) || '';
-    userContact.avatar = info.avatar;
-    userContact.contact_name = info.username;
+    const linked = state.linked
+    console.log(';linked ', linked)
+    const isChild = await wallet.getActiveWallet();
+    if (isChild) {
+      const childResp = await wallet.checkUserChildAccount();
+      const cwallet = childResp[currentWallet.address!];
+      userContact.address = withPrefix(currentWallet.address!) || '';
+      userContact.avatar = cwallet.thumbnail.url;
+      userContact.contact_name = cwallet.name;
+    } else if (linked) {
+      const childResp = await wallet.checkUserChildAccount();
+      const cwallet = childResp[linked!];
+      userContact.address = withPrefix(linked!) || '';
+      userContact.avatar = cwallet.thumbnail.url;
+      userContact.contact_name = cwallet.name;
+    } else {
+      userContact.address = withPrefix(currentWallet.address) || '';
+      userContact.avatar = info.avatar;
+      userContact.contact_name = info.username;
+
+    }
+    console.log('userContact ', userContact)
     setUser(userContact);
   }
 
   const fetchNFTInfo = async () => {
-    const state = location.state as NFTDetailState;
 
     const NFT = state.nft;
 
     const media = state.media;
     setDetail(NFT);
     setMedia(media);
-   
+
     const contractList = await wallet.openapi.getAllNft();
+    console.log('contractList ', contractList)
+    console.log('NFT ', NFT)
     const filteredCollections = returnFilteredCollections(contractList, NFT)
+    console.log('filteredCollections ', filteredCollections)
     if (filteredCollections.length > 0) {
       setContractInfo(filteredCollections[0])
     }
@@ -246,8 +270,8 @@ const SendToAddress = () => {
     const fArray = searchContacts;
     let result = '';
     let group = '';
-    let keyword = keys 
-    if (keyword.includes('.')){
+    let keyword = keys
+    if (keyword.includes('.')) {
       keyword = keys.substring(0, keys.lastIndexOf('.'));
     }
     switch (searchType) {
@@ -270,7 +294,7 @@ const SendToAddress = () => {
     const domainRresult = {
       address: '',
       contact_name: '',
-      avatar:'',
+      avatar: '',
       domain: {
         domain_type: 0,
         value: '',
@@ -299,7 +323,7 @@ const SendToAddress = () => {
     const lilicoResult = {
       address: '',
       contact_name: '',
-      avatar:'',
+      avatar: '',
       domain: {
         domain_type: 0,
         value: '',
@@ -308,8 +332,8 @@ const SendToAddress = () => {
     if (result) {
       result.map((data) => {
         let address = data.address;
-        if(!reg.test(data.address)) { address = '0x' + data.address; }
-        lilicoResult['group'] = 'Flow Reference user';
+        if (!reg.test(data.address)) { address = '0x' + data.address; }
+        lilicoResult['group'] = 'Flow Wallet user';
         lilicoResult.address = address;
         lilicoResult.contact_name = data.username;
         lilicoResult.domain!.domain_type = 999;
@@ -345,7 +369,7 @@ const SendToAddress = () => {
     setIsLoading(false);
   };
 
-  const checkKey = async (e) =>{
+  const checkKey = async (e) => {
     if (e.code === 'Enter') {
       searchAll();
     }
@@ -381,7 +405,19 @@ const SendToAddress = () => {
         searchResult.address = withPrefix(keyword) || keyword;
         searchResult.contact_name = withPrefix(checkAddress) || keyword;
         searchResult.avatar = '';
-          searchResult.type! = 4;
+        searchResult.type! = 4;
+      }
+      setConfirmationOpen(true)
+    }
+
+    if (isValidEthereumAddress(checkAddress)) {
+      if (filtered[0]) {
+        searchResult = filtered[0]
+      } else {
+        searchResult.address = withPrefix(keyword) || keyword;
+        searchResult.contact_name = withPrefix(checkAddress) || keyword;
+        searchResult.avatar = '';
+        searchResult.type! = 4;
       }
       setConfirmationOpen(true)
     }
@@ -389,16 +425,6 @@ const SendToAddress = () => {
     setSearchContacts(filtered);
     if (isEmpty(filtered)) {
       setHasNoFilteredContacts(true);
-      if (keyword.endsWith('.find')) {
-        await checkDomain(0, keyword);
-        setSearched(true);
-      } else if (keyword.endsWith('.fn')) {
-        await checkDomain(1, keyword);
-        setSearched(true);
-      } else if (keyword.endsWith('.meow')) {
-        await checkDomain(2, keyword);
-        setSearched(true);
-      }
     } else {
       setHasNoFilteredContacts(false);
     }
@@ -502,9 +528,17 @@ const SendToAddress = () => {
                     }}
                   />
                 </TabPanel>
-                {/* <TabPanel value={tabValue} index={2} dir={theme.direction}>
-                  <Typography>{SendPageTabOptions.Accounts}</Typography>
-                </TabPanel> */}
+                <TabPanel value={tabValue} index={2} dir={theme.direction}>
+                  <AccountsList
+                    filteredContacts={filteredContacts}
+                    isLoading={isLoading}
+                    handleClick={(eachgroup) => {
+                      searchResult = eachgroup
+                      setConfirmationOpen(true)
+                    }}
+                    isSend={false}
+                  />
+                </TabPanel>
               </SwipeableViews>
             </Box>
           </div>
@@ -544,21 +578,21 @@ const SendToAddress = () => {
               </ListItem>
             }
 
-            {(!searched && !hasNoFilteredContacts) && 
-            <AddressBookList
-              filteredContacts={filteredContacts}
-              isLoading={isLoading}
-              handleClick={(eachgroup) => {
-                searchResult = eachgroup
-                setConfirmationOpen(true)
-              }}
-            />}
+            {(!searched && !hasNoFilteredContacts) &&
+              <AddressBookList
+                filteredContacts={filteredContacts}
+                isLoading={isLoading}
+                handleClick={(eachgroup) => {
+                  searchResult = eachgroup
+                  setConfirmationOpen(true)
+                }}
+              />}
 
             {(searched && !searchContacts.length) &&
-              <ListItem sx={{backgroundColor: '#000000'}}>
+              <ListItem sx={{ backgroundColor: '#000000' }}>
                 <ListItemAvatar sx={{ marginRight: '8px', minWidth: '20px' }}>
                   {/* <CardMedia sx={{ width:'18px', height:'18px'}} image={empty} />   */}
-                  <IconAbout size={20} color='#E54040'/>
+                  <IconAbout size={20} color='#E54040' />
                 </ListItemAvatar>
                 <ListItemText>
                   <Typography
@@ -579,19 +613,21 @@ const SendToAddress = () => {
                   searchResult = eachgroup
                   setConfirmationOpen(true)
                 }}
-              /> 
+              />
             }
           </div>
         )}
-        <SendNFTConfirmation
-          isConfirmationOpen={isConfirmationOpen}
-          data={{contact: searchResult, userContact: userInfo, nft: nftDetail, contract: contractInfo, media: media}}
-          handleCloseIconClicked={() => setConfirmationOpen(false)}
-          handleCancelBtnClicked={() => setConfirmationOpen(false)}
-          handleAddBtnClicked={() => {
-            setConfirmationOpen(false);
-          }}
-        />
+        {isConfirmationOpen &&
+          <SendNFTConfirmation
+            isConfirmationOpen={isConfirmationOpen}
+            data={{ contact: searchResult, userContact: userInfo, nft: nftDetail, contract: contractInfo, media: media, linked: state.linked }}
+            handleCloseIconClicked={() => setConfirmationOpen(false)}
+            handleCancelBtnClicked={() => setConfirmationOpen(false)}
+            handleAddBtnClicked={() => {
+              setConfirmationOpen(false);
+            }}
+          />
+        }
       </div>
     </StyledEngineProvider>
   );

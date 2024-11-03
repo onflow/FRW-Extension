@@ -197,7 +197,7 @@ const Flowns = () => {
             fontSize: '20px',
           }}
         >
-          {chrome.i18n.getMessage('Account')}
+          {chrome.i18n.getMessage('Profile')}
         </Typography>
         <IconButton>
           <EditRoundedIcon

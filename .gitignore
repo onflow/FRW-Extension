@@ -16,3 +16,5 @@ _raw/manifest.json
 yarn-error.log
 dist2
 src/background/utils/firebase.config.json
+dist.rar
+dist.7z

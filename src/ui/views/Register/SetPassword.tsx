@@ -23,7 +23,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { Presets } from 'react-component-transition';
 import zxcvbn from 'zxcvbn';
 import theme from '../../style/LLTheme';
-import { useWallet } from 'ui/utils';
+import { useWallet, saveIndex } from 'ui/utils';
 import { AccountKey } from 'background/service/networkModel';
 import HDWallet from 'ethereum-hdwallet';
 import { LLSpinner } from 'ui/FRWComponent';
@@ -145,7 +145,6 @@ const SetPassword = ({ handleClick, mnemonic, username, setExPassword }) => {
   const [isCheck, setCheck] = useState(false);
   const [isLoading, setLoading] = useState(false);
   // TODO: FIX ME
-  // Disable recaptcha for now
   const [notBot, setNotBot] = useState(true);
 
   const [errMessage, setErrorMessage] = useState('Something wrong, please try again');
@@ -224,6 +223,8 @@ const SetPassword = ({ handleClick, mnemonic, username, setExPassword }) => {
 
   const register = async () => {
     setLoading(true);
+
+    await saveIndex(username);
     const accountKey = getAccountKey(mnemonic);
     wallet.openapi
       .register(accountKey, username)
@@ -248,34 +249,6 @@ const SetPassword = ({ handleClick, mnemonic, username, setExPassword }) => {
         setLoading(false);
       });
   };
-
-  // const handleLoaded = () => {
-  //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //   // @ts-ignore: Unreachable code error
-  //   window.grecaptcha.ready(() => {
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore: Unreachable code error
-  //     window.grecaptcha
-  //       .execute('6LfNDE4fAAAAAInXbOisYD-IemzNFRbs-ULgbQEB', { action: 'homepage' })
-  //       .then(async token => {
-  //         const result = await wallet.openapi.validateRecaptcha(token);
-  //         if(result.data.success) {
-  //           console.log(result.data)
-  //           if (result.data.score > 0.5) setNotBot(true)
-  //         }
-  //         console.log(result)
-  //       })
-  //   })
-  // }
-
-  // useEffect(() => {
-  //   // Add reCaptcha
-  //   const script = document.createElement('script')
-  //   script.src = 'https://www.google.com/recaptcha/api.js?render=6LfNDE4fAAAAAInXbOisYD-IemzNFRbs-ULgbQEB'
-  //   script.addEventListener('load', handleLoaded)
-  //   document.body.appendChild(script)
-  // }, [])
-
 
   useEffect(() => {
     if (password.length > 7) {
@@ -450,11 +423,6 @@ const SetPassword = ({ handleClick, mnemonic, username, setExPassword }) => {
           </Typography>
         </Button>
       </Box>
-      <div
-        className="g-recaptcha"
-        data-sitekey="6LfNDE4fAAAAAInXbOisYD-IemzNFRbs-ULgbQEB"
-        data-size="invisible"
-      ></div>
       <Snackbar open={showError} autoHideDuration={6000} onClose={handleErrorClose}>
         <Alert onClose={handleErrorClose} variant="filled" severity="error" sx={{ width: '100%' }}>
           {errMessage}

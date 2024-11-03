@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, ThemeProvider } from '@mui/system';
 import { useHistory } from 'react-router-dom';
 import theme from '../../style/LLTheme';
-// import { useWallet } from 'ui/utils';
+import { formatLargeNumber } from 'ui/utils/number';
 import {
   Typography,
   ListItem,
@@ -15,8 +15,9 @@ import {
   IconButton
 } from '@mui/material';
 import IconCreate from '../../../components/iconfont/IconCreate';
+import TokenDropdown from './TokenDropdown'
 
-const CoinList = ({ data, ableFt, isActive }) => {
+const CoinList = ({ data, ableFt, isActive, childType, coinLoading }) => {
   // const wallet = useWallet();
   const [isLoading, setLoading] = useState(true);
   const history = useHistory();
@@ -24,6 +25,7 @@ const CoinList = ({ data, ableFt, isActive }) => {
 
   useEffect(() => {
     setLoading(data.length === 0);
+    console.log('data ', data)
     if (data.length) {
       setCoinList(data);
       setLoading(false);
@@ -40,7 +42,7 @@ const CoinList = ({ data, ableFt, isActive }) => {
               variant="body1"
               sx={{ fontSize: 14, fontWeight: '550', textAlign: 'end', color: 'text.title' }}
             >
-              {props.primary} {props.unit.toUpperCase()}
+              {formatLargeNumber(props.primary)} {props.unit.toUpperCase()}
             </Typography>
           ) : (
             <Skeleton variant="text" width={35} height={15} />
@@ -70,7 +72,16 @@ const CoinList = ({ data, ableFt, isActive }) => {
           !isLoading ? (
             <Typography
               variant="body1"
-              sx={{ fontSize: 14, fontWeight: '550', textAlign: 'start', color: 'text.title' }}
+              sx={{
+                fontSize: 14,
+                fontWeight: '550',
+                textAlign: 'start',
+                color: 'text.title',
+                maxWidth: '120px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}
             >
               {props.primary}
             </Typography>
@@ -84,13 +95,13 @@ const CoinList = ({ data, ableFt, isActive }) => {
               {(ableFt.some(item => {
                 const parts = item.id.split('.');
                 return parts[2] && parts[2].includes(props.coin);
-              }) || isActive) ?
+              }) || isActive || props.primary.toLowerCase() === 'flow') ?
                 <Box
-                  sx={{ display:'flex'}}
+                  sx={{ display: 'flex' }}
                 >
                   <Typography
                     variant="body1"
-                    sx={{ fontSize: 12, fontWeight: '500', textAlign: 'start', color: 'text.secondary',marginRight:'6px' }}
+                    sx={{ fontSize: 12, fontWeight: '500', textAlign: 'start', color: 'text.secondary', marginRight: '6px' }}
                   >
                     {props.change === null ? '-' : '$'}{props.price}
                   </Typography>
@@ -111,16 +122,16 @@ const CoinList = ({ data, ableFt, isActive }) => {
                 :
                 <Box
                   sx={{
-                    display:'flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    justifyContent:'center', 
-                    padding:'4px 8px',
-                    borderRadius:'4px',
-                    color:'neutral.text',
-                    marginTop:'2px',
-                    fontSize:'10px',
-                    fontFamily:'Inter, sans-serif',
-                    backgroundColor:'neutral1.light'
+                    justifyContent: 'center',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    color: 'neutral.text',
+                    marginTop: '2px',
+                    fontSize: '10px',
+                    fontFamily: 'Inter, sans-serif',
+                    backgroundColor: 'neutral1.light'
                   }}
                 >
                   {chrome.i18n.getMessage('Inaccessible')}
@@ -137,21 +148,35 @@ const CoinList = ({ data, ableFt, isActive }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', px: '12px', pt: '4px' }}>
-        <Box sx={{ flexGrow: 1 }} />
-        <IconButton onClick={() => history.push('dashboard/tokenList')}>
-          <IconCreate size={16} color="#787878" />
-        </IconButton>
-      </Box>
+      {!childType &&
+        <Box sx={{ display: 'flex', px: '12px', pt: '4px' }}>
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton onClick={() => history.push('dashboard/tokenList')}>
+            <IconCreate size={16} color="#787878" />
+          </IconButton>
+        </Box>
+      }
+      {childType === 'evm' &&
+        <Box sx={{ display: 'flex', px: '12px', pt: '4px' }}>
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton onClick={() => history.push('dashboard/addcustomevm')}>
+            <IconCreate size={16} color="#787878" />
+          </IconButton>
+        </Box>
+      }
+
       <List sx={{ paddingTop: '0px', paddingBottom: '0px' }}>
         {!isLoading
           ? (coinList || []).map((coin: any) => {
+            if (childType === 'evm' && coin.unit !== 'flow' && parseFloat(coin.balance) === 0 && !coin.custom) {
+              return null;
+            }
             return (
               <ListItem
                 key={coin.unit}
                 secondaryAction={
                   <EndListItemText
-                    primary={coin.balance}
+                    primary={parseFloat(coin.balance).toFixed(3)}
                     secondary={parseFloat(coin.total.toFixed(2))}
                     unit={coin.unit}
                     change={parseFloat(coin.change24h.toFixed(2))}

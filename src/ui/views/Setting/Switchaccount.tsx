@@ -4,9 +4,9 @@ import Avatar from '@mui/material/Avatar';
 
 const Switchaccount = () => {
   const accounts =[
-    {id:'@happylee', address:'sjkhdskjfhlsahf', avatar:'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA'},
-    {id:'@happylee', address:'sjkhdskjfhlsahf',avatar:'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA'},
-    {id:'@happylee', address:'sjkhdskjfhlsahf',avatar:'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA'},
+    {id:'@happylee', address:'sjkhdskjfhlsahf', avatar:'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA'},
+    {id:'@happylee', address:'sjkhdskjfhlsahf',avatar:'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA'},
+    {id:'@happylee', address:'sjkhdskjfhlsahf',avatar:'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA'},
   ]
   // const [connect,setConnect]= useState(false)
 

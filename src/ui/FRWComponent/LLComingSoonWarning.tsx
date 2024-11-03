@@ -17,7 +17,7 @@ const LLComingSoon = (props: ComingSoonProps) => {
   };
 
   return (
-    <Collapse in={props.alertOpen} sx={{position: 'absolute', top: '400px', alignSelf: 'center'}}>
+    <Collapse in={props.alertOpen} sx={{position: 'absolute', bottom: '10px', alignSelf: 'center'}}>
       <Alert variant="filled" severity="info" sx={{backgroundColor: '#41CC5D'}} action={
         <IconButton
           aria-label="close"

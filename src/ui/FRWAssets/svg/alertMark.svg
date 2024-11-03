@@ -1,0 +1,11 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Warning Triangle">
+<g id="Group 48037">
+<circle id="Ellipse 95" cx="7.5" cy="7.5" r="6" stroke="white"/>
+<g id="Union">
+<path d="M8 5.5C8 5.22386 7.77614 5 7.5 5C7.22386 5 7 5.22386 7 5.5V7.94C7 8.21614 7.22386 8.44 7.5 8.44C7.77614 8.44 8 8.21614 8 7.94V5.5Z" fill="white"/>
+<path d="M8 9.77332C8 10.0495 7.77614 10.2733 7.5 10.2733C7.22386 10.2733 7 10.0495 7 9.77332C7 9.49717 7.22386 9.27332 7.5 9.27332C7.77614 9.27332 8 9.49717 8 9.77332Z" fill="white"/>
+</g>
+</g>
+</g>
+</svg>

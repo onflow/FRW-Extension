@@ -124,7 +124,7 @@ const Linked = () => {
                         variant="body1"
                         component="span"
                         color="#fff"
-                        fontSize={"14px"}
+                        fontSize={'14px'}
                       // color={key === currentWallet ? 'text.nonselect' : 'text.primary'}
                       >
                         {childAccounts[key]?.name ?? key}
@@ -135,7 +135,7 @@ const Linked = () => {
                         variant="body1"
                         component="span"
                         color="#808080"
-                        fontSize={"12px"}
+                        fontSize={'12px'}
                       // color={key === currentWallet ? 'text.nonselect' : 'text.primary'}
                       >
                         {key}

@@ -32,7 +32,7 @@ export const LLConnectLoading = ({logo}) => {
     <Box
       sx={{
         width: '100%',
-        height: '100%',
+        height: '90vh',
         // background: 'rgba(0, 0, 0, 0.5)',
         flexDirection: 'column',
         alignItems: 'center',

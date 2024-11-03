@@ -1,0 +1,52 @@
+div.logoContainer {
+    position: relative;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background-size: 800%;
+    /* margin-top:80px;  */
+    height: 140px; 
+    width: 140px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  div.logoContainer:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background-size: 800%;
+    border-radius: 50%;
+    opacity: 0;
+    transition: .5s;
+  }
+
+  div.logoContainer:hover {
+    animation: animate 30s linear infinite alternate;
+    background-size: 800%;
+  }
+
+  div.logoContainer:hover:before {
+    filter: blur(25px);
+    opacity: .8;
+    animation: animate 30s linear infinite alternate;
+  }
+
+  @keyframes animate {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 800%;
+    }
+  }
+  a {
+    text-decoration: none;
+  }

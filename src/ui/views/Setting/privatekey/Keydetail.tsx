@@ -1,14 +1,14 @@
-import React,{ useEffect, useState } from 'react';
-import { useLocation} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
-import {Box,Grid,IconButton} from '@mui/material';
-import {Typography} from '@mui/material';
+import { Box, Grid, IconButton } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useRouteMatch } from 'react-router-dom';
 import IconCopy from '../../../../components/iconfont/IconCopy';
 import { useWallet } from 'ui/utils';
-import HDWallet from 'ethereum-hdwallet';
 import { LLHeader } from '@/ui/FRWComponent';
-
+import { pk2PubKey } from '../../../utils/modules/passkey';
+import { storage } from '@/background/webapi';
 interface State {
   password: string;
 }
@@ -18,22 +18,18 @@ const Keydetail = () => {
   const match = useRouteMatch();
   const wallet = useWallet();
   const [privatekey, setKey] = useState('');
-  const [publickey, setPublicKey] = useState('')
+  const [publickey, setPublicKey] = useState('');
 
   const verify = async () => {
     const pwd = location.state.password;
-    const result = await wallet.getMnemonics(pwd);
-    const hdwallet = HDWallet.fromMnemonic(result);
-    const privateKey = hdwallet
-      .derive("m/44'/539'/0'/0/0")
-      .getPrivateKey()
-      .toString('hex');
-    setKey(privateKey);
-    const publicKey = hdwallet
-      .derive("m/44'/539'/0'/0/0")
-      .getPublicKey()
-      .toString('hex');
-    setPublicKey(publicKey);
+    const result = await wallet.getKey(pwd);
+    // const privateKey = hdwallet
+    //   .derive("m/44'/539'/0'/0/0")
+    //   .getPrivateKey()
+    //   .toString('hex');
+    setKey(result);
+    const pubKey = await storage.get('pubKey');
+    setPublicKey(pubKey);
   }
 
   const setTab = async () => {
@@ -45,18 +41,18 @@ const Keydetail = () => {
     verify();
   }, []);
 
-  const CredentialBox = ({data}) => {
+  const CredentialBox = ({ data }) => {
     return (
       <>
         <Box
-          sx={{ 
+          sx={{
             // border: '2px solid #5E5E5E',
             borderRadius: '12px',
             position: 'relative',
             width: '364px',
             marginLeft: '17px',
-            padding:'5px 16px',
-            lineBreak:'anywhere',
+            padding: '5px 16px',
+            lineBreak: 'anywhere',
             marginTop: '0px',
             backgroundColor: '#333333',
           }}>
@@ -82,9 +78,9 @@ const Keydetail = () => {
               onClick={() => {
                 navigator.clipboard.writeText(data);
               }}
-              // sx={{ marginLeft:'380px'}}
+            // sx={{ marginLeft:'380px'}}
             >
-              <IconCopy 
+              <IconCopy
                 style={{
                   height: '20px',
                   width: '20px',
@@ -99,7 +95,7 @@ const Keydetail = () => {
 
   return (
     <div className="page">
-      <LLHeader title={chrome.i18n.getMessage('Private__Key')} help={false} /> 
+      <LLHeader title={chrome.i18n.getMessage('Private__Key')} help={false} />
       <Typography variant="body1" align="left" py="14px" px="20px" fontSize="17px">
         {chrome.i18n.getMessage('Private__Key')}
       </Typography>
@@ -121,30 +117,33 @@ const Keydetail = () => {
         }}
       >
         <Box
-          sx={{borderLeft: 1,
+          sx={{
+            borderLeft: 1,
             px: '15px',
             borderColor: '#333333'
           }}
         >
-          <Typography variant="body1" color="text.secondary" align="left"  fontSize="14px">
+          <Typography variant="body1" color="text.secondary" align="left" fontSize="14px">
             {chrome.i18n.getMessage('Hash__Algorithm')} <br />
             SHA2_256
           </Typography>
         </Box>
         <Box
-          sx={{borderLeft: 1,
-            borderColor:'#333333',
-            px:'15px'}}
+          sx={{
+            borderLeft: 1,
+            borderColor: '#333333',
+            px: '15px'
+          }}
         >
-          <Typography variant="body1" color="text.secondary" align="left"  fontSize="14px">
+          <Typography variant="body1" color="text.secondary" align="left" fontSize="14px">
             {chrome.i18n.getMessage('Sign__Algorithm')} <br />
-             ECDSA_secp256k1
+            ECDSA_secp256k1
           </Typography>
         </Box>
       </Box>
     </div>
-        
-   
+
+
   );
 };
 

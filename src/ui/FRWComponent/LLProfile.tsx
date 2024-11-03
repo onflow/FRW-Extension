@@ -3,40 +3,10 @@ import { Box, Typography, Avatar, Skeleton } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../style/LLTheme';
 import { makeStyles } from '@mui/styles';
+import { formatAddress } from 'ui/utils';
 
-const useStyles = makeStyles(() => ({
-  ContactCardAvatar: {
-    mr: '13px',
-    color: 'primary.main',
-    backgroundColor: 'neutral.main',
-  },
-  ContactCardContainer: {
-    display: 'flex',
-    // border: '1px solid #4C4C4C',
-    // borderRadius: '8px',
-    // padding: ''
-    alignItems: 'center',
-    px: '18px',
-  },
-}));
 
 export const LLProfile = ({ contact, isLoading = false }) => {
-
-  const DomainLogo = () => {
-    if (contact.domain?.value === '') {
-      return undefined;
-    }
-    switch (contact.domain?.domain_type) {
-      case 0:
-        return 'https://raw.githubusercontent.com/Outblock/Assets/main/dapp/find/logo.png';
-      case 1:
-        return 'https://raw.githubusercontent.com/Outblock/Assets/main/dapp/flowns/logo.png';
-      case 2:
-        return 'https://lilico.app/logo.png';
-      default:
-        return undefined;
-    }
-  };
 
   const getName = (name: string) => {
     if (!name) {
@@ -64,9 +34,8 @@ export const LLProfile = ({ contact, isLoading = false }) => {
         
           <Avatar
             alt={contact.contact_name}
-            src={DomainLogo() || contact.avatar}
+            src={contact.avatar}
             sx={{
-              mr: '13px',
               color: 'primary.main',
               backgroundColor: '#484848',
               width: '40px',
@@ -81,12 +50,8 @@ export const LLProfile = ({ contact, isLoading = false }) => {
         }
         {!isLoading?
           <Typography variant="body2" sx={{ textAlign: 'start' }}>
-            {contact.domain?.value || contact.contact_name}{' '}
-            {contact.username && contact.username !== '' && (
-              <Box display="inline" color="info.main">
-                {contact.username !== '' ? ' (@' + contact.username + ')' : ''}
-              </Box>
-            )}
+            {contact.domain?.value || formatAddress(contact.contact_name)}
+
           </Typography>: (
             <Skeleton variant="text" width={45} height={15} />
           )}
@@ -96,7 +61,7 @@ export const LLProfile = ({ contact, isLoading = false }) => {
             sx={{ lineHeight: '1', textAlign: 'start' }}
             color="text.secondary"
           >
-            {`${contact.address}`}
+            {`${formatAddress(contact.address)}`}
           </Typography>
           : (
             <Skeleton variant="text" width={45} height={15} />

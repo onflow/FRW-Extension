@@ -13,7 +13,7 @@ import {
   Chip,
   Tooltip
 } from '@mui/material';
-import { makeStyles} from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 import IconFlow from '../../../components/iconfont/IconFlow';
 import IconSwitch from '../../../components/iconfont/IconSwitch';
 import CancelIcon from '../../../components/iconfont/IconClose';
@@ -50,14 +50,14 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     gap: '8px',
     color: '#CDD2D7',
-    border:'1px solid #282828',
-  
+    border: '1px solid #282828',
+
     // &.${selectUnstyledClasses.expanded} {
     //   &::after {
     //     content: '▴';
     //   }
     // }
-  
+
     // &::after {
     //   content: '▾';
     //   float: right;
@@ -70,13 +70,13 @@ const useStyles = makeStyles(() => ({
       margin: '10px 0',
       maxHeight: '400px',
       backgroundColor: '#282828',
-      border:'none',
+      border: 'none',
       borderRadius: '0.75em',
       color: '#CDD2D7',
       overflow: 'auto',
       outline: '0px',
     },
-    '& .MuiOutlinedInput-notchedOutline':{
+    '& .MuiOutlinedInput-notchedOutline': {
       border: 'none !important',
       borderWidth: '0px !important',
       outline: 'none !important',
@@ -90,7 +90,7 @@ const useStyles = makeStyles(() => ({
     margin: '10px 0',
     maxHeight: '400px',
     backgroundColor: '#282828',
-    border:'1px solid #787878',
+    border: '1px solid #787878',
     borderRadius: '0.75em',
     color: '#CDD2D7',
     overflow: 'auto',
@@ -99,32 +99,34 @@ const useStyles = makeStyles(() => ({
   },
   exceedBox: {
     background: 'rgba(196,69,54,0.08)',
-    display:'flex',
+    display: 'flex',
     height: '25px',
   },
 }));
 
 
-const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, exceed, setExceed, coinInfo, setCurrentCoin, coinList}) => {
+const TransferAmount = ({ amount, setAmount, secondAmount, setSecondAmount, exceed, setExceed, coinInfo, setCurrentCoin, coinList, minAmount }) => {
   const classes = useStyles();
   const [coin, setCoin] = useState<string>('flow');
   const [coinType, setCoinType] = useState<any>(0);
   const handleMaxClick = () => {
     if (coinInfo) {
-      if (coin === 'flow') {
-        setAmount(coinInfo.balance - 0.001)
+      if (coinInfo.unit.toLowerCase() === 'flow') {
+        setAmount(coinInfo.balance - minAmount)
       } else {
-        setAmount(coinInfo.balance)
+        // const minimumValue = minAmount > 0.001 ? minAmount : 0.001;
+        const newAmount = coinInfo.balance - 0;
+        setAmount(newAmount);
       }
     }
   }
 
-  const renderValue = (option) =>{
+  const renderValue = (option) => {
     setCurrentCoin(option);
     setCoin(option);
     const selectCoin = coinList.find(coin => coin.unit === option)
     return (
-      selectCoin && <img src={selectCoin.icon} style={{height: '24px', width: '24px'}}/>
+      selectCoin && <img src={selectCoin.icon} style={{ height: '24px', width: '24px' }} />
     );
   }
 
@@ -138,7 +140,7 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
 
   useEffect(() => {
     currentCoinType();
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (coinType) {
@@ -157,7 +159,7 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
         setAmount(parseFloat(value.toFixed(3)))
       }
     }
-  },[secondAmount])
+  }, [secondAmount])
 
   useEffect(() => {
     if (!coinType) {
@@ -172,32 +174,32 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
             setExceed(false);
           }
         }
-        const  value = new BN(amount)
+        const value = new BN(amount)
           .times(new BN(coinInfo.price))
           .toFixed(3);
         setSecondAmount(value)
       }
     }
-  },[amount, coin])
+  }, [amount, coin])
 
   return (
-    <StyledEngineProvider injectFirst> 
+    <StyledEngineProvider injectFirst>
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         gap: '0'
       }}>
-        <Box sx={{        
+        <Box sx={{
           display: 'flex',
           flexDirection: 'column',
           borderRadius: '16px',
-          px:'4px',
+          px: '4px',
           backgroundColor: 'neutral.main',
           zIndex: 1000
         }}>
-          {coinType ? 
+          {coinType ?
             <Box sx={{ width: '100%', display: 'flex' }}>
-              <Box sx={{ display:'flex', alignItems: 'center', padding:'0 14px 0 14px', fontSize: '16px' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', padding: '0 14px 0 14px', fontSize: '16px' }}>
                 <Typography>$</Typography>
               </Box>
               <FormControl sx={{ flex: '1', display: 'flex' }}>
@@ -217,11 +219,11 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
                     setExceed(false);
                     setSecondAmount(event.target.value);
                   }}
-                  inputProps={{ sx: {fontSize: '24px'}}}
+                  inputProps={{ sx: { fontSize: '24px' } }}
                   endAdornment={
                     <Tooltip title={coin === 'flow' ? chrome.i18n.getMessage('on_Flow_the_balance_cant_less_than_0001_FLOW') : ''} arrow>
                       <InputAdornment position="end">
-                        <Chip label={chrome.i18n.getMessage('Inbox')} size="small" onClick={handleMaxClick} sx={{padding: '2px 5px'}} />
+                        <Chip label={chrome.i18n.getMessage('Inbox')} size="small" onClick={handleMaxClick} sx={{ padding: '2px 5px' }} />
                       </InputAdornment>
                     </Tooltip>
                   }
@@ -234,13 +236,21 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
                 renderValue={renderValue}
                 className={classes.selectRoot}
                 defaultValue={coinInfo.unit}
-                MenuProps={{ MenuListProps: { disablePadding: true } }}
+                MenuProps={{
+                  MenuListProps: { disablePadding: true },
+                  PaperProps: {
+                    style: {
+                      zIndex: 2000,
+                    },
+                  },
+                }}
+                sx={{ zIndex: 2000 }}
               >
                 {
                   coinList.map(coin => (
-                    <MenuItem value={coin.unit} key={coin.unit}>
+                    <MenuItem value={coin.unit} key={coin.unit} sx={{ zIndex: 2000 }}>
                       <ListItemIcon>
-                        <img src={coin.icon} style={{height: '24px', width: '24px'}}/>
+                        <img src={coin.icon} style={{ height: '24px', width: '24px' }} />
                       </ListItemIcon>
                       <ListItemText>{coin.coin}</ListItemText>
                     </MenuItem>
@@ -264,10 +274,10 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
                     setExceed(false);
                     setAmount(event.target.value);
                   }}
-                  inputProps={{ sx: {fontSize: '24px'}}}
+                  inputProps={{ sx: { fontSize: '24px' } }}
                   endAdornment={
                     <InputAdornment position="end">
-                      <Chip label={chrome.i18n.getMessage('Max')} size="small" onClick={handleMaxClick} sx={{padding: '2px 5px'}} />
+                      <Chip label={chrome.i18n.getMessage('Max')} size="small" onClick={handleMaxClick} sx={{ padding: '2px 5px' }} />
                     </InputAdornment>
                   }
                 />
@@ -285,14 +295,14 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
             }}
           >
             <Typography>≈</Typography>
-            {coinType ?           
-              <IconFlow size={16}/>
+            {coinType ?
+              <IconFlow size={16} />
               :
               <AttachMoneyRoundedIcon
                 style={{ fontSize: '16px' }}
                 color="secondary"
-              />            }
-            {coinType ?           
+              />}
+            {coinType ?
               <Typography>{amount}</Typography>
               :
               <Typography>{secondAmount}</Typography>
@@ -316,13 +326,13 @@ const TransferAmount = ({amount, setAmount, secondAmount, setSecondAmount, excee
               }}
             >
               <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-              <Typography variant="body1" color="text.secondary" sx={{fontSize: coin === 'flow' ? '0.7rem' : '1rem'}}>
+              <Typography variant="body1" color="text.secondary" sx={{ fontSize: coin === 'flow' ? '0.7rem' : '1rem' }}>
                 {chrome.i18n.getMessage('Insufficient_balance') + (coin === 'flow' ? chrome.i18n.getMessage('on_Flow_the_balance_cant_less_than_0001_FLOW') : '')}
               </Typography>
             </Box>
           }
         </Presets.TransitionSlideUp>
-              
+
 
       </Box>
     </StyledEngineProvider>

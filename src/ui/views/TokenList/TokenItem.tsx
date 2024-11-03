@@ -34,7 +34,7 @@ const TokenItem = ({token, isLoading, enabledList, onClick}) => {
   const [isEnabled, setEnabled] = useState(false);
 
   const checkStorageStatus = async () => {
-    const isEnabled = enabledList.map(item => item.name).includes(token.name)
+    const isEnabled = enabledList.map(item => item.contractName).includes(token.contractName)
     setEnabled(isEnabled);
   }
 
@@ -58,7 +58,7 @@ const TokenItem = ({token, isLoading, enabledList, onClick}) => {
           </IconButton>
         }>
         <ListItemAvatar>
-          <Avatar src={token.icon}/>
+          <Avatar src={token.logoURI}/>
         </ListItemAvatar>
         <ListItemText primary={token.name} secondary={token.symbol.toUpperCase()} />
       </ListItem>

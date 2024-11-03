@@ -98,7 +98,6 @@ class NotificationService extends Events {
 
   // currently it only support one approval at the same time
   requestApproval = async (data, winProps?): Promise<any> => {
-    console.log(data, this.approval);
 
     // if the request comes into while user approving
     if (this.approval) {

@@ -58,6 +58,10 @@ class UserInfo {
     this.store.avatar = data['avatar'];
   };
 
+  addUserId = (userId: string) => {
+    this.store.user_id = userId;
+  };
+
   removeUserInfo = () => {
     this.store = template;
   };

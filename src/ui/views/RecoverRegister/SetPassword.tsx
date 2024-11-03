@@ -23,7 +23,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { Presets } from 'react-component-transition';
 import zxcvbn from 'zxcvbn';
 import theme from '../../style/LLTheme';
-import { useWallet } from 'ui/utils';
+import { useWallet, saveIndex } from 'ui/utils';
 import { AccountKey } from 'background/service/networkModel';
 import HDWallet from 'ethereum-hdwallet';
 import { LLSpinner } from '@/ui/FRWComponent';
@@ -221,6 +221,8 @@ const SetPassword = ({ handleClick, mnemonic, username }) => {
 
   const register = async () => {
     setLoading(true);
+
+    await saveIndex(username);
     const accountKey = getAccountKey(mnemonic);
     wallet.openapi
       .register(accountKey, username)

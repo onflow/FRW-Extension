@@ -52,7 +52,7 @@ const proecessURL = (matches, blockList): string | null => {
     if (!findurl) {
       findurl = matche.value
     }
-    const url = findurl?.replace('ipfs://', 'https://lilico.infura-ipfs.io/ipfs/').replace('https://ipfs.infura.io/ipfs', 'https://lilico.infura-ipfs.io/ipfs/')
+    const url = findurl?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/').replace('https://ipfs.infura.io/ipfs', 'https://gateway.pinata.cloud/ipfs/')
     if (url === '' || url === undefined || !url.includes('.') ) {
       return null;
     }
