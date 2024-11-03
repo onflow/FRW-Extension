@@ -3,16 +3,21 @@ import {
   keyringService,
   notificationService,
   permissionService,
+  userWalletService,
 } from 'background/service';
 import { PromiseFlow, underline2Camelcase } from 'background/utils';
 import { EVENTS } from 'consts';
 import providerController from './controller';
 import eventBus from '@/eventBus';
+import Wallet from '../wallet';
+import { isValidEthereumAddress } from '@/ui/utils/address';
 
 const isSignApproval = (type: string) => {
-  const SIGN_APPROVALS = ['SignText', 'SignTypedData', 'SignTx'];
+  const SIGN_APPROVALS = ['SignText', 'SignTypedData', 'SignTx', 'EthConfirm'];
   return SIGN_APPROVALS.includes(type);
 };
+
+const lockedOrigins = new Set<string>();
 
 const flow = new PromiseFlow();
 const flowContext = flow
@@ -22,54 +27,87 @@ const flowContext = flow
       data: { method },
     } = ctx.request;
     ctx.mapMethod = underline2Camelcase(method);
-
     if (!providerController[ctx.mapMethod]) {
       // TODO: make rpc whitelist
-      // if (method.startsWith('eth_') || method === 'net_version') {
-      //   return providerController.ethRpc(ctx.request);
-      // }
-
-      throw ethErrors.rpc.methodNotFound({
-        message: `method [${method}] doesn't has corresponding handler`,
-        data: ctx.request.data,
-      });
-    }
-
-    return next();
-  })
-  .use(async (ctx, next) => {
-    const { mapMethod } = ctx;
-    if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-      // check lock
-      const isUnlock = keyringService.memStore.getState().isUnlocked;
-
-      if (!isUnlock) {
-        ctx.request.requestedApproval = true;
-        await notificationService.requestApproval({ lock: true });
+      try {
+        const result = await providerController.ethRpc(ctx.request.data);
+        return result;
+      } catch (error) {
+        // Catch any error and throw the custom error
+        throw ethErrors.rpc.methodNotFound({
+          message: `method [${ctx.request.data.method}] doesn't have a corresponding handler`,
+          data: ctx.request.data,
+        });
       }
+
     }
 
     return next();
   })
   .use(async (ctx, next) => {
-    // check connect
+    const {
+      request: {
+        session: { origin, },
+      },
+      mapMethod,
+    } = ctx;
+    if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
+      const mainwallet = await Wallet.getMainWallet();
+      const evmAddress = await Wallet.queryEvmAddress(mainwallet);
+      const currentNetwork = await Wallet.getNetwork();
+      if (!isValidEthereumAddress(evmAddress)) {
+        throw new Error('evm must has at least one account.');
+      }
+      const isUnlock = keyringService.memStore.getState().isUnlocked;
+      const site = permissionService.getConnectedSite(origin);
+      if (mapMethod === 'ethAccounts' && (!site || !isUnlock)) {
+        throw new Error('Origin not connected. Please connect first.');
+      }
+      // console.log('isUnlock ', isUnlock)
+      // await notificationService.requestApproval(
+      //   {
+      //     params: { origin, name },
+      //     approvalComponent: 'EthConnect', lock: true
+      //   },
+      //   { height: 599 }
+      // );
+      // if (!isUnlock) {
+      //   ctx.request.requestedApproval = true;
+      //   lockedOrigins.add(origin);
+      //   try {
+      //     await notificationService.requestApproval({ lock: true });
+      //     lockedOrigins.delete(origin);
+      //   } catch (e) {
+      //     lockedOrigins.delete(origin);
+      //     throw e;
+      //   }
+      // }
+    }
+
+    return next();
+  })
+  .use(async (ctx, next) => {
     const {
       request: {
         session: { origin, name, icon },
       },
       mapMethod,
     } = ctx;
+    // check connect
     if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-      if (!permissionService.hasPerssmion(origin)) {
+
+      if (!permissionService.hasPermission(origin)) {
         ctx.request.requestedApproval = true;
-        const { defaultChain } = await notificationService.requestApproval(
+        const {
+          defaultChain,
+          signPermission,
+        } = await notificationService.requestApproval(
           {
             params: { origin, name, icon },
-            approvalComponent: 'Connect',
+            approvalComponent: 'EthConnect',
           },
-          { height: 390 }
+          { height: 599 }
         );
-
         permissionService.addConnectedSite(origin, name, icon, defaultChain);
       }
     }
@@ -85,14 +123,13 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
-    const [approvalType, condition, { height = 770 } = {}] =
+    const [approvalType, condition, { height = 599 } = {}] =
       Reflect.getMetadata('APPROVAL', providerController, mapMethod) || [];
-
-    if (approvalType && (!condition || !condition(ctx.request))) {
+    if (mapMethod === 'ethSendTransaction' || mapMethod === 'personalSign') {
       ctx.request.requestedApproval = true;
       ctx.approvalRes = await notificationService.requestApproval(
         {
-          approvalComponent: approvalType,
+          approvalComponent: 'EthConfirm',
           params: {
             method,
             data: params,
@@ -102,7 +139,7 @@ const flowContext = flow
         },
         { height }
       );
-      if (isSignApproval(approvalType)) {
+      if (isSignApproval('EthConfirm')) {
         permissionService.updateConnectSite(origin, { isSigned: true }, true);
       } else {
         permissionService.touchConnectedSite(origin);

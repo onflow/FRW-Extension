@@ -131,7 +131,7 @@ const PasswordIndicator = (props) => {
   );
 };
 
-const SetPassword = ({ handleClick, mnemonic, username }) => {
+const SetPassword = ({ handleClick, mnemonic, pk, username }) => {
   const classes = useStyles();
   const wallet = useWallet();
 
@@ -208,8 +208,12 @@ const SetPassword = ({ handleClick, mnemonic, username }) => {
     setLoading(true);
     try {
       await wallet.boot(password);
-      const formatted = mnemonic.trim().split(/\s+/g).join(' ');
-      await wallet.createKeyringWithMnemonics(formatted);
+      if (pk) {
+        await wallet.importPrivateKey(pk);
+      } else {
+        const formatted = mnemonic.trim().split(/\s+/g).join(' ');
+        await wallet.createKeyringWithMnemonics(formatted);
+      }
       setLoading(false);
       handleClick();
     } catch (e) {

@@ -1,0 +1,343 @@
+[
+  {
+    "name": "Flow",
+    "address": {
+      "mainnet": "0x1654653399040a61",
+      "testnet": "0x7e60df042a9c0868",
+      "crescendo": "0x7e60df042a9c0868"
+    },
+    "contract_name": "FlowToken",
+    "storage_path": {
+      "balance": "/public/flowTokenBalance",
+      "vault": "/storage/flowTokenVault",
+      "receiver": "/public/flowTokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/flow/logo.png",
+    "symbol": "flow",
+    "website": "https://www.onflow.org"
+  },
+  {
+    "name": "Flow USD",
+    "address": {
+      "mainnet": "0x3c5959b568896393",
+      "testnet": "0xe223d8a629e49c68"
+    },
+    "contract_name": "FUSD",
+    "storage_path": {
+      "balance": "/public/fusdBalance",
+      "vault": "/storage/fusdVault",
+      "receiver": "/public/fusdReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/fusd/logo.png",
+    "symbol": "fusd",
+    "website": "https://docs.onflow.org/fusd/"
+  },
+  {
+    "name": "Blocto Token",
+    "address": {
+      "mainnet": "0x0f9df91c9121c460",
+      "testnet": "0x6e0797ac987005f5"
+    },
+    "contract_name": "BloctoToken",
+    "storage_path": {
+      "balance": "/public/bloctoTokenBalance",
+      "vault": "/storage/bloctoTokenVault",
+      "receiver": "/public/bloctoTokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/blt/logo.png",
+    "symbol": "blt",
+    "website": "https://blocto.portto.io/en/"
+  },
+  {
+    "name": "USD Coin",
+    "address": {
+      "mainnet": "0xb19436aae4d94622",
+      "testnet": "0xa983fecbed621163"
+    },
+    "contract_name": "FiatToken",
+    "storage_path": {
+      "balance": "/public/USDCVaultBalance",
+      "vault": "/storage/USDCVault",
+      "receiver": "/public/USDCVaultReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/usdc/logo.png",
+    "symbol": "usdc",
+    "website": "https://www.circle.com/en/"
+  },
+  {
+    "name": "My",
+    "address": {
+      "mainnet": "0x348fe2042c8a70d8",
+      "testnet": "0x40212f3e288efd03"
+    },
+    "contract_name": "MyToken",
+    "storage_path": {
+      "balance": "/public/mytokenBalance",
+      "vault": "/storage/mytokenVault",
+      "receiver": "/public/mytokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://raw.githubusercontent.com/Outblock/Assets/main/ft/my/logo.png",
+    "symbol": "my",
+    "website": "https://mynft.io/"
+  },
+  {
+    "name": "Starly Token",
+    "address": {
+      "mainnet": "0x142fa6570b62fd97",
+      "testnet": "0xf63219072aaddd50"
+    },
+    "contract_name": "StarlyToken",
+    "storage_path": {
+      "balance": "/public/starlyTokenBalance",
+      "vault": "/storage/starlyTokenVault",
+      "receiver": "/public/starlyTokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.142fa6570b62fd97.StarlyToken/logo.png",
+    "symbol": "STARLY",
+    "website": "https://starly.io/"
+  },
+  {
+    "name": "Rally",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "RLY",
+    "storage_path": {
+      "balance": "/public/RLYBalance",
+      "vault": "/storage/RLYVault",
+      "receiver": "/public/RLYReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.RLY/logo.png",
+    "symbol": "RLY",
+    "website": null
+  },
+  {
+    "name": "SOUND Token",
+    "address": {
+      "mainnet": "0x7849250fbd83edb6",
+      "testnet": "0x389cc4e8f9520df0"
+    },
+    "contract_name": "SOUNDToken",
+    "storage_path": {
+      "balance": "/public/SOUNDTokenBalance",
+      "vault": "/storage/SOUNDTokenVault",
+      "receiver": "/public/SOUNDTokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://assets.website-files.com/6227d5e32d0d1b6b6a65ded0/6250e5ab1dd3ee7f8f385a3c_CoinSound-p-500.png",
+    "symbol": "SOUND",
+    "website": "https://soundtoken.xyz"
+  },
+  {
+    "name": "Avalanche (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceAVAX",
+    "storage_path": {
+      "balance": "/public/ceAVAXBalance",
+      "vault": "/storage/ceAVAXVault",
+      "receiver": "/public/ceAVAXReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceAVAX/logo.png",
+    "symbol": "ceAVAX",
+    "website": "https://snowtrace.io/token/0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"
+  },
+  {
+    "name": "Binance Coin (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceBNB",
+    "storage_path": {
+      "balance": "/public/ceBNBBalance",
+      "vault": "/storage/ceBNBVault",
+      "receiver": "/public/ceBNBReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceBNB/logo.png",
+    "symbol": "ceBNB",
+    "website": "https://bscscan.com/address/0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+  },
+  {
+    "name": "Binance USD (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceBUSD",
+    "storage_path": {
+      "balance": "/public/ceBUSDBalance",
+      "vault": "/storage/ceBUSDVault",
+      "receiver": "/public/ceBUSDReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceBUSD/logo.png",
+    "symbol": "ceBUSD",
+    "website": "https://bscscan.com/address/0xe9e7cea3dedca5984780bafc599bd69add087d56"
+  },
+  {
+    "name": "Dai Stablecoin (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceDAI",
+    "storage_path": {
+      "balance": "/public/ceDAIBalance",
+      "vault": "/storage/ceDAIVault",
+      "receiver": "/public/ceDAIReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceDAI/logo.png",
+    "symbol": "ceDAI",
+    "website": "https://etherscan.io/address/0x6b175474e89094c44da98b954eedeac495271d0f"
+  },
+  {
+    "name": "Fantom (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceFTM",
+    "storage_path": {
+      "balance": "/public/ceFTMBalance",
+      "vault": "/storage/ceFTMVault",
+      "receiver": "/public/ceFTMReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceFTM/logo.png",
+    "symbol": "ceFTM",
+    "website": null
+  },
+  {
+    "name": "Matic Token (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceMATIC",
+    "storage_path": {
+      "balance": "/public/ceMATICBalance",
+      "vault": "/storage/ceMATICVault",
+      "receiver": "/public/ceMATICReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceMATIC/logo.png",
+    "symbol": "ceMATIC",
+    "website": null
+  },
+  {
+    "name": "Tether USD (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceUSDT",
+    "storage_path": {
+      "balance": "/public/ceUSDTBalance",
+      "vault": "/storage/ceUSDTVault",
+      "receiver": "/public/ceUSDTReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceUSDT/logo.png",
+    "symbol": "ceUSDT",
+    "website": "https://tether.to/"
+  },
+  {
+    "name": "Wrapped BTC (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceWBTC",
+    "storage_path": {
+      "balance": "/public/ceWBTCBalance",
+      "vault": "/storage/ceWBTCVault",
+      "receiver": "/public/ceWBTCReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceWBTC/logo.png",
+    "symbol": "ceWBTC",
+    "website": null
+  },
+  {
+    "name": "Wrapped Ether (Celer)",
+    "address": {
+      "mainnet": "0x231cc0dbbcffc4b7",
+      "testnet": null
+    },
+    "contract_name": "ceWETH",
+    "storage_path": {
+      "balance": "/public/ceWETHBalance",
+      "vault": "/storage/ceWETHVault",
+      "receiver": "/public/ceWETHReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.231cc0dbbcffc4b7.ceWETH/logo.png",
+    "symbol": "ceWETH",
+    "website": null
+  },
+  {
+    "name": "Teleported Sportium Token",
+    "address": {
+      "mainnet": "0x475755d2c9dccc3a",
+      "testnet": null
+    },
+    "contract_name": "TeleportedSportiumToken",
+    "storage_path": {
+      "balance": "/public/TeleportedSportiumTokenBalance",
+      "vault": "/storage/TeleportedSportiumTokenVault",
+      "receiver": "/public/TeleportedSportiumTokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.475755d2c9dccc3a.TeleportedSportiumToken/logo.png",
+    "symbol": "SPRT",
+    "website": null
+  },
+  {
+    "name": "Teleported Tether Token",
+    "address": {
+      "mainnet": "0xcfdd90d4a00f7b5b",
+      "testnet": null
+    },
+    "contract_name": "TeleportedTetherToken",
+    "storage_path": {
+      "balance": "/public/teleportedTetherTokenBalance",
+      "vault": "/storage/teleportedTetherTokenVault",
+      "receiver": "/public/teleportedTetherTokenReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.cfdd90d4a00f7b5b.TeleportedTetherToken/logo.png",
+    "symbol": "tUSDT",
+    "website": "https://blocto.app/"
+  },
+  {
+    "name": "REVV",
+    "address": {
+      "mainnet": "0xd01e482eb680ec9f",
+      "testnet": null
+    },
+    "contract_name": "REVV",
+    "storage_path": {
+      "balance": "/public/revvBalance",
+      "vault": "/storage/revvVault",
+      "receiver": "/public/revvReceiver"
+    },
+    "decimal": 8,
+    "icon": "https://cdn.jsdelivr.net/gh/FlowFans/flow-token-list@main/token-registry/A.d01e482eb680ec9f.REVV/logo.png",
+    "symbol": "REVV",
+    "website": "https://revvmotorsport.com/"
+  }
+]

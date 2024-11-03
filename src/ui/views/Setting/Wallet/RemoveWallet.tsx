@@ -91,8 +91,7 @@ const RemoveWallet = ({hideBackButton = false}) => {
   const history = useHistory();
 
   const restPass = () => {
-    openInternalPageInTab('reset')
-    
+    usewallet.resetPwd();    
   };
   
   const usewallet = useWallet();

@@ -38,9 +38,8 @@ const TransferConfirmation = (props: TransferConfirmationProps) => {
   const [occupied, setOccupied] = useState(false);
   const [tid, setTid] = useState<string>('');
   const [count, setCount] = useState(0);
-  const colorArray = ['#FCE9E1', '#FCC7AE', '#FCA47C', '#FCA47C', '#41CC5D', '#41CC5D', '#41CC5D'];
+  const colorArray = ['#32E35529', '#32E35540', '#32E35559', '#32E35573', '#41CC5D', '#41CC5D', '#41CC5D'];
   
-  console.log('TransferConfirmation ->', props)
 
   // const startCount = () => {
   //   let count = 0;
@@ -73,7 +72,6 @@ const TransferConfirmation = (props: TransferConfirmationProps) => {
       return;
     }
 
-    console.log('execSwap ->', props.data.estimateInfo)
 
     setSending(true);
     const resJson = props.data.estimateInfo;

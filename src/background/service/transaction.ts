@@ -39,12 +39,12 @@ class Transaction {
         total: 0,
         transactionItem: {
           mainnet:[],
-          sandboxnet: [],
+          crescendo: [],
           testnet:[],
         },
         pendingItem: {
           mainnet:[],
-          sandboxnet: [],
+          crescendo: [],
           testnet:[],
         },
       },
@@ -56,13 +56,13 @@ class Transaction {
         total: 0,
         transactionItem: {
           mainnet:[],
-          sandboxnet: [],
+          crescendo: [],
           testnet:[],
         },
         pendingItem: {
           mainnet:[],
           testnet:[],
-          sandboxnet: [],
+          crescendo: [],
         },
       },
     });
@@ -74,13 +74,13 @@ class Transaction {
       total: 0,
       transactionItem: {
         mainnet:[],
-        sandboxnet: [],
+        crescendo: [],
         testnet:[],
       },
       pendingItem: {
         mainnet:[],
         testnet:[],
-        sandboxnet: [],
+        crescendo: [],
       }
     }
     this.session = {
@@ -89,12 +89,12 @@ class Transaction {
       transactionItem: {
         mainnet:[],
         testnet:[],
-        sandboxnet: [],
+        crescendo: [],
       },
       pendingItem: {
         mainnet:[],
         testnet:[],
-        sandboxnet: [],
+        crescendo: [],
       }
     }
   }
@@ -131,6 +131,7 @@ class Transaction {
     txItem.hash = txId;
     txItem.image = icon;
     txItem.title = title;
+    console.log('txItem ', txItem)
     txList.unshift(txItem);
     this.session.pendingItem[network] = txList;
   };
@@ -152,6 +153,7 @@ class Transaction {
   }
 
   setTransaction = (data, network:string) => {
+    console.log('data ', data)
     const txList: TransferItem[] = [];
     if(data.transactions && data.transactions.length > 0) {
       data.transactions.forEach(async (tx) => {

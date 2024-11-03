@@ -22,8 +22,9 @@ import EmptyStatus from './EmptyStatus';
 interface GridTabProps {
   data: Data;
   accessible: any;
-  isActive : boolean;
+  isActive: boolean;
   setCount: (count: any) => void;
+  activeCollection: any;
 }
 
 interface Data {
@@ -166,13 +167,13 @@ const GridTab = forwardRef((props: GridTabProps, ref) => {
       setNFTLoading(true);
       fetchNFTCache(ownerAddress);
     }
- }));
+  }));
 
   const nextPage = async () => {
     if (loadingMore) {
       return
     }
-  
+
     setLoadingMore(true);
     const offset = nfts.length
     // pageIndex * 24;
@@ -198,11 +199,10 @@ const GridTab = forwardRef((props: GridTabProps, ref) => {
     if (loading) {
       return
     }
-    
+
     setNFTLoading(true);
     try {
       const response = await usewallet.refreshNft(address, 0);
-      // console.log('fetchNFT ->', nfts, nftCount);
       if (response.nfts) {
         const newList: any[] = []
         response.nfts.forEach(item => {
@@ -217,72 +217,88 @@ const GridTab = forwardRef((props: GridTabProps, ref) => {
         const hasMore = mergedList.length > 0 && mergedList.length < total
         setHasMore(hasMore)
       }
-  
+
       props.setCount(response.nftCount);
       setTotal(response.nftCount);
     } finally {
       setNFTLoading(false);
+      setHasMore(false);
     }
   };
 
   const fetchNFTCache = async (address: string, reload = true) => {
     // setNFTLoading(true);
     try {
-      const {nfts, nftCount} = await usewallet.getNFTListCahce();
+      const { nfts, nftCount } = await usewallet.getNFTListCahce();
       props.setCount(nftCount);
       setTotal(nftCount);
       setNFTs(nfts);
-      if (nfts.length == 0 ) {
+      if (nfts.length == 0) {
         // setNFTLoading(false);
         fetchNFT(address);
       }
-    } catch(e) {
+    } catch (e) {
       console.log('e ->', e)
     } finally {
-      // setNFTLoading(false);
+      setNFTLoading(false);
+      setHasMore(false);
     }
   };
 
+
   const loader = (
     <Grid container className={classes.grid}>
-    {[...Array(2).keys()].map((key) => (
-      <Card className={classes.card} elevation={0} key={key}>
-        <CardMedia className={classes.cardmedia}>
-          <Skeleton
-            variant="rectangular"
-            width={150}
-            height={150}
-            sx={{ margin: '0 auto', borderRadius: '8px' }}
-          />
-        </CardMedia>
-        <CardContent className={classes.content}>
-          <Skeleton
-            variant="text"
-            width={150}
-            sx={{ margin: '0 auto' }}
-          />
-        </CardContent>
-      </Card>
-    ))}
-  </Grid>
+      {[...Array(2).keys()].map((key) => (
+        <Card className={classes.card} elevation={0} key={key}>
+          <CardMedia className={classes.cardmedia}>
+            <Skeleton
+              variant="rectangular"
+              width={150}
+              height={150}
+              sx={{ margin: '0 auto', borderRadius: '8px' }}
+            />
+          </CardMedia>
+          <CardContent className={classes.content}>
+            <Skeleton
+              variant="text"
+              width={150}
+              sx={{ margin: '0 auto' }}
+            />
+          </CardContent>
+        </Card>
+      ))}
+    </Grid>
   )
 
   // const hasMore = (): boolean => {
-  //   console.log('hasMore ->', nfts.length, total, nfts && nfts.length < total);
   //   return nfts && nfts.length < total
   //   // return false;
   // }
 
   useEffect(() => {
-    console.log('fetchWalletCollection ->', props.data.ownerAddress);
     if (props.data.ownerAddress) {
       fetchNFTCache(props.data.ownerAddress);
       setAddress(props.data.ownerAddress);
     }
   }, []);
 
+  const extractContractAddress = (collection) => {
+    return collection.split('.')[2];
+  };
+  const checkContractAddressInCollections = (nft) => {
+    if (props.isActive) {
+      return true
+    }
+    const contractAddressWithout0x = nft.collectionContractName;
+    console.log('nft is ', contractAddressWithout0x)
+    return props.activeCollection.some(collection => {
+      const extractedAddress = extractContractAddress(collection);
+      return extractedAddress === contractAddressWithout0x;
+    });
+  };
 
   const createGridCard = (data, index) => {
+    const isAccessibleNft = checkContractAddressInCollections(data);
     return (
       <GridView
         data={data}
@@ -291,6 +307,8 @@ const GridTab = forwardRef((props: GridTabProps, ref) => {
         accessible={props.accessible}
         index={index}
         ownerAddress={ownerAddress}
+        isAccessibleNft={isAccessibleNft}
+        collectionInfo={data}
       />
     );
   };
@@ -320,25 +338,25 @@ const GridTab = forwardRef((props: GridTabProps, ref) => {
           ))}
         </Grid>
       ) : (
-        total !== 0  ? 
+        total !== 0 ?
           <InfiniteScroll
-              dataLength={nfts.length} //This is important field to render the next data
-              next={nextPage}
-              hasMore={hasMore}
-              loader={loader}
-              height={485}
-              scrollableTarget="scrollableTab"
-            >
-              <Grid container className={classes.grid}>
-                {nfts && nfts.map(createGridCard)}
-                {nfts.length % 2 != 0 && <Card className={classes.cardNoHover} elevation={0}/>}
-              </Grid>
-                  
-            </InfiniteScroll>
-            :
-            <EmptyStatus />
-          )
-        }
+            dataLength={nfts.length} //This is important field to render the next data
+            next={nextPage}
+            hasMore={hasMore}
+            loader={loader}
+            height={485}
+            scrollableTarget="scrollableTab"
+          >
+            <Grid container className={classes.grid}>
+              {nfts && nfts.map(createGridCard)}
+              {nfts.length % 2 != 0 && <Card className={classes.cardNoHover} elevation={0} />}
+            </Grid>
+
+          </InfiniteScroll>
+          :
+          <EmptyStatus />
+      )
+      }
     </StyledEngineProvider>
   );
 });

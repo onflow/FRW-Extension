@@ -15,13 +15,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { LLSpinner,
 } from 'ui/FRWComponent';
 import { useWallet } from 'ui/utils';
-import { LLSwap } from 'ui/FRWComponent';
-import IconNext from 'ui/FRWAssets/svg/next.svg';
-import eventBus from '@/eventBus';
-import InfoIcon from '@mui/icons-material/Info';
-import { Presets } from 'react-component-transition';
+import { notification } from 'background/webapi';
 
-import Increment from '../../FRWAssets/svg/increment.svg';
 interface TransferConfirmationProps {
   isConfirmationOpen: boolean;
   data: any;
@@ -65,7 +60,15 @@ const StakeConfirm = (props: TransferConfirmationProps) => {
   }
 
   const createStake = () => {
-
+    if (props.data.amount < 50) {
+      notification.create(
+        '/',
+        'Not enough Flow',
+        'A minimum of 50 Flow is required for staking',
+      );
+      return;
+    }
+    
     const amount = parseFloat(props.data.amount).toFixed(8);
     wallet.createStake(amount, props.data.nodeid, props.data.delegateid).then(async (txID)=> {
       wallet.listenTransaction(txID, true, `${props.data.amount} have sent to the node`, `You have sent ${props.data.amount} Flow to node id: ${props.data.nodeid}. \nClick to view this transaction.`, props.data.coinInfo.icon);
@@ -81,6 +84,14 @@ const StakeConfirm = (props: TransferConfirmationProps) => {
   }
 
   const createDelegate = () => {
+    if (props.data.amount < 50) {
+      notification.create(
+        '/',
+        'Not enough Flow',
+        'A minimum of 50 Flow is required for staking',
+      );
+      return;
+    }
 
     const amount = parseFloat(props.data.amount).toFixed(8);
     wallet.createDelegator(amount, props.data.nodeid).then(async (txID)=> {
@@ -182,7 +193,7 @@ const StakeConfirm = (props: TransferConfirmationProps) => {
             }}
             variant="body2"
           >
-            Stake Flow
+            Stake FLOW
           </Typography>
         </Box>
 

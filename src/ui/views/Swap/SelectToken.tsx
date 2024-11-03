@@ -96,13 +96,11 @@ const SelectToken = (props: TransferConfirmationProps) => {
 
   useEffect(() => {
     // startCount();
-    console.log('start')
     setToken();
   }, [props.data.token0]);
 
   useEffect(() => {
     // startCount();
-    console.log('start')
     setToken();
   }, [props.data.token1]);
 

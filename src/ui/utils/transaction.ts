@@ -12,12 +12,12 @@ import BigNumber from 'bignumber.js';
 //   }
 // }
 
-export function getTokenAddressParam(
-  tokenData: ethers.utils.TransactionDescription
-): string {
-  const value = tokenData?.args?._to || tokenData?.args?.[0];
-  return value?.toString().toLowerCase();
-}
+// export function getTokenAddressParam(
+//   tokenData: ethers.utils.TransactionDescription
+// ): string {
+//   const value = tokenData?.args?._to || tokenData?.args?.[0];
+//   return value?.toString().toLowerCase();
+// }
 
 export function calcTokenValue(value: string, decimals: number) {
   const multiplier = Math.pow(10, Number(decimals || 0));

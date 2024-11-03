@@ -10,7 +10,7 @@ const Approval = () => {
   const history = useHistory();
   // const [account, setAccount] = useState('');
   const wallet = useWallet();
-  const [getApproval, , rejectApproval] = useApproval();
+  const [getApproval, resolveApproval, rejectApproval] = useApproval();
   const [approval, setApproval] = useState<any>(null);
 
   const init = async () => {
@@ -19,16 +19,32 @@ const Approval = () => {
       history.replace('/');
       return null;
     }
-    console.log('approval ', approval ) 
+    console.log('approval ', approval)
     setApproval(approval);
     if (approval.origin || approval.params.origin) {
       document.title = approval.origin || approval.params.origin;
+    } else if (approval['lock']){
+      history.replace('/unlock');
+      return;
     }
     const account = await wallet.getCurrentAccount();
     if (!account) {
       rejectApproval();
       return;
+    } else if (!approval.approvalComponent) {
+      rejectApproval();
+      return;
     }
+  };
+
+
+
+  const handleCancel = () => {
+    rejectApproval();
+  };
+
+  const handleAllow = async () => {
+    resolveApproval();
   };
 
   useEffect(() => {
@@ -40,7 +56,7 @@ const Approval = () => {
   const CurrentApprovalComponent = ApprovalComponent[approvalComponent];
 
   return (
-    <Box sx={{  
+    <Box sx={{
       // height: 'calc(100vh - 56px)',
       height: '100vh',
       display: 'flex',

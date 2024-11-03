@@ -14,11 +14,11 @@ import {
   LLSpinner,
 } from 'ui/FRWComponent';
 import { useWallet } from 'ui/utils';
-import { TokenModel } from 'background/service/networkModel'
+import { TokenInfo } from 'flow-native-token-registry';
 
 interface AddTokenConfirmationProps {
   isConfirmationOpen: boolean;
-  data: TokenModel | null;
+  data: TokenInfo | null;
   handleCloseIconClicked: () => void;
   handleCancelBtnClicked: () => void;
   handleAddBtnClicked: () => void;
@@ -39,7 +39,7 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
     try {
       const txID = await wallet.enableTokenStorage(props.data.symbol);
       if (txID) {
-        wallet.listenTransaction(txID, true, `Enable ${props.data.symbol}`, `Your ${props.data.symbol} vault is enabled, you should able to receive ${props.data.symbol} token now !\nClick to view this transaction.`, props.data.icon);
+        wallet.listenTransaction(txID, true, `Enable ${props.data.symbol}`, `Your ${props.data.symbol} vault has been enabled. You are now able to receive ${props.data.symbol}!\nClick to view this transaction.`, props.data.logoURI);
         props.handleAddBtnClicked();
         await wallet.setDashIndex(0);
         setSending(false);
@@ -99,7 +99,7 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
           <Typography variant="h6" sx={{textAlign: 'center'}}>{props.data.name}</Typography>
         </Box>
         <Box sx={{flexGrow: 1}}/>
-        <img src={props.data.icon} style={{width: '114px', height: '114px', alignSelf: 'center'}}/>
+        <img src={props.data.logoURI} style={{width: '114px', height: '114px', alignSelf: 'center'}}/>
         <Box sx={{flexGrow: 1}}/>
       </Box>
       }

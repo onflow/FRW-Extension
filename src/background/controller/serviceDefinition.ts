@@ -21,7 +21,7 @@ export function serviceDefinition(address, keyId, type, network, opts = {}) {
       f_type: 'ServiceProvider', // Its a Service Provider
       f_vsn: '1.0.0', // Follows the v1.0.0 spec for service providers
       address: address, // A flow address owned by the wallet
-      name: 'Flow Reference', // OPTIONAL - The name of your wallet. ie: "Dapper Wallet" or "Blocto Wallet"
+      name: 'Flow Wallet', // OPTIONAL - The name of your wallet. ie: "Dapper Wallet" or "Blocto Wallet"
       icon: 'https://lilico.app/fcw-logo.png',
       description: 'A wallet created for everyone.',
     }

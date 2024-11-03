@@ -9,7 +9,9 @@ import {
   CardContent,
   CardMedia,
   Grid,
-  Skeleton
+  Skeleton,
+  ButtonGroup,
+  Button
 } from '@mui/material';
 import { useWallet } from 'ui/utils';
 import { useHistory } from 'react-router-dom';
@@ -63,7 +65,7 @@ export interface CollectionItem {
   address?: {
     mainnet?: string;
     testnet?: string;
-    sandboxnet?: string;
+    crescendo?: string;
   };
   contract_name?: string;
   banner?: string;
@@ -80,17 +82,27 @@ const AddList = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [statusLoading, setStatusLoading] = useState<boolean>(true);
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [filter, setFilter] = useState('all');
 
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
-  const [selectedNFT, setSelectedNFT] = useState<NFTModel|null>(null);
+  const [selectedNFT, setSelectedNFT] = useState<NFTModel | null>(null);
+
+
+  const filteredCollections = collections.filter(ele => {
+    if (filter === 'all') return true;
+    if (filter === 'enabled') return ele.added;
+    if (filter === 'notEnabled') return !ele.added;
+    return true;
+  });
 
   const fetchList = async (data) => {
     setStatusLoading(true)
     try {
-      const enabledList = await usewallet.openapi.getEnabledNFTList(data);
+      const enabledList = await usewallet.openapi.getEnabledNFTList();
       if (enabledList.length > 0) {
-        data.map(item => { item.added = (enabledList.filter(enabled => enabled.contract_name === item.contract_name && enabled.address === item.address).length > 0)})
+        data.map(item => { item.added = (enabledList.filter(enabled => enabled.contract_name === item.contract_name && enabled.address === item.address).length > 0) })
       }
+
       setCollections(data);
     } finally {
       setStatusLoading(false);
@@ -165,30 +177,102 @@ const AddList = () => {
         <Box sx={{ padding: '8px 18px', display: 'flex', flexDirection: 'column' }}>
 
           {loading &&
-          (
-            <Grid container className={classes.grid}>
-              {[...Array(4).keys()].map(key =>(
-                <Card key={key} sx={{borderRadius: '12px', backgroundColor: '#000000', padding: '12px'}} className={classes.skeletonCard}>
-                  <Box sx={{display: 'flex', flexDirection: 'row'}}>
-                    <CardMedia sx={{
-                      width: '48px',
-                      height: '48px',
-                      justifyContent: 'center',
-                    }}><Skeleton variant='circular' width={48} height={48} /></CardMedia>
-                    <CardContent sx={{ flex: '1 0 auto', padding: '0 8px' }}>
-                      <Skeleton variant='text' width={280}/>
-                      <Skeleton variant='text' width={150}/>
-                    </CardContent>
-                  </Box>
-                </Card>
-              ))}
-            </Grid>
-          )
+            (
+              <Grid container className={classes.grid}>
+                {[...Array(4).keys()].map(key => (
+                  <Card key={key} sx={{ borderRadius: '12px', backgroundColor: '#000000', padding: '12px' }} className={classes.skeletonCard}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                      <CardMedia sx={{
+                        width: '48px',
+                        height: '48px',
+                        justifyContent: 'center',
+                      }}><Skeleton variant='circular' width={48} height={48} /></CardMedia>
+                      <CardContent sx={{ flex: '1 0 auto', padding: '0 8px' }}>
+                        <Skeleton variant='text' width={280} />
+                        <Skeleton variant='text' width={150} />
+                      </CardContent>
+                    </Box>
+                  </Card>
+                ))}
+              </Grid>
+            )
           }
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0' }}>
+
+            {/* Button group for filter options */}
+            <Box sx={{ display: 'inline-flex', gap: '10px' }}>
+              <Button
+                onClick={() => setFilter('all')}
+                sx={{
+                  display: 'inline-flex',
+                  height: '36px',
+                  padding: '9px 12px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
+                  flexShrink: 0,
+                  borderRadius: '36px',
+                  border: `1.5px solid ${filter === 'all' ? '#41CC5D' : '#FFFFFF66'}`,
+                  backgroundColor: 'transparent',
+                  color: filter === 'all' ? '#41CC5D' : '#FFFFFF66',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: '#41CC5D',
+                  },
+                }}
+              >
+                All
+              </Button>
+              <Button
+                onClick={() => setFilter('enabled')}
+                sx={{
+                  display: 'inline-flex',
+                  height: '36px',
+                  padding: '9px 12px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
+                  flexShrink: 0,
+                  borderRadius: '36px',
+                  border: `1.5px solid ${filter === 'enabled' ? '#41CC5D' : '#FFFFFF66'}`,
+                  backgroundColor: 'transparent',
+                  color: filter === 'enabled' ? '#41CC5D' : '#FFFFFF66',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: '#41CC5D',
+                  },
+                }}
+              >
+                Enabled
+              </Button>
+              <Button
+                onClick={() => setFilter('notEnabled')}
+                sx={{
+                  display: 'inline-flex',
+                  height: '36px',
+                  padding: '9px 12px',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '10px',
+                  flexShrink: 0,
+                  borderRadius: '36px',
+                  border: `1.5px solid ${filter === 'notEnabled' ? '#41CC5D' : '#FFFFFF66'}`,
+                  backgroundColor: 'transparent',
+                  color: filter === 'notEnabled' ? '#41CC5D' : '#FFFFFF66',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: '#41CC5D',
+                  },
+                }}
+              >
+                Not Enabled
+              </Button>
+            </Box>
+          </Box>
 
           <Typography sx={{ color: '#5E5E5E', fontSize: '14px', fontWeight: 600 }}>{chrome.i18n.getMessage('COLLECTION__LIST')}</Typography>
-          {collections.filter(ele => !ele.hidden).map((ele, index) =>
-            <CollectionCard item={ele} key={index} setAlertOpen={setAlertOpen} isLoading={statusLoading} onClick={handleNFTClick}/>)
+          {filteredCollections.filter(ele => !ele.hidden).map((ele, index) =>
+            <CollectionCard item={ele} key={index} setAlertOpen={setAlertOpen} isLoading={statusLoading} onClick={handleNFTClick} />)
           }
         </Box>
       </Box>

@@ -29,6 +29,7 @@ const ImportPager = () => {
   const [activeIndex, onChange] = useState(0);
   const [mnemonic, setMnemonic] = useState('');
   const [username, setUsername] = useState('');
+  const [pk, setPk] = useState('');
   const [errMessage, setErrorMessage] = useState(chrome.i18n.getMessage('No__backup__found'));
   const [showError, setShowError] = useState(false);
   const [direction, setDirection] = useState(Direction.Right);
@@ -86,9 +87,9 @@ const ImportPager = () => {
   const page = (index) => {
     switch (index) {
       case 0:
-        return <ImportRecoveryPhrase handleClick={goNext} confirmMnemonic={setMnemonic} setUsername={setUsername} />;
+        return <ImportRecoveryPhrase handleClick={goNext} confirmMnemonic={setMnemonic} confirmPk={setPk}  setUsername={setUsername} />;
       case 1:
-        return <RecoverPassword handleClick={goNext} mnemonic={mnemonic} username={username} />;
+        return <RecoverPassword handleClick={goNext} pk={pk} mnemonic={mnemonic} username={username} />;
       case 2:
         return <AllSet handleClick={goNext} />;
       default:
@@ -103,7 +104,7 @@ const ImportPager = () => {
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: 'background.default',
-          height: 'auto',
+          height: '100vh',
           justifyContent: 'center',
           alignItems: 'center',
         }}

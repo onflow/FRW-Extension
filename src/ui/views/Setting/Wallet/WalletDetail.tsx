@@ -13,17 +13,20 @@ import {
   Divider,
   Button,
   Alert,
-  Snackbar
+  Snackbar,
+  CardMedia
 } from '@mui/material';
 import IconEnd from '../../../../components/iconfont/IconAVector11Stroke';
 import { useWallet } from 'ui/utils';
 import { StorageInfo, UserInfoResponse } from 'background/service/networkModel';
-import { withPrefix } from '@/ui/utils/address';
+import { withPrefix, isValidEthereumAddress } from '@/ui/utils/address';
 import { LLHeader } from '@/ui/FRWComponent';
 import { styled } from '@mui/system';
 import SwitchUnstyled, { switchUnstyledClasses } from '@mui/core/SwitchUnstyled';
 import { storage } from '@/background/webapi';
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
+import editEmoji from '../../../FRWAssets/svg/editEmoji.svg';
+import EditProfile from './EditProfile'
 
 const useStyles = makeStyles(() => ({
   arrowback: {
@@ -120,20 +123,20 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'row',
     borderRadius: '16px',
     alignContent: 'space-between',
-    gap:'8px'
+    gap: '8px'
   },
 }));
 
 const orange = {
   500: '#41CC5D',
 };
-  
+
 const grey = {
   400: '#BABABA',
   500: '#787878',
   600: '#5E5E5E',
 };
-  
+
 const Root = styled('span')(
   ({ theme }) => `
     font-size: 0;
@@ -202,21 +205,30 @@ const Root = styled('span')(
     `,
 );
 
+const tempEmoji = {
+  "emoji": "🥥",
+  "name": "Coconut",
+  "bgcolor": "#FFE4C4"
+};
+
+
 const WalletDetail = () => {
   const classes = useStyles();
   const history = useHistory();
   const usewallet = useWallet();
-  
+
   const [isLoading, setLoading] = useState(true);
   const [userWallet, setWallet] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
   const [walletName, setWalletName] = useState('');
-  const [walletAddress, setWalletAddress] = useState('');
+  const [showProfile, setShowProfile] = useState(false);
   const [gasKillSwitch, setGasKillSwitch] = useState(false);
   const [modeGas, setGasMode] = useState(false);
   const [showError, setShowError] = useState(false);
   const [walletList, setWalletList] = useState([]);
-  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null)
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
+  const [isKeyphrase, setIsKeyphrase] = useState(false);
+  const [emoji, setEmoji] = useState<any>(tempEmoji);
 
   const handleErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -227,15 +239,13 @@ const WalletDetail = () => {
 
   const loadGasMode = async () => {
     const isFreeGasFeeEnabled = await storage.get('lilicoPayer');
-    if (isFreeGasFeeEnabled) 
-    {setGasMode(isFreeGasFeeEnabled);}
+    if (isFreeGasFeeEnabled) { setGasMode(isFreeGasFeeEnabled); }
   }
 
   const loadGasKillSwitch = async () => {
     const config = await usewallet.getPayerAddressAndKeyId()
     const isFreeGasFeeEnabled = await storage.get('freeGas');
-    if (isFreeGasFeeEnabled) 
-    {setGasKillSwitch(isFreeGasFeeEnabled);}
+    if (isFreeGasFeeEnabled) { setGasKillSwitch(isFreeGasFeeEnabled); }
   }
 
   const switchGasMode = async () => {
@@ -243,6 +253,14 @@ const WalletDetail = () => {
     storage.set('lilicoPayer', !modeGas);
     setShowError(true);
   }
+
+  const toggleEditProfile = async () => {
+    setShowProfile(!showProfile)
+  };
+
+  const updateProfileEmoji = (emoji) => {
+    setEmoji(emoji);
+  };
 
   const wallets = (data) => {
     return (data || []).map((wallet, index) => {
@@ -257,10 +275,12 @@ const WalletDetail = () => {
 
   const setUserWallet = async () => {
     await usewallet.setDashIndex(3);
-    const userInfo = await usewallet.getUserInfo(false);
-    const wallet = await usewallet.getUserWallets();
-    setWallet(wallet);
-    setUserInfo(userInfo);
+    const savedWallet = await storage.get('walletDetail');
+    const walletDetail = JSON.parse(savedWallet);
+    if (walletDetail) {
+      setWallet([walletDetail.wallet]);
+      setEmoji(walletDetail.selectedEmoji);
+    }
   };
 
   const loadStorageInfo = async () => {
@@ -286,11 +306,22 @@ const WalletDetail = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
+
+
+
+
+  const checkKeyphrase = async () => {
+    const keyrings = await usewallet.checkMnemonics();
+    await setIsKeyphrase(keyrings);
+  };
+
+
   useEffect(() => {
     setUserWallet();
     loadGasKillSwitch();
     loadGasMode();
     loadStorageInfo();
+    checkKeyphrase();
   }, []);
 
   useEffect(() => {
@@ -301,89 +332,134 @@ const WalletDetail = () => {
       const walletName = currentWallet.name;
       setWalletName(walletName);
     }
-    
+
     setLoading(userWallet === null);
   }, [userWallet]);
 
 
   return (
-    <div className='page' style={{display: 'flex', flexDirection: 'column'}}>
+    <div className='page' style={{ display: 'flex', flexDirection: 'column' }}>
 
-      <LLHeader title={chrome.i18n.getMessage('Wallet')}  help={false}/>
+      <LLHeader title={chrome.i18n.getMessage('Account')} help={false} />
 
-      <Box px='20px' sx={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexGrow: 1, }}>
+      <Box px='20px' sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexGrow: 1, }}>
         <Box>
-          <List className={classes.list} sx={{margin: '8px auto 8px auto', pt: 0, pb: 0}}>
+          <List className={classes.list} sx={{ margin: '8px auto 8px auto', pt: 0, pb: 0 }}>
             <ListItem
-              button
-              component={Link}
-              to='/dashboard/nested/privatekeypassword'
               disablePadding
               className={classes.listItem}
+              onClick={() => toggleEditProfile()}
             >
               <ListItemButton className={classes.itemButton}>
-                <ListItemText primary={chrome.i18n.getMessage('Private__Key')} />
-                <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                  <IconEnd size={12} />
-                </ListItemIcon>
-              </ListItemButton>
-            </ListItem>
-
-            <Divider sx={{ width: '90%' }} variant="middle"/>
-    
-            <ListItem
-              button
-              component={Link}
-              to='/dashboard/nested/recoveryphrasepassword'
-              disablePadding
-              className={classes.listItem}
-            >
-              <ListItemButton className={classes.itemButton}>
-                <ListItemText primary={chrome.i18n.getMessage('Recovery__Phrase')} />
-                <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                  <IconEnd size={12} />
+                <Box sx={{
+                  display: 'flex', height: '32px', width: '32px', borderRadius: '32px', alignItems: 'center', justifyContent: 'center', backgroundColor: emoji['bgcolor'], marginRight: '12px'
+                }}>
+                  <Typography sx={{ fontSize: '20px', fontWeight: '600' }}>
+                    {emoji.emoji}
+                  </Typography>
+                </Box>
+                <Typography sx={{ color: '##FFFFFF', fontSize: '14px', fontWeight: '600', marginRight: '4px' }}>{emoji.name}</Typography>
+                <Box sx={{ flex: '1' }}></Box>
+                <ListItemIcon aria-label="end" sx={{ minWidth: '20px' }}>
+                  <CardMedia component="img" sx={{ width: '20px', height: '20px' }} image={editEmoji} />
                 </ListItemIcon>
               </ListItemButton>
             </ListItem>
           </List>
+          {userWallet && !isValidEthereumAddress(userWallet[0].blockchain[0].address) &&
 
-          <Box className={classes.gasBox}>
-            <Box sx={{display: 'flex', flexDirection: 'column'}}>
-              <Typography variant='body1' color='neutral.contrastText' style={{weight: 600}}>{chrome.i18n.getMessage('Free__Gas__Fee')}</Typography>
-              <Typography variant='body1' color={gasKillSwitch ? 'text.secondary' : 'error.main'} sx={{weight: 400, fontSize: '12px'}}>
-                {gasKillSwitch ? chrome.i18n.getMessage('Allow__lilico__to__pay__the__gas__fee') : chrome.i18n.getMessage('This__feature__has__been__disabled__temporarily')}
-              </Typography>
-              {
-                gasKillSwitch && modeGas &&
-                <Typography variant='body1' color={'error.main'} sx={{weight: 400, fontSize: '10px', pt: '4px'}}>
-                  {chrome.i18n.getMessage('It__might__increase__the__waiting__time__when__you__approve__a__transaction')}
-                </Typography>
-              }
-            </Box>
-            <SwitchUnstyled disabled={!gasKillSwitch} checked={modeGas} component={Root} onChange={()=>{switchGasMode()}} />
-          </Box>
+            <>
+              <List className={classes.list} sx={{ margin: '8px auto 8px auto', pt: 0, pb: 0 }}>
+                <ListItem
+                  button
+                  component={Link}
+                  to='/dashboard/nested/privatekeypassword'
+                  disablePadding
+                  className={classes.listItem}
+                >
+                  <ListItemButton className={classes.itemButton}>
+                    <ListItemText primary={chrome.i18n.getMessage('Private__Key')} />
+                    <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
+                      <IconEnd size={12} />
+                    </ListItemIcon>
+                  </ListItemButton>
+                </ListItem>
+                {
+                  isKeyphrase && <Divider sx={{ width: '90%' }} variant="middle" />
+                }
 
-          { storageInfo && <Box className={classes.gasBox}>
-            <Box sx={{display: 'flex', flexDirection: 'column', width: '100%'}}>
-              <Typography variant='body1' color='neutral.contrastText' style={{weight: 600}}>{chrome.i18n.getMessage('Storage')}</Typography>
-              <Box sx={{display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between'}}>
-                <Typography variant='body1' color={gasKillSwitch ? 'text.secondary' : 'error.main'} sx={{weight: 400, fontSize: '12px'}}>
-                  {`${storageCapacity(storageInfo).toFixed(2)}%`}
-                </Typography>
-                <Typography variant='body1' color={gasKillSwitch ? 'text.secondary' : 'error.main'} sx={{weight: 400, fontSize: '12px'}}>
-                  {`${formatBytes(storageInfo.used * 10)} / ${formatBytes(storageInfo.capacity * 10)}`}
-                </Typography>
+                {
+                  isKeyphrase &&
+                  <ListItem
+                    button
+                    component={Link}
+                    to='/dashboard/nested/recoveryphrasepassword'
+                    disablePadding
+                    className={classes.listItem}
+                  >
+                    <ListItemButton className={classes.itemButton}>
+                      <ListItemText primary={chrome.i18n.getMessage('Recovery__Phrase')} />
+                      <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
+                        <IconEnd size={12} />
+                      </ListItemIcon>
+                    </ListItemButton>
+                  </ListItem>
+                }
+              </List>
+
+              <Box>
+                <List className={classes.list} sx={{ margin: '8px auto 8px auto', pt: 0, pb: 0 }}>
+                  <ListItem
+                    button
+                    component={Link}
+                    to='/dashboard/nested/keylist'
+                    disablePadding
+                    className={classes.listItem}
+                  >
+                    <ListItemButton className={classes.itemButton}>
+                      <ListItemText primary={'Account Keys'} />
+                      <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
+                        <IconEnd size={12} />
+                      </ListItemIcon>
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+
               </Box>
-              <LinearProgress variant="determinate" value={storageCapacity(storageInfo)} sx={{height: '8px', borderRadius: '4px'}} ></LinearProgress>
-            </Box>
-          </Box>
-          }
 
+              <Box className={classes.gasBox}>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant='body1' color='neutral.contrastText' style={{ weight: 600 }}>{chrome.i18n.getMessage('Free__Gas__Fee')}</Typography>
+                  <Typography variant='body1' color={gasKillSwitch ? 'text.secondary' : 'error.main'} sx={{ weight: 400, fontSize: '12px' }}>
+                    {gasKillSwitch ? chrome.i18n.getMessage('Allow__lilico__to__pay__the__gas__fee') : chrome.i18n.getMessage('This__feature__has__been__disabled__temporarily')}
+                  </Typography>
+                </Box>
+                <SwitchUnstyled disabled={!gasKillSwitch} checked={modeGas} component={Root} onChange={() => { switchGasMode() }} />
+              </Box>
+
+              {storageInfo && <Box className={classes.gasBox}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                  <Typography variant='body1' color='neutral.contrastText' style={{ weight: 600 }}>{chrome.i18n.getMessage('Storage')}</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                    <Typography variant='body1' color={gasKillSwitch ? 'text.secondary' : 'error.main'} sx={{ weight: 400, fontSize: '12px' }}>
+                      {`${storageCapacity(storageInfo).toFixed(2)}%`}
+                    </Typography>
+                    <Typography variant='body1' color={gasKillSwitch ? 'text.secondary' : 'error.main'} sx={{ weight: 400, fontSize: '12px' }}>
+                      {`${formatBytes(storageInfo.used * 10)} / ${formatBytes(storageInfo.capacity * 10)}`}
+                    </Typography>
+                  </Box>
+                  <LinearProgress variant="determinate" value={storageCapacity(storageInfo)} sx={{ height: '8px', borderRadius: '4px' }} ></LinearProgress>
+                </Box>
+              </Box>
+              }
+
+            </>
+          }
         </Box>
 
-        <Box sx={{ flexGrow: 1 }}/>
+        <Box sx={{ flexGrow: 1 }} />
 
-        <Button 
+        <Button
           variant='contained'
           disableElevation
           color='error'
@@ -408,6 +484,22 @@ const WalletDetail = () => {
           {chrome.i18n.getMessage('You__will__need__to__connect__to__your__wallet__again')}
         </Alert>
       </Snackbar>
+      {
+        showProfile && (
+          <EditProfile
+            showMoveBoard={showProfile}
+            handleCloseIconClicked={() => setShowProfile(false)}
+            handleCancelBtnClicked={() => setShowProfile(false)}
+            handleAddBtnClicked={() => {
+              setShowProfile(false);
+            }}
+            updateProfileEmoji={(emoji) => updateProfileEmoji(emoji)}
+
+            emoji={emoji}
+            userWallet={userWallet}
+          />
+        )
+      }
     </div>
   )
 }

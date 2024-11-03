@@ -9,10 +9,11 @@ const StackingCard = ({network}) => {
   const history = useHistory();
 
   const openFlowPort = async () => {
-
-    await wallet.setDashIndex(2);
-  
-    history.push('/dashboard');
+    // await wallet.setDashIndex(2);
+    // history.push('/dashboard');
+    await chrome.tabs.create({
+      url: 'https://port.onflow.org',
+    });
   }
 
   return (

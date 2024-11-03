@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Avatar, IconButton, CardMedia, Skeleton } from '@mui/material';
-import { useWallet } from 'ui/utils';
+import { useWallet, formatAddress, isEmoji } from 'ui/utils';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../style/LLTheme';
@@ -31,38 +31,25 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
   const history = useHistory();
   const [contactAdd, setContactAdd] = useState(false);
 
-  const DomainLogo = () => {
-    if (contact.domain?.value === '') {
-      return undefined;
-    }
-    switch (contact.domain?.domain_type) {
-      case 0:
-        return 'https://raw.githubusercontent.com/Outblock/Assets/main/dapp/find/logo.png';
-      case 1:
-        return 'https://raw.githubusercontent.com/Outblock/Assets/main/dapp/flowns/logo.png';
-      case 2:
-        return 'https://lilico.app/logo.png'
-      default:
-        return undefined;
-    }
-  };
-
   const getName = (name: string) => {
-    if (name.startsWith('0')){
+    console.log('contact ', contact)
+    if (name.startsWith('0')) {
       return '0x'
-    } else {
+    } else if (name.length > 0){
       return name[0].toUpperCase()
+    } else {
+      return '0x'
     }
   }
 
   const addAddressBook = async (contact) => {
-    
+
     if (!contact.domain.value) {
       wallet.openapi.addAddressBook(
         contact.contact_name,
         contact.address,
         contact.contact_name
-      ).then((response) =>{
+      ).then((response) => {
         if (response.status === 200) {
           setContactAdd(true);
           wallet.refreshAddressBook();
@@ -76,7 +63,7 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
         contact.address,
         contact.domain.value,
         contact.domain.domain_type
-      ).then((response) =>{
+      ).then((response) => {
         if (response.status === 200) {
           setContactAdd(true);
           wallet.refreshAddressBook();
@@ -84,6 +71,7 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
       });
     }
   };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -101,44 +89,61 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
           },
         }}
       >
-        {!isLoading ?
-        
-          <Avatar
-            alt={contact.contact_name}
-            src={DomainLogo() || contact.avatar}
-            sx={{
-              mr: '13px',
-              color: 'primary.main',
-              backgroundColor: '#484848',
-              width: '40px',
-              height: '40px',
-            }}
-          >
-            {getName(contact.contact_name)}
-          </Avatar>
-          : (
-            <Skeleton variant="circular" width={40} height={40} />
+        {!isLoading ? (
+          isEmoji(contact.avatar) ? (
+            <Typography
+              sx={{
+                mr: '13px',
+                color: 'primary.main',
+                backgroundColor: '#484848',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                fontSize: '24px', // Adjust font size to fit within the box
+              }}
+            >
+              {contact.avatar}
+            </Typography>
+          ) : (
+            <Avatar
+              alt={contact.contact_name}
+              src={contact.avatar}
+              sx={{
+                mr: '13px',
+                color: 'primary.main',
+                backgroundColor: '#484848',
+                width: '40px',
+                height: '40px',
+              }}
+            >
+              {getName(contact.contact_name)}
+            </Avatar>
           )
-        }
+        ) : (
+          <Skeleton variant="circular" width={40} height={40} />
+        )}
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          {!isLoading?
+          {!isLoading ?
             <Typography variant="body1" sx={{ textAlign: 'start' }}>
-              {contact.domain?.value || contact.contact_name}{' '}
+              {contact.domain?.value || formatAddress(contact.contact_name)}{' '}
               {contact.usernam && contact.usernam !== '' && (
                 <Box display="inline" color="info.main">
                   {contact.username !== '' ? ' (@' + contact.username + ')' : ''}
                 </Box>
               )}
-            </Typography>: (
+            </Typography> : (
               <Skeleton variant="text" width={45} height={15} />
             )}
-          {!isLoading?
+          {!isLoading ?
             <Typography
               variant="overline"
               sx={{ lineHeight: '1', textAlign: 'start' }}
               color="text.secondary"
             >
-              {contact.address}
+              {formatAddress(contact.address)}
             </Typography>
             : (
               <Skeleton variant="text" width={45} height={15} />
@@ -150,14 +155,15 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
             e.stopPropagation();
             history.push('/dashboard/wallet/send')
           }}>
-            <CardMedia sx={{ width:'11px', height:'11px'}} image={closex} />
+            <CardMedia sx={{ width: '11px', height: '11px' }} image={closex} />
           </IconButton>)
           :
           (
             contact.type === 4 && !contactAdd ? (
               <IconButton onClick={(e) => {
                 e.stopPropagation();
-                addAddressBook(contact)}}>
+                addAddressBook(contact)
+              }}>
                 <PersonAddAltIcon color="info" />
               </IconButton>
             ) : (

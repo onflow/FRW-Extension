@@ -7,6 +7,7 @@ import{Input} from '@mui/material';
 import { Presets } from 'react-component-transition';
 import CancelIcon from '../../../components/iconfont/IconClose';
 import { makeStyles } from '@mui/styles';
+import { openInternalPageInTab } from 'ui/utils/webapi';
 import lilo from 'ui/FRWAssets/image/lilo.png';
 import './style.css';
 
@@ -47,10 +48,10 @@ const Unlock = () => {
     inputEl.current.focus();
   }, []);
 
-  const restPass = () => {
-    setResetPop(true);
-    
-    // openInternalPageInTab('reset')
+  const restPass = async () => {
+    // setResetPop(true);
+    await wallet.lockWallet();
+    openInternalPageInTab('forgot');
   };
 
   const [run] = useWalletRequest(wallet.unlock, {

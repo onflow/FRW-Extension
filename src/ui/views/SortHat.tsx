@@ -52,7 +52,7 @@ const SortHat = () => {
     const currentAccount = await wallet.getCurrentAccount();
 
     if (!currentAccount) {
-      setTo('/no-address');
+      setTo('/welcome');
     } else if (approval) {
       setTo('/approval');
     } else {

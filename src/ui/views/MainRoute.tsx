@@ -1,10 +1,19 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import Synce from './Sync';
 import RegisterPager from './Register/RegisterPager';
 import RecoverRegister from './RecoverRegister';
-import ImportPager from './Import/ImportPager';
-import GoogleImport from './Import/GoogleImport';
-import Reset from './Reset';
+import AddressImport from './AddressImport';
+import AddRegister from './AddWelcome/AddRegister';
+import AddImport from './AddWelcome/AddressImport';
+import AddSync from './AddWelcome/Sync';
+// import ProxySync from './AddWelcome/ProxySync';
+import AddWelcome from './AddWelcome';
+import GoogleImport from './AddressImport/GoogleImport';
+import AddGoogle from './AddWelcome/AddressImport/GoogleImport';
+import Forgot from './Forgot';
+import Reset from './Forgot/Reset';
+import Recover from './Forgot/Recover';
 import WelcomePage from './WelcomePage';
 import './MainRoute.css';
 import { spring, AnimatedSwitch } from 'react-router-transition';
@@ -66,10 +75,20 @@ const Main = () => {
         <Switch>
           <Route exact path="/welcome" component={WelcomePage} />
           <Route exact path="/register" component={RegisterPager} />
+          <Route exact path="/sync" component={Synce} />
+          <Route exact path="/addressimport" component={AddressImport} />
           <Route exact path="/recover" component={RecoverRegister} />
-          <Route exact path="/import" component={ImportPager} />
-          <Route exact path="/reset" component={Reset} />
+          <Route exact path="/addregister" component={AddRegister} />
+          {/* <Route exact path="/proxysync" component={ProxySync} /> */}
+          <Route exact path="/addimport" component={AddImport} />
+          <Route exact path="/addsync" component={AddSync} />
+          <Route exact path="/addwelcome" component={AddWelcome} />
+          <Route exact path="/forgot" component={Forgot} />
+          <Route exact path="/recoverpage" component={Recover} />
+          <Route exact path="/resetpage" component={Reset} />
+          <Route exact path="/reset" component={WelcomePage} />
           <Route exact path="/import/google" component={GoogleImport} />
+          <Route exact path="/add/google" component={AddGoogle} />
           <Route exact path="/import/accounts" component={GoogleImport} />
         </Switch>
       </AnimatedSwitch>

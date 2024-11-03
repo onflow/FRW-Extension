@@ -31,7 +31,7 @@ export const LinkingBlock = ({ image, accountTitle, userInfo }) => {
               <img style={{ height: '60px', width: '60px', borderRadius: '30px', backgroundColor: 'text.secondary', objectFit: 'cover' }} src={image} />
               <Typography sx={{ fontSize: '14px', color: '#E6E6E6', fontWeight: 'bold', width: '100%', pt: '4px', textAlign: 'center' }}>{accountTitle}</Typography>
             </Box>
-            <img src={Link}/>
+            <img style={{width:'108px'}} src={Link}/>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {userInfo && <img style={{ height: '60px', width: '60px', borderRadius: '30px', backgroundColor: 'text.secondary', objectFit: 'cover' }} src={userInfo.avatar} />}
               <Typography sx={{ fontSize: '14px', color: '#E6E6E6', fontWeight: 'bold', width: '100%', pt: '4px', textAlign: 'center' }}>{userInfo?.nickname}</Typography>
@@ -44,8 +44,8 @@ export const LinkingBlock = ({ image, accountTitle, userInfo }) => {
 
       <Box sx={{ borderRadius: '12px', overflow: 'hidden', width: '100%', display: 'table' }}>
         <Typography sx={{ fontSize: '14px', textTransform: 'uppercase', color: '#5E5E5E' }}>{chrome.i18n.getMessage('This_App_would_like_to')}</Typography>
-        <Typography sx={{ fontSize: '14px', color: '#FFFFFF',marginTop:'4px' }}><img className={classes.IconCheck} src={IconCheck} /> Delegate dApp account to your lilico wallet</Typography>
-        <Typography sx={{ fontSize: '14px', color: '#FFFFFF',marginTop:'8px' }}><img className={classes.IconCheck} src={IconCheck} /> Flow Reference wallet will manage linked account </Typography>
+        <Typography sx={{ fontSize: '14px', color: '#FFFFFF',marginTop:'4px' }}><img className={classes.IconCheck} src={IconCheck} /> Delegate dApp account to your Flow Wallet</Typography>
+        <Typography sx={{ fontSize: '14px', color: '#FFFFFF',marginTop:'8px' }}><img className={classes.IconCheck} src={IconCheck} /> Flow Wallet will manage linked account </Typography>
       </Box>
 
     </Box>

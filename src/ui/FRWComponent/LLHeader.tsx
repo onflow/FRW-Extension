@@ -43,10 +43,10 @@ export const LLHeader = (props: LLHeaderProps) => {
       {/* <Grid item xs={1}> */}
       {/* </Grid> */}
       {props.help && <Grid item xs={1} sx={{pl: 0}}>
-        <a href="https://outblock.notion.site/FAQ-lilico-support-fc26f774ad514439a11c5c7cb255d1ec" target='_blank'>
+        <a href="https://wallet.flow.com/contact" target='_blank'>
           <IconButton>
             <Tooltip title={chrome.i18n.getMessage('Need__Help')} arrow>
-              {/* <a href="https://outblock.notion.site/FAQ-lilico-support-fc26f774ad514439a11c5c7cb255d1ec" target='_blank'> */}
+              {/* <a href="https://wallet.flow.com/contact" target='_blank'> */}
               <HelpOutlineRoundedIcon  sx={{ color: 'icon.navi' }} />
               {/* </a> */}
             </Tooltip>

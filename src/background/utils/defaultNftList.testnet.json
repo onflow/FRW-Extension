@@ -1,0 +1,1673 @@
+[{
+    "id": "BILPlayerCollection",
+    "contract_name": "Player",
+    "logo": "https://www.gamifylabs.io/img/index_nav_logo.6a9cf2d9.png",
+    "address": "0x9e6cdb88e34fa1f3",
+    "name": "The Example Collection",
+    "marketplace": "",
+    "banner": "https://www.gamifylabs.io/img/index_nav_logo.6a9cf2d9.png",
+    "official_website": "https://example-nft.onflow.org/",
+    "description": "This collection is used as an example to help you develop your next Flow NFT.",
+    "path": {
+        "storage_path": "/storage/PlayerCollection",
+        "public_path": "/public/PlayerCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Player.Collection{Player.PlayerCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Player.Collection{Player.PlayerCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flow_blockchain"
+        }
+    }
+},
+{
+    "id": "NewFunThing",
+    "contract_name": "NewFunThingPack",
+    "logo": "https://NewFunThing.com",
+    "address": "0xcbf10523da1a9ee9",
+    "name": "NewFunThing",
+    "marketplace": "",
+    "banner": "https://NewFunThing.com",
+    "official_website": "https://NewFunThing.com",
+    "description": "This is a New Fun Thing that you're going to want to be an active participant in.",
+    "path": {
+        "storage_path": "/storage/NewFunThingPackCollection",
+        "public_path": "/public/NewFunThingPackCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "NewFunThingPack.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,NewFunThingPack.PackCollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "NewFunThingPack.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,NewFunThingPack.PackCollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "TheSilverlightLandmarkNFTCollection",
+    "contract_name": "SilverlightLocationNFT",
+    "logo": "https://nft.silverlight.store/landmarks/Angels_Landing.png",
+    "address": "0x9847e3f695f053d0",
+    "name": "The Silverlight Landmark NFT Collection",
+    "marketplace": "",
+    "banner": "https://nft.silverlight.store/landmarks/Angels_Landing.png",
+    "official_website": "https://nft.silverlight.store",
+    "description": "A collection of rare Landmark NFTs representing picturesque natural landmark destinations. Starting with the United States edition, you can own NFTs of famous locations like Antelope Canyon and Grand Prismatic Spring. NFT holders will earn Effort tokens for every Silverligh app user visiting the location in the real world.",
+    "path": {
+        "storage_path": "/storage/SilverlightLocationNFTCollection",
+        "public_path": "/public/SilverlightLocationNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SilverlightLocationNFT.Collection{SilverlightLocationNFT.SilverlightLocationNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SilverlightLocationNFT.Collection{SilverlightLocationNFT.SilverlightLocationNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/xDHjJfKETY"
+        },
+        "twitter": {
+            "url": " https://twitter.com/shopsilverlight"
+        }
+    }
+},
+{
+    "id": "Mindtrix",
+    "contract_name": "Mindtrix",
+    "logo": "https://files.soundon.fm/1653806949295-e3bf410c-28f9-45d0-962a-e37a35d2c2ae.jpeg",
+    "address": "0xd7220a1216d9d4b9",
+    "name": "EP151 投資自己，投資人生",
+    "marketplace": "",
+    "banner": "https://files.soundon.fm/1653806949295-e3bf410c-28f9-45d0-962a-e37a35d2c2ae.jpeg",
+    "official_website": "https://player.soundon.fm/p/4a8660a0-e0d0-490b-8d46-c28219606f47/episodes/58ecbc37-26ef-42d5-b57d-03169b1cdacc",
+    "description": "跟大家分享近期盤勢與財報，及好書《檯面下我是這樣投資》心得\n\n✅ 支持Jenny的付費專欄『美股投資學』\n航空旅遊持續復甦，下半年加速帶飛股價？達美航空(DAL)最新財報分析\nhttps://reurl.cc/3od5RM\n\n✅ 訂閱《風傳媒x華爾街日報》VVIP專案\n財經的世界，情勢瞬息萬變\n了解最即時的趨勢脈動，才能取得先機，打造獲利策略！\n輸入優惠碼『JCSWSJ』即享年訂閱2.8折\n優惠價格$3,988/年（原價$13,996）\n額外加贈Pressplay『美股投資學』一個月，再送聯名證件套\n➡ https://reurl.cc/yrWxZE",
+    "path": {
+        "storage_path": "/storage/MindtrixCollection",
+        "public_path": "/public/MindtrixCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Mindtrix.Collection{Mindtrix.MindtrixCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Mindtrix.Collection{Mindtrix.MindtrixCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "none"
+        }
+    }
+},
+{
+    "id": "MonoCatsGachapon",
+    "contract_name": "MonoCatMysteryBox",
+    "logo": "https://static-test.mono.fun/public/contents/projects/a73c1a41-be88-4c7c-a32e-929d453dbd39/nft/MysteryBox.png",
+    "address": "0xa01dd6e82b7352be",
+    "name": "MonoCatsGachapon",
+    "marketplace": "",
+    "banner": "https://static-test.mono.fun/public/contents/projects/a73c1a41-be88-4c7c-a32e-929d453dbd39/carousels/mono%20cats%20PC.png",
+    "official_website": "https://monocats.xyz/mainpage",
+    "description": "N(W)A(H)N(A)I(T)!!? A cat birth in Monoverse? Just come and grab your fellow.",
+    "path": {
+        "storage_path": "/storage/MonoCatMysteryBoxCollection",
+        "public_path": "/public/MonoCatMysteryBoxCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "MonoCatMysteryBox.Collection{MonoCatMysteryBox.MonoCatMysteryBoxCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "MonoCatMysteryBox.Collection{MonoCatMysteryBox.MonoCatMysteryBoxCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://monocats.xyz/discord"
+        },
+        "twitter": {
+            "url": "https://monocats.xyz/twitter"
+        },
+        "instagram": {
+            "url": "https://monocats.xyz/instagram"
+        }
+    }
+},
+{
+    "id": "CuveeCollectiveWineNFT",
+    "contract_name": "Wine",
+    "logo": "https://assets.test-cuveecollective.com/nfts/wine/robert-craig/2022/image.jpg",
+    "address": "0x0146169a1d60abc5",
+    "name": "Robert Craig - 2022 Series",
+    "marketplace": "",
+    "banner": "https://assets.test-cuveecollective.com/nfts/wine/robert-craig/2022/banner_image.jpg",
+    "official_website": "https://www.test-cuveecollective.com/marketplace/wine/robert-craig-winery",
+    "description": "Robert Craig - 2022 Series",
+    "path": {
+        "storage_path": "/storage/WineCollection",
+        "public_path": "/public/WineCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Wine.Collection{Wine.NFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Wine.Collection{Wine.NFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://cuveecollective.com/discord"
+        },
+        "twitter": {
+            "url": "https://twitter.com/cuveecollective"
+        },
+        "instagram": {
+            "url": "https://twitter.com/cuveecollectivehq"
+        }
+    }
+},
+{
+    "id": "SolarpupsNFT",
+    "contract_name": "SolarpupsNFT",
+    "logo": "https://cdn.krikeyapp.com/web/assets/img/solar-pups/logo.png",
+    "address": "0x0175f50044de592d",
+    "name": "The Krikey Solarpups Collection",
+    "marketplace": "",
+    "banner": "https://cdn.krikeyapp.com/web/assets/img/solar-pups/logo.png",
+    "official_website": "https://www.solarpups.com/marketplace",
+    "description": "The world's most adorable and sensitive pups.",
+    "path": {
+        "storage_path": "/storage/SolarpupsNFTsDev05",
+        "public_path": "/public/SolarpupsNFTsDev05",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SolarpupsNFT.Collection{SolarpupsNFT.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SolarpupsNFT.Collection{SolarpupsNFT.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/krikey"
+        },
+        "twitter": {
+            "url": "https://twitter.com/SolarPupsNFTs"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/krikeyapp/?hl=en"
+        }
+    }
+},
+{
+    "id": "Momentables",
+    "contract_name": "Momentables",
+    "logo": "https://s3.amazonaws.com/xyz.find.momentable/logo-black.svg",
+    "address": "0x9f2eb43b6df02730",
+    "name": "Modern Art1",
+    "marketplace": "",
+    "banner": "https://s3.amazonaws.com/xyz.find.momentable/logo-black.svg",
+    "official_website": "https://www.momentable.ai/406",
+    "description": "Narmer is a cryptographically unique majestic collectible, programmatically brought to life Narmer is a Rare Pharoah",
+    "path": {
+        "storage_path": "/storage/MomentablesCollection",
+        "public_path": "/public/MomentablesCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Momentables.Collection{Momentables.MomentablesCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Momentables.Collection{Momentables.MomentablesCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/nextdecentrum"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/nextdecentrum"
+        }
+    }
+},
+{
+    "id": "UFCStrike",
+    "contract_name": "ufcInt_NFT",
+    "logo": "https://media.gigantik.io/ufc/square.png",
+    "address": "0x04625c28593d9408",
+    "name": "UFC Strike",
+    "marketplace": "",
+    "banner": "https://media.gigantik.io/ufc/banner.png",
+    "official_website": "https://www.ufcstrike.com/",
+    "description": "Collect the most iconic video highlights from the biggest (and most notorious) fighters from UFC. UFC Strike allows fans to express their fandom like never before with fully licensed UFC video NFTs.",
+    "path": {
+        "storage_path": "/storage/ufcInt_NFTCollection",
+        "public_path": "/public/ufcInt_NFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "ufcInt_NFT.Collection{ufcInt_NFT.ufcInt_NFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "ufcInt_NFT.Collection{ufcInt_NFT.ufcInt_NFTCollectionPublic,NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/UFCStrike"
+        },
+        "twitter": {
+            "url": "https://twitter.com/UFCStrikeNFT"
+        },
+        "instagram": {
+            "url": "https://instagram.com/ufcstrike"
+        }
+    }
+},
+{
+    "id": "StoreFrontTR",
+    "contract_name": "StoreFront",
+    "logo": "https://tokenrunners.com/assets/hero_logo.svg",
+    "address": "0x34d2a0f0a4f8c6e8",
+    "name": "Token Runners Example",
+    "marketplace": "",
+    "banner": "https://tokenrunners.com/assets/hero_logo.svg",
+    "official_website": "https://example02.tokenpirates.com/nft/62e7e046de3ddfd05e750cc2",
+    "description": "Token Runners Example",
+    "path": {
+        "storage_path": "/storage/StoreFrontCollection",
+        "public_path": "/public/StoreFrontCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "StoreFront.Collection{StoreFront.CollectionPublic,StoreFront.IRevealNFT,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "StoreFront.Collection{StoreFront.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/cPJq98AY"
+        },
+        "twitter": {
+            "url": "https://twitter.com/runtokenrun"
+        }
+    }
+},
+{
+    "id": "JollyJokers",
+    "contract_name": "JollyJokers",
+    "logo": "https://storage.googleapis.com/inception_public/Jolly_Jokers.png",
+    "address": "0xe9760069d688ef5e",
+    "name": "Jolly Jokers",
+    "marketplace": "",
+    "banner": "https://storage.googleapis.com/inception_public/Jolly_Jokers.png",
+    "official_website": "https://www.jollyjokersnft.com/",
+    "description": "The Jolly Joker Sports Society is a collection of 5,000 NFTs living on the Flow blockchain",
+    "path": {
+        "storage_path": "/storage/JollyJokersCollection",
+        "public_path": "/public/JollyJokersCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "JollyJokers.Collection{NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,JollyJokers.JollyJokersCollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "JollyJokers.Collection{NonFungibleToken.Provider,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,JollyJokers.JollyJokersCollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/jollyjokersnft"
+        }
+    }
+},
+{
+    "id": "Zeedz",
+    "contract_name": "ZeedzINO",
+    "logo": "https://play.zeedz.io/logo-zeedz.svg",
+    "address": "0x7dc7430a06f38af3",
+    "name": "Zeedz",
+    "marketplace": "",
+    "banner": "https://play.zeedz.io/background-zeedz.jpg",
+    "official_website": "https://play.zeedz.io/",
+    "description": "Zeedz is the first play-for-purpose game where players reduce global carbon emissions by collecting plant-inspired creatures: Zeedles. They live as NFTs on an eco-friendly blockchain (Flow) and grow with the real-world weather.",
+    "path": {
+        "storage_path": "/storage/ZeedzINOCollection",
+        "public_path": "/public/ZeedzINOCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "ZeedzINO.Collection{ZeedzINO.ZeedzCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "http://discord.com/invite/zeedz"
+        },
+        "twitter": {
+            "url": "https://twitter.com/zeedz_official"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/zeedz_official/"
+        }
+    }
+},
+{
+    "id": "ChainmonstersRewards",
+    "contract_name": "ChainmonstersRewards",
+    "logo": "https://chainmonsters.com/images/chipleaf.png",
+    "address": "0x75783e3c937304a8",
+    "name": "Chainmonsters Rewards",
+    "marketplace": "",
+    "banner": "https://chainmonsters.com/images/bg.jpg",
+    "official_website": "https://chainmonsters.com",
+    "description": "An NFT metadata description for Chainmonsters collections",
+    "path": {
+        "storage_path": "/storage/ChainmonstersRewardCollection",
+        "public_path": "/public/ChainmonstersRewardCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "ChainmonstersRewards.Collection{ChainmonstersRewards.ChainmonstersRewardCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "ChainmonstersRewards.Collection{ChainmonstersRewards.ChainmonstersRewardCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/chainmonsters"
+        },
+        "twitter": {
+            "url": "https://twitter.com/chainmonsters"
+        }
+    }
+},
+{
+    "id": "TuneGOMarketplaceUAT",
+    "contract_name": "TuneGONFTV5",
+    "logo": "https://static.tunegonft.com/d89153b479a785ee9187609398e946b7aa63c171/assets/images/tunego-beta-logo.png",
+    "address": "0x58b60c5240d3f39b",
+    "name": "TuneGO NFT",
+    "marketplace": "",
+    "banner": "https://static.tunegonft.com/d89153b479a785ee9187609398e946b7aa63c171/assets/images/tunego-beta-logo.png",
+    "official_website": "https://www.tunegonft.com/",
+    "description": "Unique music collectibles from the TuneGO Community",
+    "path": {
+        "storage_path": "/storage/tunegoNFTCollection013",
+        "public_path": "/public/tunegoNFTCollection013",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "TuneGONFTV5.Collection{TuneGONFTV5.TuneGONFTV5CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "TuneGONFTV5.Collection{TuneGONFTV5.TuneGONFTV5CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "SoulMadePack",
+    "contract_name": "SoulMadePack",
+    "logo": "https://i.imgur.com/Xlfqj5g.png",
+    "address": "0x421c19b7dc122357",
+    "name": "SoulMadeMain",
+    "marketplace": "",
+    "banner": "https://i.imgur.com/HWXhRXt.png",
+    "official_website": "https://soulmade.art",
+    "description": "SoulMade Main Collection",
+    "path": {
+        "storage_path": "/storage/SoulMadePackCollection",
+        "public_path": "/public/SoulMadePackCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SoulMadePack.Collection{SoulMadePack.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SoulMadePack.Collection{SoulMadePack.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/xtqqXCKW9B"
+        },
+        "twitter": {
+            "url": "https://twitter.com/soulmade_nft"
+        }
+    }
+},
+{
+    "id": "FlowverseMysteryPass",
+    "contract_name": "FlowversePass",
+    "logo": "https://flowverse-mystery-pass.s3.filebase.com/testnet/squareImage.jpg",
+    "address": "0xc7c122b5b811de8e",
+    "name": "Test Mystery Pass 2",
+    "marketplace": "",
+    "banner": "https://flowverse-mystery-pass.s3.filebase.com/testnet/bannerImage.jpg",
+    "official_website": "https://nft.flowverse.co/flowverse-mystery-pass",
+    "description": "The Flowverse Mystery Pass is a utility-focused membership pass that aims to level up Flowverse from a web2 information provider to a web3 brand",
+    "path": {
+        "storage_path": "/storage/FlowversePassCollection",
+        "public_path": "/public/FlowversePassCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "FlowversePass.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,FlowversePass.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "FlowversePass.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,FlowversePass.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/flowverse"
+        },
+        "twitter": {
+            "url": "https://twitter.com/flowverse_"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/flowverseofficial"
+        }
+    }
+},
+{
+    "id": "Patch",
+    "contract_name": "Patch",
+    "logo": "https://storage.googleapis.com/flunks_public/website-assets/classroom.png",
+    "address": "0xe666c53e1758dec6",
+    "name": "Backpack Patch",
+    "marketplace": "",
+    "banner": "https://storage.googleapis.com/flunks_public/website-assets/classroom.png",
+    "official_website": "https://flunks.io/",
+    "description": "Backpack Patches #onFlow",
+    "path": {
+        "storage_path": "/storage/PatchCollection",
+        "public_path": "/public/PatchCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Patch.Collection{NonFungibleToken.CollectionPublic,Patch.PatchCollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Patch.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flunks_nft"
+        }
+    }
+},
+{
+    "id": "BILBoxCollection",
+    "contract_name": "PlayerBox",
+    "logo": "https://www.gamifylabs.io/img/boxicon4.dbe5206b.png",
+    "address": "0x9e6cdb88e34fa1f3",
+    "name": "The Example Collection",
+    "marketplace": "",
+    "banner": "https://www.gamifylabs.io/img/boxicon4.dbe5206b.png",
+    "official_website": "https://example-nft.onflow.org/",
+    "description": "This collection is used as an example to help you develop your next Flow NFT.",
+    "path": {
+        "storage_path": "/storage/PlayerBoxCollection",
+        "public_path": "/public/PlayerBoxCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "PlayerBox.Collection{PlayerBox.PlayerBoxCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "PlayerBox.Collection{PlayerBox.PlayerBoxCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flow_blockchain"
+        }
+    }
+},
+{
+    "id": "TheEpixCollection",
+    "contract_name": "EpixV2",
+    "logo": "https://d2an3q4scpi3of.cloudfront.net/epix/files/collections/i-am-logo-1.jpg",
+    "address": "0x628a3d5a0629c20a",
+    "name": "The Epix Collection",
+    "marketplace": "",
+    "banner": "https://d2an3q4scpi3of.cloudfront.net/epix/files/collections/i-am-logo-1.jpg",
+    "official_website": "",
+    "description": "",
+    "path": {
+        "storage_path": "/storage/EpixV2Collection",
+        "public_path": "/public/EpixV2Collection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "EpixV2.Collection{EpixV2.EpixCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "EpixV2.Collection{EpixV2.EpixCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/thisisepix"
+        }
+    }
+},
+{
+    "id": "SNKRHUD",
+    "contract_name": "SNKRHUDNFT",
+    "logo": "https://www.snkrhud.com/img/snkrhud-logo-white.fb9acd95.png",
+    "address": "0x29b39a0daa6e0897",
+    "name": "SNKRHUD",
+    "marketplace": "",
+    "banner": "https://www.snkrhud.com/img/snkrhud-logo-white.fb9acd95.png",
+    "official_website": "https://www.snkrhud.com",
+    "description": "SNKRHUD NFT",
+    "path": {
+        "storage_path": "/storage/SNKRHUDNFTCollection",
+        "public_path": "/public/SNKRHUDNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SNKRHUDNFT.Collection{SNKRHUDNFT.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SNKRHUDNFT.Collection{SNKRHUDNFT.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/snkrhud"
+        },
+        "twitter": {
+            "url": "https://twitter.com/snkrhud"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/snkrhud"
+        }
+    }
+},
+{
+    "id": "OpenLockerIncBoneYardHuskyzClub",
+    "contract_name": "OpenLockerIncBoneYardHuskyzClub",
+    "logo": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "address": "0x985d410b577fd4a1",
+    "name": "OpenLockerIncBoneYardHuskyzClub",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "official_website": "https://google.ca",
+    "description": "Templated Contract!",
+    "path": {
+        "storage_path": "/storage/OpenLockerIncBoneYardHuskyzClubCollection",
+        "public_path": "/public/OpenLockerIncBoneYardHuskyzClubCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "OpenLockerIncBoneYardHuskyzClub.Collection{OpenLockerIncBoneYardHuskyzClub.OpenLockerIncBoneYardHuskyzClubCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "OpenLockerIncBoneYardHuskyzClub.Collection{OpenLockerIncBoneYardHuskyzClub.OpenLockerIncBoneYardHuskyzClubCollectionPublic,NonFungibleToken.Provider,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "NewFunThingToken",
+    "contract_name": "NewFunThing",
+    "logo": "https://NewFunThing.com",
+    "address": "0xcbf10523da1a9ee9",
+    "name": "NewFunThing",
+    "marketplace": "",
+    "banner": "https://NewFunThing.com",
+    "official_website": "https://NewFunThing.com",
+    "description": "This is a New Fun Thing that you're going to want to be an active participant in.",
+    "path": {
+        "storage_path": "/storage/NewFunThingCollection",
+        "public_path": "/public/NewFunThingCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "NewFunThing.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,NewFunThing.NewFunThingCollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "NewFunThing.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,NewFunThing.NewFunThingCollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "CuveeCollectiveCollector",
+    "contract_name": "Collector",
+    "logo": "https://assets.test-cuveecollective.com/nfts/collector/nft_collector_1.jpg",
+    "address": "0x3a1ebf12b8e3da71",
+    "name": "Cuvée Collective - Collector",
+    "marketplace": "",
+    "banner": "https://assets.cuveecollective.com/nfts/collector/nft_collector_1_banner.jpg",
+    "official_website": "Collector #13",
+    "description": "Our genesis collection for Cuvée Collective, called The Collector. The Collector NFT gives the NFT holder access to all future NFT drops 24 hours before they are open to the public, in addition to core Cuvée Collective benefits to include members-only discord channels, community voting status, concierge services, Sommelier hotline, and airdrops, events, and giveaways.",
+    "path": {
+        "storage_path": "/storage/CollectorCollection",
+        "public_path": "/public/CollectorCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Collector.Collection{Collector.NFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Collector.Collection{Collector.NFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://cuveecollective.com/discord"
+        },
+        "twitter": {
+            "url": "https://twitter.com/cuveecollective"
+        },
+        "instagram": {
+            "url": "https://twitter.com/cuveecollectivehq"
+        }
+    }
+},
+{
+    "id": "G23ANDME",
+    "contract_name": "VivlioNFT",
+    "logo": "https://i.imgur.com/sWYJMBu.jpg",
+    "address": "0xd43215762454749a",
+    "name": "G23ANDME",
+    "marketplace": "",
+    "banner": "https://i.imgur.com/4nQg7xY.jpeg",
+    "official_website": "https://genoma23.com/en/about-us/",
+    "description": "Life is Art, turn your DNA into art through Genome 23 / La vida es Arte, convierte tu ADN en Arte a través del Genoma 23",
+    "path": {
+        "storage_path": "/storage/vivlioNFTCollection",
+        "public_path": "/public/vivlioNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "VivlioNFT.Collection{VivlioNFT.VivlioNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "VivlioNFT.Collection{VivlioNFT.VivlioNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/artegenoma23"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/artegenoma23/"
+        }
+    }
+},
+{
+    "id": "BarterYardClub_werewolves",
+    "contract_name": "BarterYardClubWerewolf",
+    "logo": "https://images.barteryard.club/logo.svg",
+    "address": "0x195caada038c5806",
+    "name": "BarterYard Club Werewolves",
+    "marketplace": "",
+    "banner": "https://images.barteryard.club/banner.svg",
+    "official_website": "https://www.barteryard.club",
+    "description": "Barter Yard Club is an NFT toolbox organisation built on Flow Protocol and co-owned by the werewolves",
+    "path": {
+        "storage_path": "/storage/BarterYardClubWerewolfCollection",
+        "public_path": "/public/BarterYardClubWerewolfCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "BarterYardClubWerewolf.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "BarterYardClubWerewolf.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/barteryard"
+        },
+        "twitter": {
+            "url": "https://twitter.com/barteryard"
+        }
+    }
+},
+{
+    "id": "ThePublishedNFTCollection",
+    "contract_name": "LibraryPass",
+    "logo": "https://publishednft.io/logo-desktop.png",
+    "address": "0x4d79d7aa8c56c615",
+    "name": "The Published NFT Collection",
+    "marketplace": "",
+    "banner": "https://publishednft.io/logo-desktop.png",
+    "official_website": "https://publishednft.io/",
+    "description": "Published NFT is pioneering eBooks in Web3, complete with a metaverse and big ideas on innovating what it means to collect and interact with written media.",
+    "path": {
+        "storage_path": "/storage/LibraryPassCollection",
+        "public_path": "/public/LibraryPassCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "LibraryPass.Collection{LibraryPass.LibraryPassCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "LibraryPass.Collection{LibraryPass.LibraryPassCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/publishednft/"
+        }
+    }
+},
+{
+    "id": "Bitku",
+    "contract_name": "HaikuNFT",
+    "logo": "https://bitku.art/logo512.png",
+    "address": "0x824f612f78d34250",
+    "name": "Bitku",
+    "marketplace": "",
+    "banner": "https://bitku.art/banner1200x630.png",
+    "official_website": "https://bitku.art/#0x7ec39614dae9645d/75",
+    "description": "Generative Haiku NFT on Flow",
+    "path": {
+        "storage_path": "/storage/BitkuCollection",
+        "public_path": "/public/BitkuCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "HaikuNFT.Collection{HaikuNFT.HaikuCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "HaikuNFT.Collection{HaikuNFT.HaikuCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/bKTHTd5ztx"
+        }
+    }
+},
+{
+    "id": "LOSTiNTurismo",
+    "contract_name": "LOSTiNTurismo",
+    "logo": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "address": "0x985d410b577fd4a1",
+    "name": "LOSTiNTurismo",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "official_website": "https://google.ca",
+    "description": "Templated Contract!",
+    "path": {
+        "storage_path": "/storage/LOSTiNTurismoCollection",
+        "public_path": "/public/LOSTiNTurismoCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "LOSTiNTurismo.Collection{LOSTiNTurismo.LOSTiNTurismoCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "LOSTiNTurismo.Collection{LOSTiNTurismo.LOSTiNTurismoCollectionPublic,NonFungibleToken.Provider,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "FlowverseSocks",
+    "contract_name": "FlowverseSocks01",
+    "logo": "https://dy8ckr8o2pye7.cloudfront.net/media/dbbrUIkarYLXKKjiY5AYk_IMAGE.png",
+    "address": "0x7f3812b53dd4de20",
+    "name": "Flowverse Socks",
+    "marketplace": "",
+    "banner": "https://dy8ckr8o2pye7.cloudfront.net/media/cvR_VOmK5g6oGMhXRj1pR_IMAGE.png",
+    "official_website": "https://www.socknft.com/",
+    "description": "Socks by Flowverse are versatile NFTs that enable you to claim 1 limited edition pair of physical Flowverse Socks, shipped globally. The total number of Socks by Flowverse is 111.",
+    "path": {
+        "storage_path": "/storage/MatrixMarketFlowverseSocks01Collection",
+        "public_path": "/public/MatrixMarketFlowverseSocks01Collection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "FlowverseSocks01.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,FlowverseSocks01.FlowverseSocks01CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "FlowverseSocks01.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,FlowverseSocks01.FlowverseSocks01CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/flowverse"
+        },
+        "twitter": {
+            "url": "https://twitter.com/flowverse_"
+        }
+    }
+},
+{
+    "id": "TuneKittiesUAT",
+    "contract_name": "TuneGO",
+    "logo": "https://tunegonft.com/assets/images/collections-page/tunekitties.png",
+    "address": "0x58b60c5240d3f39b",
+    "name": "TuneKitties",
+    "marketplace": "",
+    "banner": "https://tunegonft.com/assets/images/collections-page/tunekitties.png",
+    "official_website": "https://www.tunegonft.com/collection-details/98434c03-17e3-4e9a-9f6b-3b786a4fad6e",
+    "description": "Deep in the clubs and streets of the metaverse TuneKitties prowl with the purrfect mix of sound and style. Limited edition NFTs by TuneGO.",
+    "path": {
+        "storage_path": "/storage/TuneGOCollection",
+        "public_path": "/public/TuneGOCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "TuneGO.Collection{TuneGO.TuneGOCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "TuneGO.Collection{TuneGO.TuneGOCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "ThingFundMembershipBadge",
+    "contract_name": "CaaPass",
+    "logo": "https://raw.githubusercontent.com/williampucs/THiNG.FUND-Minter/main/assets/squareImage.png",
+    "address": "0xa8b1239250f8d342",
+    "name": "THiNG.FUND Membership Badge",
+    "marketplace": "",
+    "banner": "https://raw.githubusercontent.com/williampucs/THiNG.FUND-Minter/main/assets/bannerImage.png",
+    "official_website": "https://thing.fund/",
+    "description": "By holding THiNG.FUND’s membership badge NFTs in your blockchain wallet, you will become a member of THiNG.FUND club, grow with the creators and share the joy and beauty of Web3. At the same time, as a member, you will also get more privileges, including but not limited to obtaining airdrop gifts for creators’ works before obtaining THiNG.FUND limited collections or being invited to participate in offline/online events as a VIP.",
+    "path": {
+        "storage_path": "/storage/caaPassCollection",
+        "public_path": "/public/caaPassCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "CaaPass.Collection{CaaPass.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "CaaPass.Collection{CaaPass.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/thingfund"
+        },
+        "twitter": {
+            "url": "https://twitter.com/thing_fund"
+        }
+    }
+},
+{
+    "id": "DisruptArtCollection",
+    "contract_name": "DisruptArt",
+    "logo": "https://disrupt.art/nft/assets/images/logoicon.png",
+    "address": "0x439c2b49c0b2f62b",
+    "name": "DisruptArt Collection",
+    "marketplace": "",
+    "banner": "https://disrupt.art/nft/assets/images/logoicon.png",
+    "official_website": "https://ipfs.perma.store/content/bafkreibpugxxq5yqt4ec7y3utake6y6auyq2qd52y7po2qujv2crwdutwq",
+    "description": "Discover amazing NFT collections from various disruptor creators. Disrupt.art Marketplace's featured and spotlight NFTs",
+    "path": {
+        "storage_path": "/storage/DisruptArtNFTCollection",
+        "public_path": "/public/DisruptArtNFTPublicCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "DisruptArt.Collection{DisruptArt.DisruptArtCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "DisruptArt.Collection{DisruptArt.DisruptArtCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.io/disruptart"
+        },
+        "twitter": {
+            "url": "https://twitter.com/DisruptArt"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/disrupt.art/"
+        }
+    }
+},
+{
+    "id": "GoatedGoats",
+    "contract_name": "GoatedGoats",
+    "logo": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png&w=32&q=75",
+    "address": "0x386817f360a5c8df",
+    "name": "GoatedGoats",
+    "marketplace": "",
+    "banner": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png&w=32&q=75",
+    "official_website": "https://GoatedGoats.com",
+    "description": "GoatedGoats",
+    "path": {
+        "storage_path": "/storage/GoatCollection",
+        "public_path": "/public/GoatCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "GoatedGoats.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,GoatedGoats.GoatCollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "GoatedGoats.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,GoatedGoats.GoatCollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/goatedgoats"
+        }
+    }
+},
+{
+    "id": "FlowtyTestNFT",
+    "contract_name": "FlowtyTestNFT",
+    "logo": "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
+    "address": "0xd9c02cdacccb25ab",
+    "name": "Flowty Test NFT Collection",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
+    "official_website": "https://flowty.io/",
+    "description": "This collection is used for testing things out on flowty.",
+    "path": {
+        "storage_path": "/storage/FlowtyTestNFTCollection",
+        "public_path": "/public/FlowtyTestNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "FlowtyTestNFT.Collection{FlowtyTestNFT.FlowtyTestNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "FlowtyTestNFT.Collection{FlowtyTestNFT.FlowtyTestNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flowty_io"
+        }
+    }
+},
+{
+    "id": "SequelDigitalArt",
+    "contract_name": "DigitalArt",
+    "logo": "https://sequel.space/home/img/flow-sequel-logo.png",
+    "address": "0x745b085dafdd4fc0",
+    "name": "Sequel Digital Art",
+    "marketplace": "",
+    "banner": "https://sequel.space/home/img/flow-sequel-banner.jpg",
+    "official_website": "https://sequel.mypinata.cloud/ipfs/QmNkZZMUwsNM6VZRakHLPTX1zeWMJSek5GrdncrkYpQPwZ",
+    "description": "Sequel is a social platform where everything is for fun and purely fictional.",
+    "path": {
+        "storage_path": "/storage/sequelDigitalArtCollection",
+        "public_path": "/public/sequelDigitalArtCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "DigitalArt.Collection{DigitalArt.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "DigitalArt.Collection{DigitalArt.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/YaR7BFuXNk"
+        },
+        "twitter": {
+            "url": "https://twitter.com/sequelspace"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/sequelspace"
+        }
+    }
+},
+{
+    "id": "Robotics",
+    "contract_name": "NftItems",
+    "logo": "https://bcware.infura-ipfs.io/ipfs/QmQKHKNQjrC7H7Hj19cr1y6NuYyMd6KqZj7e3fhL4H5yLB",
+    "address": "0x88cdc579027ab940",
+    "name": "Robotics",
+    "marketplace": "",
+    "banner": "https://bcware.infura-ipfs.io/ipfs/QmQKHKNQjrC7H7Hj19cr1y6NuYyMd6KqZj7e3fhL4H5yLB",
+    "official_website": "https://bcware.infura-ipfs.io/ipfs/QmRDgaH7eiBCeKQnHHdJcMTxWSLKrNRYDihRES7k1iuHd1",
+    "description": "Robots are better than humans?",
+    "path": {
+        "storage_path": "/storage/nftItemsCollectionV9",
+        "public_path": "/public/nftItemsCollectionV9",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "NftItems.Collection{NftItems.NftItemsCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "NftItems.Collection{NftItems.NftItemsCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "TheRCRDSHPCollectionTestnet",
+    "contract_name": "RCRDSHPNFT",
+    "logo": "https://rcrdshp-happyfox-assets.s3.amazonaws.com/Purple.svg",
+    "address": "0x7cde1ed9dfd13561",
+    "name": "The RCRDSHP Collection",
+    "marketplace": "",
+    "banner": "https://rcrdshp-happyfox-assets.s3.amazonaws.com/banner.png",
+    "official_website": "https://app.rcrdshp.com",
+    "description": "Here comes the drop!",
+    "path": {
+        "storage_path": "/storage/RCRDSHPNFTCollection",
+        "public_path": "/public/RCRDSHPNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "RCRDSHPNFT.Collection{RCRDSHPNFT.RCRDSHPNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "RCRDSHPNFT.Collection{RCRDSHPNFT.RCRDSHPNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/rcrdshp"
+        },
+        "twitter": {
+            "url": "https://twitter.com/rcrdshp"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/rcrdshp"
+        }
+    }
+},
+{
+    "id": "MusicPeaksVideoNFT",
+    "contract_name": "MusicPeaksVideoNFT",
+    "logo": "https://hub.dev.musicpeaks.com/sites/default/files/2022-04/JUNOS_logo.jpg",
+    "address": "0x171d2aeb325e6e3e",
+    "name": "The Juno Awards Collection",
+    "marketplace": "",
+    "banner": "https://hub.dev.musicpeaks.com/sites/default/files/2022-04/JUNOS_logo.jpg",
+    "official_website": "https://hub.dev.musicpeaks.com/collection/the-juno-awards-collection",
+    "description": "Clips from the Juno Awards archive.",
+    "path": {
+        "storage_path": "/storage/MusicPeaksVideoCollection",
+        "public_path": "/public/MusicPeaksVideoCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "MusicPeaksVideoNFT.Collection{MusicPeaksVideoNFT.MusicPeaksVideoNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "MusicPeaksVideoNFT.Collection{MusicPeaksVideoNFT.MusicPeaksVideoNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flow_blockchain"
+        }
+    }
+},
+{
+    "id": "LOSTiNTurismoEurope",
+    "contract_name": "LOSTiNTurismoEurope",
+    "logo": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "address": "0x985d410b577fd4a1",
+    "name": "LOSTiNTurismoEurope",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "official_website": "https://lostin.com/",
+    "description": "Templated Contract!",
+    "path": {
+        "storage_path": "/storage/LOSTiNTurismoEuropeCollection",
+        "public_path": "/public/LOSTiNTurismoEuropeCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "LOSTiNTurismoEurope.Collection{LOSTiNTurismoEurope.LOSTiNTurismoEuropeCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "LOSTiNTurismoEurope.Collection{LOSTiNTurismoEurope.LOSTiNTurismoEuropeCollectionPublic,NonFungibleToken.Provider,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "instagram": {
+            "url": "https://www.instagram.com/lostincityguides/"
+        }
+    }
+},
+{
+    "id": "example",
+    "contract_name": "ExampleNFT",
+    "logo": "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
+    "address": "0xa60cf32e8369f919",
+    "name": "The Example Collection",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
+    "official_website": "https://example-nft.onflow.org",
+    "description": "This collection is used as an example to help you develop your next Flow NFT.",
+    "path": {
+        "storage_path": "/storage/exampleNFTCollection",
+        "public_path": "/public/exampleNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flow_blockchain"
+        }
+    }
+},
+{
+    "id": "MonoCats",
+    "contract_name": "MonoCat",
+    "logo": "https://static-test.mono.fun/public/contents/projects/a73c1a41-be88-4c7c-a32e-929d453dbd39/nft/monocats/MonoCatSet_350x350.png",
+    "address": "0xa01dd6e82b7352be",
+    "name": "MonoCats",
+    "marketplace": "",
+    "banner": "https://static-test.mono.fun/public/contents/projects/a73c1a41-be88-4c7c-a32e-929d453dbd39/carousels/mono%20cats%20PC.png",
+    "official_website": "https://monocats.xyz/mainpage",
+    "description": "Each NFT represent a MonoCats from the Meow Planets comes with unique design and utility.",
+    "path": {
+        "storage_path": "/storage/MonoCatCollection",
+        "public_path": "/public/MonoCatCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "MonoCat.Collection{MonoCat.MonoCatCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "MonoCat.Collection{MonoCat.MonoCatCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://monocats.xyz/discord"
+        },
+        "twitter": {
+            "url": "https://monocats.xyz/twitter"
+        },
+        "instagram": {
+            "url": "https://monocats.xyz/instagram"
+        }
+    }
+},
+{
+    "id": "SoulMadeMain",
+    "contract_name": "SoulMadeMain",
+    "logo": "https://i.imgur.com/Xlfqj5g.png",
+    "address": "0x421c19b7dc122357",
+    "name": "SoulMadeMain",
+    "marketplace": "",
+    "banner": "https://i.imgur.com/HWXhRXt.png",
+    "official_website": "https://soulmade.art",
+    "description": "SoulMade Main Collection",
+    "path": {
+        "storage_path": "/storage/SoulMadeMainCollection",
+        "public_path": "/public/SoulMadeMainCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SoulMadeMain.Collection{SoulMadeMain.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SoulMadeMain.Collection{SoulMadeMain.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/xtqqXCKW9B"
+        },
+        "twitter": {
+            "url": "https://twitter.com/soulmade_nft"
+        }
+    }
+},
+{
+    "id": "Flunks",
+    "contract_name": "Flunks",
+    "logo": "https://storage.googleapis.com/flunks_public/website-assets/classroom.png",
+    "address": "0xe666c53e1758dec6",
+    "name": "Flunks",
+    "marketplace": "",
+    "banner": "https://storage.googleapis.com/flunks_public/website-assets/classroom.png",
+    "official_website": "https://flunks.io/",
+    "description": "Flunks are cute but mischievous high-schoolers wreaking havoc #onFlow",
+    "path": {
+        "storage_path": "/storage/FlunksCollection",
+        "public_path": "/public/FlunksCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Flunks.Collection{NonFungibleToken.CollectionPublic,Flunks.FlunksCollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Flunks.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flunks_nft"
+        }
+    }
+},
+{
+    "id": "xG",
+    "contract_name": "XGStudio",
+    "logo": "https://xgstudios.mypinata.cloud/ipfs/QmZP32SFcQ2rN2diEXsnwyFxZ5dmyFhuqAybDRANg2cEsk/XG_MOVE_THUMBNAIL.png",
+    "address": "0xd9575c84a88eada0",
+    "name": "xGMove",
+    "marketplace": "",
+    "banner": "https://xgstudios.mypinata.cloud/ipfs/QmZP32SFcQ2rN2diEXsnwyFxZ5dmyFhuqAybDRANg2cEsk/XG_MOVE_COLLECTION_BANNER.png",
+    "official_website": "https://xgmove.io",
+    "description": "A brand new collecting experience for athletes. Collect your achievements and clock up milestones to build your journey. Complete collecting quests to unlock xG rewards and experiences",
+    "path": {
+        "storage_path": "/storage/XGStudioCollection",
+        "public_path": "/public/XGStudioCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "XGStudio.Collection{XGStudio.XGStudioCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "XGStudio.Collection{XGStudio.XGStudioCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/uaYhFARqXM"
+        },
+        "twitter": {
+            "url": "https://twitter.com/xGStudios_"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/xGStudios_/"
+        }
+    }
+},
+{
+    "id": "YBees",
+    "contract_name": "YBees",
+    "logo": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "address": "0x985d410b577fd4a1",
+    "name": "YBees",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/60e2d81804d21546b930cf4e/6282368335c3a352cef0677c_mint-white-tm-p-500.png",
+    "official_website": "https://google.ca",
+    "description": "Templated Contract!",
+    "path": {
+        "storage_path": "/storage/YBeesCollection",
+        "public_path": "/public/YBeesCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "YBees.Collection{YBees.YBeesCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "YBees.Collection{YBees.YBeesCollectionPublic,NonFungibleToken.Provider,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "schmoes_pre_launch_token",
+    "contract_name": "SchmoesPreLaunchToken",
+    "logo": "",
+    "address": "0x44510157a80ad550",
+    "name": "Schmoes Pre Launch Token",
+    "marketplace": "",
+    "banner": "",
+    "official_website": "https://schmoes.io",
+    "description": "",
+    "path": {
+        "storage_path": "/storage/SchmoesPreLaunchTokenCollection",
+        "public_path": "/public/SchmoesPreLaunchTokenCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SchmoesPreLaunchToken.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SchmoesPreLaunchToken.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/SchmoesNFT"
+        }
+    }
+},
+{
+    "id": "DUCForDapperTest",
+    "contract_name": "FluteDucTesting",
+    "logo": "https://gateway.pinata.cloud/ipfs/bafkreicrfbblmaduqg2kmeqbymdifawex7rxqq2743mitmeia4zdybmmre/",
+    "address": "0xfacdb60318092ce3",
+    "name": "FluteDUCTesting",
+    "marketplace": "",
+    "banner": "https://gateway.pinata.cloud/ipfs/bafkreicrfbblmaduqg2kmeqbymdifawex7rxqq2743mitmeia4zdybmmre/",
+    "official_website": "https://flute-app.vercel.app",
+    "description": "Testing ducs with flute and dapper",
+    "path": {
+        "storage_path": "/storage/FluteDucTesting_Collection",
+        "public_path": "/public/FluteDucTesting_Collection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "FluteDucTesting.Collection{FluteDucTesting.FluteDucTestingCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "FluteDucTesting.Collection{FluteDucTesting.FluteDucTestingCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "KlktnVoucher",
+    "contract_name": "KlktnVoucher",
+    "logo": "",
+    "address": "0x21344d9b7e93ade6",
+    "name": "KlktnVoucher",
+    "marketplace": "",
+    "banner": "",
+    "official_website": "http://www.mangakollektion.xyz/",
+    "description": "KlktnVoucher are cute but mischievous high-schoolers wreaking havoc #onFlow",
+    "path": {
+        "storage_path": "/storage/KlktnVoucherCollection",
+        "public_path": "/public/KlktnVoucherCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "KlktnVoucher.Collection{NonFungibleToken.CollectionPublic,KlktnVoucher.KlktnVoucherCollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "KlktnVoucher.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/MangaKollektion"
+        }
+    }
+},
+{
+    "id": "Backpack",
+    "contract_name": "Backpack",
+    "logo": "https://storage.googleapis.com/flunks_public/website-assets/classroom.png",
+    "address": "0xe666c53e1758dec6",
+    "name": "Backpack",
+    "marketplace": "",
+    "banner": "https://storage.googleapis.com/flunks_public/website-assets/classroom.png",
+    "official_website": "https://flunks.io/",
+    "description": "Backpack #onFlow",
+    "path": {
+        "storage_path": "/storage/BackpackCollection",
+        "public_path": "/public/BackpackCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Backpack.Collection{NonFungibleToken.CollectionPublic,Backpack.BackpackCollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Backpack.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flunks_nft"
+        }
+    }
+},
+{
+    "id": "FlownsdomainCollection",
+    "contract_name": "Domains",
+    "logo": "https://www.flowns.org/_next/image?url=%2Fassets%2Fflowns_v_logo_light.svg&w=256&q=75",
+    "address": "0xb05b2abb42335e88",
+    "name": "The Flowns domain Collection",
+    "marketplace": "",
+    "banner": "https://www.flowns.org/_next/image?url=%2Fassets%2Fflowns_logo_light.svg&w=128&q=75",
+    "official_website": "https://flowns.org",
+    "description": "This collection is managed by Flowns and present the ownership of domain.",
+    "path": {
+        "storage_path": "/storage/fnsDomainCollection",
+        "public_path": "/public/fnsDomainCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Domains.Collection{Domains.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Domains.Collection{Domains.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/fXz4gBaYXd"
+        },
+        "twitter": {
+            "url": "https://twitter.com/flownsorg"
+        }
+    }
+},
+{
+    "id": "athlete_studio_testnet",
+    "contract_name": "AthleteStudio",
+    "logo": "https://d3w5a827wx4ops.cloudfront.net/athlete-studio-logo-light.png",
+    "address": "0x6ad6a8246cec9822",
+    "name": "Athlete Studio NFTs",
+    "marketplace": "",
+    "banner": "https://d3w5a827wx4ops.cloudfront.net/athlete-studio-logo-light.png",
+    "official_website": "https://athlete.studio",
+    "description": "Officially licensed NFTs from Pro Athletes.",
+    "path": {
+        "storage_path": "/storage/AthleteStudio_Collection",
+        "public_path": "/public/AthleteStudio_Collection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "AthleteStudio.Collection{AthleteStudio.AthleteStudioCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "AthleteStudio.Collection{AthleteStudio.AthleteStudioCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://athlete.studio/twitter"
+        },
+        "instagram": {
+            "url": "https://athlete.studio/instagram"
+        }
+    }
+},
+{
+    "id": "PiratesOfTheMetaverse",
+    "contract_name": "PiratesOfTheMetaverse",
+    "logo": "https://potm-collection-images.s3.amazonaws.com/square.png",
+    "address": "0xc97017ed85e496bf",
+    "name": "Pirates Of The Metaverse",
+    "marketplace": "",
+    "banner": "https://potm-collection-images.s3.amazonaws.com/banner.jpeg",
+    "official_website": "https://www.piratesnft.io/",
+    "description": "Thrust into a strange future by tragedy and twist of fate, Ethero Caspain must rally a crew of degen pirates to help him locate the most coveted treasure in all the metaverse: a key rumored to unlock inter-dimensional travel.\n\nPirates of the Metaverse™ by Drip Studios is a collection of 10,000 digitally unique NFTs about to embark on an uncharted journey across blockchains.",
+    "path": {
+        "storage_path": "/storage/piratesOfTheMetaverseCollection",
+        "public_path": "/public/piratesOfTheMetaverseCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "PiratesOfTheMetaverse.Collection{PiratesOfTheMetaverse.PiratesOfTheMetaverseCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "PiratesOfTheMetaverse.Collection{PiratesOfTheMetaverse.PiratesOfTheMetaverseCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/PiratesMeta"
+        }
+    }
+},
+{
+    "id": "Charlie",
+    "contract_name": "CharlieNFT",
+    "logo": "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
+    "address": "0x0c7f58ca4b64219d",
+    "name": "The Charlie Collection",
+    "marketplace": "",
+    "banner": "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg",
+    "official_website": "https://Charlie-nft.onflow.org/0",
+    "description": "This collection is used as an Charlie to help you develop your next Flow NFT.",
+    "path": {
+        "storage_path": "/storage/CharlieNFTCollection",
+        "public_path": "/public/CharlieNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "CharlieNFT.Collection{CharlieNFT.CharlieNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "CharlieNFT.Collection{CharlieNFT.CharlieNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/flow_blockchain"
+        }
+    }
+},
+{
+    "id": "GoatedGoatsTraits",
+    "contract_name": "GoatedGoatsTrait",
+    "logo": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png&w=32&q=75",
+    "address": "0x386817f360a5c8df",
+    "name": "Goated Goats Traits",
+    "marketplace": "",
+    "banner": "https://goatedgoats.com/_ipx/w_32,q_75/%2FLogo.png?url=%2FLogo.png&w=32&q=75",
+    "official_website": "https://GoatedGoats.com",
+    "description": "This is the collection of Traits that can be equipped onto Goated Goats",
+    "path": {
+        "storage_path": "/storage/GoatTraitCollection",
+        "public_path": "/public/GoatTraitCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "GoatedGoatsTrait.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,GoatedGoatsTrait.TraitCollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "GoatedGoatsTrait.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,GoatedGoatsTrait.TraitCollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/goatedgoats"
+        }
+    }
+},
+{
+    "id": "TicalUniverseUAT",
+    "contract_name": "TicalUniverse",
+    "logo": "https://tunegonft.com/assets/images/collections-page/tical.png",
+    "address": "0x58b60c5240d3f39b",
+    "name": "Tical Universe",
+    "marketplace": "",
+    "banner": "https://tunegonft.com/assets/images/collections-page/tical.png",
+    "official_website": "https://www.tunegonft.com/collection-details/95487a67-a66a-43d5-913d-46fa8a644f4c",
+    "description": "The Genesis NFT drop represents the dawn of Method Man’s Tical Universe and the birth and introduction of the original Tical Universe heroes and villains.",
+    "path": {
+        "storage_path": "/storage/TicalUniverseCollection",
+        "public_path": "/public/TicalUniverseCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "TicalUniverse.Collection{TicalUniverse.TicalUniverseCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "TicalUniverse.Collection{TicalUniverse.TicalUniverseCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "BlovizeNFTTrophies",
+    "contract_name": "BlovizeNFT",
+    "logo": "https://blovizedevcdn.blob.core.windows.net/blovizenft-onflow/thumbnail-white.jpg",
+    "address": "0xc8f7112fa2f1af97",
+    "name": "Blovize NFT Trophies",
+    "marketplace": "",
+    "banner": "https://blovizedevcdn.blob.core.windows.net/blovizenft-onflow/banner-white.jpg",
+    "official_website": "https://www.blovize.com/",
+    "description": "Blovize NFT Trophies is your chance to own, store and share your sports achievements as a digital collectible. Letting you to create your digital trophies room.",
+    "path": {
+        "storage_path": "/storage/blovizeNFTCollection",
+        "public_path": "/public/blovizeNFTCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "BlovizeNFT.Collection{BlovizeNFT.BlovizeNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "BlovizeNFT.Collection{BlovizeNFT.BlovizeNFTCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/blovizelabs"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/blovizenftlabs"
+        }
+    }
+},
+{
+    "id": "Starly",
+    "contract_name": "StarlyCard",
+    "logo": "https://storage.googleapis.com/starly-prod.appspot.com/assets/starly-square-logo.jpg",
+    "address": "0x697d72a988a77070",
+    "name": "Starly",
+    "marketplace": "",
+    "banner": "https://storage.googleapis.com/starly-prod.appspot.com/assets/starly-banner.jpg",
+    "official_website": "https://dev.starly.io/elonmusk/av1QtFqYAwiRCpkyMbam/15/73",
+    "description": "Starly is a launchpad and marketplace for gamified NFT collections on Flow.",
+    "path": {
+        "storage_path": "/storage/starlyCardCollection",
+        "public_path": "/public/starlyCardCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "StarlyCard.Collection{StarlyCard.StarlyCardCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "StarlyCard.Collection{StarlyCard.StarlyCardCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/starly"
+        },
+        "twitter": {
+            "url": "https://twitter.com/StarlyNFT"
+        }
+    }
+},
+{
+    "id": "FLOAT",
+    "contract_name": "FLOAT",
+    "logo": "https://i.imgur.com/uzt90wM.png",
+    "address": "0x0afe396ebc8eee65",
+    "name": "FLOAT",
+    "marketplace": "",
+    "banner": "https://i.imgur.com/lEJuM70.png",
+    "official_website": "https://floats.city/0xfe10201e647ca718/event/110498748",
+    "description": "FLOAT is a proof of attendance platform on the Flow blockchain.",
+    "path": {
+        "storage_path": "/storage/FLOATCollectionStoragePath",
+        "public_path": "/public/FLOATCollectionPublicPath",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "FLOAT.Collection{FLOAT.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "FLOAT.Collection{FLOAT.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/emeraldcity"
+        },
+        "twitter": {
+            "url": "https://twitter.com/emerald_dao"
+        }
+    }
+},
+{
+    "id": "FluteNFTCatalogTest1",
+    "contract_name": "FluteTestProject",
+    "logo": "https://gateway.pinata.cloud/ipfs/bafkreicrfbblmaduqg2kmeqbymdifawex7rxqq2743mitmeia4zdybmmre/",
+    "address": "0x17f9cd1a1dfc0946",
+    "name": "Testing Project Name",
+    "marketplace": "",
+    "banner": "https://gateway.pinata.cloud/ipfs/bafkreicrfbblmaduqg2kmeqbymdifawex7rxqq2743mitmeia4zdybmmre/",
+    "official_website": "https://flute-app.vercel.app",
+    "description": "Testing Project Description",
+    "path": {
+        "storage_path": "/storage/FluteTestProject_Collection",
+        "public_path": "/public/FluteTestProject_Collection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "FluteTestProject.Collection{FluteTestProject.FluteTestProjectCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "FluteTestProject.Collection{FluteTestProject.FluteTestProjectCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {}
+},
+{
+    "id": "yahoo",
+    "contract_name": "YahooCollectible",
+    "logo": "https://raw.githubusercontent.com/portto/assets/main/nft/flow/yahoo/logo.png",
+    "address": "0x5d50ce3fd080edce",
+    "name": "Yahoo",
+    "marketplace": "",
+    "banner": "https://raw.githubusercontent.com/portto/assets/main/nft/flow/yahoo/banner.png",
+    "official_website": "https://bay.blocto.app/flow/yahoo/149",
+    "description": "NFT collection of Yahoo Taiwan",
+    "path": {
+        "storage_path": "/storage/yahooCollectibleCollection",
+        "public_path": "/public/yahooCollectibleCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "YahooCollectible.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,YahooCollectible.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "YahooCollectible.Collection"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/Yahoo"
+        }
+    }
+},
+{
+    "id": "SportsIconCollection",
+    "contract_name": "SportsIconCollectible",
+    "logo": "https://sportsicon.com/images/sportsicon-logo-flow.png",
+    "address": "0xaf4725f17cc7afdb",
+    "name": "SportsIcon Collection",
+    "marketplace": "",
+    "banner": "https://sportsicon.com/images/sportsicon-banner-flow.jpg",
+    "official_website": "https://sportsicon.com",
+    "description": "The world's first sports-focused NFT marketplace.",
+    "path": {
+        "storage_path": "/storage/sportsIconCollectibleCollection",
+        "public_path": "/public/sportsIconCollectibleCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SportsIconCollectible.Collection{SportsIconCollectible.CollectibleCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SportsIconCollectible.Collection{SportsIconCollectible.CollectibleCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "http://discord.gg/mfAx4nzqEe"
+        },
+        "twitter": {
+            "url": "https://twitter.com/sportsicon"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/_SportsIcon_/"
+        }
+    }
+},
+{
+    "id": "MFLPackCollection",
+    "contract_name": "MFLPack",
+    "logo": "https://d13e14gtps4iwl.cloudfront.net/branding/logos/mfl_logo_black_square_small.svg",
+    "address": "0x683564e46977788a",
+    "name": "MFL Pack Collection",
+    "marketplace": "",
+    "banner": "https://d13e14gtps4iwl.cloudfront.net/branding/players/banner_1900_X_600.png",
+    "official_website": "https://playmfl.com",
+    "description": "MFL is a unique Web3 Football (Soccer) Management game & ecosystem where you’ll be able to own and develop your football players as well as build a club from the ground up. As in real football, you’ll be able to : Be a recruiter (Scout, find, and trade players…), be an agent (Find the best clubs for your players, negotiate contracts with club owners…), be a club owner (Develop your club, recruit players, compete in leagues and tournaments…) and be a coach (Train and develop your players, play matches, and define your match tactics...). This collection allows you to collect Packs.",
+    "path": {
+        "storage_path": "/storage/MFLPackCollection",
+        "public_path": "/public/MFLPackCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "MFLPack.Collection{NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "MFLPack.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/pEDTR4wSPr"
+        },
+        "twitter": {
+            "url": "https://twitter.com/playMFL"
+        }
+    }
+},
+{
+    "id": "bl0x",
+    "contract_name": "Bl0x",
+    "logo": "https://bl0x.xyz/assets/home/Bl0xlogo.webp",
+    "address": "0xe8124d8428980aa6",
+    "name": "bl0x",
+    "marketplace": "",
+    "banner": "https://pbs.twimg.com/profile_banners/1535883931777892352/1655241022/1500x500",
+    "official_website": "https://bl0x.xyz/collection/0x0785f86201867f4e/90505354",
+    "description": "Minting a Bl0x triggers the catalyst moment of a big bang scenario. Generating a treasure that is designed to relate specifically to its holder.",
+    "path": {
+        "storage_path": "/storage/bl0xNFTs",
+        "public_path": "/public/bl0xNFTs",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "Bl0x.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "Bl0x.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://t.co/iY7AhEumR9"
+        },
+        "twitter": {
+            "url": "https://twitter.com/Bl0xNFT"
+        }
+    }
+},
+{
+    "id": "MFLPlayerCollection",
+    "contract_name": "MFLPlayer",
+    "logo": "https://d13e14gtps4iwl.cloudfront.net/branding/logos/mfl_logo_black_square_small.svg",
+    "address": "0x683564e46977788a",
+    "name": "MFL Player Collection",
+    "marketplace": "",
+    "banner": "https://d13e14gtps4iwl.cloudfront.net/branding/players/banner_1900_X_600.png",
+    "official_website": "https://playmfl.com",
+    "description": "MFL is a unique Web3 Football (Soccer) Management game & ecosystem where you’ll be able to own and develop your football players as well as build a club from the ground up. As in real football, you’ll be able to : Be a recruiter (Scout, find, and trade players…), be an agent (Find the best clubs for your players, negotiate contracts with club owners…), be a club owner (Develop your club, recruit players, compete in leagues and tournaments…) and be a coach (Train and develop your players, play matches, and define your match tactics...). This collection allows you to collect Players.",
+    "path": {
+        "storage_path": "/storage/MFLPlayerCollection",
+        "public_path": "/public/MFLPlayerCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "MFLPlayer.Collection{NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "MFLPlayer.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.gg/pEDTR4wSPr"
+        },
+        "twitter": {
+            "url": "https://twitter.com/playMFL"
+        }
+    }
+},
+{
+    "id": "NBATopShot",
+    "contract_name": "TopShot",
+    "logo": "https://nbatopshot.com/static/img/og/og.png",
+    "address": "0x877931736ee77cff",
+    "name": "NBA-Top-Shot",
+    "marketplace": "",
+    "banner": "https://nbatopshot.com/static/img/top-shot-logo-horizontal-white.svg",
+    "official_website": "https://nbatopshot.com",
+    "description": "NBA Top Shot is your chance to own, sell, and trade official digital collectibles of the NBA and WNBA's greatest plays and players",
+    "path": {
+        "storage_path": "/storage/MomentCollection",
+        "public_path": "/public/MomentCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}",
+        "private_type": "TopShot.Collection{NonFungibleToken.Provider,TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/nbatopshot"
+        },
+        "twitter": {
+            "url": "https://twitter.com/nbatopshot"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/nbatopshot"
+        }
+    }
+},
+{
+    "id": "The_Football_Club",
+    "contract_name": "TFCItems",
+    "logo": "https://thefootballclub.com/public/images/logo.png",
+    "address": "0x91a6217c3b70cae8",
+    "name": "TFC",
+    "marketplace": "",
+    "banner": "https://thefootballclub.com/public/images/banner.png",
+    "official_website": "https://thefootballclub.com/",
+    "description": "Play the fastest NFT based fantasy football manager. Earn coins and collect, trade and wear officially licensed football & lifestyle NFTs.",
+    "path": {
+        "storage_path": "/storage/TFCItemsCollection",
+        "public_path": "/public/TFCItemsCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "TFCItems.Collection{TFCItems.TFCItemsCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "TFCItems.Collection{TFCItems.TFCItemsCollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/urFYvGNAhM"
+        },
+        "twitter": {
+            "url": "https://twitter.com/play_tfc"
+        },
+        "instagram": {
+            "url": "https://www.instagram.com/playtfc"
+        }
+    }
+},
+{
+    "id": "MelodyPaymentTicketNFT",
+    "contract_name": "MelodyTicket",
+    "logo": "https://trello.com/1/cards/62dd12a167854020143ccd01/attachments/631422356f0fe60111e1ed3c/previews/631422366f0fe60111e1ed43/download/image.png",
+    "address": "0xb797a88390357df4",
+    "name": "The Melody ticket NFT",
+    "marketplace": "",
+    "banner": "https://trello.com/1/cards/62dd12a167854020143ccd01/attachments/631423e7c7e6b800d710f2a1/download/image.png",
+    "official_website": "",
+    "description": "This collection is Melody ticket NFT.",
+    "path": {
+        "storage_path": "/storage/MelodyTicketCollection",
+        "public_path": "/public/MelodyTicketCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "MelodyTicket.Collection{MelodyTicket.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "MelodyTicket.Collection{MelodyTicket.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "twitter": {
+            "url": "https://twitter.com/lyric_labs"
+        }
+    }
+},
+{
+    "id": "SoulMadeComponent",
+    "contract_name": "SoulMadeComponent",
+    "logo": "https://i.imgur.com/Xlfqj5g.png",
+    "address": "0x421c19b7dc122357",
+    "name": "SoulMadeComponent",
+    "marketplace": "",
+    "banner": "https://i.imgur.com/HWXhRXt.png",
+    "official_website": "https://soulmade.art",
+    "description": "SoulMade Component Collection",
+    "path": {
+        "storage_path": "/storage/SoulMadeComponentCollection",
+        "public_path": "/public/SoulMadeComponentCollection",
+        "public_collection_name": "NonFungibleToken.CollectionPublic",
+        "public_type": "SoulMadeComponent.Collection{SoulMadeComponent.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}",
+        "private_type": "SoulMadeComponent.Collection{SoulMadeComponent.CollectionPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}"
+    },
+    "socials": {
+        "discord": {
+            "url": "https://discord.com/invite/xtqqXCKW9B"
+        },
+        "twitter": {
+            "url": "https://twitter.com/soulmade_nft"
+        }
+    }
+}]

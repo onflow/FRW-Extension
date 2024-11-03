@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { Box, Drawer, Grid, Typography, Stack, InputBase } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import { LLPrimaryButton, LLSecondaryButton } from '../../../FRWComponent';
+import { LLPrimaryButton, LLSecondaryButton, LLSpinner } from '../../../FRWComponent';
 import { useWallet } from 'ui/utils';
 import { useForm, FieldValues } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
@@ -81,12 +81,12 @@ const UnlinkAccount = (props: UnlinkAccountProps) => {
     setIsLoading(true);
     console.log('submit');
     wallet
-      .unlinkChildAccount(props.address!)
+      .unlinkChildAccountV2(props.address!)
       .then(async (resp) => {
         setIsLoading(false);
         props.handleCancelBtnClicked();
         wallet.listenTransaction(
-          resp['txId'],
+          resp,
           true,
           `${props.address} unlinked`,
           `You have unlinked the child account ${props.address} from your account. \nClick to view this transaction.`
@@ -187,7 +187,7 @@ const UnlinkAccount = (props: UnlinkAccountProps) => {
               <Box className={classes.normalLine}></Box>
             )} */}
 
-            <img src={UnlinkSVG}/>
+            <img src={UnlinkSVG} />
 
             <Box
               sx={{
@@ -253,7 +253,7 @@ const UnlinkAccount = (props: UnlinkAccountProps) => {
           {chrome.i18n.getMessage('Unlink_Message')}
         </Typography>
       </Box>
-      <Box sx={{flexGrow: 1}}></Box>
+      <Box sx={{ flexGrow: 1 }}></Box>
       <Stack direction="row" spacing={1} sx={{ paddingBottom: '32px' }}>
         <LLSecondaryButton
           label={chrome.i18n.getMessage('Cancel')}
@@ -261,7 +261,7 @@ const UnlinkAccount = (props: UnlinkAccountProps) => {
           onClick={onCancelBtnClicked}
         />
         <LLPrimaryButton
-          label="Confirm"
+          label={isLoading ? <LLSpinner size={28} /> : "Confirm"}
           fullWidth
           type="submit"
           onClick={onSubmit}

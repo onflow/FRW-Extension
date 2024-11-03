@@ -15,7 +15,6 @@ const StakedListCard = ({desc, delegate}) => {
     const currentNode = nodeList.filter((node) => {
       return node.id == delegate.nodeID;
     })
-    console.log(currentNode)
     setCurrent(currentNode[0]);
   },[])
 

@@ -1,76 +1,131 @@
 import * as fcl from '@onflow/fcl';
 import { send as httpSend } from '@onflow/transport-http';
+import { storage } from './webapi';
 
-// const {
-//   ACCESSNODE_API,
-//   LOCKEDTOKENS,
-//   FIND,
-//   CHILDACCOUNT,
-//   HYBRIDCUSTODY,
-//   FLOWNS,
-//   DOMAINS,
-//   FLOWTOKEN,
-//   FUNGIBLETOKEN,
-//   NONFUNGIBLETOKEN,
-//   FLOWFEES,
-//   METADATAVIEWS,
-//   FLOW_NETWORK,
-//   FLOW_AUDITORS,
-// } = process.env;
+const CONTRACTS_URL = process.env.NODE_ENV === 'dev'
+  ? 'https://us-central1-lilico-dev.cloudfunctions.net/contracts'
+  : 'https://us-central1-lilico-334404.cloudfunctions.net/contracts';
 
-export const fclTestnetConfig = async () => {
-  fcl
-    .config()
-    .put('accessNode.api', 'https://rest-testnet.onflow.org')
-    .put('sdk.transport', httpSend)
-    .put('0xLockedTokens', '0x95e019a17d0e23d7')
-    .put('0xFind', '0xa16ab1d0abde3625')
-    .put('0xChildAccount', '0x1b655847a90e644a')
-    .put('0xHybridCustody', '0x294e44e1ec6993c6')
-    .put('0xFlowns', '0xb05b2abb42335e88')
-    .put('0xDomains', '0xb05b2abb42335e88')
-    .put('0xFlowToken', '0x7e60df042a9c0868')
-    .put('0xFungibleToken', '0x9a0766d93b6608b7')
-    .put('0xNonFungibleToken', '0x631e88ae7f1d7c20')
-    .put('0xFlowFees', '0x912d5440f7e3769e')
-    .put('0xMetadataViews', '0x631e88ae7f1d7c20')
-    .put('flow.network', 'testnet')
-    .put('flow.auditors', ['0xf78bfc12d0a786dc']);
-    
+// Fallback values for critical contracts (useful when fetch fails)
+const fallbackContracts = {
+  "mainnet": {
+    "0xDomains": "0x233eb012d34b0070",
+    "0xFind": "0x097bafa4e0b48eef",
+    "0xFlowFees": "0xf919ee77447b7497",
+    "0xFlowIDTableStaking": "0x8624b52f9ddcd04a",
+    "0xFlowns": "0x233eb012d34b0070",
+    "0xFlowTableStaking": "0x8624b52f9ddcd04a",
+    "0xFlowToken": "0x1654653399040a61",
+    "0xFungibleToken": "0xf233dcee88fe0abe",
+    "0xHybridCustody": "0xd8a7e05a7ac670c0",
+    "0xLockedTokens": "0x8d0e87b65159ae63",
+    "0xMetadataViews": "0x1d7e57aa55817448",
+    "0xNonFungibleToken": "0x1d7e57aa55817448",
+    "0xStakingCollection": "0x8d0e87b65159ae63",
+    "0xFlowStakingCollection": "0x8d0e87b65159ae63",
+    "0xStakingProxy": "0x62430cf28c26d095",
+    "0xSwapError": "0xb78ef7afa52ff906",
+    "0xSwapRouter": "0xa6850776a94e6551",
+    "0xEVM": "0xe467b9dd11fa00df",
+    "0xFlowEVMBridge": "0x1e4aa0b87d10b141",
+    "0xCapabilityFilter": "0xd8a7e05a7ac670c0"
+  },
+  "testnet": {
+    "0xDomains": "0xb05b2abb42335e88",
+    "0xFind": "0xa16ab1d0abde3625",
+    "0xFlowFees": "0x912d5440f7e3769e",
+    "0xFlowIDTableStaking": "0x9eca2b38b18b5dfe",
+    "0xFlowns": "0xb05b2abb42335e88",
+    "0xFlowTableStaking": "0x9eca2b38b18b5dfe",
+    "0xFlowToken": "0x7e60df042a9c0868",
+    "0xFungibleToken": "0x9a0766d93b6608b7",
+    "0xHybridCustody": "0x294e44e1ec6993c6",
+    "0xLockedTokens": "0x95e019a17d0e23d7",
+    "0xMetadataViews": "0x631e88ae7f1d7c20",
+    "0xNonFungibleToken": "0x631e88ae7f1d7c20",
+    "0xStakingCollection": "0x95e019a17d0e23d7",
+    "0xFlowStakingCollection": "0x95e019a17d0e23d7",
+    "0xStakingProxy": "0x7aad92e5a0715d21",
+    "0xSwapError": "0xddb929038d45d4b3",
+    "0xSwapRouter": "0x2f8af5ed05bbde0d",
+    "0xEVM": "0x8c5303eaa26202d6",
+    "0xFlowEVMBridge": "0xdfc20aee650fcbdf",
+    "0xCapabilityFilter": "0xd8a7e05a7ac670c0"
+  },
+  "sandboxnet": {
+    "0xDomains": "0x8998b29311d1f3da",
+    "0xFlowFees": "0xe92c2039bbe9da96",
+    "0xFlowns": "0x8998b29311d1f3da",
+    "0xFlowTableStaking": "0xf4527793ee68aede",
+    "0xFlowToken": "0x0661ab7d6696a460",
+    "0xFungibleToken": "0xe20612a0776ca4bf",
+    "0xLockedTokens": "0xf4527793ee68aede",
+    "0xNonFungibleToken": "0x83ade3a54eb3870c"
+  }
 };
 
+
+// Fetch contracts from API and cache them
+async function fetchContracts() {
+  const ttl = 60 * 60 * 1000; // 1 hour in milliseconds
+
+  try {
+    // First, try to get the cached contracts
+    const cachedContracts = await storage.getExpiry('contracts');
+
+    if (cachedContracts) {
+      console.log("Loaded contracts from cache.");
+      return cachedContracts;
+    }
+
+    // If not cached or expired, fetch from the remote server
+    const response = await fetch(CONTRACTS_URL);
+    const data = await response.json();
+
+    // Cache the fetched contracts for future use with expiry
+    await storage.setExpiry('contracts', data, ttl);
+    console.log("Fetched and cached contracts.");
+    return data;
+
+  } catch (error) {
+    console.error("Error fetching contracts:", error);
+
+    // If fetching and cache both fail, return fallback contracts
+    console.warn("Using fallback contract addresses.");
+    return fallbackContracts;
+  }
+}
+
+// Configure FCL for Mainnet
 export const fclMainnetConfig = async () => {
-  fcl
-    .config()
+  const contracts = await fetchContracts();
+  const mainnetContracts = contracts.mainnet || fallbackContracts.mainnet;
+  const config = fcl.config()
     .put('accessNode.api', 'https://rest-mainnet.onflow.org')
     .put('sdk.transport', httpSend)
-    .put('0xLockedTokens', '0x8d0e87b65159ae63')
-    .put('0xFind', '0x097bafa4e0b48eef')
-    .put('0xChildAccount', '0x1b655847a90e644a')
-    .put('0xHybridCustody', '0xd8a7e05a7ac670c0')
-    .put('0xFlowns', '0x233eb012d34b0070')
-    .put('0xDomains', '0x233eb012d34b0070')
-    .put('0xFlowToken', '0x1654653399040a61')
-    .put('0xFungibleToken', '0xf233dcee88fe0abe')
-    .put('0xNonFungibleToken', '0x1d7e57aa55817448')
-    .put('0xMetadataViews', '0x1d7e57aa55817448')
-    .put('0xFlowFees', '0xf919ee77447b7497')
-    .put('flow.network', 'mainnet')
-    .put('flow.auditors', ['0xfd100e39d50a13e6']);
+    .put('flow.network', 'mainnet');
+
+  // Loop through all keys in mainnetContracts and apply them to the configuration
+  for (const key in mainnetContracts) {
+    if (Object.prototype.hasOwnProperty.call(mainnetContracts, key)) {
+      config.put(key, mainnetContracts[key]);
+    }
+  }
 };
 
-export const fclSanboxnetConfig = async () => {
-  fcl
-    .config()
-    .put('accessNode.api', 'https://rest-sandboxnet.onflow.org')
+// Configure FCL for Testnet
+export const fclTestnetConfig = async () => {
+  const contracts = await fetchContracts();
+  const testnetContracts = contracts.testnet || fallbackContracts.testnet;
+
+  const config = fcl.config()
+    .put('accessNode.api', 'https://rest-testnet.onflow.org')
     .put('sdk.transport', httpSend)
-    .put('0xLockedTokens', '0xf4527793ee68aede')
-    .put('0xChildAccount', '0x1b655847a90e644a')
-    .put('0xHybridCustody', '0x294e44e1ec6993c6')
-    .put('0xFlowToken', '0x0661ab7d6696a460')
-    .put('0xFungibleToken', '0xe20612a0776ca4bf')
-    .put('0xNonFungibleToken', '0x83ade3a54eb3870c')
-    .put('0xMetadataViews', '0x83ade3a54eb3870c')
-    .put('0xFlowFees', '0xe92c2039bbe9da96')
-    .put('flow.network', 'sandboxnet');
+    .put('flow.network', 'testnet');
+
+  for (const key in testnetContracts) {
+    if (Object.prototype.hasOwnProperty.call(testnetContracts, key)) {
+      config.put(key, testnetContracts[key]);
+    }
+  }
 };

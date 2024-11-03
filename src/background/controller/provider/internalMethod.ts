@@ -1,6 +1,7 @@
 
 import {
   preferenceService,
+  keyringService
 } from 'background/service';
 
 
@@ -13,21 +14,23 @@ const tabCheckin = ({
   session.setProp({ origin, name, icon });
 };
 
-// const getProviderState = async (req) => {
-//   const {
-//     session: { origin },
-//   } = req;
+const getProviderState = async (req) => {
+  const {
+    session: { origin },
+  } = req;
+  
+  // const chainEnum = permissionService.getWithoutUpdate(origin)?.chain;
+  const isUnlocked = keyringService.memStore.getState().isUnlocked;
 
-//   const chainEnum = permissionService.getWithoutUpdate(origin)?.chain;
-//   const isUnlocked = keyringService.memStore.getState().isUnlocked;
-
-//   return {
-//     chainId: CHAINS[chainEnum || CHAINS_ENUM.ETH].hex,
-//     isUnlocked,
-//     accounts: isUnlocked ? await providerController.ethAccounts(req) : [],
-//     networkVersion: await providerController.netVersion(req),
-//   };
-// };
+  return {
+    chainId: "ETH",
+    isUnlocked,
+    // accounts: isUnlocked ? await providerController.ethAccounts(req) : [],
+    accounts: [],
+    // networkVersion: await providerController.netVersion(req),
+    networkVersion:[],
+  };
+};
 
 const providerOverwrite = ({
   data: {
@@ -49,7 +52,7 @@ const isDefaultWallet = () => {
 
 export default {
   tabCheckin,
-  // getProviderState,
+  getProviderState,
   providerOverwrite,
   hasOtherProvider,
   isDefaultWallet,

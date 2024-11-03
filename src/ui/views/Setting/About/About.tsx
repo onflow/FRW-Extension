@@ -4,10 +4,11 @@ import { makeStyles } from '@mui/styles';
 import {
   Typography,
   Box,
+  CardMedia
 } from '@mui/material';
 import twitter from 'ui/FRWAssets/image/twitter.png';
 import discord from 'ui/FRWAssets/image/discord.png';
-import email from 'ui/FRWAssets/image/email.png';
+import X from 'ui/FRWAssets/svg/xLogo.svg';
 import lilo from 'ui/FRWAssets/image/lilo.png';
 import { version } from '@/../package.json';
 // import '../../Unlock/style.css';
@@ -97,7 +98,7 @@ const About = () => {
             component="div"
             sx={{ textAlign: 'center', fontWeight: 600, mt: '5px' }}
           >
-            Flow Reference
+            Flow Wallet
           </Typography>
         </a>
         <Typography
@@ -180,14 +181,9 @@ const About = () => {
           {/* <Divider orientation="vertical" flexItem variant="middle" /> */}
           <a href="https://twitter.com/FlowCoreWallet" target="_blank" style={{width:'58px'}}>
             <Box sx={{ alignSelf: 'center',display:'flex !important',flexDirection:'column',alignItems:'center' }}>
-              <img
-                src={twitter}
-                width="32px"
-                height="32px"
-                style={{ margin: '8px auto' }}
-              />
+              <CardMedia component="img" sx={{ margin: '8px auto', width: '32px', height: '32px' }} image={X} />
               <Typography color="text" sx={{ textTransform: 'none' }} align="center" >
-                Twitter
+                X
               </Typography>
             </Box>
           </a>
@@ -214,8 +210,8 @@ const About = () => {
           color="text.secondary"
         >
           {chrome.i18n.getMessage('Made__by')}
-          <a href="https://outblock.io" target="_blank">
-            Outblock
+          <a href="https://flow.com" target="_blank">
+            Flow Foundation
           </a>
           {chrome.i18n.getMessage('outblock__made')}
         </Typography>

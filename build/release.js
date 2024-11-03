@@ -10,7 +10,7 @@ async function release() {
   const input = await prompt({
     type: 'input',
     name: 'version',
-    message: '[Flow Reference] Please input the release version:'
+    message: '[Flow Wallet] Please input the release version:'
   });
   const manifestPath = path.resolve(PROJECT_ROOT, '_raw', 'manifest.json');
   const manifest = fs.readJSONSync(manifestPath);

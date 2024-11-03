@@ -110,7 +110,7 @@ const TransferAmount = ({token, amount, setAmount, setSwapTypes, setError,remove
   const classes = useStyles();
   const handleMaxClick = () => {
     if (coinInfo) {
-      if (coinInfo.unit === 'flow') {
+      if (coinInfo.unit.toLowerCase() === 'flow') {
         setAmount(coinInfo.balance - 0.001)
       } else {
         setAmount(coinInfo.balance)
@@ -206,7 +206,7 @@ const TransferAmount = ({token, amount, setAmount, setSwapTypes, setError,remove
             }}
           >
             <Stack direction="row" spacing={1}>
-              <Typography color="text.secondary" variant="caption">Balance</Typography>
+              <Typography color="text.secondary" variant="caption">{chrome.i18n.getMessage('Balance')}</Typography>
               <Typography color="text.secondary" variant="caption">{coinInfo.balance}</Typography>
             </Stack>
             <Chip label={chrome.i18n.getMessage('Max')} size="small" onClick={handleMaxClick} sx={{padding: '2px 5px'}} />

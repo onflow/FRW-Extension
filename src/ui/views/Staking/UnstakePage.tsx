@@ -40,7 +40,8 @@ const UnstakePage = () => {
     'name': 'Flow',
     'address': {
       'mainnet': '0x1654653399040a61',
-      'testnet': '0x7e60df042a9c0868'
+      'testnet': '0x7e60df042a9c0868',
+      'crescendo': '0x7e60df042a9c0868',
     },
     'contract_name': 'FlowToken',
     'storage_path': {
@@ -296,7 +297,6 @@ const UnstakePage = () => {
 
             <Button
               onClick={() => {setConfirmationOpen(true)}}
-              // disabled={true}
               variant="contained"
               size="large"
               sx={{

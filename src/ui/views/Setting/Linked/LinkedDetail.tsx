@@ -22,6 +22,7 @@ import CheckCircleIcon from '../../../../components/iconfont/IconCheckmark';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import IconCopy from '../../../../components/iconfont/IconCopy';
 import IconNext from 'ui/FRWAssets/svg/nextgray.svg';
+import { Link } from 'react-router-dom';
 import { useWallet } from 'ui/utils';
 // import '../../Unlock/style.css';
 import { LLSecondaryButton } from '@/ui/FRWComponent';
@@ -59,6 +60,16 @@ interface TicketToken {
   balance: string;
 }
 
+interface Collection {
+  id: string;
+  contract_name: string;
+  logo?: string;
+  address: string;
+  name: string;
+  total?: number;
+  nfts: any[];
+}
+
 const LinkedDetail = () => {
   const location = useParams();
 
@@ -71,9 +82,11 @@ const LinkedDetail = () => {
   const [isEdit, setEdit] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [availableFt, setFt] = useState<TicketToken[]>([]);
-  const [availableNft, setNft] = useState<AvailableNFT[]>([]);
+  const [availableNft, setNft] = useState<any[]>([]);
+  const [availableNftCollection, setAvailableCollections] = useState<any[]>([]);
   const [hideEmpty, setHide] = useState<boolean>(false);
   const [nftCatalog, setCatalog] = useState<any[]>([]);
+  const [activeCollection, setActiveCollection] = useState<any>([]);
   const [value, setValue] = useState('one');
 
   const handleChange = (_, newValue: string) => {
@@ -95,10 +108,42 @@ const LinkedDetail = () => {
       setKey(key);
       const catalog = await usewallet.getNftCatalog();
       console.log('catalog ,', catalog);
+
+
+      const parentaddress = await usewallet.getMainWallet();
+
+      const activec = await usewallet.getChildAccountAllowTypes(parentaddress, key!);
+      setActiveCollection(activec)
       await setCatalog(catalog);
-      const nftResult = await usewallet.checkAccessibleNft(key);
+      const collectionMap: { [key: string]: Collection } = {};
+
+      const nftResult = await usewallet.checkAccessibleNft(parentaddress);
+      activec.forEach((active) => {
+        console.log('nft result ', active);
+        const collection = findObjectByContractName(active, catalog);
+        if (collection) {
+          collectionMap[collection.contract_name] = { ...collection, total: 0, nfts: [] };
+        }
+
+      });
+      console.log('nft result ', nftResult, key);
+
+      nftResult.forEach((nft) => {
+        const someResult = checkContractAddressInCollections(nft, Object.values(collectionMap));
+        console.log('someResult , ', someResult, Object.values(collectionMap))
+        if (someResult) {
+          collectionMap[someResult.contract_name].total! += 1;
+          collectionMap[someResult.contract_name].nfts!.push(nft)
+        }
+      })
+      console.log('collectionMap result ', collectionMap);
+
+
+      console.log('active check nftResult ', nftResult)
       if (nftResult) {
         setNft(nftResult)
+        const collectionsArray = Object.values(collectionMap);
+        setAvailableCollections(collectionsArray);
       }
       const ftResult = await usewallet.checkAccessibleFt(key);
       if (ftResult) {
@@ -114,6 +159,26 @@ const LinkedDetail = () => {
     }
   };
 
+  const extractContractAddress = (collection) => {
+    return collection.split('.')[2];
+  };
+
+  const findObjectByContractName = (contractName, collections) => {
+    const extractedAddress = extractContractAddress(contractName);
+    const foundObject = collections.find(item => item.contract_name === extractedAddress);
+    return foundObject || null;
+  };
+
+  const checkContractAddressInCollections = (nft, activec) => {
+    const contractAddressWithout0x = nft.collectionName;
+    const matchedResult = activec.find(collection => {
+      const extractedAddress = collection.name;
+      return extractedAddress === contractAddressWithout0x;
+    });
+    return matchedResult;
+  };
+
+
   const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
 
   const getUserInfo = async () => {
@@ -127,11 +192,30 @@ const LinkedDetail = () => {
 
   const toggleEdit = () => {
     setEdit(!isEdit);
-  }
+  };
 
-  const toggleHide = () => {
-    setHide(!hideEmpty);
-  }
+  const toggleHide = (event) => {
+    event.stopPropagation();
+    console.log('hideEmpty ', hideEmpty)
+    const prevEmpty = hideEmpty;
+    setHide(!prevEmpty);
+  };
+
+
+  const navigateWithState = (data, key) => {
+    const state = { nft: data };
+    localStorage.setItem('nftLinkedState', JSON.stringify(state));
+    if (data.total) {
+      history.push({
+        pathname: `/dashboard/nested/linked/collectiondetail/${key + '.' + data.contract_name + '.' + data.total + '.linked'}`,
+        state: {
+          collection: data,
+          ownerAddress: key,
+        }
+      });
+    }
+  };
+
 
   useEffect(() => {
     getUserInfo();
@@ -139,81 +223,80 @@ const LinkedDetail = () => {
   }, []);
 
 
-  const nftContent = () => (
-    <Box sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '8px' }}>
-      {availableNft.map((item, index) => {
-        if ((hideEmpty && item.idList.length > 0) || !hideEmpty) {
-          const imagePath = item.display?.squareImage ?? (nftCatalog.find(cat => cat.contract_name === item.id.split(".")[2])?.logo);
-          const name = item.display?.name ?? item.id.split(".")[2];
-          const collectedText = chrome.i18n.getMessage('Collected');
+  const nftContent = () => {
+    const filteredNftCollection = availableNftCollection.filter(item => !hideEmpty || (hideEmpty && item.total && item.total > 0));
 
-          return (
-            <Box
-              sx={{
-                display: 'flex',
-                height: '64px',
-                marginTop: '8px',
-                padding: '16px 20px',
-                borderRadius: '16px',
-                backgroundColor: '#292929',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-              key={index}
-              onClick={() =>
-                history.push({
-                  pathname: `/dashboard/nested/collectiondetail/${key + '.' + item.path.split('/')[2] + '.' + item.idList.length + '.linked'}`,
-                  state: {
-                    collection: item,
-                    ownerAddress: key,
-                  },
-                })
-              }
-            >
-              <img
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '32px'
-                }}
-                src={imagePath}
-                alt={name}
-              />
-              <Typography
+    return (
+      <Box sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '8px' }}>
+        {filteredNftCollection.length ? (
+          filteredNftCollection.map((item, index) => {
+            const collectedText = chrome.i18n.getMessage('Collected');
+
+            return (
+              <CardActionArea
                 sx={{
-                  color: '#FFF',
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  fontStyle: 'normal',
-                  fontWeight: 600,
-                  lineHeight: '18px',
-                  textTransform: 'capitalize',
-                  marginLeft: '8px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '50%',
+                  display: 'flex',
+                  height: '64px',
+                  marginTop: '8px',
+                  padding: '16px 20px',
+                  borderRadius: '16px',
+                  backgroundColor: '#292929',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                 }}
+                key={index}
+                // to={{
+                //   pathname: `/dashboard/nested/linked/collectiondetail/${key + '.' + item.contract_name + '.' + item.total + '.linked'}`,
+                //   state: {
+                //     collection: item,
+                //     ownerAddress: key,
+                //   }
+                // }}
+                onClick={() => navigateWithState(item, key)}
               >
-                {name}
-              </Typography>
-              <Box sx={{ flex: 1 }}></Box>
-              <Typography
-                sx={{
-                  color: '#BABABA',
-                  textAlign: 'right',
-                  fontFamily: 'Inter',
-                  fontSize: 12,
-                  fontStyle: 'normal',
-                  fontWeight: 600,
-                  lineHeight: '20px',
-                  alignItems: 'center',
-                }}
-              >
-                {item.idList.length} {collectedText}
-              </Typography>
-              {item.idList.length > 0 && (
+                <img
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '32px'
+                  }}
+                  src={item.logo}
+                  alt={item.name}
+                />
+                <Typography
+                  sx={{
+                    color: '#FFF',
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    lineHeight: '18px',
+                    textTransform: 'capitalize',
+                    marginLeft: '8px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '50%',
+                    alignItems: 'center',
+                  }}
+                >
+                  {item.name}
+                </Typography>
+                <Box sx={{ flex: 1 }}></Box>
+                <Typography
+                  sx={{
+                    color: '#BABABA',
+                    textAlign: 'right',
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    fontStyle: 'normal',
+                    fontWeight: 600,
+                    lineHeight: '20px',
+                    alignItems: 'center',
+                  }}
+                >
+                  {item.total + ' '}{collectedText}
+                </Typography>
                 <CardMedia
                   sx={{
                     width: '4px',
@@ -223,14 +306,32 @@ const LinkedDetail = () => {
                   }}
                   image={IconNext}
                 />
-              )}
-            </Box>
-          );
-        }
-
-      })}
-    </Box>
-  );
+              </CardActionArea>
+            );
+          })
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              height: '64px',
+              marginTop: '8px',
+              padding: '8px 20px',
+              borderRadius: '16px',
+              backgroundColor: '#292929',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Typography sx={{
+              fontSize: '12px',
+              color: '#bababa',
+              textAlign: 'center'
+            }}>No accessible NFT</Typography>
+          </Box>
+        )}
+      </Box>
+    );
+  };
 
 
   const ftContent = () => (
@@ -455,6 +556,7 @@ const LinkedDetail = () => {
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'space-between',
+                alignItems: 'center',
                 marginBottom: '14px',
                 flexGrow: '1'
               }}
@@ -468,33 +570,30 @@ const LinkedDetail = () => {
               >
                 {chrome.i18n.getMessage('Accessible')}
               </Typography>
-              <Box sx={{flexGrow:'1'}}></Box>
+              <Box sx={{ flexGrow: '1' }}></Box>
               <CardActionArea
-                onClick={() => toggleHide()}
-                sx={{width:'auto'}}
+                sx={{ width: 'auto' }}
               >
-                <Box>
-                  <FormControlLabel
-                    label={
-                      <Typography variant="body2" sx={{ fontSize: '12px', color: '#5e5e5e',marginRight:'0px' }}>
-                        {chrome.i18n.getMessage('Hide_Empty_collection')}
-                      </Typography>
-                    }
-                    control={
-                      <Checkbox
-                        size='small'
-                        icon={<CircleOutlinedIcon
-                          sx={{ width: '16px', height: '16px' }}
-                        />}
-                        sx={{ paddingLeft:'10px' }}
-                        checkedIcon={<CheckCircleIcon color={'#41CC5D'} />}
-                        value='mainnet'
-                        checked={hideEmpty}
-                        onChange={() => toggleHide()}
-                      />
-                    }
-                  />
-                </Box>
+                <FormControlLabel
+                  label={
+                    <Typography variant="body2" sx={{ fontSize: '12px', color: '#5e5e5e', marginRight: '0px' }}>
+                      {chrome.i18n.getMessage('Hide_Empty_collection')}
+                    </Typography>
+                  }
+                  control={
+                    <Checkbox
+                      size='small'
+                      icon={<CircleOutlinedIcon
+                        sx={{ width: '16px', height: '16px' }}
+                      />}
+                      sx={{ paddingLeft: '10px' }}
+                      checkedIcon={<CheckCircleIcon color={'#41CC5D'} />}
+                      value='mainnet'
+                      checked={hideEmpty}
+                      onClick={toggleHide}
+                    />
+                  }
+                />
               </CardActionArea>
             </Box>
             <Tabs
@@ -504,7 +603,7 @@ const LinkedDetail = () => {
               indicatorColor="secondary"
               aria-label="secondary tabs example"
               sx={{
-                ".MuiTabs-indicator": {
+                '.MuiTabs-indicator': {
                   display: 'none'
                 }
               }}

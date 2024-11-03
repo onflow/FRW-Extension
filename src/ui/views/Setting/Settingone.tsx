@@ -37,55 +37,55 @@ const CONTACTS = [
     name: 'Andy',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Bob',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Tom Hulk',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Tom Hank',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Audra',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Anna',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Tom',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Tom Riddle',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
   {
     name: 'Bolo',
     address: 'wjqhewqjifgiue',
     avatar:
-      'https://source.boringavatars.com/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
+      'https://lilico.app/api/avatar/beam/120/anna?colors=FFDD32,FC814A,7678ED,B3DEE2,BCF0DA',
   },
 ];
 

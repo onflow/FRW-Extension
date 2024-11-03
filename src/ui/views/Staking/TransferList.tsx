@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, ThemeProvider } from '@mui/system';
 import { useWallet } from 'ui/utils';
+import { formatString } from 'ui/utils/address';
 import theme from '../../style/LLTheme';
 import {
   Typography,
@@ -28,8 +29,8 @@ const TransferList = ({setCount}) => {
   const [isLoading, setLoading] = useState(true);
   const [transaction, setTx] = useState([]);
   const [monitor, setMonitor] = useState('flowscan');
-  const [flowscanURL, setFlowscanURL] = useState('https://flowdiver.io')
-  const [viewSource, setViewSourceUrl] = useState('https://flow-view-source.com/mainnet')
+  const [flowscanURL, setFlowscanURL] = useState('https://www.flowscan.io')
+  const [viewSource, setViewSourceUrl] = useState('https://f.dnz.dev')
   const [address, setAddress] = useState<string | null>('0x')
   const [showButton, setShowButton] = useState(false)
 
@@ -38,7 +39,7 @@ const TransferList = ({setCount}) => {
     const monitor = await wallet.getMonitor();
     setMonitor(monitor)
     try {
-      const url = await wallet.getFlowscanURL()
+      const url = await wallet.getFlowscanUrl()
       const viewSourceUrl = await wallet.getViewSourceUrl()
       setFlowscanURL(url)
       setViewSourceUrl(viewSourceUrl)
@@ -94,7 +95,7 @@ const TransferList = ({setCount}) => {
               variant="body1"
               sx={{ fontSize: 14, fontWeight: '500', textAlign: 'end', color: isReceive && isFT ? 'success.main' : 'text.primary' }}
             >
-              {props.type == 1 ? ( (isReceive ? '+' : '-') + `${props.amount/ 100000000}`) : `${props.token.split('.')[2]}`}
+              {props.type == 1 ? ( (isReceive ? '+' : '-') + `${props.amount}`) : `${props.token.split('.')[2]}`}
             </Typography>
           ) : (
             <Skeleton variant="text" width={35} height={15} />
@@ -155,8 +156,8 @@ const TransferList = ({setCount}) => {
                   color:'#41CC5D'
                 }}
               >
-                {(props.txType === 1 && props.receiver) && ` To ${props.receiver}`}
-                {(props.txType === 2 && props.sender) && ` From ${props.sender}`}
+                {(props.txType === 1 && props.receiver) && ` To ${formatString(props.receiver)}`}
+                {(props.txType === 2 && props.sender) && ` From ${formatString(props.sender)}`}
               </Typography>
             </Box>
           ) : (
@@ -193,7 +194,7 @@ const TransferList = ({setCount}) => {
                     <ListItemButton sx={{paddingRight:'0px'}} dense={true} onClick={() => {
                       {monitor === 'flowscan' ?
                         window.open(`${flowscanURL}/tx/${tx.hash}`):
-                        window.open(`${viewSource}/tx/${tx.hash}`)
+                        window.open(`${viewSource}/${tx.hash}`)
                       }
                     }}>
                       <ListItemIcon sx={{borderRadius: '20px', marginRight: '12px', minWidth: '20px'}}>

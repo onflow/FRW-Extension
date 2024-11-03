@@ -38,6 +38,12 @@ const PrivateKeyPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isMatch, setMatch] = useState(false);
 
+  const handleKeyDown = (event) => {
+    if (event.key === ' ' || event.keyCode === 32) {
+      event.preventDefault();
+    }
+  };
+
   const verify = async () => {
     setMatch(false);
 
@@ -111,7 +117,7 @@ const PrivateKeyPassword = () => {
             onChange={(event) => {
               setConfirmPassword(event.target.value);
             }}
-            // onKeyDown={handleKeyDown} 
+            onKeyDown={handleKeyDown} 
           />
 
           <Presets.TransitionSlideUp>

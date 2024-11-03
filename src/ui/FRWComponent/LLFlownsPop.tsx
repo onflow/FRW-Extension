@@ -61,7 +61,7 @@ export const LLFlownsPop = (props: DeleteBackupProps) => {
 
   const onNextBtnClicked = () => {
     wallet.setPopStat(false);
-    window.open("https://core.flow.com/", "_blank");
+    window.open('https://core.flow.com/', '_blank');
 
   }
 
@@ -153,7 +153,7 @@ export const LLFlownsPop = (props: DeleteBackupProps) => {
               fontSize="18px"
               fontWeight="700"
             >
-              Lilico Wallet Officially Renamed to Flow Reference Wallet
+              Lilico Wallet Officially Renamed to Flow Wallet
             </Typography>
             <Typography
               variant="body2"
@@ -163,7 +163,7 @@ export const LLFlownsPop = (props: DeleteBackupProps) => {
               fontSize="12px"
               paddingRight="32px"
             >
-              From now on, Lilico Wallet is rebranding as Flow Reference Wallet under new management.
+              From now on, Lilico Wallet is rebranding as Flow Wallet under new management.
             </Typography>
           </Box>
           <LLPrimaryButton

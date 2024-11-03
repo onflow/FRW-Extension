@@ -1,6 +1,6 @@
 {
   "appName": {
-    "message": "Flow Reference",
+    "message": "Flow Wallet",
     "description": "Application Name"
   },
   "appDescription": {
@@ -61,6 +61,12 @@
   "Account": {
     "message": "Аккаунт"
   },
+  "Acc__list": {
+    "message": "账户列表"
+  },
+  "Profile": {
+    "message": "Список аккаунтов"
+  },
   "Wallet": {
     "message": "Кошелек"
   },
@@ -77,7 +83,7 @@
     "message": "Анонимный"
   },
   "Other__Lilico__users__cannot__search__for__your__username": {
-    "message": "Другие пользователи Flow Reference не могут искать ваше имя пользователя."
+    "message": "Другие пользователи Flow Wallet не могут искать ваше имя пользователя."
   },
   "Private__Key": {
     "message": "Приватный ключ"
@@ -131,7 +137,7 @@
     "message": "БЕСПЛАТНЫЙ"
   },
   "Lilico__domain": {
-    "message": "Домен Flow Reference."
+    "message": "Домен Flow Wallet."
   },
   "Edit__Address": {
     "message": "Изменить адрес"
@@ -184,17 +190,20 @@
   "Testnet": {
     "message": "Testnet"
   },
-  "Sandboxnet": {
-    "message": "Sandboxnet"
+  "Crescendo": {
+    "message": "Crescendo"
+  },
+  "Previewnet": {
+    "message": "Previewnet"
   },
   "Transaction__Monitor": {
-    "message": "Монитор транзакций"
+    "message": "Блок-эксплорер"
   },
-  "Flowscan": {
-    "message": "Сканирование"
+  "Flowdiver": {
+    "message": "Flowdiver"
   },
   "Flow__view__source": {
-    "message": "Источник просмотра потока"
+    "message": "f.dnz.dev"
   },
   "Public__Key": {
     "message": "Открытый ключ"
@@ -218,7 +227,7 @@
     "message": "Не передавайте ваш приватный ключ!"
   },
   "If__someone__has__your__private__key": {
-    "message": "Если у кого-то есть ваш приватный ключ, он  <br/>получит полный доступ к вашему кошельку. "
+    "message": "Если у кого-то есть ваш приватный ключ, он получит полный доступ к вашему кошельку. "
   },
   "COPY": {
     "message": "Копировать"
@@ -227,7 +236,7 @@
     "message": "Не разделяйте вашу секретную фразу!"
   },
   "If__someone__has__your__secret__phrase": {
-    "message": "Если кто-то имеет вашу секретную фразу, то он  <br/>будет иметь полный контроль над вашим кошельком."
+    "message": "Если кто-то имеет вашу секретную фразу, то он будет иметь полный контроль над вашим кошельком."
   },
   "Done": {
     "message": "Готово"
@@ -236,7 +245,7 @@
     "message": "Вы уверены, что хотите сбросить ваш кошелек?"
   },
   "Removing__the__wallet__from__Lilico__does__not__remove__the__wallet__from__Flow__blockchain": {
-    "message": "Удаление кошелька из Flow Reference не удаляет кошелек из блокчейна Flow. Вы можете импортировать ваш кошелек снова, используя резервную копию фразы или Google Drive."
+    "message": "Удаление кошелька из Flow Wallet не удаляет кошелек из блокчейна Flow. Вы можете импортировать ваш кошелек снова, используя резервную копию фразы или Google Drive."
   },
   "Reset": {
     "message": "Reset"
@@ -260,7 +269,7 @@
     "message": "Безопасность"
   },
   "Allow__lilico__to__pay__the__gas__fee": {
-    "message": "The room was very small and the bed was very comfortable."
+    "message": "Разрешите кошельку Flow оплачивать все комиссии за мои транзакции."
   },
   "This__feature__has__been__disabled__temporarily": {
     "message": "Эта функция временно отключена"
@@ -512,7 +521,7 @@
     "message": "Запустить мой кошелек"
   },
   "Start__exploring__with__Lilico__now": {
-    "message": "Начните изучать с Flow Reference сейчас!"
+    "message": "Начните изучать с Flow Wallet сейчас!"
   },
   "all__set": {
     "message": "всё установлено"
@@ -521,10 +530,10 @@
     "message": "Вы"
   },
   "Flow_Core": {
-    "message": "Flow Reference"
+    "message": "Flow Wallet"
   },
   "Lilico": {
-    "message": "Flow Reference"
+    "message": "Flow Wallets"
   },
   "and__Pin": {
     "message": "и Пин-код"
@@ -557,7 +566,7 @@
     "message": "Выберите ваш "
   },
   "Your__username__will__be__used__to__send__and__receive": {
-    "message": "Ваше имя пользователя будет использоваться для отправки и получения жетонов с друзьями на Flow Reference."
+    "message": "Ваше имя пользователя будет использоваться для отправки и получения жетонов с друзьями на Flow Wallet."
   },
   "Okay__I__have__saved__it__properly": {
     "message": "Хорошо, я сохранил его правильно"
@@ -611,10 +620,10 @@
     "message": "Условия предоставления услуг"
   },
   "Lilico__uses__this__password__to__protect__your__recovery__phrase": {
-    "message": "Flow Reference использует этот пароль для защиты вашей фразы восстановления."
+    "message": "Flow Wallet использует этот пароль для защиты вашей фразы восстановления."
   },
   "I__agree__to__Lilico": {
-    "message": "Я согласен с Flow Reference"
+    "message": "Я согласен с Flow Wallet"
   },
   "Try__again": {
     "message": "Попробовать еще раз"
@@ -622,8 +631,11 @@
   "Welcome__Back": {
     "message": "С возвращением, "
   },
+  "Welcome__Back__import": {
+    "message": "С возвращением "
+  },
   "Use__the__same__Google__Drive__password": {
-    "message": "Используйте тот же пароль Google Drive для защиты кошелька Flow Reference"
+    "message": "Используйте тот же пароль Google Drive для защиты кошелька Flow Wallet"
   },
   "Please__enter__your__password__to__decrypt": {
     "message": "Пожалуйста, введите пароль для расшифровки резервной копии кошелька."
@@ -656,7 +668,7 @@
     "message": "Пожалуйста, выберите слово по очереди, ориентируясь на его порядок。"
   },
   "Please__notice__that__If__you__lose__you__can__not__access": {
-    "message": "Обратите внимание, что если вы потеряете фразы восстановления, вы не можете получить доступ к вашей учетной записи навсегда."
+    "message": "Если вы потеряете свою фразу для восстановления, вы не сможете получить доступ к своему аккаунту."
   },
   "Please_restart_your_browser": {
     "message": "Пожалуйста, перезапустите ваш браузер"
@@ -664,7 +676,7 @@
   "Choose_provider": {
     "message": "Выберите провайдера"
   },
-  "If_you_keep_seeing_this_spinner":{
+  "If_you_keep_seeing_this_spinner": {
     "message": "Если вы продолжаете видеть этот спиннер"
   },
   "Select_the_word_at": {
@@ -680,7 +692,7 @@
     "message": " всё установлено"
   },
   "You_can_start_experiencing_Lilico_now": {
-    "message": "Вы можете начать испытывать Flow Reference сейчас!"
+    "message": "Вы можете начать испытывать Flow Wallet сейчас!"
   },
   "Back_up": {
     "message": "Резервная копия"
@@ -812,10 +824,10 @@
     "message": "Разблокировать кошелек"
   },
   "Forgot_password": {
-    "message": "Забыли пароль?"
+    "message": "Не можете войти"
   },
   "Welcome_to_lilico": {
-    "message": "Добро пожаловать в Flow Reference"
+    "message": "Добро пожаловать в Flow Wallet"
   },
   "Flow": {
     "message": "Поток"
@@ -836,7 +848,7 @@
     "message": " Это удалит эту резервную копию Google. Вы не будете импортировать этот кошелек через резервную копию Google."
   },
   "Your_lilico_domain_will_look_like": {
-    "message": "Ваш домен Flow Reference будет выглядеть так:"
+    "message": "Ваш домен Flow Wallet будет выглядеть так:"
   },
   "meow": {
     "message": ".меу"
@@ -958,56 +970,349 @@
   "Search__PlaceHolder": {
     "message": "Адрес поиска (0x) или домен потока"
   },
-  "Unlink_Confirmation":{
-    "message":"Unlink Confirmation"
+  "Unlink_Confirmation": {
+    "message": "Unlink Confirmation"
   },
-  "Things_you_should_know":{
-    "message":"Вещи, которые вы должны знать"
+  "Things_you_should_know": {
+    "message": "Вещи, которые вы должны знать"
   },
-  "Linked_Account":{
-    "message":"Связанный аккаунт"
+  "Linked_Account": {
+    "message": "Связанный аккаунт"
   },
-  "Wallet_List":{
-    "message":"Список кошельков"
+  "Wallet_List": {
+    "message": "Список кошельков"
   },
-  "Account_Linking":{
-    "message":"Связывание аккаунта"
+  "Account_Linking": {
+    "message": "Связывание аккаунта"
   },
-  "This_App_would_like_to":{
-    "message":"Это приложение хотело бы"
+  "This_App_would_like_to": {
+    "message": "Это приложение хотело бы"
   },
-  "Linked_Successful":{
-    "message":"Связано успешно"
+  "Linked_Successful": {
+    "message": "Связано успешно"
   },
-  "Linking_Child_Account":{
-    "message":"Привязка дочерней учетной записи"
+  "Linking_Child_Account": {
+    "message": "Привязка дочерней учетной записи"
   },
-  "Try_Our_Mobile_APP":{
-    "message":"Попробуйте мобильное приложение"
+  "Try_Our_Mobile_APP": {
+    "message": "Попробуйте мобильное приложение"
   },
   "Reset_Wallet": {
     "message": "сбросить кошелек"
   },
-  "Unlink_Message":{
+  "Unlink_Message": {
     "message": "Отвяжите этот счет, и основной кошелек больше не будет иметь доступа к этому связанному счету."
   },
-  "Edit_Linked_Account":{
+  "Edit_Linked_Account": {
     "message": "Редактировать связанный аккаунт"
   },
-  "Accessible":{
+  "Accessible": {
     "message": "Доступный"
   },
-  "Collected":{
+  "Collected": {
     "message": "Собрано"
   },
-  "Hide_Empty_collection":{
+  "Hide_Empty_collection": {
     "message": "Скрыть Пустые Коллекции"
   },
-  "Inaccessible":{
+  "Inaccessible": {
     "message": "Недоступный "
   },
-  
   "No_linked": {
     "message": "Нет привязанного аккаунта"
+  },
+  "Import_Existing": {
+    "message": "Импортировать существующий аккаунт"
+  },
+  "Create_New_Account": {
+    "message": "Создать новый аккаунт"
+  },
+  "Accounts": {
+    "message": "Аккаунты"
+  },
+  "Import": {
+    "message": "Импорт"
+  },
+  "Choose_an_account_you_want_to_import": {
+    "message": "Выберите аккаунт для импорта"
+  },
+  "Accounts_Found_on_Chain": {
+    "message": "Аккаунты, найденные в блокчейне"
+  },
+  "Support_Flow_Wallet_and_private_key": {
+    "message": "Поддержка Flow Wallet, Blocto, секретной фразы, ключевого хранилища и приватного ключа"
+  },
+  "Import_Address": {
+    "message": "Импортировать адрес"
+  },
+  "Please_import_or_register_a_new_key": {
+    "message": "Пожалуйста, импортируйте новый ключ или вернитесь и войдите в систему."
+  },
+  "Publickey_already_exist": {
+    "message": "Публичный ключ уже существует"
+  },
+  "Do_you_wish_to_go": {
+    "message": "Желаете вернуться и зарегистрировать аккаунт?"
+  },
+  "No_Account_found": {
+    "message": "Аккаунт не найден"
+  },
+  "Please_enter_your_private_key": {
+    "message": "Пожалуйста, введите ваш приватный ключ"
+  },
+  "This_is_the_private_key_you": {
+    "message": "Это приватный ключ, который вам был дан"
+  },
+  "Private__is__invalid": {
+    "message": "Приватный ключ недействителен"
+  },
+  "Open_your_Flow_Reference_on_Mobil": {
+    "message": "Откройте мобильное приложение Flow Wallet и отсканируйте QR-код для синхронизации ваших кошельков. Синхронизация ваших Flow Wallets позволяет использовать ваш аккаунт Flow в ваших приложениях Flow Wallet."
+  },
+  "Sync_": {
+    "message": "Синхронизация"
+  },
+  "Note_Your_recovery_phrase_will_not": {
+    "message": "Примечание: Ваша фраза восстановления НИКОГДА не проходит через сервер Flow Wallet. Она зашифрована с конца в конец, и мы никогда не сможем ее прочитать."
+  },
+  "Scan_Successfully": {
+    "message": "Сканирование успешно"
+  },
+  "Sync_in_Process": {
+    "message": "Синхронизация в процессе..."
+  },
+  "Scan_QR_Code_with_Mobile": {
+    "message": "Сканировать QR-код с помощью мобильного приложения"
+  },
+  "Sync_with_Mobile_App": {
+    "message": "Синхронизировать с мобильным приложением"
+  },
+  "Import_Other_Wallets": {
+    "message": "Импортировать другие кошельки"
+  },
+  "Support_Flow_Wallet_Blocto": {
+    "message": "Поддержка Flow Wallet, keystore и raw ключа"
+  },
+  "A_crypto_wallet_on_Flow": {
+    "message": "Криптокошелек на Flow для исследователей, коллекционеров и геймеров"
+  },
+  "Explorers_Collectors_and_Gamers": {
+    "message": "Исследователи, коллекционеры и геймеры"
+  },
+  "Keystore": {
+    "message": "Ключевое хранилище"
+  },
+  "Seed_Phrase": {
+    "message": "Секретная фраза"
+  },
+  "Private_Key": {
+    "message": "Приватный ключ"
+  },
+  "You_can_import_the": {
+    "message": "Вставьте содержимое JSON из хранилища ключей другого кошелька (например: Blocto)"
+  },
+  "Enter_password_for_json_file": {
+    "message": "Введите пароль для json файла"
+  },
+  "Enter_your_flow_address": {
+    "message": "Введите ваш Flow адрес (необязательно)"
+  },
+  "Enter_your_Private_key": {
+    "message": "Введите ваш приватный ключ"
+  },
+  "Import_12_or_24_words": {
+    "message": "Импортируйте 12 или 24 слова, разделенные пробелами"
+  },
+  "OK": {
+    "message": "OK"
+  },
+  "We_cant_find": {
+    "message": "Мы не можем найти ваш адрес в Flow с этим ключом, или ключ недействителен. Пожалуйста, проверьте введенные данные и попробуйте снова."
+  },
+  "Add_account": {
+    "message": "Добавить аккаунт"
+  },
+  "Private__key_valid": {
+    "message": "Приватный ключ действителен"
+  },
+  "Are__you__sure__you__want__to__restore__your__wallet": {
+    "message": "Вы хотите восстановить свой кошелек?"
+  },
+  "Thie_wallet_will_try_and_restore": {
+    "message": "Кошелек попытается восстановить любые существующие учетные записи, сохраненные локально, после импорта нового аккаунта."
+  },
+  "Reset_Restore_your_wallet": {
+    "message": "Сбросить/Восстановить ваш кошелек."
+  },
+  "Restore": {
+    "message": "Восстановить"
+  },
+  "Having_trouble": {
+    "message": "Проблемы с входом?"
+  },
+  "Reset_my_wallet": {
+    "message": "Сбросить мой кошелек"
+  },
+  "If_you_have_your_recovery_phrase": {
+    "message": "Если у вас есть фраза для восстановления или личный ключ, вы можете сбросить и восстановить свой аккаунт."
+  },
+  "Retrieve_local_sensitive_data": {
+    "message": "Получить локальные конфиденциальные данные"
+  },
+  "It_seem_like_something_wrong": {
+    "message": "Похоже, что-то не так с вашими локальными данными, вы можете получить ваши локальные конфиденциальные данные с помощью пароля."
+  },
+  "Forget_Password": {
+    "message": "Забыли пароль"
+  },
+  "If_you_forgot_your_password": {
+    "message": "Если вы забыли свой пароль, вам нужно будет сбросить свой кошелек и импортировать фразу для восстановления или приватный ключ, чтобы восстановить доступ к вашему кошельку."
+  },
+  "Step_1": {
+    "message": "Шаг 1"
+  },
+  "Step_2": {
+    "message": "Шаг 2"
+  },
+  "Step_3": {
+    "message": "Шаг 3"
+  },
+  "Import_Recovery_Phrase_or_Private_Key": {
+    "message": "Импортировать фразу для восстановления или приватный ключ"
+  },
+  "Regain_Access_to_Your_Wallet": {
+    "message": "Восстановить доступ к вашему кошельку"
+  },
+  "Reset_Your_Wallet": {
+    "message": "Сбросить ваш кошелек"
+  },
+  "Confirm_to_reset_Wallet": {
+    "message": "Подтвердить сброс кошелька"
+  },
+  "This_action_will_remove": {
+    "message": "Это действие удалит все ваши локальные данные, включая ваш приватный ключ. Пожалуйста, убедитесь, что вы сделали резервную копию ваших приватных ключей."
+  },
+  "Reveal_Private_Key": {
+    "message": "Показать приватный ключ"
+  },
+  "Save_your_Private_Key": {
+    "message": "Сохраните ваш приватный ключ"
+  },
+  "Here_is_your_local_private_key": {
+    "message": "Вот ваш локальный приватный ключ, пожалуйста, сделайте резервную копию ваших ключей и переимпортируйте приватный ключ, чтобы восстановить доступ к вашему кошельку."
+  },
+  "Loading": {
+    "message": "Загрузка..."
+  },
+  "Application": {
+    "message": "Приложение"
+  },
+  "IP_Address": {
+    "message": "IP-адрес"
+  },
+  "Location": {
+    "message": "Местоположение"
+  },
+  "Date": {
+    "message": "Дата"
+  },
+  "Link_Flow_Reference_Wallet_Mobile_by_Scanning": {
+    "message": "Связать мобильный кошелек Flow, сканируя QR-код"
+  },
+  "Current_Sessions": {
+    "message": "Текущие сессии"
+  },
+  "Active_Sessions": {
+    "message": "Активные сессии"
+  },
+  "Online": {
+    "message": "Онлайн"
+  },
+  "Wallet_Confirmation": {
+    "message": "Подтверждение кошелька"
+  },
+  "Sync_Mobile_Device": {
+    "message": "Синхронизировать мобильное устройство"
+  },
+  "Link_Mobile_Device": {
+    "message": "Подключить мобильное устройство"
+  },
+  "Desktop_Device": {
+    "message": "Настольное устройство"
+  },
+  "Mobile_Device": {
+    "message": "Мобильное устройство"
+  },
+  "Scan_QR_code_to_active": {
+    "message": "Сканируйте QR-код для активации вашего мобильного устройства"
+  },
+  "lease_allow_the_camera_permission": {
+    "message": "Пожалуйста, разрешите доступ к камере через настройки веб-разрешений в расширении, находящемся в правом верхнем углу."
+  },
+  "Allow": {
+    "message": "Разрешить"
+  },
+  "to_connect": {
+    "message": "подключить?"
+  },
+  "Devices": {
+    "message": "Устройства"
+  },
+  "Move": {
+    "message": "Переместить"
+  },
+  "multi_vm": {
+    "message": "EVM аккаунт"
+  },
+  "main_wallet": {
+    "message": "Основные аккаунт"
+  },
+  "edit_wallet": {
+    "message": "Редактировать кошелек"
+  },
+  "move_tokens": {
+    "message": "Переместить токены"
+  },
+  "move_assets": {
+    "message": "Переместить активы"
+  },
+  "select_collection": {
+    "message": "Выбрать коллекцию"
+  },
+  "select": {
+    "message": "Выбрать"
+  },
+  "collection": {
+    "message": "Коллекция"
+  },
+  "Cannot_move_more": {
+    "message": "Невозможно переместить более 9 NFT"
+  },
+  "manage_multi_assets_seamlessly": {
+    "message": "Управляйте мульти-ВМ активами без проблем."
+  },
+  "path_to_enable": {
+    "message": "Включить путь к"
+  },
+  "EVM_on_flow": {
+    "message": "EVM на Flow"
+  },
+  "enable_the_path_to_evm_on_flow": {
+    "message": "Включить путь к EVM на Flow"
+  },
+  "Would_you_like_to_move": {
+    "message": "Хотите переместить ваши активы в"
+  },
+  "lowercaseaccount": {
+    "message": "аккаунт"
+  },
+  "balance": {
+    "message": "Баланс"
+  },
+  "import_account": {
+    "message": "Импортировать аккаунт"
+  },
+  "Import__Profile": {
+    "message": "Импортировать профиль"
   }
 }
