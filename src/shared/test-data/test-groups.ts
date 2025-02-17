@@ -53,6 +53,16 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
         params: { account_key: generatedAccountKey, username: commonParams.username },
       },
       {
+        unused: true,
+        name: 'login',
+        params: { public_key: commonParams.publicKey, signature: '', replaceUser: true },
+      },
+      {
+        unused: true,
+        name: 'loginV2',
+        params: { public_key: commonParams.publicKey, signature: '', replaceUser: true },
+      },
+      {
         name: 'loginV3',
         params: {
           account_key: accountKey,
@@ -91,10 +101,24 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
     user: [
       { name: 'coinMap', params: {} },
       { name: 'userInfo', params: {} },
+      { unused: true, name: 'userWallet', params: {} },
+      { unused: true, name: 'userWalletV2', params: {} },
       { name: 'searchUser', params: { keyword: 'webdev18_862' } },
       { name: 'checkImport', params: { key: 'test' } },
     ],
-    wallet: [{ name: 'createFlowAddress', params: {} }],
+    wallet: [
+      { name: 'createFlowAddress', params: {} },
+      { unused: true, name: 'createFlowSandboxAddress', params: {} },
+      {
+        unused: true,
+        name: 'createFlowNetworkAddress',
+        params: { account_key: accountKey, network: commonParams.network },
+      },
+    ],
+    coins: [
+      { unused: true, name: 'getCoinList', params: { address: commonParams.address } },
+      { unused: true, name: 'getCoinRate', params: { coinId: 'flow' } },
+    ],
     device: [
       { name: 'getManualAddress', params: {} },
       {
@@ -219,6 +243,8 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
       },
     ],
     transactions: [
+      { unused: true, name: 'prepareTransaction', params: { transaction: {} } },
+      { unused: true, name: 'sendTransaction', params: { transaction: {} } },
       { name: 'getTransfers', params: { address: commonParams.address, after: '', limit: 10 } },
       { name: 'getEVMTransfers', params: { address: commonParams.address, after: '', limit: 10 } },
     ],
@@ -251,6 +277,16 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
       },
     ],
     nft: [
+      {
+        unused: true,
+        name: 'getNFTMetadata',
+        params: {
+          address: commonParams.address,
+          contractName: 'ExampleNFT',
+          contractAddress: '0x390b4705da6305c3',
+          tokenId: 0,
+        },
+      },
       { name: 'nftCatalog', params: {} },
       {
         name: 'nftCatalogList',
@@ -267,6 +303,28 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
       },
       {
         name: 'nftCatalogCollectionList',
+        params: {
+          address: commonParams.address,
+          contractName: 'cadenceExampleNFTCollection',
+          limit: 10,
+          offset: 0,
+          network: commonParams.network,
+        },
+      },
+      {
+        unused: true,
+        name: 'nftCollectionApiPaging',
+        params: {
+          address: commonParams.address,
+          contractName: 'cadenceExampleNFTCollection',
+          limit: 10,
+          offset: 0,
+          network: commonParams.network,
+        },
+      },
+      {
+        unused: true,
+        name: 'nftCollectionInfo',
         params: {
           address: commonParams.address,
           contractName: 'cadenceExampleNFTCollection',
@@ -308,8 +366,29 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
         },
       },
       {
+        unused: true,
+        name: 'getNFTCadenceCollection',
+        params: {
+          address: commonParams.address,
+          network: commonParams.network,
+          identifier: '',
+          offset: 0,
+          limit: 24,
+        },
+      },
+      {
         name: 'getNFTV2CollectionList',
         params: { address: commonParams.address, network: commonParams.network },
+      },
+      {
+        unused: true,
+        name: 'getNFTList',
+        params: { address: commonParams.address, offset: 0, limit: 10 },
+      },
+      {
+        unused: true,
+        name: 'genTx',
+        params: { contract_name: 'cadenceExampleNFTCollection' },
       },
     ],
     profile: [
@@ -323,11 +402,33 @@ export const createTestGroups = (commonParams: CommonParams): ApiTestGroups => {
         },
       },
     ],
-    scripts: [{ name: 'cadenceScriptsV2', params: {} }],
+    flowns: [
+      { unused: true, name: 'flownsPrepare', params: {} },
+      { unused: true, name: 'flownsAuthTransaction', params: { transaction: {}, envelope: '' } },
+      { unused: true, name: 'flownsTransaction', params: { transaction: {}, envelope: '' } },
+    ],
+    swap: [
+      {
+        unused: true,
+        name: 'swapEstimate',
+        params: { network: commonParams.network, inToken: 'flow', outToken: 'usdc', amount: '1' },
+      },
+      {
+        unused: true,
+        name: 'swapOutEstimate',
+        params: { network: commonParams.network, inToken: 'flow', outToken: 'usdc', amount: '1' },
+      },
+      { unused: true, name: 'swapPairs', params: { network: commonParams.network } },
+    ],
+    scripts: [
+      { unused: true, name: 'cadenceScripts', params: { network: commonParams.network } },
+      { name: 'cadenceScriptsV2', params: {} },
+    ],
     misc: [
       { name: 'getNews', params: {} },
       { name: 'getLatestVersion', params: {} },
       { name: 'validateRecaptcha', params: { token: commonParams.token } },
+      { unused: true, name: 'flowScanQuery', params: { query: '', operationName: '' } },
       { name: 'pingNetwork', params: { network: commonParams.network } },
       {
         name: 'getMoonpayURL',

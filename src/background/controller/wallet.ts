@@ -48,6 +48,7 @@ import {
   nftService,
   googleDriveService,
   passwordService,
+  flownsService,
   proxyService,
   newsService,
   mixpanelTrack,
@@ -361,6 +362,11 @@ export class WalletController extends BaseController {
   clearPageStateCache = () => pageStateCacheService.clear();
   setPageStateCache = (cache: CacheState) => pageStateCacheService.set(cache);
 
+  getAddressBalance = async (address: string) => {
+    const data = await openapiService.getCoinList(address);
+    preferenceService.updateAddressBalance(address, data);
+    return data;
+  };
   getAddressCacheBalance = (address: string | undefined) => {
     if (!address) return null;
     return preferenceService.getAddressBalance(address);
@@ -874,6 +880,10 @@ export class WalletController extends BaseController {
   updateIsFirstOpen = () => {
     return preferenceService.updateIsFirstOpen();
   };
+  listChainAssets = async (address: string) => {
+    return await openapiService.getCoinList(address);
+  };
+
   // userinfo
   getUserInfo = async (forceRefresh: boolean) => {
     const data = await userInfoService.getUserInfo();
@@ -926,6 +936,15 @@ export class WalletController extends BaseController {
     } catch (err) {
       console.error(err);
       return avatar;
+    }
+  };
+
+  checkUserDomain = async (username: string) => {
+    const res = await openapiService.getFlownsAddress(username, 'meow');
+    const network = await this.getNetwork();
+
+    if (res) {
+      await userInfoService.setMeow(username + '.meow', network);
     }
   };
 
@@ -989,6 +1008,17 @@ export class WalletController extends BaseController {
     const wallet = await userWalletService.returnMainWallet(network);
 
     return wallet;
+  };
+
+  setPopStat = async (stat: boolean) => {
+    const network = await this.getNetwork();
+    flownsService.setPop(network, stat);
+  };
+
+  fetchPopStat = async () => {
+    const network = await this.getNetwork();
+    const popStat = await flownsService.getPop(network);
+    return popStat;
   };
 
   fetchUserDomain = async () => {
@@ -1417,6 +1447,17 @@ export class WalletController extends BaseController {
     const address = await this.getCurrentAddress();
     const NFTList = await openapiService.getNFTCadenceList(address!, network);
     return NFTList;
+  };
+
+  requestCollectionInfo = async (identifier) => {
+    const network = await this.getNetwork();
+    const address = await this.getCurrentAddress();
+    const NFTCollection = await openapiService.getNFTCadenceCollection(
+      address!,
+      network,
+      identifier
+    );
+    return NFTCollection;
   };
 
   private currencyBalance = (balance: string, price) => {
@@ -2455,6 +2496,15 @@ export class WalletController extends BaseController {
     );
   };
 
+  enableNFTStorage = async (contract_name: string) => {
+    const result = await openapiService.genTx(contract_name);
+    if (!result) {
+      return;
+    }
+    const cadence = result.data;
+    return await userWalletService.sendTransaction(cadence, []);
+  };
+
   enableNFTStorageLocal = async (token: NFTModel) => {
     const script = await getScripts('collection', 'enableNFTStorage');
     if (token['contractName']) {
@@ -3370,7 +3420,7 @@ export class WalletController extends BaseController {
     transactionService.clearPending(network);
   };
 
-  getNFTListCache = async (): Promise<NFTData> => {
+  getNFTListCahce = async (): Promise<NFTData> => {
     const network = await this.getNetwork();
     // const list =
     // if (!list.length){
@@ -3472,6 +3522,43 @@ export class WalletController extends BaseController {
     const unique_nfts = getUniqueListBy(data.nfts, 'unique_id');
     data.nfts = unique_nfts;
     return data;
+  };
+
+  getSingleCollectionv2 = async (address: string, contract: string, offset = 0) => {
+    const network = await this.getNetwork();
+    const data = await openapiService.getNFTCadenceCollection(
+      address!,
+      network,
+      contract,
+      offset,
+      24
+    );
+
+    data.nfts.map((nft) => {
+      nft.unique_id = nft.collectionName + '_' + nft.id;
+    });
+    function getUniqueListBy(arr, key) {
+      return [...new Map(arr.map((item) => [item[key], item])).values()];
+    }
+    const unique_nfts = getUniqueListBy(data.nfts, 'unique_id');
+    data.nfts = unique_nfts;
+    return data;
+  };
+
+  getCollectionApi = async (address: string, contract: string, offset = 0) => {
+    const network = await this.getNetwork();
+    const result = await openapiService.nftCollectionApiPaging(
+      address!,
+      contract,
+      24,
+      offset,
+      network
+    );
+    result['info'] = result.collection;
+    // result['info']['collectionDisplay']['name'] = result.collection.display.name
+    // result['nftCount'] = result.collection.nftCount
+    console.log('result  ---- ', result);
+    return result;
   };
 
   refreshCollection = async (address: string) => {
@@ -3654,6 +3741,31 @@ export class WalletController extends BaseController {
 
   updateProfilePreference = async (privacy: number) => {
     await openapiService.updateProfilePreference(privacy);
+  };
+
+  flownsPrepare = async () => {
+    const resp = await openapiService.flownsPrepare();
+    return resp;
+  };
+
+  // flownsResponse = async (script, domain, flownsAddress, lilicoAddress) => {
+  //   const resp = await flownsService.sendTransaction(script, domain, flownsAddress, lilicoAddress);
+  //   return resp;
+  // };
+
+  setHistory = async (token, nft) => {
+    const network = await userWalletService.getNetwork();
+    const data = {
+      token,
+      nft,
+    };
+    await flownsService.setHistory(network, data);
+  };
+
+  getHistory = async () => {
+    const network = await userWalletService.getNetwork();
+    const resp = await flownsService.getHistory(network);
+    return resp;
   };
 
   getAccount = async (): Promise<FclAccount> => {
