@@ -1730,15 +1730,11 @@ export class WalletController extends BaseController {
 
   // Master send token function that takes a transaction state from the front end and returns the transaction ID
   transferTokens = async (transactionState: TransactionState): Promise<string> => {
-    const formattedAmount = new BN(transactionState.amount).isInteger()
-      ? new BN(transactionState.amount).toFixed(1)
-      : transactionState.amount;
-
     const transferTokensOnCadence = async () => {
       return this.transferCadenceTokens(
         transactionState.selectedToken.symbol,
         transactionState.toAddress,
-        formattedAmount
+        transactionState.amount
       );
     };
 
@@ -1747,19 +1743,19 @@ export class WalletController extends BaseController {
         transactionState.fromAddress,
         transactionState.toAddress,
         'flowTokenProvider',
-        formattedAmount,
+        transactionState.amount,
         transactionState.selectedToken.symbol
       );
     };
 
     const transferFlowFromEvmToCadence = async () => {
-      return this.withdrawFlowEvm(formattedAmount, transactionState.toAddress);
+      return this.withdrawFlowEvm(transactionState.amount, transactionState.toAddress);
     };
 
     const transferFTFromEvmToCadence = async () => {
       return this.transferFTFromEvm(
         transactionState.selectedToken['flowIdentifier'],
-        formattedAmount,
+        transactionState.amount,
         transactionState.toAddress,
         transactionState.selectedToken
       );
@@ -1774,7 +1770,7 @@ export class WalletController extends BaseController {
         gas = '1';
         // the amount is always stored as a string in the transaction state
         const integerAmountStr = convertToIntegerAmount(
-          formattedAmount,
+          transactionState.amount,
           // Flow needs 18 digits always for EVM
           18
         );
@@ -1782,7 +1778,7 @@ export class WalletController extends BaseController {
         data = '0x';
       } else {
         const integerAmountStr = convertToIntegerAmount(
-          formattedAmount,
+          transactionState.amount,
           transactionState.selectedToken.decimals
         );
 
@@ -1812,7 +1808,7 @@ export class WalletController extends BaseController {
     };
 
     const transferFlowFromCadenceToEvm = async () => {
-      return this.transferFlowEvm(transactionState.toAddress, formattedAmount);
+      return this.transferFlowEvm(transactionState.toAddress, transactionState.amount);
     };
 
     const transferFTFromCadenceToEvm = async () => {
@@ -1822,13 +1818,13 @@ export class WalletController extends BaseController {
 
       return this.transferFTToEvmV2(
         `A.${address}.${transactionState.selectedToken!.contractName}.Vault`,
-        formattedAmount,
+        transactionState.amount,
         transactionState.toAddress
       );
     };
 
     // Validate the amount. Just to be sure!
-    if (!validateAmount(formattedAmount, transactionState.selectedToken.decimals)) {
+    if (!validateAmount(transactionState.amount, transactionState.selectedToken.decimals)) {
       throw new Error('Invalid amount or decimal places');
     }
 
