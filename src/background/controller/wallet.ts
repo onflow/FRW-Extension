@@ -1730,9 +1730,10 @@ export class WalletController extends BaseController {
 
   // Master send token function that takes a transaction state from the front end and returns the transaction ID
   transferTokens = async (transactionState: TransactionState): Promise<string> => {
-    const formattedAmount = transactionState.amount.includes('.')
-      ? transactionState.amount
-      : `${transactionState.amount}.0`;
+    const formattedAmount = new BN(transactionState.amount).isInteger()
+      ? new BN(transactionState.amount).toFixed(1)
+      : transactionState.amount;
+
     const transferTokensOnCadence = async () => {
       return this.transferCadenceTokens(
         transactionState.selectedToken.symbol,
