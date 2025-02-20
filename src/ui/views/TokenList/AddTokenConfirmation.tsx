@@ -1,11 +1,12 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Typography, Drawer, Grid, Button, IconButton } from '@mui/material';
+import { Box, Typography, Drawer, Grid, Button, IconButton, CircularProgress } from '@mui/material';
 import { type TokenInfo } from 'flow-native-token-registry';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { LLSpinner } from 'ui/FRWComponent';
 import { useWallet } from 'ui/utils';
+
+import IconPlus from '../../../components/iconfont/IconPlus';
 
 interface AddTokenConfirmationProps {
   isConfirmationOpen: boolean;
@@ -53,7 +54,7 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
       sx={{
         width: '100%',
         height: '100%',
-        background: 'rgba(0, 0, 0, 0.5)',
+        background: '#000000',
         flexDirection: 'column',
         display: 'flex',
       }}
@@ -93,7 +94,7 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
             display: 'flex',
             mx: '28px',
             my: '28px',
-            backgroundColor: '#333333',
+            backgroundColor: '#000000',
             borderRadius: '16px',
             flexDirection: 'column',
             flexGrow: 1,
@@ -102,7 +103,7 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
           <Box
             sx={{
               borderRadius: '0px 0px 16px 16px',
-              backgroundColor: '#121212',
+              backgroundColor: '#000000',
               alignSelf: 'center',
               width: '40%',
             }}
@@ -119,13 +120,6 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
           <Box sx={{ flexGrow: 1 }} />
         </Box>
       )}
-      {/* <Stack direction="row" spacing={1} sx={{marginBottom: '33px'}}> */}
-      {/* <LLPrimaryButton
-          label="Add"
-          onClick={enableStorage}
-          fullWidth
-          type="submit"
-        /> */}
 
       <Button
         onClick={enableStorage}
@@ -145,15 +139,18 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
       >
         {sending ? (
           <>
-            <LLSpinner size={28} />
+            <CircularProgress color="primary" size={20} />
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
               {chrome.i18n.getMessage('Working_on_it')}
             </Typography>
           </>
         ) : (
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
-            {chrome.i18n.getMessage('Enable')}
-          </Typography>
+          <>
+            <IconPlus size={20} color="#FFFFFF" />
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
+              {chrome.i18n.getMessage('Enable')}
+            </Typography>
+          </>
         )}
       </Button>
     </Box>

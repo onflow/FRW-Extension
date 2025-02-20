@@ -121,13 +121,6 @@ const AddNFTConfirmation = (props: AddNFTConfirmationProps) => {
           <Box sx={{ flexGrow: 1 }} />
         </Box>
       )}
-      {/* <Stack direction="row" spacing={1} sx={{marginBottom: '33px'}}> */}
-      {/* <LLPrimaryButton
-          label="Add"
-          onClick={enableStorage}
-          fullWidth
-          type="submit"
-        /> */}
 
       <Button
         onClick={enableStorage}

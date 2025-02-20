@@ -1,20 +1,14 @@
-import FlashOnRoundedIcon from '@mui/icons-material/FlashOnRounded';
-import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
 import { Typography, Button, Skeleton, Drawer, CardMedia, Tabs, Tab } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
 
-import { IconNfts } from '@/components/iconfont';
+import { IconActivity, IconCoins, IconNfts } from '@/components/iconfont';
 import eventBus from '@/eventBus';
 import { type ActiveChildType } from '@/shared/types/wallet-types';
 import { formatLargeNumber } from '@/shared/utils/number';
-import buyIcon from '@/ui/FRWAssets/svg/buyIcon.svg';
-import iconMove from '@/ui/FRWAssets/svg/homeMove.svg';
-import receiveIcon from '@/ui/FRWAssets/svg/receiveIcon.svg';
-import sendIcon from '@/ui/FRWAssets/svg/sendIcon.svg';
-import swapIcon from '@/ui/FRWAssets/svg/swapIcon.svg';
+import { ButtonRow } from '@/ui/FRWComponent/ButtonRow';
 import LLComingSoon from '@/ui/FRWComponent/LLComingSoonWarning';
 import { NumberTransition } from '@/ui/FRWComponent/NumberTransition';
 import { useInitHook } from '@/ui/hooks';
@@ -250,7 +244,7 @@ const WalletTab = ({ network }) => {
             width="30%"
             sx={{
               py: '25px',
-              my: '18px',
+              my: '8px',
               borderRadius: '8px',
               alignSelf: 'center',
             }}
@@ -259,7 +253,7 @@ const WalletTab = ({ network }) => {
           <Typography
             variant="body1"
             sx={{
-              py: '30px',
+              py: '8px',
               alignSelf: 'center',
               fontSize: '32px',
               fontWeight: 'semi-bold',
@@ -271,192 +265,15 @@ const WalletTab = ({ network }) => {
             ))}
           </Typography>
         )}
-        <Box
-          sx={{
-            display: 'flex',
-            height: '32px',
-            px: '20px',
-            mb: '20px',
-          }}
-        >
-          <Box sx={{ display: 'flex', gap: '2px', width: '100%' }}>
-            {(!childType || childType === null || childType === 'evm') && (
-              <Button
-                color="info3"
-                variant="contained"
-                onMouseEnter={() => setSendHover(true)}
-                onMouseLeave={() => setSendHover(false)}
-                onClick={() => history.push('/dashboard/token/flow/send')}
-                sx={{
-                  height: '36px',
-                  borderTopLeftRadius: '24px',
-                  borderBottomLeftRadius: '24px',
-                  borderTopRightRadius: '0',
-                  borderBottomRightRadius: '0',
-                  px: '12px !important',
-                  minWidth: '56px',
-                  width: sendHover ? '100%' : '56px',
-                  textTransform: 'capitalize !important',
-                  flex: '1',
-                  transition: 'width 0.3s ease-in-out',
-                }}
-              >
-                <CardMedia sx={{ width: '20px', height: '20px', color: 'FFF' }} image={sendIcon} />
-                {sendHover && (
-                  <Typography
-                    sx={{
-                      fontWeight: 'normal',
-                      color: '#FFF',
-                      fontSize: '12px',
-                      textTransform: 'capitalize !important',
-                      marginLeft: '4px',
-                    }}
-                  >
-                    {chrome.i18n.getMessage('Send')}
-                  </Typography>
-                )}
-              </Button>
-            )}
-
-            {!childType && (
-              <Button
-                color="info3"
-                variant="contained"
-                sx={{
-                  height: '36px',
-                  px: '12px !important',
-                  minWidth: '56px',
-                  borderRadius: '0px',
-                  width: swapHover ? '100%' : '56px',
-                  textTransform: 'capitalize !important',
-                  flex: '1',
-                  transition: 'width 0.3s ease-in-out',
-                }}
-                onMouseEnter={() => setSwapHover(true)}
-                onMouseLeave={() => setSwapHover(false)}
-                onClick={() => {
-                  window.open(incLink, '_blank', 'noopener,noreferrer');
-                }}
-              >
-                <CardMedia sx={{ width: '20px', height: '20px', color: 'FFF' }} image={swapIcon} />
-                {swapHover && (
-                  <Typography
-                    sx={{
-                      fontWeight: 'normal',
-                      color: '#FFF',
-                      fontSize: '12px',
-                      textTransform: 'capitalize !important',
-                      marginLeft: '4px',
-                    }}
-                  >
-                    {chrome.i18n.getMessage('Swap')}
-                  </Typography>
-                )}
-              </Button>
-            )}
-
-            <Button
-              color="info3"
-              variant="contained"
-              sx={{
-                height: '36px',
-                px: '12px !important',
-                minWidth: '56px',
-                borderTopLeftRadius:
-                  !childType || childType === null || childType === 'evm' ? '0px' : '24px',
-                borderBottomLeftRadius:
-                  !childType || childType === null || childType === 'evm' ? '0px' : '24px',
-                borderTopRightRadius: isActive ? '0px' : '24px',
-                borderBottomRightRadius: isActive ? '0px' : '24px',
-                width: receiveHover ? '100%' : '56px',
-                textTransform: 'capitalize !important',
-                flex: '1',
-                transition: 'width 0.3s ease-in-out',
-              }}
-              onMouseEnter={() => setReceiveHover(true)}
-              onMouseLeave={() => setReceiveHover(false)}
-              onClick={() => history.push('/dashboard/wallet/deposit')}
-            >
-              <CardMedia sx={{ width: '20px', height: '20px', color: 'FFF' }} image={receiveIcon} />
-              {receiveHover && (
-                <Typography
-                  sx={{
-                    fontWeight: 'normal',
-                    color: '#FFF',
-                    fontSize: '12px',
-                    textTransform: 'capitalize !important',
-                    marginLeft: '4px',
-                  }}
-                >
-                  {chrome.i18n.getMessage('Receive')}
-                </Typography>
-              )}
-            </Button>
-            {isActive && (
-              <Button
-                color="info3"
-                variant="contained"
-                sx={{
-                  height: '36px',
-                  borderTopRightRadius: '24px',
-                  borderBottomRightRadius: '24px',
-                  borderTopLeftRadius: '0px',
-                  borderBottomLeftRadius: '0px',
-                  px: '12px !important',
-                  minWidth: '56px',
-                  width: buyHover ? '100%' : '56px',
-                  textTransform: 'capitalize !important',
-                  flex: '1',
-                  transition: 'width 0.3s ease-in-out',
-                }}
-                onMouseEnter={() => setBuyHover(true)}
-                onMouseLeave={() => setBuyHover(false)}
-                onClick={() => setOnRamp(true)}
-              >
-                <CardMedia sx={{ width: '20px', height: '20px', color: 'FFF' }} image={buyIcon} />
-                {buyHover && (
-                  <Typography
-                    sx={{
-                      fontWeight: 'normal',
-                      color: '#FFF',
-                      fontSize: '12px',
-                      textTransform: 'capitalize !important',
-                      marginLeft: '4px',
-                    }}
-                  >
-                    {chrome.i18n.getMessage('Buy')}
-                  </Typography>
-                )}
-              </Button>
-            )}
-          </Box>
-          {canMoveChild && <Box sx={{ flex: '1 1 5px' }}></Box>}
-          {canMoveChild && (
-            <Box>
-              <Button
-                color="info3"
-                variant="contained"
-                onClick={() => goMoveBoard()}
-                sx={{ height: '36px', borderRadius: '24px', px: '12px' }}
-              >
-                <CardMedia
-                  sx={{ width: '20px', height: '20px', marginRight: '4px', color: 'FFF' }}
-                  image={iconMove}
-                />
-                <Typography
-                  sx={{
-                    fontWeight: 'normal',
-                    color: '#FFF',
-                    fontSize: '12px',
-                    textTransform: 'capitalize !important',
-                  }}
-                >
-                  {chrome.i18n.getMessage('Move')}
-                </Typography>
-              </Button>
-            </Box>
-          )}
-        </Box>
+        <ButtonRow
+          isActive={isActive}
+          onSendClick={() => history.push('/dashboard/token/flow/send')}
+          onReceiveClick={() => history.push('/dashboard/wallet/deposit')}
+          onSwapClick={() => window.open(incLink, '_blank', 'noopener,noreferrer')}
+          onBuyClick={() => setOnRamp(true)}
+          onMoveClick={() => goMoveBoard()}
+          canMoveChild={canMoveChild}
+        />
       </Box>
       <Tabs
         value={value}
@@ -466,70 +283,109 @@ const WalletTab = ({ network }) => {
           top: '0',
           zIndex: 1100,
           backgroundColor: 'black',
+          '& .MuiTab-root': {
+            minHeight: '48px',
+            color: '#777E90',
+            opacity: 1,
+            position: 'relative',
+            gap: '8px',
+            '&.Mui-selected': {
+              color: '#FFFFFF',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: '2px',
+                backgroundColor: '#FFFFFF',
+              },
+            },
+          },
         }}
         onChange={handleChange}
         TabIndicatorProps={{
           style: {
-            backgroundColor: '#5a5a5a',
+            display: 'none',
           },
         }}
         variant="fullWidth"
         aria-label="full width tabs example"
       >
         <Tab
-          icon={<SavingsRoundedIcon sx={{ color: 'text.secondary' }} fontSize="small" />}
+          icon={
+            <IconCoins
+              sx={{
+                width: '20px',
+                height: '20px',
+              }}
+              color={value === 0 ? '#FFFFFF' : '#777E90'}
+            />
+          }
           iconPosition="start"
           label={
             <Typography
               variant="body1"
-              color="text.secondary"
               sx={{
                 textTransform: 'capitalize',
-                fontSize: '10',
-                fontWeight: 'semi-bold',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: value === 0 ? '#FFFFFF' : '#777E90',
               }}
             >
-              {childType === 'evm' ? filteredCoinData?.length || '' : coins?.length || ''}{' '}
               {chrome.i18n.getMessage('coins')}
             </Typography>
           }
-          style={{ color: '#F9F9F9', minHeight: '25px' }}
         />
         <Tab
-          icon={<IconNfts fontSize="small" />}
+          icon={
+            <IconNfts
+              sx={{
+                width: '20px',
+                height: '20px',
+              }}
+              color={value === 1 ? '#FFFFFF' : '#777E90'}
+            />
+          }
           iconPosition="start"
           label={
             <Typography
               variant="body1"
-              color="text.secondary"
               sx={{
                 textTransform: 'capitalize',
-                fontSize: '10',
-                fontWeight: 'semi-bold',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: value === 1 ? '#FFFFFF' : '#777E90',
               }}
             >
               {chrome.i18n.getMessage('NFTs')}
             </Typography>
           }
-          style={{ color: '#F9F9F9', minHeight: '25px' }}
         />
         <Tab
-          icon={<FlashOnRoundedIcon sx={{ color: 'text.secondary' }} fontSize="small" />}
+          icon={
+            <IconActivity
+              sx={{
+                width: '20px',
+                height: '20px',
+              }}
+              color={value === 2 ? '#FFFFFF' : '#777E90'}
+            />
+          }
           iconPosition="start"
           label={
             <Typography
               variant="body1"
-              color="text.secondary"
               sx={{
                 textTransform: 'capitalize',
-                fontSize: '10',
-                fontWeight: 'semi-bold',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: value === 2 ? '#FFFFFF' : '#777E90',
               }}
             >
               {chrome.i18n.getMessage('Activity')}
             </Typography>
           }
-          style={{ color: '#F9F9F9', minHeight: '25px' }}
         />
       </Tabs>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>

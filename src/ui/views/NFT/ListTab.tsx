@@ -12,12 +12,12 @@ import {
 import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
 import React, { forwardRef, useImperativeHandle, useEffect, useState, useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { useWallet } from '@/ui/utils/WalletContext';
 import placeholder from 'ui/FRWAssets/image/placeholder.png';
 
-import EmptyStatus from './EmptyStatus';
+import EmptyStatus from '../EmptyStatus';
 
 interface ListTabProps {
   data: any;
@@ -31,6 +31,7 @@ const useStyles = makeStyles(() => ({
   collectionContainer: {
     width: '100%',
     justifyContent: 'center',
+    padding: '0 8px',
   },
   collectionCard: {
     display: 'flex',
@@ -38,15 +39,18 @@ const useStyles = makeStyles(() => ({
     height: '64px',
     margin: '12px auto',
     boxShadow: 'none',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '12px',
   },
   skeletonCard: {
     display: 'flex',
-    backgroundColor: '#000000',
     width: '100%',
     height: '72px',
     margin: '12px auto',
     boxShadow: 'none',
     padding: 'auto',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '12px',
   },
   collectionImg: {
     borderRadius: '12px',
@@ -60,10 +64,8 @@ const useStyles = makeStyles(() => ({
   actionarea: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#282828',
     '&:hover': {
-      color: '#787878',
-      backgroundColor: '#787878',
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
     },
   },
 }));
@@ -169,9 +171,15 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
       });
     };
     return (
-      <Card sx={{ borderRadius: '12px' }} className={classes.collectionCard}>
+      <Card
+        sx={{ borderRadius: '12px', backgroundColor: '#000000' }}
+        className={classes.collectionCard}
+      >
         <CardActionArea
-          sx={{ backgroundColor: 'background.paper', borderRadius: '12px', paddingRight: '8px' }}
+          sx={{
+            borderRadius: '12px',
+            paddingRight: '8px',
+          }}
           className={classes.actionarea}
           onClick={data.isAccessible && handleClick}
         >
@@ -190,8 +198,8 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
               alt={data.name}
             />
             <CardContent sx={{ flex: '1 0 auto', padding: '8px 4px' }}>
-              <Grid container>
-                <Grid item sx={{ width: '260px' }}>
+              <Grid container justifyContent="space-between" alignItems="center" sx={{ pr: 2 }}>
+                <Grid item sx={{ flex: 1 }}>
                   <Typography component="div" variant="body1" color="#fff" sx={{ mb: 0 }}>
                     {data.name}
                   </Typography>
@@ -216,7 +224,6 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
                         fontSize: '10px',
                         width: '80px',
                         fontFamily: 'Inter, sans-serif',
-                        backgroundColor: 'neutral1.light',
                       }}
                     >
                       {chrome.i18n.getMessage('Inaccessible')}
@@ -224,7 +231,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
                   )}
                 </Grid>
                 <Grid item>
-                  <ArrowForwardIcon color="primary" sx={{ mt: '12px' }} />
+                  <ArrowForwardIcon color="primary" />
                 </Grid>
               </Grid>
             </CardContent>
@@ -257,7 +264,6 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
           <Card
             sx={{
               borderRadius: '12px',
-              backgroundColor: '#000000',
               padding: '12px',
             }}
             className={classes.skeletonCard}
@@ -282,7 +288,6 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
           <Card
             sx={{
               borderRadius: '12px',
-              backgroundColor: '#000000',
               padding: '12px',
             }}
             className={classes.skeletonCard}
@@ -307,7 +312,6 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
           <Card
             sx={{
               borderRadius: '12px',
-              backgroundColor: '#000000',
               padding: '12px',
             }}
             className={classes.skeletonCard}
@@ -332,7 +336,6 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
           <Card
             sx={{
               borderRadius: '12px',
-              backgroundColor: '#000000',
               padding: '12px',
             }}
             className={classes.skeletonCard}

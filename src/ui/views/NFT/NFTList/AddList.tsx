@@ -123,6 +123,7 @@ const AddList = () => {
     try {
       setLoading(true);
       const nftList = await usewallet.openapi.getAllNft();
+      console.log('nftList', nftList);
       setCollections(nftList);
       return nftList;
     } finally {
@@ -189,7 +190,7 @@ const AddList = () => {
               {[...Array(4).keys()].map((key) => (
                 <Card
                   key={key}
-                  sx={{ borderRadius: '12px', backgroundColor: '#000000', padding: '12px' }}
+                  sx={{ borderRadius: '12px', backgroundColor: 'transparent', padding: '12px' }}
                   className={classes.skeletonCard}
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'row' }}>

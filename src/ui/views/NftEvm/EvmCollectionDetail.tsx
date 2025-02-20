@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { makeStyles } from '@mui/styles';
-import { StyledEngineProvider } from '@mui/material/styles';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
+import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import {
   Typography,
   Card,
@@ -14,19 +15,20 @@ import {
   ButtonBase,
   Tooltip,
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
+import { has } from 'lodash';
+import React, { useState, useEffect, useCallback } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
+
 import { storage } from '@/background/webapi';
+import { LLSpinner } from '@/ui/FRWComponent';
+import { type PostMedia, MatchMediaType } from '@/ui/utils/url';
 import { useWallet } from 'ui/utils';
+
 import GridView from './GridView';
 // import InfiniteScroll from 'react-infinite-scroller';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { LLSpinner } from '@/ui/FRWComponent';
-import { has } from 'lodash';
-import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
-import { PostMedia, MatchMediaType } from '@/ui/utils/url';
 
 interface CollectionDisplay {
   name: string;
@@ -72,7 +74,6 @@ const useStyles = makeStyles(() => ({
   card: {
     width: '185px',
     height: '225px',
-    backgroundColor: '#1B1B1B',
     padding: '0',
     boxShadow: 'none',
     margin: 0,
@@ -81,8 +82,6 @@ const useStyles = makeStyles(() => ({
   cardNoHover: {
     flex: '50%',
     padding: '13px',
-    // height: '211px',
-    backgroundColor: 'inherit',
     boxShadow: 'none',
     margin: 0,
     borderRadius: '8px',
@@ -101,7 +100,6 @@ const useStyles = makeStyles(() => ({
   grid: {
     width: '100%',
     minHeight: '360px',
-    backgroundColor: '#1B1B1B',
     borderRadius: '16px 16px 0 0',
     padding: '10px 13px',
     margin: 0,
@@ -127,7 +125,6 @@ const useStyles = makeStyles(() => ({
   content: {
     height: '40px',
     padding: '5px 0',
-    backgroundColor: 'inherit',
     borderRadius: '0 0 8px 8px',
   },
   nftname: {
@@ -140,7 +137,6 @@ const useStyles = makeStyles(() => ({
   },
   collectionCard: {
     display: 'flex',
-    // backgroundColor: '#282828',
     width: '100%',
     height: '64px',
     margin: '11px auto',
@@ -159,7 +155,6 @@ const useStyles = makeStyles(() => ({
   iconbox: {
     position: 'sticky',
     top: 0,
-    backgroundColor: '#121212',
     width: '100%',
     margin: 0,
     padding: 0,
@@ -193,8 +188,7 @@ const EvmCollectionDetail = (props) => {
   const collection_name = collection_info[3];
   const { nftList } = uselocation.state || {};
 
-  const fetchCollection = async () => {
-    // const { collection, ownerAddress } = await getInfo();
+  const fetchCollection = useCallback(async () => {
     setOwnerAddress(address);
     setLoading(true);
     try {
@@ -211,10 +205,10 @@ const EvmCollectionDetail = (props) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [nftList, collection_name, address]);
 
   function convertToNftCollectionModel(data, collection_name) {
-    // Filter the array based on collectionContractName == "ExampleNFT"
+    // Filter the array based on collectionContractName === "ExampleNFT"
     const filteredData = data.filter((nft) => nft.collectionContractName === collection_name);
 
     if (filteredData.length === 0) {
@@ -448,7 +442,7 @@ const EvmCollectionDetail = (props) => {
   }
 
   const hasMore = (): boolean => {
-    if (list && list.length == 0) {
+    if (list && list.length === 0) {
       return true;
     }
     return list.length < total;
@@ -462,7 +456,7 @@ const EvmCollectionDetail = (props) => {
 
   useEffect(() => {
     fetchCollection();
-  }, []);
+  }, [fetchCollection]);
 
   const createGridCard = (data, index) => {
     return (
@@ -493,7 +487,6 @@ const EvmCollectionDetail = (props) => {
                 item
                 sx={{
                   justifyContent: 'center',
-                  backgroundColor: '#121212',
                   width: '108px',
                   height: '108px',
                 }}
@@ -536,7 +529,6 @@ const EvmCollectionDetail = (props) => {
                         />
                       }
                       sx={{
-                        backgroundColor: 'neutral2.main',
                         color: 'text.secondary',
                         borderRadius: '12px',
                         textTransform: 'none',
@@ -565,7 +557,6 @@ const EvmCollectionDetail = (props) => {
                         />
                       }
                       sx={{
-                        backgroundColor: 'neutral2.main',
                         color: 'text.secondary',
                         borderRadius: '12px',
                         textTransform: 'none',
@@ -614,13 +605,14 @@ const EvmCollectionDetail = (props) => {
                   loader={loader}
                   scrollableTarget="scrollableDiv"
                   style={{
-                    backgroundColor: '#1B1B1B',
                     borderRadius: '16px 16px 0 0',
                   }}
                 >
                   <Grid container className={classes.grid}>
                     {list && list.map(createGridCard)}
-                    {list.length % 2 != 0 && <Card className={classes.cardNoHover} elevation={0} />}
+                    {list.length % 2 !== 0 && (
+                      <Card className={classes.cardNoHover} elevation={0} />
+                    )}
                   </Grid>
                 </InfiniteScroll>
               )

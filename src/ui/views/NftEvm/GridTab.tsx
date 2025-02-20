@@ -14,7 +14,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { LLSpinner } from '@/ui/FRWComponent';
 import { useWallet } from 'ui/utils';
 
-import EmptyStatus from './EmptyStatus';
+import EmptyStatus from '../EmptyStatus';
+
 import GridView from './GridView';
 
 // import InfiniteScroll from 'react-infinite-scroll-component';

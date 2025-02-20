@@ -52,6 +52,8 @@ import IconEye from './IconEye';
 import IconPlayStore from './IconPlayStore';
 import IconAppStore from './IconAppStore';
 import IconBackButton from './IconBackButton';
+import IconActivity from './IconActivity';
+import IconCoins from './IconCoins';
 export { default as IconKucoin } from './IconKucoin';
 export { default as IconCoinbase } from './IconCoinbase';
 export { default as IconInbox } from './IconInbox';
@@ -103,6 +105,8 @@ export { default as IconEye } from './IconEye';
 export { default as IconPlayStore } from './IconPlayStore';
 export { default as IconAppStore } from './IconAppStore';
 export { default as IconBackButton } from './IconBackButton';
+export { default as IconCoins } from './IconCoins';
+export { default as IconActivity } from './IconActivity';
 
 const IconFont = ({ name, ...rest }) => {
   switch (name) {
@@ -208,6 +212,10 @@ const IconFont = ({ name, ...rest }) => {
       return <IconAppStore {...rest} />;
     case 'back-button':
       return <IconBackButton {...rest} />;
+    case 'coins':
+      return <IconCoins {...rest} />;
+    case 'activity':
+      return <IconActivity {...rest} />;
   }
 
   return null;

@@ -1,19 +1,21 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import { Typography, Container, Box, IconButton, Button, CardMedia } from '@mui/material';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
+import { saveAs } from 'file-saver';
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
-import { StyledEngineProvider } from '@mui/material/styles';
-import { useWallet } from 'ui/utils';
-import { Typography, Container, Box, IconButton, Button, CardMedia } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
-import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
-import { PostMedia, MatchMediaType } from '@/ui/utils/url';
-import { saveAs } from 'file-saver';
-import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
-import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
-import fallback from 'ui/FRWAssets/image/errorImage.png';
-import MoveNftConfirmation from './SendNFT/MoveNftConfirmation';
+
 import nft from '@/background/service/nft';
+import { type PostMedia, MatchMediaType } from '@/ui/utils/url';
+import fallback from 'ui/FRWAssets/image/errorImage.png';
+import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
+import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
+import { useWallet } from 'ui/utils';
+
+import MoveNftConfirmation from './SendNFT/MoveNftConfirmation';
 
 const useStyles = makeStyles(() => ({
   pageContainer: {
@@ -326,7 +328,7 @@ const Detail = () => {
             <ArrowBackIcon sx={{ color: 'icon.navi' }} />
           </IconButton>
           {/* {
-            nftDetail && 
+            nftDetail &&
             <>
               <IconButton onClick={handleClick} className={classes.extendMore}>
                 <MoreHorizIcon sx={{ color: 'icon.navi'}} />
@@ -363,7 +365,7 @@ const Detail = () => {
               }}
             >
               <Box className={classes.mediabox}>
-                {media && media?.video != null ? getMedia() : getUri()}
+                {media && media?.video !== null ? getMedia() : getUri()}
               </Box>
               <Box
                 sx={{

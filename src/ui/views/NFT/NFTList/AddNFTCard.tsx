@@ -38,35 +38,34 @@ const CollectionCard = ({
   };
   return (
     <Card
-      // onClick={() => officialWebsite && window.open(officialWebsite, '_blank')}
       sx={{
         borderRadius: '12px',
         overflow: 'hidden',
         display: 'flex',
         width: '100%',
-        height: '88px',
+        height: '64px',
         boxShadow: 'none',
         marginTop: '8px',
         position: 'relative',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
       }}
     >
       {logo && (
         <Box
           sx={{
-            width: '100%',
+            width: '48px',
             height: '100%',
             display: 'flex',
-            justifyContent: 'end',
+            padding: '8px',
           }}
         >
           <CardMedia
             component="img"
             sx={{
-              width: '200px',
-              height: '200px',
-              margin: '-56px 0',
+              width: '48px',
+              height: '48px',
               borderRadius: '12px',
-              justifyContent: 'center',
+              objectFit: 'cover',
             }}
             image={logo}
           />
@@ -77,12 +76,10 @@ const CollectionCard = ({
           position: 'absolute',
           width: '100%',
           height: '100%',
-          padding: '12px 18px',
-          background:
-            'linear-gradient(270deg, rgba(40, 40, 40, 0.32) 0%, rgba(40, 40, 40, 0.88) 30.56%, #282828 42.04%)',
-          backdropFilter: 'blur(6px)',
+          padding: '8px 4px',
+          backgroundColor: 'transparent',
           '&:hover': {
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
           },
         }}
       >
@@ -93,6 +90,8 @@ const CollectionCard = ({
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            paddingLeft: '8px',
+            paddingRight: '8px',
           }}
         >
           <Box
@@ -140,7 +139,7 @@ const CollectionCard = ({
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                background: added ? '#69C93C' : 'black',
+                background: added ? '#FFFFFF' : 'black',
                 padding: '2px',
                 display: 'flex',
                 justifyContent: 'center',
@@ -153,8 +152,7 @@ const CollectionCard = ({
                 <DoneIcon sx={{ color: 'black', fontSize: '20px' }} />
               ) : (
                 <AddIcon
-                  color="primary"
-                  sx={{ fontSize: '20px' }}
+                  sx={{ fontSize: '20px', color: 'white' }}
                   onClick={() => {
                     if (!added && !isLoading) {
                       setAlertOpen(true);

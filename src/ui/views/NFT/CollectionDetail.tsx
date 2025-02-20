@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { makeStyles } from '@mui/styles';
-import { StyledEngineProvider } from '@mui/material/styles';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
+import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import {
   Typography,
   Card,
@@ -14,19 +15,20 @@ import {
   ButtonBase,
   Tooltip,
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
-import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
+import { has } from 'lodash';
+import React, { useState, useEffect, useCallback } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
+
 import { storage } from '@/background/webapi';
+import { LLSpinner } from '@/ui/FRWComponent';
+import { type PostMedia, MatchMediaType } from '@/ui/utils/url';
 import { useWallet } from 'ui/utils';
+
 import GridView from './GridView';
 // import InfiniteScroll from 'react-infinite-scroller';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { LLSpinner } from '@/ui/FRWComponent';
-import { has } from 'lodash';
-import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
-import { PostMedia, MatchMediaType } from '@/ui/utils/url';
 
 interface CollectionDisplay {
   name: string;
@@ -140,7 +142,6 @@ const useStyles = makeStyles(() => ({
   },
   collectionCard: {
     display: 'flex',
-    // backgroundColor: '#282828',
     width: '100%',
     height: '64px',
     margin: '11px auto',
@@ -194,24 +195,27 @@ const CollectionDetail = (props) => {
   const collection_name = collection_info[1];
   const nftCount = collection_info[2];
 
-  const fetchCollection = async () => {
-    // const { collection, ownerAddress } = await getInfo();
+  const getCollection = useCallback(
+    async (ownerAddress, collection, offset = 0) => {
+      return await usewallet.getSingleCollection(ownerAddress, collection, offset);
+    },
+    [usewallet]
+  );
+
+  const fetchCollection = useCallback(async () => {
     setOwnerAddress(address);
     setLoading(true);
-
     try {
       const res = await getCollection(address, collection_name);
-      console.log('res   ', res);
       setInfo(res.collection);
       setTotal(res.nftCount);
       setLists(res.nfts);
     } catch (err) {
       console.log('err   ', err);
-      // Handle the error if needed
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, collection_name, getCollection]);
 
   const nextPage = async () => {
     if (loadingMore) {
@@ -244,16 +248,12 @@ const CollectionDetail = (props) => {
     }
   };
 
-  const getCollection = async (ownerAddress, collection, offset = 0) => {
-    return await usewallet.getSingleCollection(ownerAddress, collection, offset);
-  };
-
   function truncate(str, n) {
     return str.length > n ? str.slice(0, n - 1) + '...' : str;
   }
 
   const hasMore = (): boolean => {
-    if (list && list.length == 0) {
+    if (list && list.length === 0) {
       return true;
     }
     return list.length < total;
@@ -267,7 +267,7 @@ const CollectionDetail = (props) => {
 
   useEffect(() => {
     fetchCollection();
-  }, []);
+  }, [fetchCollection]);
 
   const createGridCard = (data, index) => {
     return (
@@ -426,7 +426,9 @@ const CollectionDetail = (props) => {
                 >
                   <Grid container className={classes.grid}>
                     {list && list.map(createGridCard)}
-                    {list.length % 2 != 0 && <Card className={classes.cardNoHover} elevation={0} />}
+                    {list.length % 2 !== 0 && (
+                      <Card className={classes.cardNoHover} elevation={0} />
+                    )}
                   </Grid>
                 </InfiniteScroll>
               )

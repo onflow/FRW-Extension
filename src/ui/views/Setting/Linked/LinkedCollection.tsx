@@ -142,7 +142,6 @@ const useStyles = makeStyles(() => ({
   },
   collectionCard: {
     display: 'flex',
-    // backgroundColor: '#282828',
     width: '100%',
     height: '64px',
     margin: '11px auto',
