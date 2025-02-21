@@ -195,14 +195,11 @@ const CollectionDetail = (props) => {
   const collection_name = collection_info[1];
   const nftCount = collection_info[2];
 
-  //Todo: call the openapi from wallet controller, add cache in the evm nft list in background service
-  const openapi = useMemo(() => usewallet.openapi, [usewallet]);
-
   const getCollection = useCallback(
     async (ownerAddress, collection, offset = 0) => {
-      return await openapi.EvmNFTcollectionList(ownerAddress, collection, offset);
+      return await usewallet.getEvmNftCollectionList(ownerAddress, collection, offset);
     },
-    [openapi]
+    [usewallet]
   );
 
   const fetchCollection = useCallback(async () => {

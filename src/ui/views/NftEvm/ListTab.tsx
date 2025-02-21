@@ -84,7 +84,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
     async (addr: string) => {
       try {
         setCollectionLoading(true);
-        const list = await usewallet.openapi.EvmNFTID(addr);
+        const list = await usewallet.getEvmNftId(addr);
         if (list && list.length > 0) {
           setCollectionEmpty(false);
           setCollections(list);
@@ -100,7 +100,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
         setCollectionLoading(false);
       }
     },
-    [usewallet.openapi, setCount]
+    [usewallet, setCount]
   );
 
   // Only fetch when ownerAddress changes

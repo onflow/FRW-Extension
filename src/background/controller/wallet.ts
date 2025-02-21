@@ -51,6 +51,7 @@ import {
   proxyService,
   newsService,
   mixpanelTrack,
+  evmNftService,
 } from 'background/service';
 import i18n from 'background/service/i18n';
 import { type DisplayedKeryring, KEYRING_CLASS } from 'background/service/keyring';
@@ -3819,6 +3820,53 @@ export class WalletController extends BaseController {
     if (userId) {
       await storage.set('currentId', userId);
     }
+  };
+
+  getEvmNftId = async (address: string) => {
+    if (!isValidEthereumAddress(address)) {
+      throw new Error('Invalid Ethereum address');
+    }
+    const network = await this.getNetwork();
+    const cacheData = await evmNftService.getNftIds(network);
+    if (cacheData) {
+      return cacheData;
+    }
+    const result = await openapiService.EvmNFTID(address);
+    await evmNftService.setNftIds(result, network);
+
+    return result;
+  };
+
+  getEvmNftCollectionList = async (
+    address: string,
+    collectionIdentifier: string,
+    limit = 24,
+    offset = 0
+  ) => {
+    if (!isValidEthereumAddress(address)) {
+      throw new Error('Invalid Ethereum address');
+    }
+    const network = await this.getNetwork();
+    const cacheData = await evmNftService.getSingleCollection(
+      network,
+      collectionIdentifier,
+      offset
+    );
+    if (cacheData) {
+      return cacheData;
+    }
+    const result = await openapiService.EvmNFTcollectionList(
+      address,
+      collectionIdentifier,
+      limit,
+      offset
+    );
+    await evmNftService.setSingleCollection(result, collectionIdentifier, offset, network);
+    return result;
+  };
+
+  clearEvmNFTList = async () => {
+    await evmNftService.clearEvmNfts();
   };
 }
 

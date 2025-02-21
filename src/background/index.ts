@@ -30,6 +30,7 @@ import {
   notificationService,
   transactionService,
   nftService,
+  evmNftService,
   googleSafeHostService,
   passwordService,
   mixpanelTrack,
@@ -121,6 +122,7 @@ async function restoreAppState() {
   await userWalletService.init();
   await transactionService.init();
   await nftService.init();
+  await evmNftService.init();
   await googleSafeHostService.init();
   await passwordService.init();
   await mixpanelTrack.init();
