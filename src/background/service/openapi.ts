@@ -1,5 +1,5 @@
 import * as fcl from '@onflow/fcl';
-import type { Account, Account as FclAccount } from '@onflow/typedefs';
+import type { Account as FclAccount } from '@onflow/typedefs';
 import type { Method } from 'axios';
 import dayjs from 'dayjs';
 import { initializeApp, getApp } from 'firebase/app';
@@ -47,6 +47,7 @@ import {
   PriceProvider,
   type BlockchainResponse,
   type AccountInfo,
+  type Contact,
 } from '../../shared/types/network-types';
 
 import {
@@ -828,7 +829,7 @@ class OpenApiService {
     return tokens;
   };
 
-  getAddressBook = async () => {
+  getAddressBook = async (): Promise<{ data: { contacts: Contact[] } }> => {
     const config = this.store.config.fetch_address_book;
     const data = await this.sendRequest(config.method, config.path);
     return data;
@@ -1086,13 +1087,17 @@ class OpenApiService {
     return id;
   };
 
-  searchUser = async (keyword: string) => {
+  searchUser = async (
+    keyword: string
+  ): Promise<{
+    data: { users: { address: string; username: string; avatar: string; nickname: string }[] };
+  }> => {
     const config = this.store.config.search_user;
     const data = await this.sendRequest(config.method, config.path, {
       keyword,
     });
 
-    return data;
+    return data?.data?.users ? data : { data: { users: [] } };
   };
 
   checkImport = async (key: string) => {

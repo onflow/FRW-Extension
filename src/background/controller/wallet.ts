@@ -26,6 +26,7 @@ import {
 } from '@/background/utils/modules/publicPrivateKey';
 import eventBus from '@/eventBus';
 import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
+import { ContactType } from '@/shared/types/network-types';
 import { type TrackingEvents } from '@/shared/types/tracking-types';
 import { type TransferItem, type TransactionState } from '@/shared/types/transaction-types';
 import { type LoggedInAccount } from '@/shared/types/wallet-types';
@@ -64,6 +65,7 @@ import { INTERNAL_REQUEST_ORIGIN, EVENTS, KEYRING_TYPE, EVM_ENDPOINT } from 'con
 
 import type {
   BlockchainResponse,
+  Contact,
   NFTData,
   NFTModel,
   NFTModelV2,
@@ -1450,14 +1452,14 @@ export class WalletController extends BaseController {
     addressBookService.setRecent(data, network);
   };
 
-  getRecent = async () => {
+  getRecent = async (): Promise<Contact[]> => {
     const network = await this.getNetwork();
     return addressBookService.getRecent(network);
   };
 
-  getAddressBook = async () => {
+  getAddressBook = async (): Promise<Contact[]> => {
     const network = await this.getNetwork();
-    const addressBook = await addressBookService.getAddresBook(network);
+    const addressBook = await addressBookService.getAddressBook(network);
     if (!addressBook) {
       return await this.refreshAddressBook();
     } else if (!addressBook[0]) {
@@ -1466,19 +1468,43 @@ export class WalletController extends BaseController {
     return addressBook;
   };
 
-  refreshAddressBook = async () => {
+  refreshAddressBook = async (): Promise<Contact[]> => {
     const network = await this.getNetwork();
     const { data } = await openapiService.getAddressBook();
     const list = data.contacts;
     if (list && list.length > 0) {
       list.forEach((addressBook, index) => {
-        if (list[index] && list[index].avatar) {
+        if (addressBook && addressBook.avatar) {
           list[index].avatar = this.addTokenForFirebaseImage(addressBook.avatar);
         }
       });
     }
     addressBookService.setAddressBook(list, network);
     return list;
+  };
+
+  searchByUsername = async (searchKey: string) => {
+    const apiResponse = await openapiService.searchUser(searchKey);
+    console.log('searchByUsername -apiResponse', apiResponse);
+
+    return (
+      apiResponse?.data?.users?.map((user, index): Contact => {
+        const address = withPrefix(user.address) || '';
+        return {
+          group: 'Flow Wallet User',
+          address: address,
+          contact_name: user.nickname,
+          username: user.username,
+          avatar: user.avatar,
+          domain: {
+            domain_type: 999,
+            value: '',
+          },
+          contact_type: ContactType.User,
+          id: index,
+        };
+      }) || []
+    );
   };
 
   checkAddress = async (address: string) => {

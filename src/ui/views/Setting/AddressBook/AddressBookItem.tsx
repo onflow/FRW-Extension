@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { ListItem, Stack, Divider, Box, Drawer, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
-import { type Contact } from '@/shared/types/network-types';
+import { ContactType, type Contact } from '@/shared/types/network-types';
 
 import IconSubtract from '../../../../components/iconfont/IconSubtract';
 import { LLContactCard, LLPrimaryButton, LLSecondaryButton } from '../../../FRWComponent';
@@ -104,7 +104,7 @@ const AddressBookItem = (props: AddressBookItemProps) => {
               }
               spacing={1}
             >
-              {props.contact.contact_type === 0 && (
+              {props.contact.contact_type === ContactType.External && (
                 <EditIcon
                   sx={{ color: 'icon.navi', cursor: 'pointer' }}
                   onClick={() => props.onEditClicked(props.contact)}

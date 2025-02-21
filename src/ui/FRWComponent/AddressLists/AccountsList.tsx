@@ -1,27 +1,30 @@
 import { List, ListSubheader, ButtonBase, Box } from '@mui/material';
-import { groupBy, isEmpty } from 'lodash';
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import React from 'react';
 
-import { withPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import { LLContactCard, LLContactEth, FWContactCard } from '@/ui/FRWComponent';
 import { useContacts } from '@/ui/hooks/useContactHook';
 
-const AccountsList = ({ filteredContacts, isLoading, handleClick, isSend = true }) => {
-  const { accountList, evmAccounts, childAccounts, setupAccounts } = useContacts();
-  const mounted = useRef(false);
-
-  useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      setupAccounts();
-    }
-  }, [setupAccounts]);
+const AccountsList = ({ handleClick }) => {
+  const { cadenceAccounts, evmAccounts, childAccounts } = useContacts();
 
   return (
     <Box sx={{ height: '100%' }}>
-      {!isEmpty(accountList) &&
-        accountList.map((eachgroup, index) => (
+      {cadenceAccounts?.length > 0 && (
+        <ListSubheader
+          sx={{
+            lineHeight: '18px',
+            marginTop: '0px',
+            marginBottom: '0px',
+            backgroundColor: '#000000',
+            textTransform: 'capitalize',
+            py: '4px',
+          }}
+        >
+          {chrome.i18n.getMessage('Wallet_List')}
+        </ListSubheader>
+      )}
+      {cadenceAccounts?.length > 0 &&
+        cadenceAccounts.map((eachgroup, index) => (
           <List dense={false} sx={{ paddingTop: '0px', paddingBottom: '0px' }} key={index}>
             <Box>
               <ButtonBase
@@ -34,7 +37,7 @@ const AccountsList = ({ filteredContacts, isLoading, handleClick, isSend = true 
             </Box>
           </List>
         ))}
-      {(!isEmpty(evmAccounts) || !isEmpty(childAccounts)) && (
+      {(evmAccounts?.length > 0 || childAccounts?.length > 0) && (
         <ListSubheader
           sx={{
             lineHeight: '18px',
@@ -48,7 +51,7 @@ const AccountsList = ({ filteredContacts, isLoading, handleClick, isSend = true 
           {chrome.i18n.getMessage('Linked_Account')}
         </ListSubheader>
       )}
-      {!isEmpty(evmAccounts) &&
+      {evmAccounts?.length > 0 &&
         evmAccounts.map((eachgroup, index) => (
           <List dense={false} sx={{ paddingTop: '0px', paddingBottom: '0px' }} key={index}>
             <Box>
@@ -63,7 +66,7 @@ const AccountsList = ({ filteredContacts, isLoading, handleClick, isSend = true 
           </List>
         ))}
 
-      {!isEmpty(childAccounts) &&
+      {childAccounts?.length > 0 &&
         childAccounts.map((eachgroup, index) => (
           <List dense={false} sx={{ paddingTop: '0px', paddingBottom: '0px' }} key={index}>
             <Box>

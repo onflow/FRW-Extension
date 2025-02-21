@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { ContactType } from '@/shared/types/network-types';
 import closex from 'ui/assets/closex.svg';
 import { useWallet, formatAddress } from 'ui/utils';
 
@@ -119,8 +120,8 @@ export const FWContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
           {!isLoading ? (
             <Typography variant="body1" sx={{ textAlign: 'start' }}>
               {contact.domain?.value || formatAddress(contact.contact_name)}{' '}
-              {contact.usernam && contact.usernam !== '' && (
-                <Box display="inline" color="info.main">
+              {contact.username && contact.username !== '' && (
+                <Box component="span" sx={{ color: 'info.main' }}>
                   {contact.username !== '' ? ' (@' + contact.username + ')' : ''}
                 </Box>
               )}
@@ -150,7 +151,7 @@ export const FWContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
           >
             <CardMedia sx={{ width: '11px', height: '11px' }} image={closex} />
           </IconButton>
-        ) : contact.type === 4 && !contactAdd ? (
+        ) : contact.contact_type === ContactType.User && !contactAdd ? (
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
