@@ -2,7 +2,9 @@ import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Switch, withRouter, type RouteComponentProps } from 'react-router-dom';
 
+import PasskeyManagement from '@/ui/FRWComponent/PasskeyManagement';
 import { useInitHook } from '@/ui/hooks';
+import PasskeySetup from '@/ui/views/Setting/PasskeySetup';
 import { PrivateRoute } from 'ui/component';
 import { useWallet } from 'ui/utils';
 
@@ -32,6 +34,7 @@ import Linked from './Setting/Linked';
 import LinkedCollection from './Setting/Linked/LinkedCollection';
 import LinkedDetail from './Setting/Linked/LinkedDetail';
 import LinkedNftDetail from './Setting/Linked/LinkedNftDetail';
+import PasskeySettings from './Setting/PasskeySettings';
 import Keydetail from './Setting/privatekey/Keydetail';
 import PrivateKeyPassword from './Setting/privatekey/Privatekeypassword';
 import RecoveryPhasesDetail from './Setting/recoveryphase/Recoveryphasedetail';
@@ -217,6 +220,18 @@ const InnerRoute = (props: RouteComponentProps) => {
             </PrivateRoute>
             <PrivateRoute path={`${props.match.url}/enable`}>
               <Enable />
+            </PrivateRoute>
+
+            <PrivateRoute path={`${props.match.url}/setting/passkey-setup`}>
+              <PasskeySetup />
+            </PrivateRoute>
+
+            <PrivateRoute path={`${props.match.url}/setting/passkey-management`}>
+              <PasskeyManagement />
+            </PrivateRoute>
+
+            <PrivateRoute path={`${props.match.url}/setting/passkey-settings`}>
+              <PasskeySettings />
             </PrivateRoute>
           </Switch>
         </div>

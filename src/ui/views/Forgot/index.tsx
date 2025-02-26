@@ -1,13 +1,18 @@
+import LockPersonIcon from '@mui/icons-material/LockPerson';
 import { Typography, Button, CardMedia } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import recover from '@/ui/FRWAssets/svg/recover.svg';
 import reset from '@/ui/FRWAssets/svg/resetarrow.svg';
 import RegisterHeader from '@/ui/FRWComponent/LandingPages/RegisterHeader';
+import { usePasskey } from '@/ui/utils/usePasskey';
 
 const Forgot = () => {
+  const history = useHistory();
+  const { isEnabled: isPasskeyEnabled } = usePasskey();
+
   return (
     <>
       <Box
@@ -27,7 +32,7 @@ const Forgot = () => {
         <Box
           className="welcomeBox"
           sx={{
-            height: '460px',
+            height: '460px', // Fixed height since we removed the password button
             backgroundColor: 'transparent',
             marginBottom: '80px',
           }}
