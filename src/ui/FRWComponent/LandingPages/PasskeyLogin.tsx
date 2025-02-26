@@ -6,8 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import WarningSnackbar from '@/ui/FRWComponent/WarningSnackbar';
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
-import { usePasskey } from '@/ui/utils/usePasskey';
 
 const useStyles = makeStyles(() => ({
   container: {

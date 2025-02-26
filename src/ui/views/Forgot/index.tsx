@@ -7,7 +7,7 @@ import { Link, useHistory } from 'react-router-dom';
 import recover from '@/ui/FRWAssets/svg/recover.svg';
 import reset from '@/ui/FRWAssets/svg/resetarrow.svg';
 import RegisterHeader from '@/ui/FRWComponent/LandingPages/RegisterHeader';
-import { usePasskey } from '@/ui/utils/usePasskey';
+import { usePasskey } from '@/ui/hooks/usePasskey';
 
 const Forgot = () => {
   const history = useHistory();

@@ -30,8 +30,8 @@ import { makeStyles } from '@mui/styles';
 import dayjs from 'dayjs';
 import React, { useState, useEffect, useCallback } from 'react';
 
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
-import { usePasskey } from '@/ui/utils/usePasskey';
 
 import { SuccessDialog } from './Dialog';
 import WarningSnackbar from './WarningSnackbar';

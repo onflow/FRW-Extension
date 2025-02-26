@@ -165,5 +165,5 @@ export const returnFilteredCollections = (contractList, NFT) => {
   );
 };
 
-export { usePasskey } from './usePasskey';
+export { usePasskey } from '../hooks/usePasskey';
 export { usePasskeyPrompt, PasskeyPromptProvider } from './PasskeyPromptContext';

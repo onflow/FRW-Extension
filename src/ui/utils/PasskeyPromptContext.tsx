@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-import { usePasskey } from './usePasskey';
+import { usePasskey } from '../hooks/usePasskey';
 
 interface PasskeyPromptContextType {
   shouldShowPrompt: boolean;

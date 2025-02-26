@@ -11,10 +11,10 @@ import { LLPrimaryButton, LLResetPopup } from '@/ui/FRWComponent';
 import PasskeyPrompt from '@/ui/FRWComponent/PasskeyPrompt';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { ErrorSnackbar } from '@/ui/FRWComponent/Snackbar';
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet, useApproval, useWalletRequest, useWalletLoaded } from '@/ui/utils';
 import { usePasskeyPrompt } from '@/ui/utils/PasskeyPromptContext';
-import { usePasskey } from '@/ui/utils/usePasskey';
 import { openInternalPageInTab } from '@/ui/utils/webapi';
 
 import CancelIcon from '../../../components/iconfont/IconClose';

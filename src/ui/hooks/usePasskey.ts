@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { useWallet } from './index';
+import { useWallet } from '../utils/index';
 
 /**
  * Custom hook to check if passkeys are supported by the browser and enabled for the user

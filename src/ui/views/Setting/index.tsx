@@ -19,8 +19,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import { LLHeader } from '@/ui/FRWComponent';
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
-import { usePasskey } from '@/ui/utils/usePasskey';
 import Device from 'ui/FRWAssets/svg/device.svg';
 import IconLink from 'ui/FRWAssets/svg/Iconlink.svg';
 

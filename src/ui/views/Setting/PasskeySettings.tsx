@@ -14,8 +14,8 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { LLHeader } from '@/ui/FRWComponent/LLHeader';
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
-import { usePasskey } from '@/ui/utils/usePasskey';
 
 import IconEnd from '../../../components/iconfont/IconAVector11Stroke';
 

@@ -26,8 +26,8 @@ import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
-import { usePasskey } from '@/ui/utils/usePasskey';
 
 import { SuccessDialog } from '../../FRWComponent/Dialog';
 import { LLHeader } from '../../FRWComponent/LLHeader';
