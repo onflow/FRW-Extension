@@ -3852,44 +3852,6 @@ export class WalletController extends BaseController {
   // === Passkey Related Methods ===
 
   /**
-   * Check if passkeys are supported in the current browser environment
-   */
-  checkPasskeySupport = async (): Promise<boolean> => {
-    return await passkeyService.isPasskeySupported();
-  };
-
-  /**
-   * Create a new passkey for the current user
-   */
-  createPasskey = async (): Promise<boolean> => {
-    try {
-      const result = await passkeyService.createPasskey();
-      if (result) {
-        // Track successful passkey creation
-        mixpanelTrack.track('passkey_created_success', { source: 'wallet_controller' });
-      }
-      return result;
-    } catch (error) {
-      console.error('Error creating passkey:', error);
-      mixpanelTrack.track('passkey_created_failed', { source: 'wallet_controller' });
-      return false;
-    }
-  };
-
-  /**
-   * Sign in with a passkey
-   */
-  signInWithPasskey = async (): Promise<boolean> => {
-    try {
-      const result = await passkeyService.signInWithPasskey();
-      return result;
-    } catch (error) {
-      console.error('Error signing in with passkey:', error);
-      return false;
-    }
-  };
-
-  /**
    * Check if passkeys are enabled for the current user
    */
   isPasskeyEnabled = async (): Promise<boolean> => {
