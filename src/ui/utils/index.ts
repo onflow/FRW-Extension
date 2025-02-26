@@ -164,6 +164,3 @@ export const returnFilteredCollections = (contractList, NFT) => {
       collection.contractName === searchName || collection.contract_name === searchName
   );
 };
-
-export { usePasskey } from '../hooks/usePasskey';
-export { usePasskeyPrompt, PasskeyPromptProvider } from './PasskeyPromptContext';
