@@ -1003,6 +1003,9 @@
   "Things_you_should_know": {
     "message": "Вещи, которые вы должны знать"
   },
+  "Passkey_Authentication": {
+    "message": "Пассфайр аутентификация"
+  },
   "Linked_Account": {
     "message": "Связанный аккаунт"
   },

@@ -3,8 +3,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import React from 'react';
 import { HashRouter as Router, Route, useLocation } from 'react-router-dom';
 
+import GlobalPasskeyPrompt from '@/ui/FRWComponent/GlobalPasskeyPrompt';
 import themeOptions from '@/ui/style/LLTheme';
 import { NewsProvider } from '@/ui/utils/NewsContext';
+import { PasskeyPromptProvider } from '@/ui/utils/PasskeyPromptContext';
 import { PrivateRoute } from 'ui/component';
 import { WalletProvider, useWallet } from 'ui/utils';
 
@@ -55,6 +57,8 @@ function Main() {
   return (
     <Router>
       <Routes />
+      {/* Render the global passkey prompt */}
+      <GlobalPasskeyPrompt />
     </Router>
   );
 }
@@ -65,7 +69,9 @@ const App = ({ wallet }: { wallet: any }) => {
       <CssBaseline />
       <WalletProvider wallet={wallet}>
         <NewsProvider>
-          <Main />
+          <PasskeyPromptProvider>
+            <Main />
+          </PasskeyPromptProvider>
         </NewsProvider>
       </WalletProvider>
     </ThemeProvider>

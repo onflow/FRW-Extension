@@ -3,10 +3,12 @@
 import { Snackbar, Alert } from '@mui/material';
 import React from 'react';
 
+import warningIcon from '../FRWAssets/svg/lowStorage.svg';
+
 interface WarningSnackbarProps {
   open: boolean;
   onClose: () => void;
-  alertIcon: string;
+  alertIcon?: string;
   message: string | React.ReactNode;
   sx?: object;
 }
@@ -14,7 +16,7 @@ interface WarningSnackbarProps {
 export default function WarningSnackbar({
   open,
   onClose,
-  alertIcon,
+  alertIcon = warningIcon,
   message,
   sx,
 }: WarningSnackbarProps) {

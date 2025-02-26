@@ -1003,6 +1003,9 @@
   "Things_you_should_know": {
     "message": "你应该知道的事情"
   },
+  "Passkey_Authentication": {
+    "message": "Passkey 认证"
+  },
   "Linked_Account": {
     "message": "关联账户"
   },

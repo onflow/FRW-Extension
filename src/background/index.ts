@@ -33,6 +33,7 @@ import {
   evmNftService,
   googleSafeHostService,
   passwordService,
+  passkeyService,
   mixpanelTrack,
 } from './service';
 import { getFirbaseConfig } from './utils/firebaseConfig';
@@ -95,6 +96,7 @@ async function restoreAppState() {
   keyringService.loadStore(keyringState);
   keyringService.store.subscribe((value) => storage.set('keyringState', value));
   await openapiService.init();
+  await passkeyService.init();
 
   // clear premnemonic in storage
   storage.remove('premnemonic');
