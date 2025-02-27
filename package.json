@@ -1,6 +1,6 @@
 {
   "name": "flow-reference-wallet",
-  "version": "2.7.4",
+  "version": "2.7.5",
   "description": "Digital wallet created for everyone.",
   "type": "module",
   "scripts": {
