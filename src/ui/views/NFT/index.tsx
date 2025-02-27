@@ -55,7 +55,7 @@ interface State {
 }
 
 const NFTTab = () => {
-  console.log('NFTTab');
+  console.log('NFTTab render');
   const classes = useStyles();
   const wallet = useWallet();
   const history = useHistory();
@@ -77,15 +77,18 @@ const NFTTab = () => {
   const [childType, setChildType] = useState<string>('');
 
   const setCountMemoized = useCallback((count: number) => {
+    console.log('setCountMemoized:', count);
     setCount(count);
   }, []);
 
   const fetchLatestCollection = useCallback(
     async (address: string) => {
+      console.log('fetchLatestCollection:', address);
       if (!address) return;
 
       try {
         const list = await wallet.refreshCollection(address);
+        console.log('fetchLatestCollection response:', list?.length);
         setState((prev) => ({
           ...prev,
           collectionLoading: false,
@@ -93,6 +96,7 @@ const NFTTab = () => {
           isCollectionEmpty: !list || list.length === 0,
         }));
       } catch (err) {
+        console.error('fetchLatestCollection error:', err);
         setState((prev) => ({
           ...prev,
           collectionLoading: false,
@@ -106,12 +110,14 @@ const NFTTab = () => {
 
   const fetchCollectionCache = useCallback(
     async (address: string) => {
+      console.log('fetchCollectionCache:', address, state.ownerAddress);
       if (!address || address === state.ownerAddress) return;
 
       try {
         setState((prev) => ({ ...prev, collectionLoading: true, ownerAddress: address }));
 
         const list = await wallet.getCollectionCache(address);
+        console.log('fetchCollectionCache response:', list?.length);
 
         if (list && list.length > 0) {
           const count = list.reduce((acc, item) => acc + item.count, 0);
@@ -126,6 +132,7 @@ const NFTTab = () => {
           await fetchLatestCollection(address);
         }
       } catch (error) {
+        console.error('fetchCollectionCache error:', error);
         await fetchLatestCollection(address);
       }
     },
@@ -133,8 +140,10 @@ const NFTTab = () => {
   );
 
   const loadNFTs = useCallback(async () => {
+    console.log('loadNFTs start');
     const isChild = await wallet.getActiveWallet();
     const address = await wallet.getCurrentAddress();
+    console.log('loadNFTs data:', { isChild, address });
     setAddress(address);
 
     if (isChild) {
@@ -150,19 +159,23 @@ const NFTTab = () => {
     } else {
       setIsActive(true);
     }
+    console.log('loadNFTs end');
   }, [wallet]);
 
   useEffect(() => {
+    console.log('loadNFTs effect');
     loadNFTs();
   }, [loadNFTs]);
 
   useEffect(() => {
+    console.log('address effect:', { address, ownerAddress: state.ownerAddress });
     if (address && address !== state.ownerAddress) {
       fetchCollectionCache(address);
     }
   }, [address, state.ownerAddress, fetchCollectionCache]);
 
   const handleReload = useCallback(() => {
+    console.log('handleReload called');
     wallet.clearNFTCollection();
     setState((prev) => ({
       ...prev,
@@ -175,6 +188,14 @@ const NFTTab = () => {
   }, [wallet, state.ownerAddress, fetchLatestCollection]);
 
   const handleCollectionClick = (params) => {
+    console.log('handleCollectionClick:', {
+      collection: params.collection,
+      currentWalletAddress: currentWallet.address,
+      collectionId: params.collection.id,
+      nftCount,
+      accessible,
+    });
+
     const { collection } = params;
     history.push({
       pathname: `/dashboard/nested/collectiondetail/${currentWallet.address}.${collection.id}.${nftCount}`,
