@@ -3,7 +3,10 @@ import debounce from 'debounce';
 import { storage } from 'background/webapi';
 
 const persistStorage = (name: string, obj: object) => {
-  debounce(() => storage.set(name, obj), 1000);
+  //  if (name === 'userWallets') {
+  console.log('persistStorage', name, JSON.parse(JSON.stringify(obj)));
+  //x}
+  storage.set(name, obj);
 };
 
 interface CreatePersistStoreParams<T> {
@@ -18,11 +21,13 @@ const createPersistStore = async <T extends object>({
   fromStorage = true,
 }: CreatePersistStoreParams<T>): Promise<T> => {
   let tpl = template;
-
+  console.log('createPersistStore', name, fromStorage);
   if (fromStorage) {
     const storageCache = await storage.get(name);
+    console.log('storageCache', storageCache);
     tpl = storageCache || template;
     if (!storageCache) {
+      console.log('set storageCache', name, tpl);
       await storage.set(name, tpl);
     }
   }
