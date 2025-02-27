@@ -13,8 +13,9 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
+import { useProfiles } from '@/ui/hooks/useProfileHook';
 import placeholder from 'ui/FRWAssets/image/placeholder.png';
 import { useWallet } from 'ui/utils';
 
@@ -54,8 +55,11 @@ interface State {
 }
 
 const NFTTab = () => {
+  console.log('NFTTab');
   const classes = useStyles();
   const wallet = useWallet();
+  const history = useHistory();
+  const { currentWallet } = useProfiles();
   const [state, setState] = useState<State>({
     collectionLoading: true,
     collections: [],
@@ -170,6 +174,18 @@ const NFTTab = () => {
     }
   }, [wallet, state.ownerAddress, fetchLatestCollection]);
 
+  const handleCollectionClick = (params) => {
+    const { collection } = params;
+    history.push({
+      pathname: `/dashboard/nested/collectiondetail/${currentWallet.address}.${collection.id}.${nftCount}`,
+      state: {
+        collection: collection,
+        ownerAddress: currentWallet.address,
+        accessible: accessible,
+      },
+    });
+  };
+
   return (
     <div id="scrollableTab">
       <Container className={classes.collectionContainer}>
@@ -201,7 +217,10 @@ const NFTTab = () => {
               key={collection.collection?.name || collection.name}
               className={classes.collectionCard}
             >
-              <CardActionArea className={classes.actionarea}>
+              <CardActionArea
+                className={classes.actionarea}
+                onClick={() => handleCollectionClick(collection)}
+              >
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                   <CardMedia
                     component="img"
