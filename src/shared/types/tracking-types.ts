@@ -44,6 +44,35 @@ export type TrackingEvents = {
     type: 'biometric' | 'pin' | 'none';
   };
 
+  // Passkey Events
+  passkey_created: {
+    success: boolean; // Whether creating the passkey was successful or not
+    error?: string; // Error message if creation failed
+    source?: string; // Source of the passkey creation
+    with_password?: boolean; // Whether the passkey was created with a password
+  };
+  passkey_created_success: {
+    source?: string; // Source of the passkey creation success
+  };
+  passkey_created_failed: {
+    source?: string; // Source of the passkey creation failure
+    reason?: string; // Reason for the failure
+  };
+  passkey_signin: {
+    success: boolean; // Whether signing in with passkey was successful
+    error?: string; // Error message if sign in failed
+    reason?: string; // Reason for failure
+    password_decrypted?: boolean; // Whether a password was successfully decrypted
+  };
+  passkey_signin_success: {
+    source?: string; // Source of the passkey signin success
+    with_password?: boolean; // Whether the signin included a decrypted password
+  };
+  passkey_signin_failed: {
+    source?: string; // Source of the passkey signin failure
+    reason?: string; // Reason for the failure
+  };
+
   // Backup Events
   multi_backup_created: {
     address: string; // Address of the account that set up multi-backup

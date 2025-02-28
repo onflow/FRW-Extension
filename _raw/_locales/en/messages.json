@@ -1000,6 +1000,9 @@
   "Things_you_should_know": {
     "message": "Things you should know"
   },
+  "Passkey_Authentication": {
+    "message": "Passkey Authentication"
+  },
   "Linked_Account": {
     "message": "Linked Account"
   },

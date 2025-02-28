@@ -1,6 +1,8 @@
 import AndroidIcon from '@mui/icons-material/Android';
 import AppleIcon from '@mui/icons-material/Apple';
+import KeyIcon from '@mui/icons-material/Key';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import SecurityIcon from '@mui/icons-material/Security';
 import {
   Typography,
   List,
@@ -17,6 +19,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import { LLHeader } from '@/ui/FRWComponent';
+import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
 import Device from 'ui/FRWAssets/svg/device.svg';
 import IconLink from 'ui/FRWAssets/svg/Iconlink.svg';
@@ -88,6 +91,7 @@ const SettingTab = () => {
   const usewallet = useWallet();
   const [isActive, setIsActive] = useState(false);
   const [isKeyphrase, setIsKeyphrase] = useState(false);
+  const { isSupported: isPasskeySupported } = usePasskey();
 
   const checkIsActive = useCallback(async () => {
     // setSending(true);
@@ -209,6 +213,30 @@ const SettingTab = () => {
                 </ListItemIcon>
               </ListItemButton>
             </ListItem>
+          )}
+
+          {/* Add Passkey Settings if supported */}
+          {isPasskeySupported && (
+            <>
+              <Divider sx={{ width: '90%' }} variant="middle" />
+              <ListItem
+                button
+                component={Link}
+                to="/dashboard/setting/passkey-settings"
+                disablePadding
+                className={classes.listItem}
+              >
+                <ListItemButton className={classes.itemButton}>
+                  <ListItemIcon sx={{ minWidth: '25px' }}>
+                    <KeyIcon className={classes.iconOthers} style={{ color: '#59A1DB' }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Passkey Authentication" />
+                  <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
+                    <IconEnd size={12} />
+                  </ListItemIcon>
+                </ListItemButton>
+              </ListItem>
+            </>
           )}
         </List>
 

@@ -1003,6 +1003,9 @@
   "Things_you_should_know": {
     "message": "知っておくべきこと"
   },
+  "Passkey_Authentication": {
+    "message": "パスキー認証"
+  },
   "Linked_Account": {
     "message": "リンクされたアカウント"
   },

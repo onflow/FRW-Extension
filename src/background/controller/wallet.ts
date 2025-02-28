@@ -53,6 +53,7 @@ import {
   newsService,
   mixpanelTrack,
   evmNftService,
+  passkeyService,
 } from 'background/service';
 import i18n from 'background/service/i18n';
 import { type DisplayedKeryring, KEYRING_CLASS } from 'background/service/keyring';
@@ -835,7 +836,7 @@ export class WalletController extends BaseController {
     return preferenceService.updateIsFirstOpen();
   };
   // userinfo
-  getUserInfo = async (forceRefresh: boolean) => {
+  getUserInfo = async (forceRefresh: boolean): Promise<UserInfoStore> => {
     const data = await userInfoService.getUserInfo();
 
     if (forceRefresh) {
@@ -849,7 +850,7 @@ export class WalletController extends BaseController {
     return await this.fetchUserInfo();
   };
 
-  fetchUserInfo = async () => {
+  fetchUserInfo = async (): Promise<UserInfoStore> => {
     const result = await openapiService.userInfo();
     const info = result['data'];
     const avatar = this.addTokenForFirebaseImage(info.avatar);
@@ -3804,6 +3805,151 @@ export class WalletController extends BaseController {
 
   clearEvmNFTList = async () => {
     await evmNftService.clearEvmNfts();
+  };
+
+  // === Passkey Related Methods ===
+
+  /**
+   * Check if passkeys are enabled for the current user
+   */
+  isPasskeyEnabled = async (): Promise<boolean> => {
+    return passkeyService.store.enabled;
+  };
+
+  /**
+   * Get available passkeys for the current user
+   */
+  getAvailablePasskeys = async () => {
+    return await passkeyService.getAvailablePasskeys();
+  };
+
+  /**
+   * Delete a specific passkey
+   */
+  deletePasskey = async (passkeyId: string): Promise<boolean> => {
+    return await passkeyService.deletePasskey(passkeyId);
+  };
+
+  /**
+   * Register a passkey credential created in the UI
+   */
+  registerPasskeyCredential = async (
+    credentialId: string,
+    rawId: string,
+    password?: string
+  ): Promise<boolean> => {
+    try {
+      // Create a registered credential object
+      const registeredCredential = {
+        id: credentialId,
+        rawId,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Add to the passkey store
+      passkeyService.store.registeredCredentials.push(registeredCredential);
+      passkeyService.store.enabled = true;
+      passkeyService.store.lastUsed = new Date().toISOString();
+
+      // If password is provided, encrypt and store it
+      let passwordStored = false;
+      if (password) {
+        passwordStored = await passkeyService.storeEncryptedPassword(password);
+      }
+
+      // Save to storage
+      await storage.set('passkey', passkeyService.store);
+
+      // Track successful passkey registration
+      mixpanelTrack.track('passkey_created', {
+        success: true,
+        with_password: !!password && passwordStored,
+        source: 'wallet_controller',
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error registering passkey credential:', error);
+      mixpanelTrack.track('passkey_created', {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        source: 'wallet_controller',
+      });
+      return false;
+    }
+  };
+
+  /**
+   * Verify a passkey credential from the UI
+   */
+  verifyPasskeyCredential = async (credentialId: string): Promise<boolean> => {
+    try {
+      // Check if the credential exists in our store
+      const matchedCredential = passkeyService.store.registeredCredentials.find(
+        (cred) => cred.id === credentialId
+      );
+
+      if (matchedCredential) {
+        // Update last used timestamp
+        passkeyService.store.lastUsed = new Date().toISOString();
+        await storage.set('passkey', passkeyService.store);
+
+        // Get the decrypted password if available
+        const password = await passkeyService.getDecryptedPassword();
+        let passwordDecrypted = false;
+
+        if (password) {
+          passwordDecrypted = true;
+
+          // Follow the same flow as the unlock method
+          await keyringService.submitPassword(password);
+
+          // Store the password temporarily in the password service
+          await passwordService.setPassword(password);
+
+          // Get the public key and switch login
+          const pubKey = await this.getPubKey();
+          await userWalletService.switchLogin(pubKey);
+
+          // Broadcast the unlock event
+          sessionService.broadcastEvent('unlock');
+        } else {
+          // If no password is available, fall back to just unlocking the keyring
+          keyringService.setUnlocked();
+
+          try {
+            const pubKey = await this.getPubKey();
+            await userWalletService.switchLogin(pubKey);
+          } catch (error) {
+            console.error('Error switching login after passkey authentication:', error);
+            // Even if switching login fails, the wallet is still unlocked
+          }
+        }
+
+        // Track successful passkey sign-in
+        mixpanelTrack.track('passkey_signin', {
+          success: true,
+          password_decrypted: passwordDecrypted,
+        });
+
+        return true;
+      }
+
+      mixpanelTrack.track('passkey_signin', {
+        success: false,
+        reason: 'credential_not_found',
+      });
+
+      return false;
+    } catch (error) {
+      console.error('Error verifying passkey credential:', error);
+      mixpanelTrack.track('passkey_signin', {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      return false;
+    }
   };
 }
 
