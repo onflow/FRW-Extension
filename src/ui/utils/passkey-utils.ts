@@ -69,8 +69,8 @@ export const createPasskeyCredential = async (
         displayName: displayName || username,
       },
       pubKeyCredParams: [
-        { type: 'public-key', alg: -7 }, // ES256
-        { type: 'public-key', alg: -257 }, // RS256
+        { type: 'public-key', alg: -7 }, // ES256 -7	ECDSA w/ SHA-256.
+        { type: 'public-key', alg: -47 }, // ES256K -47 ECDSA using secp256k1 curve and SHA-256
       ],
       authenticatorSelection: {
         authenticatorAttachment: 'platform',
@@ -157,7 +157,7 @@ export const extractCredentialData = (
  * @returns Object containing error information
  */
 export const parseWebAuthnError = (
-  error: any
+  error: unknown
 ): { message: string; code: string; isUserCancellation: boolean } => {
   let message = 'An unknown error occurred during passkey operation';
   let code = 'unknown_error';
