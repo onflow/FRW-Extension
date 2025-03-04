@@ -28,6 +28,11 @@ import { Link, useHistory } from 'react-router-dom';
 
 import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
+import {
+  createPasskeyCredential,
+  extractCredentialData,
+  parseWebAuthnError,
+} from '@/ui/utils/passkey-utils';
 
 import { SuccessDialog } from '../../FRWComponent/Dialog';
 import { LLHeader } from '../../FRWComponent/LLHeader';
@@ -195,88 +200,44 @@ const PasskeySetup: React.FC = () => {
       setIsLoading(true);
       setShowError(false);
 
-      // Create a new passkey using WebAuthn in the UI context
-      // Generate a random challenge
-      const challenge = new Uint8Array(32);
-      window.crypto.getRandomValues(challenge);
-
       // Get user info from wallet controller
       const userInfo = await wallet.getUserInfo(false);
       if (!userInfo || !userInfo.username) {
         throw new Error('User information not available');
       }
 
-      // Get the domain for the RP ID - use the effective domain
-      const rpId = window.location.hostname;
+      // Create a new passkey using our utility function
+      const credential = await createPasskeyCredential(
+        userInfo.username,
+        userInfo.nickname || userInfo.username
+      );
 
-      // Create credential options
-      const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-        challenge,
-        rp: {
-          name: 'FRW Extension Wallet',
-          id: rpId,
-        },
-        user: {
-          id: new TextEncoder().encode(userInfo.username),
-          name: userInfo.username,
-          displayName: userInfo.nickname || userInfo.username,
-        },
-        pubKeyCredParams: [
-          { type: 'public-key', alg: -7 }, // ES256
-          { type: 'public-key', alg: -257 }, // RS256
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform',
-          userVerification: 'required',
-          residentKey: 'required',
-        },
-        timeout: 60000,
-        attestation: 'none',
-      };
+      if (!credential) {
+        throw new Error('Failed to create passkey');
+      }
 
-      try {
-        // Create credential in the UI context
-        const credential = (await navigator.credentials.create({
-          publicKey: publicKeyCredentialCreationOptions,
-        })) as PublicKeyCredential;
+      // Extract credential data using our utility function
+      const { credentialId, rawId } = extractCredentialData(credential);
 
-        if (!credential) {
-          throw new Error('Failed to create passkey');
-        }
+      // Register the credential with the wallet service in the background
+      // Pass the password for encryption
+      const success = await wallet.registerPasskeyCredential(credentialId, rawId, password);
 
-        // Extract credential data to send to the background
-        const credentialId = credential.id;
-        const rawId = Buffer.from(credential.rawId).toString('base64');
-
-        // Register the credential with the wallet service in the background
-        // Pass the password for encryption
-        const success = await wallet.registerPasskeyCredential(credentialId, rawId, password);
-
-        if (success) {
-          setPasskeyEnabled(true);
-          setShowSuccessDialog(true);
-          // Refresh passkey status
-          checkPasskeyStatus();
-        } else {
-          setError('Failed to register passkey with wallet. Please try again.');
-          setShowError(true);
-        }
-      } catch (credentialError: any) {
-        console.error('Error creating credential:', credentialError);
-
-        // Provide more specific error messages based on the error
-        if (credentialError.name === 'NotAllowedError') {
-          setError('Permission denied. You may have cancelled the request.');
-        } else if (credentialError.name === 'SecurityError') {
-          setError('Security error. Operation not allowed in this context.');
-        } else {
-          setError(`Failed to create passkey: ${credentialError.message || 'Unknown error'}`);
-        }
+      if (success) {
+        setPasskeyEnabled(true);
+        setShowSuccessDialog(true);
+        // Refresh passkey status
+        checkPasskeyStatus();
+      } else {
+        setError('Failed to register passkey with wallet. Please try again.');
         setShowError(true);
       }
     } catch (error) {
       console.error('Error setting up passkey:', error);
-      setError('An error occurred while trying to set up passkey.');
+
+      // Use our utility function to parse WebAuthn errors
+      const parsedError = parseWebAuthnError(error);
+      setError(parsedError.message);
       setShowError(true);
     } finally {
       setIsLoading(false);

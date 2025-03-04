@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import { useWallet } from '../utils/index';
+import { isPasskeySupported } from '../utils/passkey-utils';
 
 /**
  * Custom hook to check if passkeys are supported by the browser and enabled for the user
@@ -30,39 +31,8 @@ export const usePasskey = () => {
         walletChecks: {},
       };
 
-      // First check browser support using the WebAuthn API directly
-      const browserSupported =
-        typeof window !== 'undefined' &&
-        typeof window.PublicKeyCredential !== 'undefined' &&
-        typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable ===
-          'function';
-
-      debug.browserChecks.hasPublicKeyCredential =
-        typeof window !== 'undefined' && typeof window.PublicKeyCredential !== 'undefined';
-      debug.browserChecks.hasIsUserVerifyingPlatformAuthenticatorAvailable =
-        debug.browserChecks.hasPublicKeyCredential &&
-        typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable ===
-          'function';
-      debug.browserChecks.browserSupported = browserSupported;
-
-      let platformAuthenticatorAvailable = false;
-
-      if (browserSupported) {
-        try {
-          platformAuthenticatorAvailable =
-            await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-          debug.browserChecks.platformAuthenticatorAvailable = platformAuthenticatorAvailable;
-        } catch (err) {
-          console.error('Error checking platform authenticator availability:', err);
-          debug.browserChecks.platformAuthenticatorError =
-            err instanceof Error ? err.message : String(err);
-          // If there's an error checking, we'll assume it's not available
-          platformAuthenticatorAvailable = false;
-        }
-      }
-
-      // Set support status based on browser capabilities
-      const supported = browserSupported && platformAuthenticatorAvailable;
+      // Use our utility function to check browser support
+      const supported = await isPasskeySupported();
       setIsSupported(supported);
       debug.supported = supported;
 

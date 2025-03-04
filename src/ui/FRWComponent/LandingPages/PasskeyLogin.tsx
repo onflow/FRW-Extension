@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import WarningSnackbar from '@/ui/FRWComponent/WarningSnackbar';
 import { usePasskey } from '@/ui/hooks/usePasskey';
 import { useWallet } from '@/ui/utils';
+import { authenticateWithPasskey, parseWebAuthnError } from '@/ui/utils/passkey-utils';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -116,86 +117,36 @@ const PasskeyLogin: React.FC<PasskeyLoginProps> = ({ onSwitchToPassword }) => {
         throw new Error('No passkeys available for this account');
       }
 
-      // Generate a random challenge in the UI context
-      const challenge = new Uint8Array(32);
-      window.crypto.getRandomValues(challenge);
+      // Use our utility function to authenticate with passkey
+      const credential = await authenticateWithPasskey(passkeyInfo);
 
-      // Get the domain for the RP ID - use the effective domain
-      const rpId = window.location.hostname;
-      console.log('Using RP ID for authentication:', rpId);
+      if (!credential) {
+        throw new Error('Failed to get passkey');
+      }
 
-      // Prepare allowed credentials from stored credentials
-      const allowCredentials = passkeyInfo.map((cred) => ({
-        type: 'public-key' as const,
-        id: Uint8Array.from(atob(cred.rawId), (c) => c.charCodeAt(0)),
-        transports: ['internal'] as AuthenticatorTransport[],
-      }));
+      console.log('Passkey authentication successful in UI context:', credential);
 
-      // Create credential request options
-      const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
-        challenge,
-        allowCredentials,
-        timeout: 60000,
-        userVerification: 'required',
-        rpId: rpId,
-      };
+      // Verify the credential with the wallet service in the background
+      // This will also decrypt and store the password if available, and unlock the wallet
+      console.log('Verifying credential with ID:', credential.id);
+      const success = await wallet.verifyPasskeyCredential(credential.id);
+      console.log('Verification result:', success);
 
-      console.log(
-        'Requesting passkey authentication with options:',
-        publicKeyCredentialRequestOptions
-      );
-
-      try {
-        // Request credential in the UI context (WebAuthn API)
-        const credential = (await navigator.credentials.get({
-          publicKey: publicKeyCredentialRequestOptions,
-        })) as PublicKeyCredential;
-
-        if (!credential) {
-          throw new Error('Failed to get passkey');
-        }
-
-        console.log('Passkey authentication successful in UI context:', credential);
-
-        // Verify the credential with the wallet service in the background
-        // This will also decrypt and store the password if available, and unlock the wallet
-        console.log('Verifying credential with ID:', credential.id);
-        const success = await wallet.verifyPasskeyCredential(credential.id);
-        console.log('Verification result:', success);
-
-        if (success) {
-          console.log('Passkey authentication complete, wallet unlocked');
-          // Successful login, navigate to home
-          history.push('/');
-        } else {
-          console.error('Passkey verification failed in the background');
-          setError('Failed to verify passkey. Please try again.');
-          setShowError(true);
-        }
-      } catch (credentialError: any) {
-        console.error('Error getting credential:', credentialError);
-
-        // Provide more specific error messages based on the error
-        if (credentialError.name === 'NotAllowedError') {
-          setError(
-            'Permission denied. You may have cancelled the authentication or your device denied the request.'
-          );
-        } else if (credentialError.name === 'SecurityError') {
-          setError(
-            'Security error. The operation is not allowed in this context or with these parameters.'
-          );
-        } else {
-          setError(
-            `Failed to authenticate with passkey: ${credentialError.message || 'Unknown error'}`
-          );
-        }
+      if (success) {
+        console.log('Passkey authentication complete, wallet unlocked');
+        // Successful login, navigate to home
+        history.push('/');
+      } else {
+        console.error('Passkey verification failed in the background');
+        setError('Failed to verify passkey. Please try again.');
         setShowError(true);
       }
     } catch (error: any) {
       console.error('Error signing in with passkey:', error);
-      setError(
-        'An error occurred during passkey authentication. Please try again or use your password.'
-      );
+
+      // Use our utility function to parse WebAuthn errors
+      const parsedError = parseWebAuthnError(error);
+      setError(parsedError.message);
       setShowError(true);
     } finally {
       setIsLoading(false);
