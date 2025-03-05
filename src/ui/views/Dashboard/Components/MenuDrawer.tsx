@@ -157,12 +157,16 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <ListItemIcon sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <img
-                src={props?.userInfo?.avatar}
-                width={48}
-                height={48}
-                style={{ backgroundColor: '#797979', borderRadius: 48 / 2 }}
-              />
+              {props?.userInfo ? (
+                <img
+                  src={props.userInfo.avatar}
+                  width={48}
+                  height={48}
+                  style={{ backgroundColor: '#797979', borderRadius: 48 / 2 }}
+                />
+              ) : (
+                <Skeleton variant="circular" width={48} height={48} />
+              )}
 
               <Box sx={{ paddingTop: '4px', px: '2px' }}>
                 <IconButton edge="end" aria-label="close" onClick={props.togglePop}>

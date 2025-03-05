@@ -160,6 +160,68 @@ export class WalletController extends BaseController {
   resolveApproval = notificationService.resolveApproval;
   rejectApproval = notificationService.rejectApproval;
 
+  // initAlianNames = async () => {
+  //   await preferenceService.changeInitAlianNameStatus();
+  //   const keyrings = await keyringService.getAllTypedAccounts();
+  //   const walletConnectKeyrings = keyrings.filter(
+  //     (item) => item.type === 'WalletConnect'
+  //   );
+  //   const catergoryGroupAccount = keyrings.map((item) => ({
+  //     type: item.type,
+  //     accounts: item.accounts,
+  //   }));
+  //   let walletConnectList: DisplayedKeryring['accounts'] = [];
+  //   for (let i = 0; i < walletConnectKeyrings.length; i++) {
+  //     const keyring = walletConnectKeyrings[i];
+  //     walletConnectList = [...walletConnectList, ...keyring.accounts];
+  //   }
+  //   const groupedWalletConnectList = groupBy(walletConnectList, 'brandName');
+  //   if (keyrings.length > 0) {
+  //     console.log(
+  //       keyrings,
+  //       'keyrings',
+  //       groupedWalletConnectList,
+  //       '==================='
+  //     );
+  //     // Object.keys(groupedWalletConnectList).forEach((key) => {
+  //     //   groupedWalletConnectList[key].map((acc, index) => {
+  //     //     this.updateAlianName(
+  //     //       acc?.address,
+  //     //       `${WALLET_BRAND_CONTENT[acc?.brandName]} ${index + 1}`
+  //     //     );
+  //     //   });
+  //     // });
+  //     const catergories = groupBy(
+  //       catergoryGroupAccount.filter((group) => group.type !== 'WalletConnect'),
+  //       'type'
+  //     );
+  //     const result = Object.keys(catergories)
+  //       .map((key) =>
+  //         catergories[key].map((item) =>
+  //           item.accounts.map((acc) => ({
+  //             address: acc.address,
+  //             type: key,
+  //           }))
+  //         )
+  //       )
+  //       .map((item) => item.flat(1));
+  //     result.forEach((group) =>
+  //       group.forEach((acc, index) => {
+  //         this.updateAlianName(
+  //           acc?.address,
+  //           `${BRAND_ALIAN_TYPE_TEXT[acc?.type]} ${index + 1}`
+  //         );
+  //       })
+  //     );
+  //   }
+  // };
+
+  switchAccount = async (currentId: string) => {
+    await keyringService.switchKeyring(currentId);
+    const pubKey = await this.getPubKey();
+    await userWalletService.switchLogin(pubKey);
+  };
+
   unlock = async (password: string) => {
     await keyringService.submitPassword(password);
 
@@ -269,6 +331,13 @@ export class WalletController extends BaseController {
     await userWalletService.clear();
     sessionService.broadcastEvent('accountsChanged', []);
     sessionService.broadcastEvent('lock');
+  };
+
+  signOutWallet = async () => {
+    await keyringService.updateKeyring();
+    await userWalletService.signOutCurrentUser();
+    await userWalletService.clear();
+    sessionService.broadcastEvent('accountsChanged', []);
   };
 
   // lockadd here
@@ -669,7 +738,7 @@ export class WalletController extends BaseController {
 
   getTypedAccounts = async (type) => {
     return Promise.all(
-      keyringService.keyrings
+      keyringService.keyring
         .filter((keyring) => !type || keyring.type === type)
         .map((keyring) => keyringService.displayForKeyring(keyring))
     );
