@@ -21,12 +21,13 @@ const NFTTab = () => {
   const [isActive, setIsActive] = useState(true);
   const gridRef = useRef<any>(null);
   const [childType, setChildType] = useState<string>('');
-
+  const [childTypeLoaded, setChildTypeLoaded] = useState<boolean>(false);
   const loadNFTs = useCallback(async () => {
     const isChild = await wallet.getActiveWallet();
     const address = await wallet.getCurrentAddress();
     setAddress(address);
     // const flowCoins = fetchRemoteConfig.flowCoins();
+    setChildTypeLoaded(true);
     if (isChild) {
       setChildType(isChild);
 
@@ -60,7 +61,7 @@ const NFTTab = () => {
         activeCollection={activeCollection}
       />
 
-      {!childType && (
+      {childTypeLoaded && !childType && (
         <Box
           sx={{
             display: 'flex',

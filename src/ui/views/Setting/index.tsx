@@ -2,7 +2,6 @@ import AndroidIcon from '@mui/icons-material/Android';
 import AppleIcon from '@mui/icons-material/Apple';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import {
-  Typography,
   List,
   ListItemText,
   ListItemIcon,
@@ -11,15 +10,17 @@ import {
   Divider,
   CardMedia,
   IconButton,
+  Box,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import { LLHeader } from '@/ui/FRWComponent';
+import CoinsIcon from '@/ui/FRWComponent/CoinsIcon';
 import { useWallet } from '@/ui/utils';
-import Device from 'ui/FRWAssets/svg/device.svg';
-import IconLink from 'ui/FRWAssets/svg/Iconlink.svg';
+import { ReactComponent as Device } from 'ui/FRWAssets/svg/device.svg';
+import { ReactComponent as IconLink } from 'ui/FRWAssets/svg/Iconlink.svg';
 
 import IconAbout from '../../../components/iconfont/IconAbout';
 import IconAccount from '../../../components/iconfont/IconAccount';
@@ -27,7 +28,6 @@ import IconAddressbook from '../../../components/iconfont/IconAddressbook';
 import IconEnd from '../../../components/iconfont/IconAVector11Stroke';
 import IconBackup from '../../../components/iconfont/IconBackup';
 import IconDeveloper from '../../../components/iconfont/IconDeveloper';
-import IconWallet from '../../../components/iconfont/IconWallet';
 
 // Feature flags
 const SHOW_DEVICES = false;
@@ -71,15 +71,22 @@ const useStyles = makeStyles(() => ({
   },
   icon: {
     color: '#59A1DB',
-    width: '14px',
-    height: '14px',
-    marginRight: '16px',
+    width: '18px',
+    height: '18px',
+    marginRight: '14px',
   },
   iconOthers: {
     color: '#59A1DB',
-    width: '16px',
-    height: '16px',
+    width: '18px',
+    height: '18px',
     marginRight: '14px',
+  },
+  iconContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '18px',
+    height: '18px',
   },
 }));
 
@@ -117,7 +124,9 @@ const SettingTab = () => {
           >
             <ListItemButton className={classes.itemButton}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <IconAccount className={classes.icon} color="#59A1DB" />
+                <Box className={classes.iconContainer}>
+                  <IconAccount size={18} color="#59A1DB" />
+                </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('Profile')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -136,7 +145,9 @@ const SettingTab = () => {
           >
             <ListItemButton className={classes.itemButton}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <IconWallet className={classes.icon} color="#59A1DB" />
+                <Box className={classes.iconContainer}>
+                  <CoinsIcon width={18} height={18} color="#59A1DB" />
+                </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('Acc__list')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -156,7 +167,9 @@ const SettingTab = () => {
           >
             <ListItemButton className={classes.itemButton}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <IconAddressbook className={classes.icon} color="#59A1DB" />
+                <Box className={classes.iconContainer}>
+                  <IconAddressbook size={18} color="#59A1DB" />
+                </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('Address__Book')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -176,11 +189,9 @@ const SettingTab = () => {
             >
               <ListItemButton className={classes.itemButton}>
                 <ListItemIcon sx={{ minWidth: '25px' }}>
-                  <CardMedia
-                    className={classes.icon}
-                    sx={{ height: '16px', width: '16px' }}
-                    image={IconLink}
-                  />
+                  <Box className={classes.iconContainer}>
+                    <IconLink style={{ width: '18px', height: '18px', color: '#59A1DB' }} />
+                  </Box>
                 </ListItemIcon>
                 <ListItemText primary={chrome.i18n.getMessage('Linked_Account')} />
                 <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -201,7 +212,9 @@ const SettingTab = () => {
             >
               <ListItemButton className={classes.itemButton}>
                 <ListItemIcon sx={{ minWidth: '25px' }}>
-                  <IconBackup className={classes.iconOthers} color="#59A1DB" />
+                  <Box className={classes.iconContainer}>
+                    <IconBackup size={18} color="#59A1DB" />
+                  </Box>
                 </ListItemIcon>
                 <ListItemText primary={chrome.i18n.getMessage('Backup')} />
                 <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -223,7 +236,9 @@ const SettingTab = () => {
           >
             <ListItemButton className={classes.itemButton}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <PhoneIphoneIcon className={classes.iconOthers} style={{ color: '#59A1DB' }} />
+                <Box className={classes.iconContainer}>
+                  <PhoneIphoneIcon sx={{ color: '#59A1DB', width: '18px', height: '18px' }} />
+                </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('Try_Our_Mobile_APP')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px', spacing: '8px' }}>
@@ -261,8 +276,9 @@ const SettingTab = () => {
           >
             <ListItemButton className={classes.itemButton}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                {/* <IconSecurity className={classes.iconOthers} color='#59A1DB' /> */}
-                <IconDeveloper className={classes.iconOthers} color="#59A1DB" />
+                <Box className={classes.iconContainer}>
+                  <IconDeveloper size={18} color="#59A1DB" />
+                </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('Developer__Mode')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -284,11 +300,9 @@ const SettingTab = () => {
               >
                 <ListItemButton className={classes.itemButton}>
                   <ListItemIcon sx={{ minWidth: '25px' }}>
-                    <CardMedia
-                      className={classes.icon}
-                      sx={{ height: '16px', width: '19px', marginRight: '13px' }}
-                      image={Device}
-                    />
+                    <Box className={classes.iconContainer}>
+                      <Device style={{ width: '18px', height: '18px', color: '#59A1DB' }} />
+                    </Box>
                   </ListItemIcon>
                   <ListItemText primary={chrome.i18n.getMessage('Devices')} />
                   <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
@@ -310,7 +324,9 @@ const SettingTab = () => {
           >
             <ListItemButton className={classes.itemButton}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <IconAbout className={classes.iconOthers} color="#59A1DB" />
+                <Box className={classes.iconContainer}>
+                  <IconAbout size={18} color="#59A1DB" />
+                </Box>
               </ListItemIcon>
               <ListItemText primary={chrome.i18n.getMessage('About')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>

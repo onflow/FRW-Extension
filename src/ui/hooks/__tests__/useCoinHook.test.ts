@@ -15,6 +15,7 @@ vi.mock('react', async () => {
     ...actual,
     useEffect: vi.fn().mockImplementation((fn) => fn()),
     useCallback: vi.fn().mockImplementation((fn) => fn),
+    useState: vi.fn().mockImplementation((initialValue) => [initialValue, vi.fn()]),
   };
 });
 
@@ -76,6 +77,8 @@ vi.mock('@/ui/utils/WalletContext', () => ({
   useWalletLoaded: vi.fn().mockReturnValue(true),
   useWallet: vi.fn().mockReturnValue({
     refreshCoinList: vi.fn().mockResolvedValue(undefined),
+    isUnlocked: vi.fn().mockResolvedValue(true),
+    getMainWallet: vi.fn().mockResolvedValue('test-address'),
   }),
 }));
 
@@ -159,6 +162,7 @@ describe('useCoinHook', () => {
         useWallet: () => ({
           refreshCoinList: vi.fn().mockResolvedValue(undefined),
           getMainWallet: vi.fn(),
+          isUnlocked: vi.fn().mockResolvedValue(true),
           openapi: {
             getAccountMinFlow: vi.fn(),
           },

@@ -97,7 +97,7 @@ const Wallet = () => {
     const fectechdWallet = await fetchBalances(wallet);
     setCurrentWallet(currentWallet.address);
     const evmWallet = await usewallet.getEvmWallet();
-    const filteredEvm = [evmWallet].filter((evm) => evm.address);
+    const filteredEvm = [evmWallet].filter((evm) => evm?.address);
     if (filteredEvm.length > 0) {
       const fetchedEvm = await fetchEvmBalances(transformData(filteredEvm));
       setEvmList(fetchedEvm);

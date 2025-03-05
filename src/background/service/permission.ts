@@ -32,6 +32,10 @@ class PermissionService {
     });
     this.store = storage || this.store;
 
+    // @todo add a size limit to the LRU cache
+    // We're creating a new LRU cache here with no size limit.
+    // That's the whole point of the LRU cache.
+
     this.lruCache = new LRU();
     const cache: ReadonlyArray<LRU.Entry<string, ConnectedSite>> = (this.store.dumpCache || []).map(
       (item) => ({

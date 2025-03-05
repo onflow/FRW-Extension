@@ -115,8 +115,10 @@ class UserWallet {
       emulatorMode: false,
     };
   };
-
-  setUserWallets = async (filteredData, network) => {
+  isLocked = () => {
+    return !keyringService.isBooted() || !keyringService.memStore.getState().isUnlocked;
+  };
+  setUserWallets = async (filteredData: WalletResponse[], network: string) => {
     this.store.wallets[network] = filteredData;
     let walletIndex = (await storage.get('currentWalletIndex')) || 0;
     if (this.store.wallets[network] && this.store.wallets[network].length > 0) {
@@ -143,7 +145,12 @@ class UserWallet {
     return this.store.activeChild;
   };
 
-  setCurrentWallet = async (wallet: any, key: any, network: string, index = null) => {
+  setCurrentWallet = async (
+    wallet: BlockchainResponse,
+    key: string,
+    network: string,
+    index = null
+  ) => {
     if (key && key !== 'evm') {
       this.store.currentWallet = wallet;
     } else if (key === 'evm') {
@@ -263,11 +270,17 @@ class UserWallet {
     this.store.currentWallet = chain;
   };
 
-  getCurrentWallet = (): BlockchainResponse => {
+  getCurrentWallet = (): BlockchainResponse | null => {
+    if (this.isLocked()) {
+      return null;
+    }
     return this.store.currentWallet;
   };
 
-  getEvmWallet = () => {
+  getEvmWallet = (): BlockchainResponse | null => {
+    if (this.isLocked()) {
+      return null;
+    }
     return this.store.evmWallet;
   };
 
@@ -297,17 +310,18 @@ class UserWallet {
     this.store.wallets[network][id].blockchain[0].color = emoji.bgcolor;
   };
 
-  getMainWallet = async (network: string) => {
-    const walletIndex = (await storage.get('currentWalletIndex')) || 0;
-    // Check if the wallet exists before accessing it
-    const wallet = this.store.wallets?.[network]?.[walletIndex]?.blockchain?.[0];
-    return withPrefix(wallet?.address) || '';
-  };
-
   returnMainWallet = async (network: string): Promise<BlockchainResponse | undefined> => {
     const walletIndex = (await storage.get('currentWalletIndex')) || 0;
     const wallet = this.store.wallets?.[network]?.[walletIndex]?.blockchain?.[0];
     return wallet;
+  };
+
+  getMainWallet = async (network: string) => {
+    if (!keyringService.isBooted() || !keyringService.memStore.getState().isUnlocked) {
+      return '';
+    }
+    const wallet = await this.returnMainWallet(network);
+    return withPrefix(wallet?.address) || '';
   };
 
   getCurrentAddress = (): string => {
@@ -460,7 +474,16 @@ class UserWallet {
   };
 
   reSign = async () => {
+    // Try to re-establish the session if the user's wallet is unlocked
+    if (this.isLocked()) {
+      // If the wallet is locked, we can't sign in
+      return;
+    }
     const password = keyringService.password;
+    if (!password) {
+      // No password means the wallet is not unlocked
+      return;
+    }
     const privateKey = await wallet.getPrivateKeyForCurrentAccount(password);
     return await this.sigInWithPk(privateKey);
   };

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Redirect, useRouteMatch } from 'react-router-dom';
 
 import { useWallet } from 'ui/utils';
 
-const PrivateRoute = ({ children, ...rest }) => {
+const PrivateRoute = ({ children, path, ...rest }) => {
   const wallet = useWallet();
+  const match = useRouteMatch(path);
+
   const [booted, setBooted] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -24,21 +26,26 @@ const PrivateRoute = ({ children, ...rest }) => {
       }
     };
 
-    fetchLockState().then(({ booted, unlocked }) => {
-      if (mounted) {
-        setBooted(booted);
-        setUnlocked(unlocked);
-        setLoading(false);
-      }
-    });
+    //const strippedPath = path.replace(/\/$/, '');
 
+    // Initial check
+    if (match?.isExact) {
+      fetchLockState().then(({ booted, unlocked }) => {
+        if (mounted) {
+          setBooted(booted);
+          setUnlocked(unlocked);
+          setLoading(false);
+        }
+      });
+    }
     return () => {
       mounted = false;
     };
-  }, [wallet]);
+  }, [wallet, match?.isExact]);
 
   return (
     <Route
+      path={path}
       {...rest}
       render={() => {
         if (loading) {

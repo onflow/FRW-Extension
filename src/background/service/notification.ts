@@ -3,9 +3,10 @@ import Events from 'events';
 import { ethErrors } from 'eth-rpc-errors';
 import { EthereumProviderError } from 'eth-rpc-errors/dist/classes';
 
-import { preferenceService } from 'background/service';
 import { winMgr } from 'background/webapi';
 import { IS_CHROME, IS_LINUX } from 'consts';
+
+import { setEnvironmentBadge } from '../utils/setEnvironmentBadge';
 
 interface Approval {
   data: {
@@ -35,9 +36,7 @@ class NotificationService extends Events {
   set approval(val: Approval | null) {
     this._approval = val;
     if (val === null) {
-      chrome.action.setBadgeText({
-        text: '',
-      });
+      setEnvironmentBadge();
     } else {
       chrome.action.setBadgeText({
         text: '1',
@@ -87,13 +86,17 @@ class NotificationService extends Events {
     } else {
       this.approval?.resolve(data);
     }
+    // Handle the case where the approval is not unlocked
     this.approval = null;
     this.emit('resolve', data);
   };
 
   rejectApproval = async (err?: string) => {
-    // this.approval?.reject(ethErrors.provider.userRejectedRequest<any>(err));
+    // Reject the approval
+    this.approval?.reject(ethErrors.provider.userRejectedRequest<any>(err));
+    // Clear the approval
     await this.clear();
+    // Emit the reject event
     this.emit('reject', err);
   };
 

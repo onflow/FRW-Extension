@@ -29,6 +29,8 @@ const flowContext = flow
     const {
       data: { method },
     } = ctx.request;
+    console.log('flow - use #1', method);
+
     ctx.mapMethod = underline2Camelcase(method);
     if (!providerController[ctx.mapMethod]) {
       // TODO: make rpc whitelist
@@ -49,36 +51,26 @@ const flowContext = flow
   .use(async (ctx, next) => {
     const {
       request: {
-        session: { origin },
-      },
-      mapMethod,
-    } = ctx;
-    if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-      const mainwallet = await Wallet.getMainWallet();
-      const evmAddress = await Wallet.queryEvmAddress(mainwallet);
-      const currentNetwork = await Wallet.getNetwork();
-      if (!isValidEthereumAddress(evmAddress)) {
-        throw new Error('evm must has at least one account.');
-      }
-      const isUnlock = keyringService.memStore.getState().isUnlocked;
-      const site = permissionService.getConnectedSite(origin);
-      if (mapMethod === 'ethAccounts' && (!site || !isUnlock)) {
-        throw new Error('Origin not connected. Please connect first.');
-      }
-    }
-
-    return next();
-  })
-  .use(async (ctx, next) => {
-    const {
-      request: {
         session: { origin, name, icon },
       },
       mapMethod,
     } = ctx;
+    console.log('flow - use #2 - check connect', mapMethod, origin, name, icon);
+
     // check connect
-    if (!Reflect.getMetadata('SAFE', providerController, mapMethod)) {
-      if (!permissionService.hasPermission(origin)) {
+    // TODO: create a whitelist and list of safe methods to remove the need for Reflect.getMetadata
+    if (
+      mapMethod !== 'ethAccounts' &&
+      mapMethod !== 'walletRequestPermissions' &&
+      mapMethod !== 'walletRevokePermissions' &&
+      mapMethod !== 'walletSwitchEthereumChain' &&
+      mapMethod !== 'walletWatchAsset' &&
+      mapMethod !== 'walletConnect' &&
+      mapMethod !== 'walletDisconnect' &&
+      mapMethod !== 'walletConnect' &&
+      !Reflect.getMetadata('SAFE', providerController, mapMethod)
+    ) {
+      if (!permissionService.hasPermission(origin) || !(await Wallet.isUnlocked())) {
         ctx.request.requestedApproval = true;
         const { defaultChain, signPermission } = await notificationService.requestApproval(
           {
@@ -102,6 +94,8 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
+    console.log('flow - use #3 - check approval', mapMethod, origin, name, icon);
+
     const [approvalType, condition, { height = 599 } = {}] =
       Reflect.getMetadata('APPROVAL', providerController, mapMethod) || [];
     if (mapMethod === 'ethSendTransaction' || mapMethod === 'personalSign') {
@@ -129,6 +123,8 @@ const flowContext = flow
   })
   .use(async (ctx) => {
     const { approvalRes, mapMethod, request } = ctx;
+    console.log('flow - use #4 - process request', mapMethod, request);
+
     // process request
     const [approvalType] = Reflect.getMetadata('APPROVAL', providerController, mapMethod) || [];
     const { uiRequestComponent, ...rest } = approvalRes || {};
@@ -144,6 +140,7 @@ const flowContext = flow
 
     requestDefer
       .then((result) => {
+        console.log('flow - process result', mapMethod, result);
         if (isSignApproval(approvalType)) {
           eventBus.emit(EVENTS.broadcastToUI, {
             method: EVENTS.SIGN_FINISHED,
@@ -156,6 +153,8 @@ const flowContext = flow
         return result;
       })
       .catch((e: any) => {
+        console.log('flow - process error', mapMethod, e);
+
         if (isSignApproval(approvalType)) {
           eventBus.emit(EVENTS.broadcastToUI, {
             method: EVENTS.SIGN_FINISHED,

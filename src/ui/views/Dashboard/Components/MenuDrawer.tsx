@@ -43,7 +43,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface MenuDrawerProps {
-  userInfo: UserInfoResponse;
+  userInfo: UserInfoResponse | null;
   drawer: boolean;
   toggleDrawer: any;
   otherAccounts: any;
@@ -155,34 +155,32 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         <ListItem
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}
         >
-          {props.userInfo && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              <ListItemIcon sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <img src={props.userInfo!.avatar} width="48px" />
+          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <ListItemIcon sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <img
+                src={props?.userInfo?.avatar}
+                width={48}
+                height={48}
+                style={{ backgroundColor: '#797979', borderRadius: 48 / 2 }}
+              />
 
-                <Box sx={{ paddingTop: '4px', px: '2px' }}>
-                  <IconButton edge="end" aria-label="close" onClick={props.togglePop}>
-                    <img style={{ display: 'inline-block', width: '24px' }} src={sideMore} />
-                  </IconButton>
-                </Box>
-              </ListItemIcon>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {!props.mainAddressLoading && props && props.walletList.length ? (
-                  <ListItemText
-                    sx={{ fontSize: '14px', fontWeight: '700' }}
-                    primary={props.userInfo!.nickname}
-                  />
-                ) : (
-                  <Skeleton
-                    variant="rectangular"
-                    width={78}
-                    height={33}
-                    sx={{ borderRadius: '8px' }}
-                  />
-                )}
+              <Box sx={{ paddingTop: '4px', px: '2px' }}>
+                <IconButton edge="end" aria-label="close" onClick={props.togglePop}>
+                  <img style={{ display: 'inline-block', width: '24px' }} src={sideMore} />
+                </IconButton>
               </Box>
+            </ListItemIcon>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <ListItemText
+                sx={{ fontSize: '14px', fontWeight: '700' }}
+                primary={
+                  (!props.mainAddressLoading && props?.userInfo?.nickname) || (
+                    <Skeleton variant="text" width={100} />
+                  )
+                }
+              />
             </Box>
-          )}
+          </Box>
         </ListItem>
         {evmMode && !props.evmLoading && !isValidEthereumAddress(props.evmWallet.address) && (
           <ListItem sx={{ display: 'flex', justifyCOntent: 'space-between', padding: '16px' }}>

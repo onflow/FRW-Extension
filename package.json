@@ -1,6 +1,6 @@
 {
   "name": "flow-reference-wallet",
-  "version": "2.7.5",
+  "version": "2.7.6",
   "description": "Digital wallet created for everyone.",
   "type": "module",
   "scripts": {
@@ -9,7 +9,9 @@
     "clean": "mkdir -p dist && rm -rf dist/* && cp -r _raw/* dist",
     "winClean": "if not exist dist mkdir dist && del /Q /F dist\\* && xcopy /E /I _raw dist",
     "winBuild:dev": "set NODE_OPTIONS=--max-old-space-size=8192 && copy _raw\\manifest\\manifest.dev.json _raw\\manifest.json && pnpm run prepare:dev && pnpm run winClean && webpack --progress --env config=dev",
+    "winBuild:dev-ci": "set NODE_OPTIONS=--max-old-space-size=8192 && copy _raw\\manifest\\manifest.dev.json _raw\\manifest.json && pnpm run prepare:dev && pnpm run winClean && webpack --env config=dev --no-watch",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=8192 && cp _raw/manifest/manifest.dev.json _raw/manifest.json && pnpm run prepare:dev && pnpm run clean && webpack --progress --env config=dev",
+    "build:dev-ci": "NODE_OPTIONS=--max-old-space-size=8192 && cp _raw/manifest/manifest.dev.json _raw/manifest.json && pnpm run prepare:dev && pnpm run clean && webpack --env config=dev --no-watch",
     "winBuild:pro": "copy _raw\\manifest\\manifest.pro.json _raw\\manifest.json && pnpm run prepare:pro && pnpm run winClean && webpack --progress --env config=pro",
     "build:ci": "cp _raw/manifest/manifest.pro.json _raw/manifest.json && pnpm run prepare:pro && pnpm run clean && webpack --env config=pro",
     "build:pro": "cp _raw/manifest/manifest.pro.json _raw/manifest.json && pnpm run prepare:pro && pnpm run clean && webpack --progress --env config=pro",

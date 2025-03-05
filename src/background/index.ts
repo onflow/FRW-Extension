@@ -36,6 +36,7 @@ import {
   mixpanelTrack,
 } from './service';
 import { getFirbaseConfig } from './utils/firebaseConfig';
+import { setEnvironmentBadge } from './utils/setEnvironmentBadge';
 import { storage } from './webapi';
 const { PortMessage } = Message;
 
@@ -135,8 +136,16 @@ async function restoreAppState() {
   // Set the loaded flag to true so that the UI knows the app is ready
   walletController.setLoaded(true);
   console.log('restoreAppState chrome.runtime.sendMessage->');
-  chrome.runtime.sendMessage({ type: 'walletInitialized' });
-
+  chrome.runtime.sendMessage({ type: 'walletInitialized' }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.log(
+        'chrome.runtime.sendMessage - Message delivery failed:',
+        chrome.runtime.lastError.message
+      );
+    } else {
+      console.log('chrome.runtime.sendMessage - Message delivered successfully:', response);
+    }
+  });
   console.log('restoreAppState chrome.tabs.query->');
   chrome.tabs
     .query({
@@ -146,9 +155,19 @@ async function restoreAppState() {
     .then((tabs) => {
       tabs.forEach((tab) => {
         const tabId = tab.id;
-        if (tabId) {
+        if (tabId && !tab.url?.match(/^chrome*/)) {
           console.log('restoreAppState chrome.tabs.sendMessage->', tabId);
-          chrome.tabs.sendMessage(tabId, { type: 'walletInitialized' });
+          chrome.tabs.sendMessage(tabId, { type: 'walletInitialized' }, (response) => {
+            if (chrome.runtime.lastError) {
+              console.log(
+                'chrome.tabs.sendMessage - Message delivery failed:',
+                chrome.runtime.lastError.message
+              );
+              // You can implement retry logic or alternative actions here
+            } else {
+              console.log('chrome.tabs.sendMessage - Message delivered successfully:', response);
+            }
+          });
         }
       });
     });
@@ -426,25 +445,6 @@ function onMessage(msg, port) {
 }
 
 console.log('Is fetch native?', fetch.toString().includes('[native code]'));
-
-// Set environment badge based on branch
-const setEnvironmentBadge = () => {
-  const deploymentEnv = process.env.DEPLOYMENT_ENV;
-
-  if (deploymentEnv === 'production') {
-    // No badge for production
-    chrome.action.setBadgeText({ text: '' });
-  } else if (deploymentEnv === 'staging') {
-    chrome.action.setBadgeText({ text: 'stg' });
-    chrome.action.setBadgeBackgroundColor({ color: process.env.BUILD_BACKGROUND || '#bf360c' });
-  } else if (deploymentEnv === 'development') {
-    chrome.action.setBadgeText({ text: '#' });
-    chrome.action.setBadgeBackgroundColor({ color: process.env.BUILD_BACKGROUND || '#666666' });
-  } else {
-    chrome.action.setBadgeText({ text: 'dev' });
-    chrome.action.setBadgeBackgroundColor({ color: process.env.BUILD_BACKGROUND || '#666666' });
-  }
-};
 
 // Call it when extension starts
 setEnvironmentBadge();

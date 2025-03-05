@@ -6,6 +6,7 @@ import type {
   WalletResponse,
 } from '@/shared/types/network-types';
 import { ensureEvmAddressPrefix, withPrefix } from '@/shared/utils/address';
+import { retryOperation } from '@/shared/utils/retryOperation';
 import { useNetworks } from '@/ui/hooks/useNetworkHook';
 import { useProfileStore } from '@/ui/stores/profileStore';
 import { useWallet, useWalletLoaded } from '@/ui/utils/WalletContext';
@@ -109,6 +110,11 @@ export const useProfiles = () => {
   const freshUserInfo = useCallback(async () => {
     if (!usewallet || !walletLoaded) return;
     try {
+      // Make sure the wallet is unlocked and has a main wallet
+      if (!(await usewallet.getMainWallet())) {
+        console.log('freshUserInfo - No main wallet yet');
+        return;
+      }
       //TODO: should rethink the wording of the wallet functions, have it be parent evm and child or something similar. State name and should be the same frontend and background.
       const [currentWallet, isChild, mainAddress] = await Promise.all([
         usewallet.getCurrentWallet(),
@@ -117,7 +123,8 @@ export const useProfiles = () => {
       ]);
 
       if (!currentWallet) {
-        throw new Error('Current wallet is undefined');
+        // We may not be logged in yet
+        return;
       }
       const mainwallet = await usewallet.returnMainWallet();
       setParentWallet(mainwallet!);
@@ -232,16 +239,4 @@ export const useProfiles = () => {
     evmLoading,
     mainAddressLoading,
   };
-};
-
-const retryOperation = async (operation: () => Promise<any>, maxAttempts = 3, delay = 1000) => {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      if (attempt === maxAttempts) throw error;
-      console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
 };

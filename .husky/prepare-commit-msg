@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Get the current branch name
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+
+# Extract issue number from branch name (assuming format like "546-feature-remove-background-colour")
+ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -o '^[0-9]\+')
+
+# Get the current commit message
+COMMIT_MSG=$(cat "$1")
+
+# Only append "Closes #issue" if:
+# 1. Issue number exists in the branch name
+# 2. It's not already in the commit message
+if [[ ! -z "$ISSUE_NUMBER" && ! "$COMMIT_MSG" =~ "Closes #$ISSUE_NUMBER" ]]; then
+  echo "$COMMIT_MSG" > "$1"
+  echo "" >> "$1"  # Add a blank line
+  echo "Closes #$ISSUE_NUMBER" >> "$1"
+fi

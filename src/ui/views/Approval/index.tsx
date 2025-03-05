@@ -16,7 +16,7 @@ const Approval = () => {
   const usewallet = useWallet();
   // const { initializeStore } = useInitHook();
   const [getApproval, resolveApproval, rejectApproval] = useApproval();
-  const [approval, setApproval] = useState<any>(null);
+  const [approval, setApproval] = useState<null | Awaited<ReturnType<typeof getApproval>>>(null);
 
   const init = useCallback(async () => {
     // initializeStore();

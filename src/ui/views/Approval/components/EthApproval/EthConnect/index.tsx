@@ -1,13 +1,11 @@
-import { Stack, Box, Typography, Divider, CardMedia, Card } from '@mui/material';
+import { Stack, Box, Typography, Divider, CardMedia } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useHistory } from 'react-router-dom';
 
 import { isValidEthereumAddress } from '@/shared/utils/address';
-import enableBg from 'ui/FRWAssets/image/enableBg.png';
+import { useProfiles } from '@/ui/hooks/useProfileHook';
 import flowgrey from 'ui/FRWAssets/svg/flow-grey.svg';
 import linkGlobe from 'ui/FRWAssets/svg/linkGlobe.svg';
-import { LLPrimaryButton, LLSecondaryButton, LLSpinner, LLConnectLoading } from 'ui/FRWComponent';
+import { LLPrimaryButton, LLSecondaryButton, LLConnectLoading } from 'ui/FRWComponent';
 import { useApproval, useWallet, formatAddress } from 'ui/utils';
 
 import CheckCircleIcon from '../../../../../../components/iconfont/IconCheckmark';
@@ -19,31 +17,42 @@ interface ConnectProps {
   params: any;
 }
 
+// The EthConnect component is used to connect to the dApp
+// The EthConnect component will show the user the request and allow or reject it
+
+// It is triggered by the eth_requestAccounts method
+// If the dApp has never connected to the wallet before, it will ask the user for permission to connect
+// If the dApp has connected to the wallet before, it will simply connect to the wallet
+// This ensures the wallet is logged in and ready to use with the dApp
+
+// Note that SortHat is the first page that is loaded when the approval notification is opened by the background
+// SortHat ensures the wallet is logged in and ready to use with the dApp
+
+// The Approval page is loaded if SortHat detects that the wallet is already logged in and the background has a pending approval
+// The Approval page looks at the approvalComponent in the background approval object
+// The Approval page then renders the corresponding component based on the approvalComponent
+
+// In this case, the approvalComponent is 'EthConnect'
+
 const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
-  const { state } = useLocation<{
-    showChainsModal?: boolean;
-  }>();
-  const { showChainsModal = false } = state ?? {};
+  // This is used to resolve or reject the approval in the background
   const [, resolveApproval, rejectApproval] = useApproval();
-  const { t } = useTranslation();
+  // This is used to interact with the wallet
   const usewallet = useWallet();
+
+  // This is used to show a loading spinner
   const [isLoading, setIsLoading] = useState(false);
 
-  const [appIdentifier, setAppIdentifier] = useState<string | undefined>(undefined);
-  const [nonce, setNonce] = useState<string | undefined>(undefined);
-  const [opener, setOpener] = useState<number | undefined>(undefined);
   const [defaultChain, setDefaultChain] = useState(747);
-  const [host, setHost] = useState('');
-  const [showMoveBoard, setMoveBoard] = useState(true);
-  const [msgNetwork, setMsgNetwork] = useState('testnet');
   const [isEvm, setIsEvm] = useState(false);
   const [currentNetwork, setCurrent] = useState('testnet');
-
-  const [approval, setApproval] = useState(false);
 
   // TODO: replace default logo
   const [logo, setLogo] = useState('');
   const [evmAddress, setEvmAddress] = useState('');
+
+  // This is used to initialize the component when the page is loaded
+
   const init = useCallback(async () => {
     const network = await usewallet.getNetwork();
     setCurrent(network);
@@ -114,6 +123,7 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
   );
 
   useEffect(() => {
+    // Handle listenting for transactionDone event
     chrome.runtime.onMessage.addListener(transactionDoneHandler);
 
     return () => {
@@ -122,10 +132,14 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
   }, [transactionDoneHandler]);
 
   const handleCancel = () => {
+    // This is called when the user clicks the cancel button
+    // This cancels the connection to the dApp
     rejectApproval('User rejected the request.');
   };
 
   const handleAllow = async () => {
+    // This is called when the user clicks the allow button
+    // This allows the connection to the dApp
     resolveApproval({
       defaultChain,
       signPermission: 'MAINNET_AND_TESTNET',

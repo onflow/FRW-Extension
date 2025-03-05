@@ -33,6 +33,7 @@ import { type LoggedInAccount } from '@/shared/types/wallet-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress, withPrefix } from '@/shared/utils/address';
 import { getSignAlgo } from '@/shared/utils/algo';
 import { convertToIntegerAmount, validateAmount } from '@/shared/utils/number';
+import { retryOperation } from '@/shared/utils/retryOperation';
 import {
   keyringService,
   preferenceService,
@@ -159,62 +160,6 @@ export class WalletController extends BaseController {
   resolveApproval = notificationService.resolveApproval;
   rejectApproval = notificationService.rejectApproval;
 
-  // initAlianNames = async () => {
-  //   await preferenceService.changeInitAlianNameStatus();
-  //   const keyrings = await keyringService.getAllTypedAccounts();
-  //   const walletConnectKeyrings = keyrings.filter(
-  //     (item) => item.type === 'WalletConnect'
-  //   );
-  //   const catergoryGroupAccount = keyrings.map((item) => ({
-  //     type: item.type,
-  //     accounts: item.accounts,
-  //   }));
-  //   let walletConnectList: DisplayedKeryring['accounts'] = [];
-  //   for (let i = 0; i < walletConnectKeyrings.length; i++) {
-  //     const keyring = walletConnectKeyrings[i];
-  //     walletConnectList = [...walletConnectList, ...keyring.accounts];
-  //   }
-  //   const groupedWalletConnectList = groupBy(walletConnectList, 'brandName');
-  //   if (keyrings.length > 0) {
-  //     console.log(
-  //       keyrings,
-  //       'keyrings',
-  //       groupedWalletConnectList,
-  //       '==================='
-  //     );
-  //     // Object.keys(groupedWalletConnectList).forEach((key) => {
-  //     //   groupedWalletConnectList[key].map((acc, index) => {
-  //     //     this.updateAlianName(
-  //     //       acc?.address,
-  //     //       `${WALLET_BRAND_CONTENT[acc?.brandName]} ${index + 1}`
-  //     //     );
-  //     //   });
-  //     // });
-  //     const catergories = groupBy(
-  //       catergoryGroupAccount.filter((group) => group.type !== 'WalletConnect'),
-  //       'type'
-  //     );
-  //     const result = Object.keys(catergories)
-  //       .map((key) =>
-  //         catergories[key].map((item) =>
-  //           item.accounts.map((acc) => ({
-  //             address: acc.address,
-  //             type: key,
-  //           }))
-  //         )
-  //       )
-  //       .map((item) => item.flat(1));
-  //     result.forEach((group) =>
-  //       group.forEach((acc, index) => {
-  //         this.updateAlianName(
-  //           acc?.address,
-  //           `${BRAND_ALIAN_TYPE_TEXT[acc?.type]} ${index + 1}`
-  //         );
-  //       })
-  //     );
-  //   }
-  // };
-
   unlock = async (password: string) => {
     await keyringService.submitPassword(password);
 
@@ -222,18 +167,44 @@ export class WalletController extends BaseController {
     await passwordService.setPassword(password);
     const pubKey = await this.getPubKey();
     await userWalletService.switchLogin(pubKey);
+    // Set up all the wallet data
+    await this.refreshWallets();
 
     sessionService.broadcastEvent('unlock');
   };
 
+  refreshWallets = async () => {
+    // Refresh all the wallets after unlocking or switching profiles
+    const mainAddress = await this.getMainAddress();
+    // Refresh the EVM wallet
+    await this.queryEvmAddress(mainAddress);
+    // Refresh the user wallets
+    await this.refreshUserWallets();
+    // Refresh the child wallets
+    await this.setChildWallet(await this.checkUserChildAccount());
+    // Refresh the logged in account
+    const [keys, pubKTuple] = await Promise.all([this.getAccount(), this.getPubKey()]);
+    // Check if a child wallet is active (it shouldn't be...)
+    const anyActiveChild = await this.getActiveWallet();
+    // Get the current wallet
+    const currentWallet = await this.getCurrentWallet();
+    if (!currentWallet) {
+      throw new Error('Current wallet is undefined');
+    }
+    // Refresh the user info
+    let userInfo = {};
+    try {
+      userInfo = await retryOperation(async () => this.getUserInfo(true), 3, 1000);
+    } catch (error) {
+      console.error('Error refreshing user info:', error);
+    }
+    // Refresh the user info
+    await openapiService.freshUserInfo(currentWallet, keys, pubKTuple, userInfo, anyActiveChild);
+  };
+
   retrievePk = async (password: string) => {
-    // const alianNameInited = await preferenceService.getInitAlianNameStatus();
-    // const alianNames = await preferenceService.getAllAlianName();
     const pk = await keyringService.retrievePk(password);
     return pk;
-    // if (!alianNameInited && Object.values(alianNames).length === 0) {
-    //   this.initAlianNames();
-    // }
   };
 
   extractKeys = (keyrings) => {
@@ -265,11 +236,15 @@ export class WalletController extends BaseController {
   };
 
   isUnlocked = async () => {
+    if (!this.isBooted()) {
+      return false;
+    }
+
     const isUnlocked = keyringService.memStore.getState().isUnlocked;
-    // TODO: Below probably never unlocks anything as the password is encrypted
     if (!isUnlocked) {
       let password = '';
       try {
+        // This uses google drive to decrypt the password
         password = await passwordService.getPassword();
       } catch {
         password = '';
@@ -879,17 +854,14 @@ export class WalletController extends BaseController {
     return preferenceService.updateIsFirstOpen();
   };
   // userinfo
-  getUserInfo = async (forceRefresh: boolean) => {
-    const data = await userInfoService.getUserInfo();
-
-    if (forceRefresh) {
-      return await this.fetchUserInfo();
+  getUserInfo = async (forceRefresh: boolean = false) => {
+    if (!forceRefresh) {
+      const data = userInfoService.getUserInfo();
+      if (data.username.length) {
+        return data;
+      }
     }
-
-    if (data.username.length) {
-      return data;
-    }
-
+    // Either force refresh or the user info is not set
     return await this.fetchUserInfo();
   };
 
@@ -999,14 +971,6 @@ export class WalletController extends BaseController {
     const network = await this.getNetwork();
     const domain = await userInfoService.getMeow(network);
     return domain;
-  };
-
-  updateUserInfo = (data: UserInfoStore) => {
-    userInfoService.updateUserInfo(data);
-  };
-
-  removeUserInfo = () => {
-    userInfoService.removeUserInfo();
   };
 
   getDashIndex = async () => {
@@ -1634,12 +1598,15 @@ export class WalletController extends BaseController {
 
   hasCurrentWallet = async () => {
     const wallet = await userWalletService.getCurrentWallet();
-    return wallet.address !== '';
+    return wallet?.address !== '';
   };
 
   getCurrentWallet = async (): Promise<BlockchainResponse | undefined> => {
+    if (!this.isBooted() || userWalletService.isLocked()) {
+      return;
+    }
     const wallet = await userWalletService.getCurrentWallet();
-    if (!wallet.address) {
+    if (!wallet?.address) {
       const network = await this.getNetwork();
       await this.refreshUserWallets();
       const data = await userWalletService.getUserWallets(network);
@@ -1660,7 +1627,7 @@ export class WalletController extends BaseController {
 
   getRawEvmAddressWithPrefix = async () => {
     const wallet = userWalletService.getEvmWallet();
-    return withPrefix(wallet.address) || '';
+    return withPrefix(wallet?.address) || '';
   };
 
   getEvmAddress = async () => {
@@ -1685,16 +1652,19 @@ export class WalletController extends BaseController {
   };
 
   getMainAddress = async () => {
+    if (!this.isBooted() || userWalletService.isLocked()) {
+      return '';
+    }
     const network = await this.getNetwork();
     const address = await userWalletService.getMainWallet(network);
     if (!address) {
       const data = await this.refreshUserWallets();
-      return withPrefix(data[0].blockchain[0].address);
+      return withPrefix(data[0].blockchain[0].address) || '';
     } else if (address.length < 3) {
       const data = await this.refreshUserWallets();
-      return withPrefix(data[0].blockchain[0].address);
+      return withPrefix(data[0].blockchain[0].address) || '';
     }
-    return withPrefix(address);
+    return withPrefix(address) || '';
   };
 
   sendTransaction = async (cadence: string, args: any[]): Promise<string> => {
@@ -2088,11 +2058,13 @@ export class WalletController extends BaseController {
     return txID;
   };
 
-  queryEvmAddress = async (address: string): Promise<string | null> => {
+  queryEvmAddress = async (address: string): Promise<string> => {
     if (address.length > 20) {
       return '';
     }
-
+    if (!(await this.isUnlocked())) {
+      return '';
+    }
     let evmAddress = '';
     try {
       evmAddress = await this.getRawEvmAddressWithPrefix();
@@ -3113,8 +3085,9 @@ export class WalletController extends BaseController {
   };
 
   checkNetwork = async () => {
-    const network = await this.getNetwork();
-    await this.switchNetwork(network);
+    if (!this.isBooted() || userWalletService.isLocked()) {
+      return;
+    }
   };
 
   switchMonitor = async (monitor: string) => {
@@ -3126,6 +3099,7 @@ export class WalletController extends BaseController {
   };
 
   refreshAll = async () => {
+    console.trace('refreshAll trace');
     console.log('refreshAll');
     await this.refreshUserWallets();
     this.clearNFT();
