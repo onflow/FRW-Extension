@@ -457,7 +457,7 @@ export const waitForTransaction = async ({
   // Get the executed item with the cadence txId that was put in the url and status is success
   const executedItem = page.getByTestId(activityItemRegexp).filter({ hasText: successtext });
 
-  await expect(executedItem).isible({
+  await expect(executedItem).toBeVisible({
     timeout: 60_000,
   });
 
