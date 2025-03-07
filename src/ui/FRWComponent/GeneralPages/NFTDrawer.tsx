@@ -96,6 +96,7 @@ export const NFTMoveDrawer: React.FC<NFTMoveDrawerProps> = ({
           mt: '10px',
           padding: '0 18px',
         }}
+        data-testid="collection-selector"
       >
         <Box sx={{ height: '24px', padding: '6px 0' }}>
           <Typography
@@ -110,7 +111,7 @@ export const NFTMoveDrawer: React.FC<NFTMoveDrawerProps> = ({
         </Box>
 
         {currentCollection && collectionDetail && (
-          <Button onClick={onCollectionSelect}>
+          <Button onClick={onCollectionSelect} data-testid="collection-selector-button">
             {currentCollection.logo && (
               <CardMedia
                 component="img"
@@ -161,6 +162,7 @@ export const NFTMoveDrawer: React.FC<NFTMoveDrawerProps> = ({
             height: '150px',
             overflowY: 'scroll',
           }}
+          data-testid="nft-selector"
         >
           {nfts && nfts.length > 0 ? (
             nfts.map((nft) => (
