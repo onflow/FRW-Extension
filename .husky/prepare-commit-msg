@@ -1,19 +1,35 @@
 #!/usr/bin/env bash
 
+# Get the commit source and message file
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"
+SHA1="$3"
+
+# Skip in case of rebase, merge, squash, or commit amend
+if [[ -n "$COMMIT_SOURCE" && "$COMMIT_SOURCE" != "message" ]]; then
+  exit 0
+fi
+
 # Get the current branch name
-BRANCH_NAME=$(git symbolic-ref --short HEAD)
+# This will fail during rebase, so we need to handle that case
+BRANCH_NAME=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+
+# If we're not on a branch (detached HEAD state), exit
+if [[ -z "$BRANCH_NAME" ]]; then
+  exit 0
+fi
 
 # Extract issue number from branch name (assuming format like "546-feature-remove-background-colour")
 ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -o '^[0-9]\+')
 
 # Get the current commit message
-COMMIT_MSG=$(cat "$1")
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
 # Only append "Closes #issue" if:
 # 1. Issue number exists in the branch name
 # 2. It's not already in the commit message
 if [[ ! -z "$ISSUE_NUMBER" && ! "$COMMIT_MSG" =~ "Closes #$ISSUE_NUMBER" ]]; then
-  echo "$COMMIT_MSG" > "$1"
-  echo "" >> "$1"  # Add a blank line
-  echo "Closes #$ISSUE_NUMBER" >> "$1"
+  echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
+  echo "" >> "$COMMIT_MSG_FILE"  # Add a blank line
+  echo "Closes #$ISSUE_NUMBER" >> "$COMMIT_MSG_FILE"
 fi
