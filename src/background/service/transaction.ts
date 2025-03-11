@@ -239,6 +239,7 @@ class Transaction {
         transactionHolder.token = tx.token;
         transactionHolder.type = tx.type;
         transactionHolder.transferType = tx.transfer_type;
+        transactionHolder.additionalMessage = tx.additional_message;
         // see if there's a pending item for this transaction
         const pendingItem = this.session.pendingItem[network].find(
           (item) =>

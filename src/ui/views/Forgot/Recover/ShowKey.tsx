@@ -21,7 +21,9 @@ const ShowKey = ({ handleSwitchTab, mnemonic }) => {
   };
 
   const resetWalletClicked = async () => {
-    usewallet.resetPwd();
+    usewallet.resetPwd().then(() => {
+      window.close();
+    });
     // console.log('reset reset reset')
   };
 

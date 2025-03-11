@@ -15,7 +15,7 @@ import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
 import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
 import { useWallet } from 'ui/utils';
 
-import MoveNftConfirmation from '../../NFT/SendNFT/MoveNftConfirmation';
+import MoveFromChild from '../../NFT/SendNFT/MoveFromChild';
 
 const useStyles = makeStyles(() => ({
   pageContainer: {
@@ -509,7 +509,7 @@ const LinkedNftDetail = () => {
         </Box>
 
         {moveOpen && (
-          <MoveNftConfirmation
+          <MoveFromChild
             isConfirmationOpen={moveOpen}
             data={{
               contact: contactTwo,

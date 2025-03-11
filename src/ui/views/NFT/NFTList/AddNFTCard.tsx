@@ -23,11 +23,17 @@ const CollectionCard = ({
   onClick,
 }: {
   item: CollectionItem;
-  setAlertOpen: any;
+  setAlertOpen: (open: boolean) => void;
   isLoading: boolean;
-  onClick: any;
+  onClick: (item: CollectionItem) => void;
 }) => {
-  const { name, description, official_website: officialWebsite, logo, added } = item || {};
+  const {
+    name,
+    description,
+    extensions: { website: officialWebsite },
+    logoURI: logo,
+    added,
+  } = item || {};
   const getDescriptionWordWrapped = (desc) => {
     if (desc.length < 60) return desc;
     const res = desc.split(' ').reduce((prev, curr) => {
@@ -38,77 +44,96 @@ const CollectionCard = ({
   };
   return (
     <Card
-      // onClick={() => officialWebsite && window.open(officialWebsite, '_blank')}
       sx={{
         borderRadius: '12px',
         overflow: 'hidden',
         display: 'flex',
         width: '100%',
-        height: '88px',
+        height: '84px',
         boxShadow: 'none',
         marginTop: '8px',
+        alignItems: 'center',
         position: 'relative',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
       }}
     >
-      {logo && (
-        <Box
-          sx={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'end',
-          }}
-        >
+      <CardActionArea
+        sx={{
+          height: '100%',
+          padding: '8px 4px',
+          backgroundColor: 'transparent',
+          display: 'flex',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          },
+          overflow: 'hidden',
+        }}
+        onClick={() => officialWebsite && window.open(officialWebsite, '_blank')}
+      >
+        {logo ? (
           <CardMedia
             component="img"
             sx={{
-              width: '200px',
-              height: '200px',
-              margin: '-56px 0',
+              width: '48px',
+              height: '48px',
+              marginLeft: '4px',
+              marginRight: '4px',
               borderRadius: '12px',
-              justifyContent: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
             }}
             image={logo}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = `https://www.google.com/s2/favicons?sz=256&domain_url=${officialWebsite}`;
+            }}
           />
-        </Box>
-      )}
-      <CardActionArea
-        sx={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          padding: '12px 18px',
-          background:
-            'linear-gradient(270deg, rgba(40, 40, 40, 0.32) 0%, rgba(40, 40, 40, 0.88) 30.56%, #282828 42.04%)',
-          backdropFilter: 'blur(6px)',
-          '&:hover': {
-            backdropFilter: 'blur(4px)',
-          },
-        }}
-      >
+        ) : (
+          <Box
+            sx={{
+              width: '48px',
+              height: '48px',
+              marginLeft: '4px',
+              marginRight: '4px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+            }}
+          />
+        )}
         <Box
           sx={{
             display: 'flex',
             height: '100%',
+            width: '100%',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            paddingLeft: '8px',
+            paddingRight: '8px',
+            overflow: 'hidden',
           }}
         >
           <Box
             sx={{
               display: 'flex',
               height: '100%',
+              width: '100%',
               flexDirection: 'column',
               justifyContent: 'center',
+              overflow: 'hidden',
             }}
           >
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <Typography
                 component="div"
                 color="#fff"
-                sx={{ fontWeight: 600, fontSize: '16px', lineHeight: '26px' }}
-                onClick={() => officialWebsite && window.open(officialWebsite, '_blank')}
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  lineHeight: '26px',
+                  textWrapMode: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
               >
                 {name}
               </Typography>
@@ -122,50 +147,53 @@ const CollectionCard = ({
                 <Typography
                   color="#5E5E5E"
                   component="div"
-                  sx={{ fontWeight: 400, fontSize: '12px', lineHeight: '18px', width: '200px' }}
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: '12px',
+                    lineHeight: '18px',
+                    width: '200px',
+                    overflow: 'hidden',
+                  }}
                 >
                   {getDescriptionWordWrapped(description)}
                 </Typography>
               </Box>
             )}
           </Box>
-
-          <IconButton
-            onClick={() => {
-              if (!added && !isLoading) onClick(item);
-            }}
-          >
-            <Box
-              sx={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                background: added ? '#69C93C' : 'black',
-                padding: '2px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {isLoading ? (
-                <CircularProgress color="primary" size={24} />
-              ) : added ? (
-                <DoneIcon sx={{ color: 'black', fontSize: '20px' }} />
-              ) : (
-                <AddIcon
-                  color="primary"
-                  sx={{ fontSize: '20px' }}
-                  onClick={() => {
-                    if (!added && !isLoading) {
-                      setAlertOpen(true);
-                    }
-                  }}
-                />
-              )}
-            </Box>
-          </IconButton>
         </Box>
       </CardActionArea>
+
+      <IconButton
+        sx={{
+          maxHeight: 'fit-content',
+          maxWidth: 'fit-content',
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (!added && !isLoading) onClick(item);
+        }}
+      >
+        <Box
+          sx={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: added ? '#FFFFFF' : 'black',
+            padding: '2px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {isLoading ? (
+            <CircularProgress color="primary" size={24} />
+          ) : added ? (
+            <DoneIcon sx={{ color: 'black', fontSize: '20px' }} />
+          ) : (
+            <AddIcon sx={{ fontSize: '20px', color: 'white' }} />
+          )}
+        </Box>
+      </IconButton>
     </Card>
   );
 };

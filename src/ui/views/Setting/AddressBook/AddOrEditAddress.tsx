@@ -1,6 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Typography, Box, Drawer, Grid, Stack, InputBase, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { isAddress } from 'ethers';
 import React, { useState, useEffect } from 'react';
 import { useForm, type FieldValues } from 'react-hook-form';
 
@@ -51,11 +52,31 @@ const AddOrEditAddress = (props: AddOrEditAddressProps) => {
   const [isValidatingAddress, setIsValidatingAddress] = useState<boolean>(false);
 
   const checkAddress = async (address: string) => {
-    //wallet controller api
+    // Ensure the address has the correct prefix
+    const formattedAddress = withPrefix(address);
     setIsValidatingAddress(true);
-    const validatedResult = await wallet.checkAddress(address);
-    setIsValidatingAddress(false);
-    return validatedResult ? true : false;
+
+    if (!formattedAddress) {
+      return false;
+    }
+
+    try {
+      // checks if valid cadence address
+      const validatedResult = await wallet.checkAddress(formattedAddress);
+      setIsValidatingAddress(false);
+      return !!validatedResult;
+    } catch (error) {
+      console.error('Error during wallet.checkAddress validation:', error);
+
+      // Check if it's a valid EVM address using ethers.js
+      if (isAddress(formattedAddress)) {
+        setIsValidatingAddress(false);
+        return true;
+      }
+
+      setIsValidatingAddress(false);
+      return false;
+    }
   };
 
   const onSubmit = async (data: FieldValues) => {

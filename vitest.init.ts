@@ -83,6 +83,10 @@ global.chrome = {
       get: vi.fn(),
       set: vi.fn(),
     },
+    onChanged: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
   },
 } as any;
 

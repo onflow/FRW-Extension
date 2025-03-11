@@ -153,9 +153,7 @@ const MoveBoard = (props: MoveBoardProps) => {
               color: '#FFFFFFCC',
             }}
           >
-            {chrome.i18n.getMessage('Would_you_like_to_move')}
-            {`${childType === 'evm' ? 'FLOW' : 'EVM on FLOW'}`}{' '}
-            {chrome.i18n.getMessage('lowercaseaccount')}?
+            {chrome.i18n.getMessage('What_type_of_assets_would_you_like_to_move')}
           </Typography>
         </Box>
       </Box>

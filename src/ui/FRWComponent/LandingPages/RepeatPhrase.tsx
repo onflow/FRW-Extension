@@ -121,12 +121,12 @@ const RepeatPhrase = ({ handleSwitchTab, mnemonic }) => {
           >
             {repeatArray.map((word, i) => {
               return (
-                <Box>
+                <Box key={`row${i}`} aria-label={`row${i}`}>
                   <Typography variant="body1" sx={{ padding: '12px 0 12px' }}>
                     {chrome.i18n.getMessage('Select_the_word_at')}
-                    <Box display="inline" color="primary.main">
+                    <Typography component="span" color="primary.main" display="inline">
                       {' #' + (chosenIndex[i] + 1) + ' '}
-                    </Box>
+                    </Typography>
                   </Typography>
                   <Box
                     sx={{
@@ -140,12 +140,14 @@ const RepeatPhrase = ({ handleSwitchTab, mnemonic }) => {
                       backgroundColor: '#333333',
                       transition: 'all .3s linear',
                     }}
-                    key={i}
-                    aria-label={`row${i}`}
                   >
                     {word.map((v, index) => {
                       return (
-                        <Box sx={{ width: '33.3%', height: '100%' }} key={'key_' + index}>
+                        <Box
+                          sx={{ width: '33.3%', height: '100%' }}
+                          key={`Select_the_word_at-${i}-${index}`}
+                          aria-label={`Select_the_word_at-${i}-${index}`}
+                        >
                           <Button
                             onClick={() => setSelected(i, v)}
                             sx={{

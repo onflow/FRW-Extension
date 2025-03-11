@@ -4,7 +4,7 @@ import { Switch, withRouter, type RouteComponentProps } from 'react-router-dom';
 
 import { useInitHook } from '@/ui/hooks';
 import { PrivateRoute } from 'ui/component';
-import { useWallet } from 'ui/utils';
+import { useWallet, useWalletLoaded } from 'ui/utils';
 
 import Deposit from '../views/Deposit';
 import Enable from '../views/Enable';
@@ -67,9 +67,14 @@ const InnerRoute = (props: RouteComponentProps) => {
   const [value, setValue] = useState(0);
 
   const usewallet = useWallet();
+  const walletLoaded = useWalletLoaded();
   const { initializeStore } = useInitHook();
 
   const fetch = useCallback(async () => {
+    if (!walletLoaded) {
+      return;
+    }
+    // TODO: Look into why this code exists...
     const dashIndex = await usewallet.getDashIndex();
     if (dashIndex) {
       setValue(dashIndex);
@@ -78,15 +83,22 @@ const InnerRoute = (props: RouteComponentProps) => {
       await usewallet.setDashIndex(0);
     }
     initializeStore();
-  }, [usewallet, initializeStore]);
+  }, [usewallet, initializeStore, walletLoaded]);
 
   useEffect(() => {
+    if (!walletLoaded) {
+      return;
+    }
+
     fetch();
-  }, [fetch]);
+  }, [fetch, walletLoaded]);
 
   useEffect(() => {
+    if (!walletLoaded) {
+      return;
+    }
     usewallet.setDashIndex(value);
-  }, [value, usewallet]);
+  }, [value, usewallet, walletLoaded]);
 
   return (
     <React.Fragment>
@@ -96,7 +108,7 @@ const InnerRoute = (props: RouteComponentProps) => {
         <div className="route-wrapper" id="scrollableTab">
           <Switch>
             <PrivateRoute exact path={`${props.match.url}/`}>
-              <Dashboard value={value} setValue={setValue} />
+              <Dashboard />
             </PrivateRoute>
             <PrivateRoute path={`${props.match.url}/setting/addressbook`}>
               <AddressBook />

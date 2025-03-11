@@ -1,5 +1,3 @@
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {
@@ -9,15 +7,10 @@ import {
   IconButton,
   Drawer,
   List,
-  ListItemText,
-  ListItemIcon,
-  ListItem,
-  ListItemButton,
   Button,
-  Avatar,
   Skeleton,
   CircularProgress,
-  Icon,
+  Chip,
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import { StyledEngineProvider } from '@mui/material/styles';
@@ -27,17 +20,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { storage } from '@/background/webapi';
-import { type LoggedInAccountWithIndex } from '@/shared/types/wallet-types';
+import { type WalletType } from '@/shared/types/network-types';
+import {
+  type WalletAddress,
+  type ActiveChildType,
+  type LoggedInAccountWithIndex,
+} from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
 import { useCoins } from '@/ui/hooks/useCoinHook';
-import { useNetworks } from '@/ui/hooks/useNetworkHook';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useNews } from '@/ui/utils/NewsContext';
 import { useWallet, formatAddress, useWalletLoaded } from 'ui/utils';
 
 import IconCopy from '../../../components/iconfont/IconCopy';
-import EyeOff from '../../FRWAssets/svg/EyeOff.svg';
 
 import MenuDrawer from './Components/MenuDrawer';
 import NewsView from './Components/NewsView';
@@ -57,17 +54,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-type ChildAccount = {
-  [key: string]: {
-    name: string;
-    description: string;
-    thumbnail: {
-      url: string;
-    };
-  };
-};
-
-const Header = ({ loading = false }) => {
+const Header = ({ _loading = false }) => {
   const usewallet = useWallet();
   const walletLoaded = useWalletLoaded();
   const classes = useStyles();
@@ -75,7 +62,7 @@ const Header = ({ loading = false }) => {
   const location = useLocation();
 
   const { clearCoins } = useCoins();
-  const { currentNetwork, setNetwork, developerMode } = useNetworks();
+  const { network, developerMode } = useNetwork();
   const {
     mainAddress,
     currentWallet,
@@ -93,9 +80,6 @@ const Header = ({ loading = false }) => {
 
   const [drawer, setDrawer] = useState(false);
 
-  const [mainnetAvailable, setMainnetAvailable] = useState(true);
-  const [testnetAvailable, setTestnetAvailable] = useState(true);
-
   const [isPending, setIsPending] = useState(false);
 
   const [ispop, setPop] = useState(false);
@@ -107,7 +91,6 @@ const Header = ({ loading = false }) => {
 
   // News Drawer
   const [showNewsDrawer, setShowNewsDrawer] = useState(false);
-  const [usernameDrawer, setUsernameDrawer] = useState(false);
 
   // const { unreadCount } = useNotificationStore();
   // TODO: add notification count
@@ -126,11 +109,6 @@ const Header = ({ loading = false }) => {
     setShowNewsDrawer((prevShowNewsDrawer) => !prevShowNewsDrawer);
   }, []);
 
-  const toggleUsernameDrawer = useCallback(() => {
-    // Avoids unnecessary re-renders using a function to toggle the state
-    setUsernameDrawer((prevUsernameDrawer) => !prevUsernameDrawer);
-  }, []);
-
   const goToSettings = useCallback(() => {
     if (location.pathname.includes('/dashboard/setting')) {
       history.push('/dashboard');
@@ -147,35 +125,37 @@ const Header = ({ loading = false }) => {
         // Note that currentAccountIndex is only used in keyring for old accounts that don't have an id stored in the keyring
         // currentId always takes precedence
         // NOTE: TO FIX it also should be set to the index of the account in the keyring array, NOT the index in the loggedInAccounts array
-        await storage.set('currentAccountIndex', account.indexInLoggedInAccounts);
         if (account.id) {
           await storage.set('currentId', account.id);
         } else {
           await storage.set('currentId', '');
         }
-
-        await usewallet.lockWallet();
+        await usewallet.signOutWallet();
         await usewallet.clearWallet();
+        await usewallet.switchAccount(account.id);
         await usewallet.switchNetwork(switchingTo);
-        setNetwork(switchingTo);
         clearCoins();
         clearProfileData();
-        history.push('/unlock');
       } catch (error) {
         console.error('Error during account switch:', error);
-        // Handle any additional error reporting or user feedback here if needed
+        //if cannot login directly with current password switch to unlock page
+        await usewallet.lockWallet();
+        history.push('/unlock');
       } finally {
+        setPop(false);
         setSwitchLoading(false);
       }
     },
-    [usewallet, history, setNetwork, clearCoins, clearProfileData]
+    [usewallet, history, clearCoins, clearProfileData]
   );
 
-  const setWallets = async (walletInfo, key, index = null) => {
+  const setWallets = async (
+    walletInfo: WalletType,
+    key: ActiveChildType | null,
+    index: number | null = null
+  ) => {
     await usewallet.setActiveWallet(walletInfo, key, index);
-    // Clear collections
-    usewallet.clearNFTCollection();
-    usewallet.clearCoinList();
+
     // Navigate if needed
     history.push('/dashboard');
     window.location.reload();
@@ -235,6 +215,7 @@ const Header = ({ loading = false }) => {
       case 'crescendo':
         return '#CCAF21';
     }
+    return '#41CC5D';
   };
 
   const checkAuthStatus = useCallback(async () => {
@@ -253,180 +234,28 @@ const Header = ({ loading = false }) => {
     return () => {
       chrome.runtime.onMessage.removeListener(transactionHandler);
     };
-  }, [checkAuthStatus, checkPendingTx, currentNetwork]);
+  }, [checkAuthStatus, checkPendingTx, network]);
 
-  const checkNetwork = useCallback(async () => {
-    const mainnetAvailable = await usewallet.openapi.pingNetwork('mainnet');
-    setMainnetAvailable(mainnetAvailable);
-    const testnetAvailable = await usewallet.openapi.pingNetwork('testnet');
-    setTestnetAvailable(testnetAvailable);
-  }, [usewallet]);
+  // Function to construct GitHub comparison URL
+  const getComparisonUrl = useCallback(() => {
+    const repoUrl = process.env.REPO_URL || 'https://github.com/onflow/FRW-Extension';
+    const latestTag = process.env.LATEST_TAG || '';
+    const commitSha = process.env.COMMIT_SHA || '';
 
-  useEffect(() => {
-    if (usernameDrawer) {
-      checkNetwork();
+    if (latestTag && commitSha) {
+      return `${repoUrl}/compare/${latestTag}...${commitSha}`;
     }
-  }, [usernameDrawer, checkNetwork]);
 
-  const switchNetwork = useCallback(
-    async (network: string) => {
-      // Update local states
-      setNetwork(network);
+    return `${repoUrl}/commits`;
+  }, []);
 
-      // Switch network in wallet
-      await usewallet.switchNetwork(network);
-
-      toggleUsernameDrawer();
-
-      // Navigate if needed
-      history.push('/dashboard');
-    },
-    [usewallet, toggleUsernameDrawer, history, setNetwork]
-  );
-
-  const AccountFunction = (props) => {
-    return (
-      <ListItem
-        disablePadding
-        key={props.username}
-        onClick={() => {
-          toggleUsernameDrawer();
-        }}
-      >
-        <ListItemButton
-          onClick={() => {
-            navigator.clipboard.writeText(props.username);
-          }}
-        >
-          <ListItemIcon>
-            <Avatar
-              component="span"
-              src={props.avatar}
-              sx={{ width: '24px', height: '24px', ml: '4px' }}
-              alt="avatar"
-            />
-          </ListItemIcon>
-          <ListItemText>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Tooltip title={chrome.i18n.getMessage('Copy__username')} arrow>
-                <Typography variant="body1" component="div" display="inline" color="text">
-                  {'@' + props.username}
-                </Typography>
-              </Tooltip>
-            </Box>
-          </ListItemText>
-        </ListItemButton>
-      </ListItem>
-    );
-  };
-
-  const NetworkFunction = () => {
-    return (
-      <>
-        <Typography variant="h5" color="text" padding="18px 0 0 18px" fontWeight="semi-bold">
-          {chrome.i18n.getMessage('Network')}
-        </Typography>
-        <List>
-          <ListItem
-            disablePadding
-            key="mainnet"
-            secondaryAction={
-              !mainnetAvailable && (
-                <ListItemText>
-                  <Typography
-                    variant="caption"
-                    component="span"
-                    display="inline"
-                    color="error.main"
-                  >
-                    {chrome.i18n.getMessage('Unavailable')}
-                  </Typography>
-                </ListItemText>
-              )
-            }
-            onClick={() => {
-              switchNetwork('mainnet');
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <FiberManualRecordIcon
-                  style={{
-                    color: networkColor('mainnet'),
-                    fontSize: '10px',
-                    marginLeft: '10px',
-                    marginRight: '10px',
-                    opacity: currentNetwork === 'mainnet' ? '1' : '0.1',
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="body1" component="span" display="inline" color="text">
-                  {chrome.i18n.getMessage('Mainnet')}
-                </Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem
-            disablePadding
-            key="testnet"
-            secondaryAction={
-              !testnetAvailable && (
-                <ListItemText>
-                  <Typography
-                    variant="caption"
-                    component="span"
-                    display="inline"
-                    color="error.main"
-                  >
-                    {chrome.i18n.getMessage('Unavailable')}
-                  </Typography>
-                </ListItemText>
-              )
-            }
-            onClick={() => {
-              switchNetwork('testnet');
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <FiberManualRecordIcon
-                  style={{
-                    color: networkColor('testnet'),
-                    fontSize: '10px',
-                    marginLeft: '10px',
-                    marginRight: '10px',
-                    fontFamily: 'Inter,sans-serif',
-                    opacity: currentNetwork === 'testnet' ? '1' : '0.1',
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="body1" component="span" display="inline" color="text">
-                  {chrome.i18n.getMessage('Testnet')}
-                </Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </>
-    );
-  };
-
-  const createWalletList = (props) => {
+  const createWalletList = (props: WalletType) => {
     return (
       <List component="nav" key={props.id} sx={{ mb: '0', padding: 0 }}>
         <WalletFunction
           props_id={props.id}
           name={props.name}
-          address={props.address}
+          address={props.address as WalletAddress}
           icon={props.icon}
           color={props.color}
           setWallets={setWallets}
@@ -441,35 +270,6 @@ const Header = ({ loading = false }) => {
     );
   };
 
-  const createAccountList = (props) => {
-    return (
-      props && (
-        <List component="nav" key={props.username}>
-          <AccountFunction username={props.username} avatar={props.avatar} />
-        </List>
-      )
-    );
-  };
-
-  const usernameSelect = () => {
-    return (
-      <Drawer
-        open={usernameDrawer}
-        anchor="top"
-        onClose={toggleUsernameDrawer}
-        classes={{ paper: classes.paper }}
-        PaperProps={{
-          sx: { width: '100%', marginTop: '56px', bgcolor: 'background.paper' },
-        }}
-      >
-        <Typography variant="h5" color="text" padding="18px 0 0 18px" fontWeight="semi-bold">
-          {chrome.i18n.getMessage('Account')}
-        </Typography>
-        {userInfo && createAccountList(userInfo)}
-        {developerMode && NetworkFunction()}
-      </Drawer>
-    );
-  };
   const NewsDrawer = () => {
     return (
       <Drawer
@@ -490,11 +290,19 @@ const Header = ({ loading = false }) => {
       </Drawer>
     );
   };
+  const deploymentEnv = process.env.DEPLOYMENT_ENV || 'local';
 
-  const appBarLabel = (props) => {
+  interface AppBarLabelProps {
+    address: string;
+    name: string;
+  }
+
+  const appBarLabel = (props: AppBarLabelProps) => {
+    const haveAddress = !mainAddressLoading && props && props.address;
+
     return (
       <Toolbar sx={{ height: '56px', width: '100%', display: 'flex', px: '0px' }}>
-        <Box sx={{ flex: '0 0 68px', position: 'relative' }}>
+        <Box sx={{ flex: '0 0 68px', position: 'relative', display: 'flex', alignItems: 'center' }}>
           {isPending && (
             <CircularProgress
               size={'28px'}
@@ -504,7 +312,7 @@ const Header = ({ loading = false }) => {
                 height: '28px',
                 left: '-1px',
                 top: '-1px',
-                color: networkColor(currentNetwork),
+                color: networkColor(network),
               }}
             />
           )}
@@ -519,8 +327,8 @@ const Header = ({ loading = false }) => {
               position: 'relative',
               border: isPending
                 ? ''
-                : currentNetwork !== 'mainnet'
-                  ? `2px solid ${networkColor(currentNetwork)}`
+                : network !== 'mainnet'
+                  ? `2px solid ${networkColor(network)}`
                   : '2px solid #282828',
               marginRight: '0px',
             }}
@@ -532,6 +340,61 @@ const Header = ({ loading = false }) => {
               height="20px"
             />
           </IconButton>
+          {deploymentEnv !== 'production' && (
+            <Box sx={{ position: 'absolute', left: '30px', top: '-8px', zIndex: 10 }}>
+              <Tooltip
+                title={
+                  <Box>
+                    <Typography variant="caption">
+                      {`Build: ${process.env.DEPLOYMENT_ENV}`}
+                    </Typography>
+                    {process.env.LATEST_TAG && process.env.COMMIT_SHA && (
+                      <Typography variant="caption" display="block">
+                        {`Compare: ${process.env.LATEST_TAG}...${process.env.COMMIT_SHA?.substring(0, 7)}`}
+                      </Typography>
+                    )}
+                    <Typography variant="caption" display="block">
+                      {`Repo: ${process.env.REPO_URL?.replace('https://github.com/', '') || 'onflow/FRW-Extension'}`}
+                    </Typography>
+                    <Typography variant="caption" display="block">
+                      Click to view changes
+                    </Typography>
+                  </Box>
+                }
+                arrow
+              >
+                <Chip
+                  label={deploymentEnv}
+                  size="small"
+                  color={
+                    deploymentEnv === 'staging'
+                      ? 'default'
+                      : deploymentEnv === 'development'
+                        ? 'warning'
+                        : 'error'
+                  }
+                  sx={{
+                    height: '18px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    minWidth: '16px',
+                    maxWidth: '90px',
+                    cursor: 'pointer',
+                    '& .MuiChip-label': {
+                      padding: '0 8px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                  onClick={() => {
+                    const url = getComparisonUrl();
+                    window.open(url, '_blank');
+                  }}
+                />
+              </Tooltip>
+            </Box>
+          )}
         </Box>
 
         <Box
@@ -542,102 +405,105 @@ const Header = ({ loading = false }) => {
             alignItems: 'center',
           }}
         >
-          {!mainAddressLoading && props && props.address ? (
-            <Tooltip title={chrome.i18n.getMessage('Copy__Address')} arrow>
-              <Button
-                onClick={() => {
+          <Tooltip title={chrome.i18n.getMessage('Copy__Address')} arrow>
+            <Button
+              disabled={!haveAddress}
+              onClick={() => {
+                if (haveAddress) {
                   navigator.clipboard.writeText(props.address);
-                }}
-                variant="text"
+                }
+              }}
+              variant="text"
+            >
+              <Box
+                component="div"
+                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
               >
-                <Box
-                  component="div"
-                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                <Typography
+                  variant="overline"
+                  color="text"
+                  align="center"
+                  display="block"
+                  sx={{ lineHeight: '1.5' }}
                 >
-                  <Typography
-                    variant="overline"
-                    color="text"
-                    align="center"
-                    display="block"
-                    sx={{ lineHeight: '1.5' }}
-                  >
-                    {`${props.name === 'Flow' ? 'Wallet' : props.name}${
+                  {haveAddress ? (
+                    `${props.name === 'Flow' ? 'Wallet' : props.name}${
                       isValidEthereumAddress(props.address) ? ' EVM' : ''
-                    }`}
+                    }`
+                  ) : (
+                    <Skeleton variant="text" width={40} />
+                  )}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {haveAddress ? (
+                      formatAddress(props.address)
+                    ) : (
+                      <Skeleton variant="text" width={120} />
+                    )}
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ textTransform: 'lowercase' }}
-                    >
-                      {formatAddress(props.address)}
-                    </Typography>
-                    <IconCopy fill="icon.navi" width="12px" />
-                  </Box>
+                  <IconCopy fill="icon.navi" width="12px" />
                 </Box>
-              </Button>
-            </Tooltip>
-          ) : (
-            <Skeleton variant="rectangular" width={78} height={33} sx={{ borderRadius: '8px' }} />
-          )}
+              </Box>
+            </Button>
+          </Tooltip>
         </Box>
 
         <Box sx={{ flex: '0 0 68px' }}>
-          {userInfo && props ? (
-            <Tooltip title={isPending ? chrome.i18n.getMessage('Pending__Transaction') : ''} arrow>
-              <Box style={{ position: 'relative' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <IconButton
-                    edge="end"
-                    color="inherit"
-                    aria-label="notification"
-                    onClick={toggleNewsDrawer}
-                  >
-                    <NotificationsIcon />
-                    {unreadCount > 0 && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: '-2px',
-                          right: '-2px',
-                          backgroundColor: '#4CAF50',
-                          color: 'black',
-                          borderRadius: '50%',
-                          minWidth: '18px',
-                          height: '18px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '12px',
-                          padding: '2px',
-                          border: 'none',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {unreadCount}
-                      </Box>
-                    )}
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    color="inherit"
-                    aria-label="avatar"
-                    onClick={() => goToSettings()}
-                    sx={{
-                      padding: '3px',
-                      marginRight: '0px',
-                      position: 'relative',
-                    }}
-                  >
-                    <SettingsIcon />
-                  </IconButton>
-                </Box>
+          <Tooltip title={isPending ? chrome.i18n.getMessage('Pending__Transaction') : ''} arrow>
+            <Box style={{ position: 'relative' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  aria-label="notification"
+                  onClick={toggleNewsDrawer}
+                >
+                  <NotificationsIcon />
+                  {unreadCount > 0 && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: '-2px',
+                        right: '-2px',
+                        backgroundColor: '#4CAF50',
+                        color: 'black',
+                        borderRadius: '50%',
+                        minWidth: '18px',
+                        height: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        padding: '2px',
+                        border: 'none',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {unreadCount}
+                    </Box>
+                  )}
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  aria-label="avatar"
+                  onClick={() => goToSettings()}
+                  sx={{
+                    padding: '3px',
+                    marginRight: '0px',
+                    position: 'relative',
+                  }}
+                >
+                  <SettingsIcon />
+                </IconButton>
               </Box>
-            </Tooltip>
-          ) : (
-            <Skeleton variant="circular" width={20} height={20} />
-          )}
+            </Box>
+          </Tooltip>
         </Box>
       </Toolbar>
     );
@@ -653,7 +519,7 @@ const Header = ({ loading = false }) => {
         <Toolbar sx={{ px: '12px', backgroundColor: '#282828' }}>
           {walletList && (
             <MenuDrawer
-              userInfo={userInfo!}
+              userInfo={userInfo}
               drawer={drawer}
               toggleDrawer={toggleDrawer}
               otherAccounts={otherAccounts}
@@ -664,7 +530,7 @@ const Header = ({ loading = false }) => {
               current={currentWallet}
               createWalletList={createWalletList}
               setWallets={setWallets}
-              currentNetwork={currentNetwork}
+              currentNetwork={network}
               evmWallet={evmWallet}
               networkColor={networkColor}
               evmLoading={evmLoading}
@@ -673,19 +539,17 @@ const Header = ({ loading = false }) => {
             />
           )}
           {appBarLabel(currentWallet)}
-          {usernameSelect()}
           <NewsDrawer />
           {userInfo && (
             <Popup
               isConfirmationOpen={ispop}
-              data={{ amount: 0 }}
               handleCloseIconClicked={() => setPop(false)}
               handleCancelBtnClicked={() => setPop(false)}
               handleAddBtnClicked={() => {
                 setPop(false);
               }}
               userInfo={userInfo!}
-              current={currentWallet!}
+              current={currentWallet}
               switchAccount={switchAccount}
               loggedInAccounts={loggedInAccounts}
               switchLoading={switchLoading}

@@ -78,12 +78,6 @@ class UserInfo {
     this.store = template;
   };
 
-  updateUserInfo = (data: UserInfoStore) => {
-    this.store = data;
-    // identify the user
-    mixpanelTrack.identify(this.store.user_id);
-  };
-
   setDashIndex = (data: number) => {
     this.store.dashboardIndex = data;
   };

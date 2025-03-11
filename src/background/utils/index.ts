@@ -169,3 +169,19 @@ export const findKeyAndInfo = (keys: FclAccount, publicKey: string) => {
 export const findPublicKeyIndex = (data: FclAccount, publicKey: string) => {
   return data.keys.findIndex((key) => key.publicKey === publicKey);
 };
+
+export const replaceNftKeywords = (script: string, token: any) => {
+  const contractName = token.contractName || token.contract_name;
+  const storagePath = token.path.storage_path || token.path.storage;
+  const publicPath = token.path.public_path || token.path.public;
+  if (!contractName) {
+    throw new Error('Contract name not found');
+  }
+
+  return script
+    .replaceAll('<NFT>', contractName)
+    .replaceAll('<NFTAddress>', token.address)
+    .replaceAll('<CollectionStoragePath>', storagePath)
+    .replaceAll('<CollectionPublicType>', token.path.public_type)
+    .replaceAll('<CollectionPublicPath>', publicPath);
+};

@@ -27,14 +27,12 @@ const useStyles = makeStyles(() => ({
     borderRadius: '8px',
     padding: '0 13px',
     '&:hover': {
-      // borderRadius: '8px',
       color: '#222222',
       backgroundColor: '#222222',
     },
   },
   card: {
     flex: '0 0 50%',
-    // height: '211px',
     backgroundColor: 'inherit',
     boxShadow: 'none',
     margin: 0,
@@ -42,7 +40,6 @@ const useStyles = makeStyles(() => ({
     padding: '13px 0',
     display: 'inline-block',
     '&:hover': {
-      // borderRadius: '8px',
       color: '#222222',
       backgroundColor: '#222222',
     },
@@ -50,13 +47,11 @@ const useStyles = makeStyles(() => ({
   grid: {
     width: '100%',
     margin: 0,
-    // paddingLeft: '15px',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignContent: 'flex-start',
     padding: '10px 13px',
-    // marginLeft: 'auto'
   },
   cardmedia: {
     height: '159px',
@@ -72,7 +67,6 @@ const useStyles = makeStyles(() => ({
     objectFit: 'cover',
   },
   content: {
-    // height: '40px',
     padding: '5px 0',
     backgroundColor: 'inherit',
     borderRadius: '0 0 8px 8px',
@@ -108,7 +102,7 @@ const GridView = ({
     if (accessible) {
       accessible.forEach((item) => {
         const parts = item.id.split('.');
-        if (parts[2] === data.collectionContractName && item.idList.includes(data.id)) {
+        if (parts[2] === data.contractName && item.idList.includes(data.id)) {
           setAccessible(true);
         } else {
           setAccessible(false);

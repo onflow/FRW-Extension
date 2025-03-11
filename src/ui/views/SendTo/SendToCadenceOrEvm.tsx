@@ -8,8 +8,8 @@ import { isValidAddress, isValidEthereumAddress } from '@/shared/utils/address';
 import { LLHeader } from '@/ui/FRWComponent';
 import { ContactCard } from '@/ui/FRWComponent/Send/ContactCard';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
-import { useContacts } from '@/ui/hooks/useContactHook';
-import { useNetworks } from '@/ui/hooks/useNetworkHook';
+import { useContact } from '@/ui/hooks/useContactHook';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { useWallet } from 'ui/utils';
 
 import CancelIcon from '../../../components/iconfont/IconClose';
@@ -25,17 +25,18 @@ const SendToCadenceOrEvm = ({
   handleTokenChange,
   handleSwitchFiatOrCoin,
   handleMaxClick,
+  handleFinalizeAmount,
 }: {
   transactionState: TransactionState;
   handleAmountChange: (amountString: string) => void;
   handleTokenChange: (tokenAddress: string) => void;
   handleSwitchFiatOrCoin: () => void;
   handleMaxClick: () => void;
+  handleFinalizeAmount: () => void;
 }) => {
   const history = useHistory();
   const wallet = useWallet();
-  const { currentNetwork: network } = useNetworks();
-  const { useContact } = useContacts();
+  const { network } = useNetwork();
   const contactData =
     useContact(transactionState.toContact?.address || '') || transactionState.toContact || null;
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
@@ -188,6 +189,8 @@ const SendToCadenceOrEvm = ({
 
             <Button
               onClick={() => {
+                // Finalize the transfer amount
+                handleFinalizeAmount();
                 setConfirmationOpen(true);
               }}
               variant="contained"

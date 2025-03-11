@@ -1,3 +1,6 @@
+export type StorageChange = chrome.storage.StorageChange;
+export type AreaName = chrome.storage.AreaName;
+
 const get = async (prop: string) => {
   const result = await chrome.storage.local.get(prop);
 
@@ -89,6 +92,18 @@ const clearSession = async () => {
   await chrome.storage.session?.clear();
 };
 
+const addStorageListener = (
+  callback: (changes: { [key: string]: StorageChange }, namespace: AreaName) => void
+) => {
+  chrome.storage.onChanged.addListener(callback);
+};
+
+const removeStorageListener = (
+  callback: (changes: { [key: string]: StorageChange }, namespace: AreaName) => void
+) => {
+  chrome.storage.onChanged.removeListener(callback);
+};
+
 export default {
   get,
   getSession,
@@ -100,4 +115,6 @@ export default {
   removeSession,
   clear,
   clearSession,
+  addStorageListener,
+  removeStorageListener,
 };

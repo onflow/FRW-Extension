@@ -99,6 +99,9 @@ type TransactionAction =
     }
   | {
       type: 'setAmountToMax';
+    }
+  | {
+      type: 'finalizeAmount';
     };
 
 export const getTransactionStateString = (state: TransactionState): TransactionStateString | '' => {
@@ -191,6 +194,13 @@ export const transactionReducer = (
       return {
         ...stateInCoinWithMaxAmount,
         fiatOrCoin: 'fiat',
+      };
+    }
+    case 'finalizeAmount': {
+      return {
+        ...state,
+        amount: trimDecimalAmount(state.amount, state.selectedToken.decimals, 'clean'),
+        fiatAmount: trimDecimalAmount(state.fiatAmount, 8, 'clean'),
       };
     }
     case 'setAmount': {

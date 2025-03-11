@@ -17,7 +17,12 @@ import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import type { UserInfoResponse } from '@/shared/types/network-types';
+import type { ChildAccount, UserInfoResponse, WalletType } from '@/shared/types/network-types';
+import {
+  type LoggedInAccount,
+  type LoggedInAccountWithIndex,
+  type ActiveChildType,
+} from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import importIcon from 'ui/FRWAssets/svg/importIcon.svg';
@@ -43,20 +48,24 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface MenuDrawerProps {
-  userInfo: UserInfoResponse;
+  userInfo: UserInfoResponse | null;
   drawer: boolean;
-  toggleDrawer: any;
-  otherAccounts: any;
-  switchAccount: any;
-  togglePop: any;
-  walletList: any;
-  childAccounts: any;
-  current: any;
-  createWalletList: any;
-  setWallets: any;
+  toggleDrawer: () => void;
+  otherAccounts: LoggedInAccount[];
+  switchAccount: (account: LoggedInAccountWithIndex) => Promise<void>;
+  togglePop: () => void;
+  walletList: WalletType[];
+  childAccounts: ChildAccount | null;
+  current: WalletType;
+  createWalletList: (props: WalletType) => React.ReactNode;
+  setWallets: (
+    walletInfo: WalletType,
+    key: ActiveChildType | null,
+    index?: number | null
+  ) => Promise<void>;
   currentNetwork: string;
-  evmWallet: any;
-  networkColor: any;
+  evmWallet: WalletType;
+  networkColor: (network: string) => string;
   evmLoading: boolean;
   modeOn: boolean;
   mainAddressLoading: boolean;
@@ -155,34 +164,36 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         <ListItem
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}
         >
-          {props.userInfo && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              <ListItemIcon sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <img src={props.userInfo!.avatar} width="48px" />
+          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <ListItemIcon sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              {props?.userInfo ? (
+                <img
+                  src={props.userInfo.avatar}
+                  width={48}
+                  height={48}
+                  style={{ backgroundColor: '#797979', borderRadius: 48 / 2 }}
+                />
+              ) : (
+                <Skeleton variant="circular" width={48} height={48} />
+              )}
 
-                <Box sx={{ paddingTop: '4px', px: '2px' }}>
-                  <IconButton edge="end" aria-label="close" onClick={props.togglePop}>
-                    <img style={{ display: 'inline-block', width: '24px' }} src={sideMore} />
-                  </IconButton>
-                </Box>
-              </ListItemIcon>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {!props.mainAddressLoading && props && props.walletList.length ? (
-                  <ListItemText
-                    sx={{ fontSize: '14px', fontWeight: '700' }}
-                    primary={props.userInfo!.nickname}
-                  />
-                ) : (
-                  <Skeleton
-                    variant="rectangular"
-                    width={78}
-                    height={33}
-                    sx={{ borderRadius: '8px' }}
-                  />
-                )}
+              <Box sx={{ paddingTop: '4px', px: '2px' }}>
+                <IconButton edge="end" aria-label="close" onClick={props.togglePop}>
+                  <img style={{ display: 'inline-block', width: '24px' }} src={sideMore} />
+                </IconButton>
               </Box>
+            </ListItemIcon>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <ListItemText
+                sx={{ fontSize: '14px', fontWeight: '700' }}
+                primary={
+                  (!props.mainAddressLoading && props?.userInfo?.nickname) || (
+                    <Skeleton variant="text" width={100} />
+                  )
+                }
+              />
             </Box>
-          )}
+          </Box>
         </ListItem>
         {evmMode && !props.evmLoading && !isValidEthereumAddress(props.evmWallet.address) && (
           <ListItem sx={{ display: 'flex', justifyCOntent: 'space-between', padding: '16px' }}>
@@ -281,6 +292,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       chain_id: props.currentNetwork,
                       coins: ['flow'],
                       id: 1,
+                      icon: props.evmWallet.icon,
+                      color: props.evmWallet.color,
                     },
                     'evm'
                   )
@@ -370,6 +383,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                   }}
                   key={index}
                   onClick={() =>
+                    props.childAccounts &&
                     props.setWallets(
                       {
                         name: props.childAccounts[key]?.name ?? key,
@@ -377,8 +391,12 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                         chain_id: props.currentNetwork,
                         coins: ['flow'],
                         id: 1,
+                        icon:
+                          props.childAccounts?.[key]?.thumbnail?.url ??
+                          'https://lilico.app/placeholder-2.0.png',
+                        color: '#282828',
                       },
-                      key
+                      key as ActiveChildType | null
                     )
                   }
                 >
@@ -395,7 +413,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     <CardMedia
                       component="img"
                       image={
-                        props.childAccounts[key]?.thumbnail?.url ??
+                        props.childAccounts?.[key]?.thumbnail?.url ??
                         'https://lilico.app/placeholder-2.0.png'
                       }
                       sx={{
@@ -421,7 +439,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                           color="#E6E6E6"
                           fontSize={'12px'}
                         >
-                          {props.childAccounts[key]?.name ?? key}
+                          {props.childAccounts?.[key]?.name ?? key}
                         </Typography>
                         {props.current['address'] === key && (
                           <ListItemIcon sx={{ display: 'flex', alignItems: 'center' }}>
@@ -450,59 +468,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
               ))}
           </Box>
         </Box>
-        {/* <ListItem disablePadding>
-          <ListItemButton onClick={() => {
-            toggleDrawer();
-            toggleUnread();
-            goToInbox();
-          }}>
-            <ListItemIcon>
-              <InboxIcon style={{
-                marginLeft: '4px',
-              }} />
-            </ListItemIcon>
-            <ListItemText primary={domain ? chrome.i18n.getMessage('Inbox') : chrome.i18n.getMessage('Enable__Inbox')} />
-            {unread ?
-              <Box
-                sx={{
-                  width: '32px',
-                  color: '#fff',
-                  textAlign: 'center',
-                  background: '#41CC5D',
-                  borderRadius: '12px',
-                }}
-              >
-                {unread}
-              </Box>
-              :
-              <Box></Box>
-            }
-          </ListItemButton>
-        </ListItem> */}
-        {/* <ListItem disablePadding>
-          <ListItemButton onClick={() => setAlertOpen(true)}>
-            <ListItemIcon
-              sx={{
-                width: '24px',
-                minWidth: '24px',
-                marginRight: '12px',
-              }}
-            >
-              <AddIcon style={{
-                marginLeft: '4px',
-              }} />
-            </ListItemIcon>
-            <ListItemText primary={chrome.i18n.getMessage('Import__Wallet')} />
-          </ListItemButton>
-        </ListItem> */}
-        {/* <ListItem disablePadding>
-          <ListItemButton component="a" href="/">
-            <ListItemIcon>
-              <LoginIcon />
-            </ListItemIcon>
-            <ListItemText primary="Import wallet" />
-          </ListItemButton>
-        </ListItem> */}
         <Box
           sx={{
             justifyContent: 'space-between',

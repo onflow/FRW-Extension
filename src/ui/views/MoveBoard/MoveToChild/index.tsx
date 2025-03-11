@@ -84,7 +84,7 @@ const MoveToChild = (props: MoveBoardProps) => {
   const fetchCollectionCache = useCallback(
     async (address: string) => {
       try {
-        const list = await usewallet.getCollectionCache();
+        const list = await usewallet.getCollectionCache(address);
         if (list && list.length > 0) {
           return list;
         } else {

@@ -1,5 +1,5 @@
 import * as fcl from '@onflow/fcl';
-import type { Account, Account as FclAccount } from '@onflow/typedefs';
+import type { Account as FclAccount } from '@onflow/typedefs';
 import type { Method } from 'axios';
 import dayjs from 'dayjs';
 import { initializeApp, getApp } from 'firebase/app';
@@ -39,7 +39,7 @@ import {
   type SignInResponse,
   type UserInfoResponse,
   type TokenModel,
-  type NFTModel,
+  type NFTModel_depreciated,
   type StorageInfo,
   type NewsItem,
   type NewsConditionType,
@@ -47,6 +47,8 @@ import {
   PriceProvider,
   type BlockchainResponse,
   type AccountInfo,
+  type Contact,
+  type NFTModelV2,
 } from '../../shared/types/network-types';
 
 import {
@@ -800,7 +802,7 @@ class OpenApiService {
     return data;
   };
 
-  getNFTList = async (network: string) => {
+  getNFTList = async (network: string): Promise<NFTModelV2[]> => {
     const childType = await userWalletService.getActiveWallet();
     let chainType = 'flow';
     if (childType === 'evm') {
@@ -812,7 +814,7 @@ class OpenApiService {
       return nftList;
     }
     const config = this.store.config.get_nft_list;
-    const { tokens } = await this.sendRequest(
+    const { tokens }: { tokens: NFTModelV2[] } = await this.sendRequest(
       config.method,
       config.path,
       {
@@ -828,7 +830,7 @@ class OpenApiService {
     return tokens;
   };
 
-  getAddressBook = async () => {
+  getAddressBook = async (): Promise<{ data: { contacts: Contact[] } }> => {
     const config = this.store.config.fetch_address_book;
     const data = await this.sendRequest(config.method, config.path);
     return data;
@@ -1086,13 +1088,17 @@ class OpenApiService {
     return id;
   };
 
-  searchUser = async (keyword: string) => {
+  searchUser = async (
+    keyword: string
+  ): Promise<{
+    data: { users: { address: string; username: string; avatar: string; nickname: string }[] };
+  }> => {
     const config = this.store.config.search_user;
     const data = await this.sendRequest(config.method, config.path, {
       keyword,
     });
 
-    return data;
+    return data?.data?.users ? data : { data: { users: [] } };
   };
 
   checkImport = async (key: string) => {
@@ -1158,14 +1164,8 @@ class OpenApiService {
     return filterNetwork ? list.filter((item) => item.address) : list;
   };
 
-  getAllNft = async (filterNetwork = true): Promise<NFTModel[]> => {
+  getAllNft = async (filterNetwork = true): Promise<NFTModelV2[]> => {
     const list = await remoteFetch.nftCollection();
-    // const network = await userWalletService.getNetwork();
-    return list;
-  };
-
-  getAllNftV2 = async (filterNetwork = true): Promise<NFTModel[]> => {
-    const list = await remoteFetch.nftv2Collection();
     // const network = await userWalletService.getNetwork();
     return list;
   };
@@ -1460,97 +1460,36 @@ class OpenApiService {
     return await googleSafeHostService.getBlockList(hosts, forceCheck);
   };
 
-  getEnabledNFTList = async () => {
+  getEnabledNFTList = async (): Promise<{ address: string; contractName: string }[]> => {
     const address = await userWalletService.getCurrentAddress();
 
-    const promiseResult = await this.checkNFTListEnabledNew(address);
-    console.log(promiseResult, 'promiseResult');
-
+    const promiseResult = await this.checkNFTListEnabled(address);
     // const network = await userWalletService.getNetwork();
     // const notEmptyTokenList = tokenList.filter(value => value.address[network] !== null && value.address[network] !== '' )
     // const data = values.map((value, index) => ({isEnabled: value, token: tokenList[index]}))
     const resultArray = Object.entries(promiseResult)
-      .filter(([_, value]) => value === true) // Only keep entries with a value of true
-      .map(([key, _]) => {
-        const [prefix, address, contractName] = key.split('.');
+      .filter(([_key, value]) => value === true) // Only keep entries with a value of true
+      .map(([key]) => {
+        // ignore the prefix
+        const [, address, contractName] = key.split('.');
         return {
           address: `0x${address}`,
-          contract_name: contractName,
+          contractName: contractName,
         };
       });
-    console.log(promiseResult, 'values', resultArray);
 
     return resultArray;
   };
 
-  checkNFTListEnabledNew = async (address: string) => {
+  checkNFTListEnabled = async (address: string): Promise<Record<string, boolean>> => {
+    // Returns a map of enabled NFTs for the address
     const script = await getScripts('nft', 'checkNFTListEnabled');
-    console.log('script checkNFTListEnabledNew ', script);
 
     const isEnabledList = await fcl.query({
       cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
     });
     return isEnabledList;
-  };
-
-  checkNFTListEnabled = async (address: string, allTokens: NFTModel[]): Promise<NFTModel[]> => {
-    const tokens = allTokens;
-    const tokenImports = tokens
-      .map((token) =>
-        'import <Token> from <TokenAddress>'
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address)
-      )
-      .join('\r\n');
-
-    const tokenFunctions = tokens
-      .map((token) =>
-        `
-      pub fun check<Token>Vault(address: Address) : Bool {
-        let account = getAccount(address)
-
-        let vaultRef = account
-        .getCapability<&{NonFungibleToken.CollectionPublic}>(<TokenCollectionPublicPath>)
-        .check()
-
-        return vaultRef
-      }
-      `
-          .replaceAll('<TokenCollectionPublicPath>', token.path.public_path)
-          .replaceAll('<Token>', token.contract_name)
-          .replaceAll('<TokenAddress>', token.address)
-      )
-      .join('\r\n');
-
-    const tokenCalls = tokens
-      .map((token) =>
-        `
-      check<Token>Vault(address: address)
-      `.replaceAll('<Token>', token.contract_name)
-      )
-      .join(',');
-
-    const cadence = `
-      import NonFungibleToken from 0xNonFungibleToken
-      <TokenImports>
-
-      <TokenFunctions>
-
-      pub fun main(address: Address) : [Bool] {
-        return [<TokenCall>]
-      }
-    `
-      .replaceAll('<TokenFunctions>', tokenFunctions)
-      .replaceAll('<TokenImports>', tokenImports)
-      .replaceAll('<TokenCall>', tokenCalls);
-
-    const enabledList = await fcl.query({
-      cadence: cadence,
-      args: (arg, t) => [arg(address, t.Address)],
-    });
-
-    return enabledList;
   };
 
   getTransactionTemplate = async (cadence: string, network: string) => {
@@ -1825,7 +1764,10 @@ class OpenApiService {
     return data;
   };
 
-  getNFTV2CollectionList = async (address: string, network = 'mainnet') => {
+  getNFTV2CollectionList = async (
+    address: string,
+    network = 'mainnet'
+  ): Promise<NFTModel_depreciated[]> => {
     const { data } = await this.sendRequest(
       'GET',
       `/api/v2/nft/collections?network=${network}&address=${address}`,

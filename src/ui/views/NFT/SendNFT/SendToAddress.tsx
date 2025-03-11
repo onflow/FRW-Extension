@@ -18,18 +18,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
 
-import { type Contact } from '@/shared/types/network-types';
+import { type Contact, ContactType } from '@/shared/types/network-types';
 import { withPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import { LLHeader } from '@/ui/FRWComponent';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { type MatchMedia } from '@/ui/utils/url';
-import { useWallet } from 'ui/utils';
+import { useWallet, returnFilteredCollections } from 'ui/utils';
 
 import IconAbout from '../../../../components/iconfont/IconAbout';
-import AccountsList from '../../Send/AddressLists/AccountsList';
-import AddressBookList from '../../Send/AddressLists/AddressBookList';
-import RecentList from '../../Send/AddressLists/RecentList';
-import SearchList from '../../Send/AddressLists/SearchList';
+import AccountsList from '../../../FRWComponent/AddressLists/AccountsList';
+import AddressBookList from '../../../FRWComponent/AddressLists/AddressBookList';
+import RecentList from '../../../FRWComponent/AddressLists/RecentList';
+import SearchList from '../../../FRWComponent/AddressLists/SearchList';
 
 import SendNFTConfirmation from './SendNFTConfirmation';
 
@@ -154,35 +154,40 @@ const SendToAddress = () => {
   const state = location.state as NFTDetailState;
 
   const fetchAddressBook = useCallback(async () => {
+    let recent: Contact[] = [];
+    let sortedContacts: Contact[] = [];
     try {
       const response = await usewallet.getAddressBook();
-      let recent = await usewallet.getRecent();
+      recent = await usewallet.getRecent();
       if (recent) {
         recent.forEach((c) => {
-          response.forEach((s) => {
-            if (c.address === s.address && c.contact_name === s.contact_name) {
-              c.type = 1;
-            }
-          });
+          if (response) {
+            response.forEach((s) => {
+              if (c.address === s.address && c.contact_name === s.contact_name) {
+                c.contact_type = ContactType.AddressBook;
+              }
+            });
+          }
         });
       } else {
         recent = [];
       }
 
-      if (recent.length < 1) {
-        setTabValue(1);
+      if (response) {
+        sortedContacts = response.sort((a, b) =>
+          a.contact_name.toLowerCase().localeCompare(b.contact_name.toLowerCase())
+        );
       }
-
-      const sortedContacts = response.sort((a, b) =>
-        a.contact_name.toLowerCase().localeCompare(b.contact_name.toLowerCase())
-      );
-
+    } catch (err) {
+      console.error('err: ', err);
+    } finally {
+      if (recent.length < 1) {
+        setTabValue(2);
+      }
       setRecentContacts(recent);
       setSortedContacts(sortedContacts);
       setFilteredContacts(sortedContacts);
       setIsLoading(false);
-    } catch (err) {
-      console.error('err: ', err);
     }
   }, [usewallet]);
 
@@ -234,16 +239,10 @@ const SendToAddress = () => {
     console.log('NFT ', NFT);
     const filteredCollections = returnFilteredCollections(contractList, NFT);
     console.log('filteredCollections ', filteredCollections);
-    if (filteredCollections.length > 0) {
-      setContractInfo(filteredCollections[0]);
+    if (filteredCollections) {
+      setContractInfo(filteredCollections);
     }
   }, [usewallet, state.nft, state.media]);
-
-  const returnFilteredCollections = (contractList, NFT) => {
-    return contractList.filter(
-      (collection) => collection.contractName === NFT.collectionContractName
-    );
-  };
 
   useEffect(() => {
     fetchNFTInfo();
@@ -252,7 +251,7 @@ const SendToAddress = () => {
   }, [fetchNFTInfo, setUserInfo, fetchAddressBook]);
 
   const checkContain = useCallback(
-    (searchResult: Contact) => {
+    (searchResult: { username: string }) => {
       if (sortedContacts.some((e) => e.contact_name === searchResult.username)) {
         return true;
       }
@@ -313,7 +312,9 @@ const SendToAddress = () => {
         domainRresult.contact_name = keys;
         domainRresult.domain!.domain_type = searchType;
         domainRresult.domain!.value = keys;
-        domainRresult.type! = checkContainDomain(keys) ? 2 : 4;
+        domainRresult.contact_type = checkContainDomain(keys)
+          ? ContactType.Domain
+          : ContactType.User;
         fArray.push(domainRresult);
         setSearchContacts(fArray);
         setHasNoFilteredContacts(false);
@@ -324,8 +325,8 @@ const SendToAddress = () => {
   );
 
   const searchUser = useCallback(async () => {
-    let result = await usewallet.openapi.searchUser(searchKey);
-    result = result.data.users;
+    const apiResult = await usewallet.openapi.searchUser(searchKey);
+    const result = apiResult.data.users;
     const fArray = searchContacts;
     const reg = /^((0x))/g;
     const lilicoResult = {
@@ -348,7 +349,7 @@ const SendToAddress = () => {
         lilicoResult.contact_name = data.username;
         lilicoResult.domain!.domain_type = 999;
         lilicoResult.avatar = data.avatar;
-        lilicoResult.type! = checkContain(data) ? 1 : 4;
+        lilicoResult.contact_type = checkContain(data) ? ContactType.AddressBook : ContactType.User;
         fArray.push(lilicoResult);
       });
       setSearchContacts(fArray);
@@ -410,7 +411,7 @@ const SendToAddress = () => {
         searchResult.address = withPrefix(keyword) || keyword;
         searchResult.contact_name = withPrefix(checkAddress) || keyword;
         searchResult.avatar = '';
-        searchResult.type! = 4;
+        searchResult.contact_type = ContactType.User;
       }
       setConfirmationOpen(true);
     }
@@ -422,7 +423,7 @@ const SendToAddress = () => {
         searchResult.address = withPrefix(keyword) || keyword;
         searchResult.contact_name = withPrefix(checkAddress) || keyword;
         searchResult.avatar = '';
-        searchResult.type! = 4;
+        searchResult.contact_type = ContactType.User;
       }
       setConfirmationOpen(true);
     }
@@ -532,13 +533,10 @@ const SendToAddress = () => {
                 </TabPanel>
                 <TabPanel value={tabValue} index={2} dir={theme.direction}>
                   <AccountsList
-                    filteredContacts={filteredContacts}
-                    isLoading={isLoading}
                     handleClick={(eachgroup) => {
                       searchResult = eachgroup;
                       setConfirmationOpen(true);
                     }}
-                    isSend={false}
                   />
                 </TabPanel>
               </SwipeableViews>

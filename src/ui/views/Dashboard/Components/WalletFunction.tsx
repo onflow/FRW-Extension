@@ -2,16 +2,37 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { ListItem, ListItemButton, ListItemIcon, Typography, Box } from '@mui/material';
 import React, { useState, useEffect, useCallback } from 'react';
 
+import { type WalletType } from '@/shared/types/network-types';
+import { type ActiveChildType, type WalletAddress } from '@/shared/types/wallet-types';
 import { useWallet } from 'ui/utils';
 
 import IconEnd from '../../../../components/iconfont/IconAVector11Stroke';
 
-const WalletFunction = (props) => {
+interface WalletFunctionProps {
+  props_id: number;
+  name: string;
+  address: WalletAddress;
+  icon: string;
+  color: string;
+  setWallets: (
+    walletInfo: WalletType,
+    key: ActiveChildType | null,
+    index?: number | null
+  ) => Promise<void>;
+  currentWalletIndex: number;
+  currentWallet: WalletType;
+  mainAddress: string;
+  setExpandAccount: React.Dispatch<React.SetStateAction<boolean>>;
+  expandAccount: boolean;
+  walletList: WalletType[];
+}
+
+const WalletFunction = (props: WalletFunctionProps) => {
   const usewallet = useWallet();
-  const [currentBalance, setCurrentBalance] = useState(null);
+  const [currentBalance, setCurrentBalance] = useState<string | null>(null);
 
   const walletFlowBalance = useCallback(
-    async (address) => {
+    async (address: string) => {
       const balance = await usewallet.getFlowBalance(address);
       return balance || 0;
     },
@@ -41,7 +62,7 @@ const WalletFunction = (props) => {
         if (props.address === props.currentWallet['address']) {
           toggleExpand(); // Toggle the list if the current address is clicked
         } else {
-          props.setWallets(props, null, props.props_id); // Set the wallet if it's a different address
+          props.setWallets(props.walletList[props.props_id], null, props.props_id); // Set the wallet if it's a different address
         }
       }}
       sx={{ mb: 0, padding: '0', cursor: 'pointer' }}

@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { type AccountDetails } from '@/shared/types/network-types';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
+import { WarningNFTNotOnboardedSnackbar } from '@/ui/FRWComponent/WarningNFTNotOnboardedSnackbar';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { MatchMediaType } from '@/ui/utils/url';
@@ -25,7 +26,6 @@ interface SendNFTConfirmationProps {
 }
 
 const MoveNftConfirmation = (props: SendNFTConfirmationProps) => {
-  console.log('MoveNftConfirmation - NftEvm');
   const usewallet = useWallet();
   const history = useHistory();
   const { mainAddress, childAccounts, parentWallet } = useProfiles();
@@ -86,7 +86,7 @@ const MoveNftConfirmation = (props: SendNFTConfirmationProps) => {
           txId,
           true,
           `Move complete`,
-          `You have moved 1 ${props.data.nft.collectionContractName} from evm to your flow address. \nClick to view this transaction.`
+          `You have moved 1 ${props.data.nft.contractName} from evm to your flow address. \nClick to view this transaction.`
         );
         props.handleCloseIconClicked();
         await usewallet.setDashIndex(0);
@@ -112,7 +112,7 @@ const MoveNftConfirmation = (props: SendNFTConfirmationProps) => {
           true,
           `Move complete`,
           `You have moved ${[props.data.nft.id].length} ${
-            props.data.nft.collectionContractName
+            props.data.nft.contractName
           } from evm to your flow address. \nClick to view this transaction.`
         );
         props.handleCloseIconClicked();
@@ -324,7 +324,6 @@ const MoveNftConfirmation = (props: SendNFTConfirmationProps) => {
               py: '8px',
             }}
           >
-            {/* <CardMedia style={{ color:'#E54040', width:'24px',height:'24px', margin: '0 12px 0' }} image={empty} />   */}
             <InfoIcon fontSize="medium" color="primary" style={{ margin: '0px 12px auto 12px' }} />
             <Typography variant="body1" color="text.secondary" sx={{ fontSize: '12px' }}>
               {chrome.i18n.getMessage('Your__address__is__currently__processing')}
@@ -332,10 +331,13 @@ const MoveNftConfirmation = (props: SendNFTConfirmationProps) => {
           </Box>
         </SlideRelative>
         <WarningStorageLowSnackbar isLowStorage={isLowStorage} />
+        <WarningNFTNotOnboardedSnackbar
+          isNotOnboarded={props?.data?.nft && !props?.data?.nft?.flowIdentifier}
+        />
 
         <Button
           onClick={sendNFT}
-          disabled={sending || occupied}
+          disabled={sending || occupied || !props?.data?.nft?.flowIdentifier}
           variant="contained"
           color="primary"
           size="large"
@@ -349,28 +351,45 @@ const MoveNftConfirmation = (props: SendNFTConfirmationProps) => {
             mb: '33px',
           }}
         >
-          {sending ? (
-            <>
-              <LLSpinner size={28} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
-                {chrome.i18n.getMessage('Working_on_it')}
-              </Typography>
-            </>
+          {props?.data?.nft ? (
+            renderButtonContent({
+              sending,
+              failed,
+            })
           ) : (
-            <>
-              {failed ? (
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
-                  {chrome.i18n.getMessage('Transaction__failed')}
-                </Typography>
-              ) : (
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
-                  {chrome.i18n.getMessage('Move')}
-                </Typography>
-              )}
-            </>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
+              {chrome.i18n.getMessage('Loading')}
+            </Typography>
           )}
         </Button>
       </Box>
+    );
+  };
+
+  const renderButtonContent = ({ sending, failed }: { sending: boolean; failed: boolean }) => {
+    if (sending) {
+      return (
+        <>
+          <LLSpinner size={28} />
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
+            {chrome.i18n.getMessage('Working_on_it')}
+          </Typography>
+        </>
+      );
+    }
+
+    if (failed) {
+      return (
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
+          {chrome.i18n.getMessage('Transaction__failed')}
+        </Typography>
+      );
+    }
+
+    return (
+      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
+        {chrome.i18n.getMessage('Move')}
+      </Typography>
     );
   };
 

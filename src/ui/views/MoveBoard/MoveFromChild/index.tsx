@@ -100,7 +100,7 @@ const MoveFromChild = (props: MoveBoardProps) => {
   const fetchCollectionCache = useCallback(
     async (address: string) => {
       try {
-        const list = await usewallet.getCollectionCache();
+        const list = await usewallet.getCollectionCache(address);
         if (list && list.length > 0) {
           return list;
         } else {
@@ -124,7 +124,7 @@ const MoveFromChild = (props: MoveBoardProps) => {
 
       const activec = await usewallet.getChildAccountAllowTypes(parentaddress, address!);
       const cadenceResult = await fetchCollectionCache(address!);
-      const filteredCadenceResult = cadenceResult.filter((nft) =>
+      const filteredCadenceResult = cadenceResult!.filter((nft) =>
         checkContractAddressInCollections(nft, activec)
       );
 

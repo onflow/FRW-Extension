@@ -3,19 +3,25 @@ import { Box, Typography, Drawer, Grid, Button, IconButton } from '@mui/material
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { type NFTModel } from '@/shared/types/network-types';
+import { type NFTModelV2 } from '@/shared/types/network-types';
 import { LLSpinner } from 'ui/FRWComponent';
 import { useWallet } from 'ui/utils';
 
 interface AddNFTConfirmationProps {
   isConfirmationOpen: boolean;
-  data: NFTModel | null;
+  nftCollection: NFTModelV2 | null;
   handleCloseIconClicked: () => void;
   handleCancelBtnClicked: () => void;
   handleAddBtnClicked: () => void;
 }
 
-const AddNFTConfirmation = (props: AddNFTConfirmationProps) => {
+const AddNFTConfirmation = ({
+  isConfirmationOpen,
+  nftCollection,
+  handleCloseIconClicked,
+  handleCancelBtnClicked,
+  handleAddBtnClicked,
+}: AddNFTConfirmationProps) => {
   const wallet = useWallet();
   const history = useHistory();
   const [sending, setSending] = useState(false);
@@ -23,26 +29,26 @@ const AddNFTConfirmation = (props: AddNFTConfirmationProps) => {
 
   const enableStorage = async () => {
     // TODO: Replace it with real data
-    if (!props.data) {
+    if (!nftCollection) {
       return;
     }
     setSending(true);
     try {
-      const txId = await wallet.enableNFTStorageLocal(props.data);
+      const txId = await wallet.enableNFTStorageLocal(nftCollection);
       if (txId) {
         await wallet.setDashIndex(0);
         wallet.listenTransaction(
           txId,
           true,
-          `${props.data.name}`,
-          `Your ${props.data.name} vault has been enabled. You are now able to receive ${props.data.name}!\nClick to view this transaction.`,
-          props.data.logo!
+          `${nftCollection.name}`,
+          `Your ${nftCollection.name} vault has been enabled. You are now able to receive ${nftCollection.name}!\nClick to view this transaction.`,
+          nftCollection.logoURI!
         );
         setSending(false);
         setTid(txId);
         history.push(`/dashboard?activity=1&txId=${txId}`);
       }
-      props.handleAddBtnClicked();
+      handleAddBtnClicked();
     } catch (err) {
       console.error('err ->', err);
       setSending(false);
@@ -83,13 +89,13 @@ const AddNFTConfirmation = (props: AddNFTConfirmationProps) => {
           </Box>
         </Grid>
         <Grid item xs={1}>
-          <IconButton onClick={props.handleCloseIconClicked}>
+          <IconButton onClick={handleCloseIconClicked}>
             <CloseIcon fontSize="medium" sx={{ color: 'icon.navi' }} />
           </IconButton>
         </Grid>
       </Grid>
 
-      {props.data && (
+      {nftCollection && (
         <Box
           sx={{
             display: 'flex',
@@ -110,24 +116,17 @@ const AddNFTConfirmation = (props: AddNFTConfirmationProps) => {
             }}
           >
             <Typography variant="h6" sx={{ textAlign: 'center' }}>
-              {props.data.name}
+              {nftCollection.name}
             </Typography>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <img
-            src={props.data.logo || ''}
+            src={nftCollection.logoURI || ''}
             style={{ height: '114px', alignSelf: 'center', borderRadius: '8px' }}
           />
           <Box sx={{ flexGrow: 1 }} />
         </Box>
       )}
-      {/* <Stack direction="row" spacing={1} sx={{marginBottom: '33px'}}> */}
-      {/* <LLPrimaryButton
-          label="Add"
-          onClick={enableStorage}
-          fullWidth
-          type="submit"
-        /> */}
 
       <Button
         onClick={enableStorage}
@@ -164,7 +163,7 @@ const AddNFTConfirmation = (props: AddNFTConfirmationProps) => {
   return (
     <Drawer
       anchor="bottom"
-      open={props.isConfirmationOpen}
+      open={isConfirmationOpen}
       transitionDuration={300}
       PaperProps={{
         sx: {

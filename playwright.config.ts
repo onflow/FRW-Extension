@@ -43,7 +43,6 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'off',
     screenshot: process.env.CI ? 'off' : 'on',
-    headless: true,
 
     browserName: 'chromium',
     channel: 'chromium',

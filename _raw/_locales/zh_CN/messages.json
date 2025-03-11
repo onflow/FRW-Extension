@@ -1214,10 +1214,10 @@
     "message": "重置您的钱包"
   },
   "Confirm_to_reset_Wallet": {
-    "message": "确认重置钱包"
+    "message": "重置每个钱包?"
   },
   "This_action_will_remove": {
-    "message": "此操作将删除所有包括私钥在内的本地数据。请确保您的私钥已备份。"
+    "message": "此操作将删除您的所有本地数据，包括您所有钱包的私钥 - 而不仅仅是当前的钱包。请确保您已备份私钥。"
   },
   "Reveal_Private_Key": {
     "message": "揭示私钥"
@@ -1327,6 +1327,9 @@
   "enable_the_path_to_evm_on_flow": {
     "message": "启用路径到Flow上的EVM"
   },
+  "What_type_of_assets_would_you_like_to_move": {
+    "message": "您想要移动什么类型的资产？"
+  },
   "Would_you_like_to_move": {
     "message": "您是否想要将您的资产转移到"
   },
@@ -1362,5 +1365,11 @@
   },
   "Deposit_warning_content": {
     "message": "请确保您的存款是在 FLOW EVM 网络上进行的，如果通过其他网络存款，您的资产可能会丢失。"
+  },
+  "NFT_Not_onboarded": {
+    "message": "此NFT收藏尚未接入Cadence。请使用Flow Port来移动和接入此NFT收藏中的NFT"
+  },
+  "Could_not_enable_this_collection": {
+    "message": "无法启用此收藏"
   }
 }

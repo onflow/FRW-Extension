@@ -32,8 +32,8 @@ const useStyles = makeStyles(() => ({
   inputBox: {
     minHeight: '46px',
     zIndex: '999',
-    border: '1px solid #5E5E5E',
-    borderRadius: '16px',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: '12px',
     boxSizing: 'border-box',
     margin: '2px 18px 10px 18px',
   },
@@ -50,12 +50,14 @@ const useStyles = makeStyles(() => ({
   },
   skeletonCard: {
     display: 'flex',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     width: '100%',
     height: '72px',
     margin: '12px auto',
     boxShadow: 'none',
     padding: 'auto',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '12px',
   },
 }));
 
@@ -197,9 +199,23 @@ const TokenList = () => {
             disableUnderline
             startAdornment={
               <InputAdornment position="start">
-                <SearchIcon color="info" sx={{ ml: '10px', my: '5px' }} />
+                <SearchIcon sx={{ ml: '10px', my: '5px', color: 'rgba(255, 255, 255, 0.6)' }} />
               </InputAdornment>
             }
+            sx={{
+              border: 'none',
+              color: '#FFFFFF',
+              '& input': {
+                padding: '8px 16px',
+                '&::placeholder': {
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  opacity: 1,
+                },
+              },
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+              },
+            }}
           />
 
           <Box
@@ -286,7 +302,12 @@ const TokenList = () => {
               {[...Array(4).keys()].map((key) => (
                 <Card
                   key={key}
-                  sx={{ borderRadius: '12px', backgroundColor: '#000000', padding: '12px' }}
+                  sx={{
+                    borderRadius: '12px',
+                    backgroundColor: 'transparent',
+                    padding: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
                   className={classes.skeletonCard}
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -313,6 +334,7 @@ const TokenList = () => {
                 flexGrow: 1,
                 overflowY: 'scroll',
                 justifyContent: 'space-between',
+                padding: '0 8px',
               }}
             >
               {filteredCollections.map((token, index) => (

@@ -42,6 +42,7 @@ const CoinList = ({ data, ableFt, isActive, childType }) => {
             <Typography
               variant="body1"
               sx={{ fontSize: 14, fontWeight: '550', textAlign: 'end', color: 'text.title' }}
+              data-testid={`coin-balance-${props.unit.toLowerCase()}`}
             >
               {formatLargeNumber(props.primary)} {props.unit.toUpperCase()}
             </Typography>

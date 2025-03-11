@@ -5,6 +5,7 @@ vi.mock('react', async () => {
     ...actual,
     useEffect: vi.fn((fn) => fn()),
     useCallback: vi.fn((fn) => fn),
+    useState: vi.fn((initialValue) => [initialValue, vi.fn()]),
   };
 });
 
@@ -12,7 +13,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import emojiList from '@/background/utils/emoji.json';
 import { useProfileStore } from '@/ui/stores/profileStore';
-import { useWallet, useWalletLoaded } from '@/ui/utils/WalletContext';
 
 import { useProfiles } from '../useProfileHook';
 

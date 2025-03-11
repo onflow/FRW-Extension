@@ -19,7 +19,14 @@ const TokenItem = ({ token, isLoading, enabled, onClick }) => {
 
   return (
     <ListItemButton
-      sx={{ mx: '18px', py: '4px', my: '8px', backgroundColor: '#1f1f1f', borderRadius: '16px' }}
+      sx={{
+        mx: '8px',
+        py: '4px',
+        my: '8px',
+        backgroundColor: '#000000',
+        borderRadius: '12px',
+        border: '1px solid #2A2A2A',
+      }}
     >
       <ListItem
         disablePadding
@@ -29,9 +36,9 @@ const TokenItem = ({ token, isLoading, enabled, onClick }) => {
             {isLoading ? (
               <CircularProgress color="primary" size={20} />
             ) : enabled ? (
-              <IconCheckmark color="#41CC5D" size={24} />
+              <IconCheckmark color="white" size={24} />
             ) : (
-              <IconPlus size={20} />
+              <IconPlus color="white" size={20} />
             )}
           </IconButton>
         }

@@ -91,8 +91,8 @@ export const ContactCard = ({ contact, coinInfo, isLoading = false }) => {
           {!isLoading ? (
             <Typography variant="body1" sx={{ textAlign: 'start' }}>
               {contact.domain?.value || formatAddress(contact.contact_name)}{' '}
-              {contact.usernam && contact.usernam !== '' && (
-                <Box display="inline" color="info.main">
+              {contact.username && contact.username !== '' && (
+                <Box component="span" sx={{ color: 'info.main' }}>
                   {contact.username !== '' ? ' (@' + contact.username + ')' : ''}
                 </Box>
               )}

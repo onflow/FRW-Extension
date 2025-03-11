@@ -4,15 +4,21 @@ on:
   push:
 
 jobs:
-  build:
+  determine-env:
     runs-on: ubuntu-latest
-    environment: >-
-      ${{
-        github.ref_type == 'tag' && 'production' ||
-        github.ref_name == 'master' && 'production' ||
-        github.ref_name == 'dev' && 'staging' ||
-        'development'
-      }}
+    outputs:
+      env_name: ${{ steps.set_env.outputs.env_name }}
+    steps:
+      - id: set_env
+        run: |
+          ENV_NAME="${{ github.ref_type == 'tag' && 'production' || github.ref_name == 'master' && 'production' || github.ref_name == 'dev' && 'staging' || 'development' }}"
+          echo "env_name=$ENV_NAME" >> $GITHUB_OUTPUT
+          echo "Environment name: $ENV_NAME"
+
+  build:
+    needs: determine-env
+    runs-on: ubuntu-latest
+    environment: ${{ needs.determine-env.outputs.env_name }}
 
     strategy:
       matrix:
@@ -20,6 +26,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for tags
+          fetch-tags: true # Explicitly fetch all tags
+
+      - name: Get latest tag
+        id: latest_tag
+        run: |
+          LATEST_TAG=$(git tag --sort=-committerdate | head -n 1 || echo "v0.0.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "Latest tag: $LATEST_TAG"
+
+      - name: Get repository URL
+        id: repo_url
+        run: |
+          REPO_URL="https://github.com/${{ github.repository }}"
+          echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
+          echo "Repository URL: $REPO_URL"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -33,16 +56,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Create .env.pro file
+      - name: Create environment files
         run: |
-          cat << EOF > .env.pro
+          # Function to create environment file with given name
+          create_env_file() {
+            local file_name=$1
+            cat << EOF > $file_name
           # Git info
           COMMIT_SHA="${{ github.sha }}"
           BRANCH_NAME="${{ github.ref_name }}"
           PR_TITLE="${{ github.event.pull_request.title || '' }}"
           PR_NUMBER="${{ github.event.pull_request.number || '' }}"
-          BUILD_BACKGROUND="${{ vars.BUILD_BACKGROUND }}"
-          DEPLOYMENT_ENV="${{ github.ref_type == 'tag' && 'production' || github.ref_name == 'master' && 'production' || github.ref_name == 'dev' && 'staging' || 'development' }}"
+          DEPLOYMENT_ENV="${{ needs.determine-env.outputs.env_name }}"
+          LATEST_TAG="${{ env.LATEST_TAG }}"
+          REPO_URL="${{ env.REPO_URL }}"
 
           # Google drive
           GD_BACKUP_NAME="${{ vars.GD_BACKUP_NAME }}"
@@ -65,6 +92,7 @@ jobs:
           API_CONFIG_PATH="${{ vars.API_CONFIG_PATH }}"
           API_BASE_URL="${{ vars.API_BASE_URL }}"
           # manifest
+          MANIFEST_KEY="${{ secrets.MANIFEST_KEY }}"
           OAUTH2_CLIENT_ID="${{ secrets.OAUTH2_CLIENT_ID }}"
           OAUTH2_SCOPES="${{ vars.OAUTH2_SCOPES }}"
           WC_PROJECTID="${{ secrets.WC_PROJECTID }}"
@@ -79,19 +107,33 @@ jobs:
           TEST_RECEIVER_EVM_ADDR="${{ secrets.TEST_RECEIVER_EVM_ADDR }}"
           TEST_RECEIVER_METAMASK_EVM_ADDR="${{ secrets.TEST_RECEIVER_METAMASK_EVM_ADDR }}"
           EOF
+          }
+
+          # Always create .env.pro
+          create_env_file ".env.pro"
+
+          # Create .env.dev if environment is development
+          if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" ]]; then
+            create_env_file ".env.dev"
+          fi
 
       - name: Run tests
         run: pnpm test
 
       - name: Build
-        run: pnpm run build:ci
+        run: |
+          if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" ]]; then
+            pnpm run build:dev-ci
+          else
+            pnpm run build:ci
+          fi
         env:
           CI: true
           COMMIT_SHA: ${{ github.sha }}
           BRANCH_NAME: ${{ github.ref_name }}
           PR_TITLE: ${{ github.event.pull_request.title || '' }}
           PR_NUMBER: ${{ github.event.pull_request.number || '' }}
-          DEPLOYMENT_ENV: ${{ github.ref_type == 'tag' && 'production' || github.ref_name == 'master' && 'production' || github.ref_name == 'dev' && 'staging' || 'development' }}
+          DEPLOYMENT_ENV: ${{ needs.determine-env.outputs.env_name }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -105,28 +147,24 @@ jobs:
           du -sh dist/
 
   test:
-    needs: build
+    needs: [determine-env, build]
     runs-on: ubuntu-latest
     concurrency:
       group: tests-${{ github.workflow }}
       cancel-in-progress: false
-    environment: >-
-      ${{
-        github.ref_type == 'tag' && 'production' ||
-        github.ref_name == 'master' && 'production' ||
-        github.ref_name == 'dev' && 'staging' ||
-        'development'
-      }}
+    environment: ${{ needs.determine-env.outputs.env_name }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: extension-build
           path: dist/
+
       - name: Create .env.test file
         run: |
           cat << EOF > .env.test
@@ -142,6 +180,7 @@ jobs:
           TEST_RECEIVER_EVM_ADDR="${{ secrets.TEST_RECEIVER_EVM_ADDR }}"
           TEST_RECEIVER_METAMASK_EVM_ADDR="${{ secrets.TEST_RECEIVER_METAMASK_EVM_ADDR }}"
           EOF
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
       - name: Install dependencies

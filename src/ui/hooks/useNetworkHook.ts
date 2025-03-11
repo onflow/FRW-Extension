@@ -1,34 +1,67 @@
-import { useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
-import { useNetworkStore } from '@/ui/stores/networkStore';
-import { useWallet, useWalletLoaded } from '@/ui/utils';
+import storage, { type StorageChange, type AreaName } from '@/background/webapi/storage';
 
-export const useNetworks = () => {
-  const usewallet = useWallet();
-  const walletLoaded = useWalletLoaded();
+export const useNetwork = () => {
+  const [network, setNetwork] = useState<string>('mainnet');
+  const [developerMode, setDeveloperMode] = useState<boolean>(false);
+  const [emulatorModeOn, setEmulatorModeOn] = useState<boolean>(false);
 
-  // Action selectors
-  const setNetwork = useNetworkStore((state) => state.setNetwork);
-  const setDeveloperMode = useNetworkStore((state) => state.setDeveloperMode);
-  const setEmulatorModeOn = useNetworkStore((state) => state.setEmulatorModeOn);
+  useEffect(() => {
+    let mounted = true;
+    // Set up storage change listener
+    const handleStorageChange = (
+      changes: { [key: string]: StorageChange },
+      namespace: AreaName
+    ) => {
+      if (namespace === 'local') {
+        // Changes is to local storage
+        // Check network change
+        if (changes['userWallets'] && changes['userWallets'].newValue) {
+          const userWallets = changes['userWallets'].newValue;
+          if (userWallets.network) {
+            setNetwork(userWallets.network);
+          }
+          if (userWallets.emulatorMode !== undefined) {
+            setEmulatorModeOn(userWallets.emulatorMode);
+          }
+        }
+        // Check developer mode change
+        if (changes['developerMode'] !== undefined) {
+          setDeveloperMode(changes['developerMode'].newValue);
+        }
+      }
+    };
 
-  // State selectors
-  const currentNetwork = useNetworkStore((state) => state.currentNetwork);
-  const developerMode = useNetworkStore((state) => state.developerMode);
-  const emulatorModeOn = useNetworkStore((state) => state.emulatorModeOn);
+    // Initial load from storage
+    const loadInitialData = async () => {
+      const developerModeValue = await storage.get('developerMode');
+      const emulatorModeValue = await storage.get('emulatorMode');
+      const userWalletsStorage = await storage.get('userWallets');
+      if (mounted) {
+        if (developerModeValue !== undefined) {
+          setDeveloperMode(developerModeValue);
+        }
+        if (emulatorModeValue !== undefined) {
+          setEmulatorModeOn(emulatorModeValue);
+        }
+        if (userWalletsStorage && userWalletsStorage.network) {
+          setNetwork(userWalletsStorage.network);
+        }
+      }
+    };
 
-  const fetchNetwork = useCallback(async () => {
-    if (!usewallet || !walletLoaded) return;
-    const network = await usewallet.getNetwork();
-    setNetwork(network);
-  }, [usewallet, setNetwork, walletLoaded]);
+    loadInitialData();
+    storage.addStorageListener(handleStorageChange);
+
+    return () => {
+      mounted = false;
+      storage.removeStorageListener(handleStorageChange);
+    };
+  }, []);
 
   return {
-    fetchNetwork,
-    setNetwork,
-    setDeveloperMode,
-    setEmulatorModeOn,
-    currentNetwork,
+    network,
     developerMode,
     emulatorModeOn,
   };

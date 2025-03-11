@@ -1,10 +1,4 @@
-import {
-  test,
-  loginToSenderAccount,
-  expect,
-  getCurrentAddress,
-  waitForTransaction,
-} from './utils/helper';
+import { test, loginToSenderAccount, getCurrentAddress, waitForTransaction } from './utils/helper';
 export const sendTokenFlow = async ({
   page,
   tokenname,

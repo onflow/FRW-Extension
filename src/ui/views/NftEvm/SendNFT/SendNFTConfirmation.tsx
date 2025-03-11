@@ -131,8 +131,8 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
         wallet.listenTransaction(
           txId,
           true,
-          `${props.data.amount} ${props.data.nft.collectionContractName} Sent`,
-          `You have sent 1 ${props.data.nft.collectionContractName} to ${props.data.contact.contact_name}. \nClick to view this transaction.`,
+          `${props.data.amount} ${props.data.nft.contractName} Sent`,
+          `You have sent 1 ${props.data.nft.contractName} to ${props.data.contact.contact_name}. \nClick to view this transaction.`,
           props.data.nft.collectionSquareImage
         );
         props.handleCloseIconClicked();

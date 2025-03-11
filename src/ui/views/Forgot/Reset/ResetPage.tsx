@@ -36,8 +36,9 @@ const ResetPage = (props: AddOrEditAddressProps) => {
   };
 
   const resetWalletClicked = async () => {
-    usewallet.resetPwd();
-    // console.log('reset reset reset')
+    usewallet.resetPwd().then(() => {
+      window.close();
+    });
   };
 
   return (

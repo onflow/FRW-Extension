@@ -2,7 +2,6 @@ import { act } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { useCoinStore } from '@/ui/stores/coinStore';
-import { useNetworkStore } from '@/ui/stores/networkStore';
 import { useProfileStore } from '@/ui/stores/profileStore';
 import { useWallet, useWalletLoaded } from '@/ui/utils/WalletContext';
 
@@ -15,22 +14,9 @@ vi.mock('react', async () => {
     ...actual,
     useEffect: vi.fn().mockImplementation((fn) => fn()),
     useCallback: vi.fn().mockImplementation((fn) => fn),
+    useState: vi.fn().mockImplementation((initialValue) => [initialValue, vi.fn()]),
   };
 });
-
-// Mock all stores first
-vi.mock('@/ui/stores/networkStore', () => ({
-  useNetworkStore: vi.fn((selector) =>
-    selector({
-      currentNetwork: 'mainnet',
-      developerMode: false,
-      emulatorModeOn: false,
-      setNetwork: vi.fn(),
-      setDeveloperMode: vi.fn(),
-      setEmulatorModeOn: vi.fn(),
-    })
-  ),
-}));
 
 vi.mock('@/ui/stores/profileStore', () => ({
   useProfileStore: vi.fn((selector) =>
@@ -76,6 +62,8 @@ vi.mock('@/ui/utils/WalletContext', () => ({
   useWalletLoaded: vi.fn().mockReturnValue(true),
   useWallet: vi.fn().mockReturnValue({
     refreshCoinList: vi.fn().mockResolvedValue(undefined),
+    isUnlocked: vi.fn().mockResolvedValue(true),
+    getMainWallet: vi.fn().mockResolvedValue('test-address'),
   }),
 }));
 
@@ -159,6 +147,7 @@ describe('useCoinHook', () => {
         useWallet: () => ({
           refreshCoinList: vi.fn().mockResolvedValue(undefined),
           getMainWallet: vi.fn(),
+          isUnlocked: vi.fn().mockResolvedValue(true),
           openapi: {
             getAccountMinFlow: vi.fn(),
           },

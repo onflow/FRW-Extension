@@ -1214,10 +1214,10 @@
     "message": "ウォレットをリセット"
   },
   "Confirm_to_reset_Wallet": {
-    "message": "ウォレットをリセット確認"
+    "message": "すべてのウォレットをリセットしますか?"
   },
   "This_action_will_remove": {
-    "message": "この操作は、あなたのローカルデータを含むすべての私的鍵を削除します。秘密鍵がバックアップされていることを確認してください。"
+    "message": "この操作により、現在のウォレットだけでなく、すべてのウォレットの秘密キーを含むすべてのローカル データが削除されます。秘密キーがバックアップされていることを確認してください。"
   },
   "Reveal_Private_Key": {
     "message": "秘密鍵を表示"
@@ -1327,6 +1327,9 @@
   "enable_the_path_to_evm_on_flow": {
     "message": "Flow上のEVMへのパスを有効にする"
   },
+  "What_type_of_assets_would_you_like_to_move": {
+    "message": "移動したい資産の種類は何ですか？"
+  },
   "Would_you_like_to_move": {
     "message": "資産を移動しますか"
   },
@@ -1362,5 +1365,11 @@
   },
   "Deposit_warning_content": {
     "message": "FLOW EVM ネットワークで入金していることを確認してください。他のネットワークを通じて入金した場合、資産が失われる可能性があります。"
+  },
+  "NFT_Not_onboarded": {
+    "message": "このNFTコレクションはまだCadenceに搭載されていません。Flow Portを使用してこのNFTコレクションからNFTを移動およびオンボードしてください"
+  },
+  "Could_not_enable_this_collection": {
+    "message": "このコレクションを有効にできませんでした"
   }
 }

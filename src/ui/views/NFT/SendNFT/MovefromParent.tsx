@@ -11,7 +11,7 @@ import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSn
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { MatchMediaType } from '@/ui/utils/url';
 import { LLSpinner, FRWProfileCard, FRWDropdownProfileCard } from 'ui/FRWComponent';
-import { useWallet } from 'ui/utils';
+import { useWallet, returnFilteredCollections } from 'ui/utils';
 import { useStorageCheck } from 'ui/utils/useStorageCheck';
 
 import IconFlow from '../../../../components/iconfont/IconFlow';
@@ -79,21 +79,17 @@ const MovefromParent = (props: SendNFTConfirmationProps) => {
     await moveNFTToFlow();
   };
 
-  const returnFilteredCollections = (contractList, NFT) => {
-    return contractList.filter((collection) => collection.name === NFT.collectionName);
-  };
-
   const moveNFTToFlow = async () => {
     setSending(true);
     // setSending(true);
-    const contractList = await usewallet.openapi.getAllNftV2();
+    const contractList = await usewallet.openapi.getAllNft();
     const filteredCollections = returnFilteredCollections(contractList, props.data.nft);
 
     if (isValidEthereumAddress(selectedAccount!['address'])) {
       await moveNFTToEvm();
     } else {
       usewallet
-        .sendNFTtoChild(selectedAccount!['address'], '', props.data.nft.id, filteredCollections[0])
+        .sendNFTtoChild(selectedAccount!['address'], '', props.data.nft.id, filteredCollections)
         .then(async (txId) => {
           usewallet.listenTransaction(
             txId,

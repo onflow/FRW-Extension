@@ -12,12 +12,14 @@ import {
 import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
 import React, { forwardRef, useImperativeHandle, useEffect, useState, useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
+import { type NFTCollections } from '@/shared/types/nft-types';
+import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from '@/ui/utils/WalletContext';
 import placeholder from 'ui/FRWAssets/image/placeholder.png';
 
-import EmptyStatus from './EmptyStatus';
+import EmptyStatus from '../EmptyStatus';
 
 interface ListTabProps {
   data: any;
@@ -27,10 +29,18 @@ interface ListTabProps {
   activeCollection: any;
 }
 
+interface State {
+  collectionLoading: boolean;
+  collections: NFTCollections[];
+  isCollectionEmpty: boolean;
+  ownerAddress: string;
+}
+
 const useStyles = makeStyles(() => ({
   collectionContainer: {
     width: '100%',
     justifyContent: 'center',
+    padding: '0 8px',
   },
   collectionCard: {
     display: 'flex',
@@ -38,15 +48,18 @@ const useStyles = makeStyles(() => ({
     height: '64px',
     margin: '12px auto',
     boxShadow: 'none',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '12px',
   },
   skeletonCard: {
     display: 'flex',
-    backgroundColor: '#000000',
     width: '100%',
     height: '72px',
     margin: '12px auto',
     boxShadow: 'none',
     padding: 'auto',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '12px',
   },
   collectionImg: {
     borderRadius: '12px',
@@ -60,10 +73,8 @@ const useStyles = makeStyles(() => ({
   actionarea: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#282828',
     '&:hover': {
-      color: '#787878',
-      backgroundColor: '#787878',
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
     },
   },
 }));
@@ -72,71 +83,96 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
   const history = useHistory();
   const classes = useStyles();
   const usewallet = useWallet();
-  const [collectionLoading, setCollectionLoading] = useState(true);
-  const [collections, setCollections] = useState<any[]>([]);
-  const [isCollectionEmpty, setCollectionEmpty] = useState(true);
-  const [accesibleArray, setAccessible] = useState([{ id: '' }]);
-  const [ownerAddress, setAddress] = useState('');
-
-  useImperativeHandle(ref, () => ({
-    reload: () => {
-      usewallet.clearNFTCollection();
-      setCollections([]);
-      setCollectionLoading(true);
-      fetchLatestCollection(ownerAddress);
-    },
-  }));
+  const { currentWallet } = useProfiles();
+  const [state, setState] = useState<State>({
+    collectionLoading: true,
+    collections: [],
+    isCollectionEmpty: true,
+    ownerAddress: '',
+  });
 
   const fetchLatestCollection = useCallback(
     async (address: string) => {
+      if (!address) return;
+
       try {
         const list = await usewallet.refreshCollection(address);
-        setCollectionLoading(false);
-        if (list && list.length > 0) {
-          setCollectionEmpty(false);
-          setCollections(list);
-        } else {
-          setCollectionEmpty(true);
-        }
+        setState((prev) => ({
+          ...prev,
+          collectionLoading: false,
+          collections: list || [],
+          isCollectionEmpty: !list || list.length === 0,
+        }));
       } catch (err) {
-        console.log(err);
-        setCollectionLoading(false);
-        setCollectionEmpty(true);
+        setState((prev) => ({
+          ...prev,
+          collectionLoading: false,
+          collections: [],
+          isCollectionEmpty: true,
+        }));
       }
     },
     [usewallet]
   );
+
   const fetchCollectionCache = useCallback(
     async (address: string) => {
-      setAccessible(props.accessible);
+      if (!address || address === state.ownerAddress) return;
+
       try {
-        setCollectionLoading(true);
-        const list = await usewallet.getCollectionCache();
+        setState((prev) => ({ ...prev, collectionLoading: true, ownerAddress: address }));
+
+        const list = await usewallet.getCollectionCache(address);
+
         if (list && list.length > 0) {
-          setCollectionEmpty(false);
-          setCollections(list);
-          const count = list.reduce((acc, item) => acc + item.count, 0);
-          props.setCount(count);
+          setState((prev) => ({
+            ...prev,
+            collections: list,
+            isCollectionEmpty: false,
+            collectionLoading: false,
+          }));
         } else {
-          setCollectionEmpty(true);
-          fetchLatestCollection(address);
+          await fetchLatestCollection(address);
         }
-      } catch {
-        setCollectionEmpty(true);
-        fetchLatestCollection(address);
-      } finally {
-        setCollectionLoading(false);
+      } catch (error) {
+        await fetchLatestCollection(address);
       }
     },
-    [props, usewallet, fetchLatestCollection]
+    [fetchLatestCollection, usewallet, state.ownerAddress]
   );
 
   useEffect(() => {
-    if (props.data.ownerAddress) {
-      fetchCollectionCache(props.data.ownerAddress);
-      setAddress(props.data.ownerAddress);
+    const newAddress = currentWallet.address;
+    let mounted = true;
+
+    if (newAddress && newAddress !== state.ownerAddress) {
+      fetchCollectionCache(newAddress).then(() => {
+        if (!mounted) return;
+      });
     }
-  }, [props.data.ownerAddress, fetchCollectionCache]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [currentWallet, state.ownerAddress, fetchCollectionCache]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      reload: () => {
+        usewallet.clearNFTCollection();
+        setState((prev) => ({
+          ...prev,
+          collections: [],
+          collectionLoading: true,
+        }));
+        if (state.ownerAddress) {
+          fetchLatestCollection(state.ownerAddress);
+        }
+      },
+    }),
+    [usewallet, fetchLatestCollection, state.ownerAddress]
+  );
 
   const extractContractAddress = (collection) => {
     return collection.split('.')[2];
@@ -169,9 +205,15 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
       });
     };
     return (
-      <Card sx={{ borderRadius: '12px' }} className={classes.collectionCard}>
+      <Card
+        sx={{ borderRadius: '12px', backgroundColor: '#000000' }}
+        className={classes.collectionCard}
+      >
         <CardActionArea
-          sx={{ backgroundColor: 'background.paper', borderRadius: '12px', paddingRight: '8px' }}
+          sx={{
+            borderRadius: '12px',
+            paddingRight: '8px',
+          }}
           className={classes.actionarea}
           onClick={data.isAccessible && handleClick}
         >
@@ -190,8 +232,8 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
               alt={data.name}
             />
             <CardContent sx={{ flex: '1 0 auto', padding: '8px 4px' }}>
-              <Grid container>
-                <Grid item sx={{ width: '260px' }}>
+              <Grid container justifyContent="space-between" alignItems="center" sx={{ pr: 2 }}>
+                <Grid item sx={{ flex: 1 }}>
                   <Typography component="div" variant="body1" color="#fff" sx={{ mb: 0 }}>
                     {data.name}
                   </Typography>
@@ -216,7 +258,6 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
                         fontSize: '10px',
                         width: '80px',
                         fontFamily: 'Inter, sans-serif',
-                        backgroundColor: 'neutral1.light',
                       }}
                     >
                       {chrome.i18n.getMessage('Inaccessible')}
@@ -224,7 +265,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
                   )}
                 </Grid>
                 <Grid item>
-                  <ArrowForwardIcon color="primary" sx={{ mt: '12px' }} />
+                  <ArrowForwardIcon color="primary" />
                 </Grid>
               </Grid>
             </CardContent>
@@ -244,7 +285,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
         count={props.count}
         index={index}
         contract_name={props.collection ? props.collection.id : props.id}
-        ownerAddress={ownerAddress}
+        ownerAddress={state.ownerAddress}
         isAccessible={isAccessible}
       />
     );
@@ -252,115 +293,16 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
 
   return (
     <Container className={classes.collectionContainer}>
-      {collectionLoading ? (
-        <div>
-          <Card
-            sx={{
-              borderRadius: '12px',
-              backgroundColor: '#000000',
-              padding: '12px',
-            }}
-            className={classes.skeletonCard}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-              <CardMedia
-                sx={{
-                  width: '48px',
-                  height: '48px',
-                  justifyContent: 'center',
-                }}
-              >
-                <Skeleton variant="circular" width={48} height={48} />
-              </CardMedia>
-              <CardContent sx={{ flex: '1 0 auto', padding: '0 8px' }}>
-                <Skeleton variant="text" width={280} />
-                <Skeleton variant="text" width={150} />
-              </CardContent>
-            </Box>
-          </Card>
-
-          <Card
-            sx={{
-              borderRadius: '12px',
-              backgroundColor: '#000000',
-              padding: '12px',
-            }}
-            className={classes.skeletonCard}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-              <CardMedia
-                sx={{
-                  width: '48px',
-                  height: '48px',
-                  justifyContent: 'center',
-                }}
-              >
-                <Skeleton variant="circular" width={48} height={48} />
-              </CardMedia>
-              <CardContent sx={{ flex: '1 0 auto', padding: '0 8px' }}>
-                <Skeleton variant="text" width={280} />
-                <Skeleton variant="text" width={150} />
-              </CardContent>
-            </Box>
-          </Card>
-
-          <Card
-            sx={{
-              borderRadius: '12px',
-              backgroundColor: '#000000',
-              padding: '12px',
-            }}
-            className={classes.skeletonCard}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-              <CardMedia
-                sx={{
-                  width: '48px',
-                  height: '48px',
-                  justifyContent: 'center',
-                }}
-              >
-                <Skeleton variant="circular" width={48} height={48} />
-              </CardMedia>
-              <CardContent sx={{ flex: '1 0 auto', padding: '0 8px' }}>
-                <Skeleton variant="text" width={280} />
-                <Skeleton variant="text" width={150} />
-              </CardContent>
-            </Box>
-          </Card>
-
-          <Card
-            sx={{
-              borderRadius: '12px',
-              backgroundColor: '#000000',
-              padding: '12px',
-            }}
-            className={classes.skeletonCard}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-              <CardMedia
-                sx={{
-                  width: '48px',
-                  height: '48px',
-                  justifyContent: 'center',
-                }}
-              >
-                <Skeleton variant="circular" width={48} height={48} />
-              </CardMedia>
-              <CardContent sx={{ flex: '1 0 auto', padding: '0 8px' }}>
-                <Skeleton variant="text" width={280} />
-                <Skeleton variant="text" width={150} />
-              </CardContent>
-            </Box>
-          </Card>
-        </div>
-      ) : isCollectionEmpty ? (
+      {state.collectionLoading ? (
+        // Just show an empty box.. it's better that a skeleton
+        <Box height={249}></Box>
+      ) : state.isCollectionEmpty ? (
         <EmptyStatus />
       ) : (
-        collections.map(createListCard)
+        state.collections.map(createListCard)
       )}
     </Container>
   );
 });
 
-export default ListTab;
+export default React.memo(ListTab);

@@ -39,7 +39,6 @@ import IconAVector11Stroke from './IconAVector11Stroke';
 import IconMax from './IconMax';
 import IconVector2 from './IconVector2';
 import IconVector from './IconVector';
-import IconWallet from './IconWallet';
 import IconDevices from './IconDevices';
 import IconFusd from './IconFusd';
 import IconGoogleDrive from './IconGoogleDrive';
@@ -52,6 +51,8 @@ import IconEye from './IconEye';
 import IconPlayStore from './IconPlayStore';
 import IconAppStore from './IconAppStore';
 import IconBackButton from './IconBackButton';
+import IconActivity from './IconActivity';
+import CoinsIcon from '@/ui/FRWComponent/CoinsIcon';
 export { default as IconKucoin } from './IconKucoin';
 export { default as IconCoinbase } from './IconCoinbase';
 export { default as IconInbox } from './IconInbox';
@@ -90,7 +91,6 @@ export { default as IconAVector11Stroke } from './IconAVector11Stroke';
 export { default as IconMax } from './IconMax';
 export { default as IconVector2 } from './IconVector2';
 export { default as IconVector } from './IconVector';
-export { default as IconWallet } from './IconWallet';
 export { default as IconDevices } from './IconDevices';
 export { default as IconFusd } from './IconFusd';
 export { default as IconGoogleDrive } from './IconGoogleDrive';
@@ -103,6 +103,8 @@ export { default as IconEye } from './IconEye';
 export { default as IconPlayStore } from './IconPlayStore';
 export { default as IconAppStore } from './IconAppStore';
 export { default as IconBackButton } from './IconBackButton';
+export { default as CoinsIcon } from '@/ui/FRWComponent/CoinsIcon';
+export { default as IconActivity } from './IconActivity';
 
 const IconFont = ({ name, ...rest }) => {
   switch (name) {
@@ -183,7 +185,14 @@ const IconFont = ({ name, ...rest }) => {
     case 'Vector':
       return <IconVector {...rest} />;
     case 'wallet':
-      return <IconWallet {...rest} />;
+      return (
+        <CoinsIcon
+          width={rest.size || 18}
+          height={rest.size || 18}
+          color={rest.color || 'white'}
+          style={rest.style}
+        />
+      );
     case 'devices':
       return <IconDevices {...rest} />;
     case 'FUSD':
@@ -208,6 +217,18 @@ const IconFont = ({ name, ...rest }) => {
       return <IconAppStore {...rest} />;
     case 'back-button':
       return <IconBackButton {...rest} />;
+    case 'coins':
+      return (
+        <CoinsIcon
+          width={20}
+          height={20}
+          color={rest.color || '#777E90'}
+          opacity={1}
+          style={rest.sx}
+        />
+      );
+    case 'activity':
+      return <IconActivity {...rest} />;
   }
 
   return null;

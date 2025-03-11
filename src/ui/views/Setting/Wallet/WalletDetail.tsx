@@ -23,6 +23,7 @@ import { storage } from '@/background/webapi';
 import type { StorageInfo } from '@/shared/types/network-types';
 import { withPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import { LLHeader } from '@/ui/FRWComponent';
+import ResetModal from '@/ui/FRWComponent/PopupModal/resetModal';
 import { useWallet } from 'ui/utils';
 
 import IconEnd from '../../../../components/iconfont/IconAVector11Stroke';
@@ -228,7 +229,7 @@ function formatStorageInfo(used: number | undefined, capacity: number | undefine
 
 const WalletDetail = () => {
   const classes = useStyles();
-  const usewallet = useWallet();
+  const wallet = useWallet();
 
   const [, setLoading] = useState(true);
   const [userWallet, setWallet] = useState<any>(null);
@@ -241,12 +242,16 @@ const WalletDetail = () => {
   const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
   const [isKeyphrase, setIsKeyphrase] = useState(false);
   const [emoji, setEmoji] = useState<any>(tempEmoji);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const handleErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
     setShowError(false);
+  };
+  const handleResetWallet = () => {
+    wallet.resetPwd();
   };
 
   const loadGasMode = useCallback(async () => {
@@ -257,12 +262,12 @@ const WalletDetail = () => {
   }, []);
 
   const loadGasKillSwitch = useCallback(async () => {
-    await usewallet.getPayerAddressAndKeyId();
+    await wallet.getPayerAddressAndKeyId();
     const isFreeGasFeeEnabled = await storage.get('freeGas');
     if (isFreeGasFeeEnabled) {
       setGasKillSwitch(isFreeGasFeeEnabled);
     }
-  }, [usewallet]);
+  }, [wallet]);
 
   const switchGasMode = async () => {
     setGasMode(!modeGas);
@@ -290,7 +295,7 @@ const WalletDetail = () => {
   };
 
   const setUserWallet = useCallback(async () => {
-    await usewallet.setDashIndex(3);
+    await wallet.setDashIndex(3);
     const savedWallet = await storage.get('walletDetail');
     const walletDetail = JSON.parse(savedWallet);
     if (walletDetail) {
@@ -301,13 +306,13 @@ const WalletDetail = () => {
       selectingEmoji['bgcolor'] = walletDetail.wallet.color;
       setEmoji(selectingEmoji);
     }
-  }, [usewallet]);
+  }, [wallet]);
 
   const loadStorageInfo = useCallback(async () => {
-    const address = await usewallet.getCurrentAddress();
-    const info = await usewallet.openapi.getStorageInfo(address!);
+    const address = await wallet.getCurrentAddress();
+    const info = await wallet.openapi.getStorageInfo(address!);
     setStorageInfo(info);
-  }, [usewallet]);
+  }, [wallet]);
 
   function storageCapacity(storage): number {
     const used = storage?.used ?? 1;
@@ -316,9 +321,9 @@ const WalletDetail = () => {
   }
 
   const checkKeyphrase = useCallback(async () => {
-    const keyrings = await usewallet.checkMnemonics();
+    const keyrings = await wallet.checkMnemonics();
     await setIsKeyphrase(keyrings);
-  }, [usewallet]);
+  }, [wallet]);
 
   useEffect(() => {
     setUserWallet();
@@ -531,8 +536,7 @@ const WalletDetail = () => {
           variant="contained"
           disableElevation
           color="error"
-          component={Link}
-          to="/dashboard/setting/removeWallet"
+          onClick={() => setShowResetModal(true)}
           sx={{
             width: '100% !important',
             height: '48px',
@@ -570,6 +574,13 @@ const WalletDetail = () => {
           userWallet={userWallet}
         />
       )}
+      <ResetModal
+        setShowAction={setShowResetModal}
+        isOpen={showResetModal}
+        onOpenChange={handleResetWallet}
+        errorName={chrome.i18n.getMessage('Confirm_to_reset_Wallet')}
+        errorMessage={chrome.i18n.getMessage('This_action_will_remove')}
+      />
     </div>
   );
 };

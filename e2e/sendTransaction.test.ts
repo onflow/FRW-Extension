@@ -1,7 +1,6 @@
 import {
   test,
   loginToSenderAccount,
-  expect,
   getCurrentAddress,
   switchToEvm,
   waitForTransaction,

@@ -114,6 +114,12 @@ export const SendTo = () => {
     });
   };
 
+  const handleFinalizeAmount = () => {
+    dispatch({
+      type: 'finalizeAmount',
+    });
+  };
+
   return (
     <SendToCadenceOrEvm
       transactionState={transactionState}
@@ -121,6 +127,7 @@ export const SendTo = () => {
       handleTokenChange={handleTokenChange}
       handleSwitchFiatOrCoin={handleSwitchFiatOrCoin}
       handleMaxClick={handleMaxClick}
+      handleFinalizeAmount={handleFinalizeAmount}
     />
   );
 };

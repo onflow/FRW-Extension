@@ -1,0 +1,57 @@
+import { Box } from '@mui/material';
+import React from 'react';
+
+interface CoinsIconProps {
+  width?: number | string;
+  height?: number | string;
+  color?: string;
+  opacity?: number;
+  className?: string;
+  style?: React.CSSProperties;
+  sx?: React.CSSProperties;
+  [key: string]: any;
+}
+
+const CoinsIcon: React.FC<CoinsIconProps> = ({
+  width = 16,
+  height = 16,
+  color = 'white',
+  opacity = 1,
+  className = '',
+  style = {},
+  sx = {},
+}) => {
+  return (
+    <Box
+      sx={{
+        width: width,
+        height: height,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...sx,
+      }}
+    >
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        style={style}
+      >
+        <path
+          d="M6 9.33333C6 10.438 7.79067 11.3333 10 11.3333C12.2093 11.3333 14 10.438 14 9.33333M6 9.33333C6 8.22867 7.79067 7.33333 10 7.33333C12.2093 7.33333 14 8.22867 14 9.33333M6 9.33333V12C6 13.104 7.79067 14 10 14C12.2093 14 14 13.104 14 12V9.33333M2 4C2 4.71467 2.76267 5.37467 4 5.732C5.23733 6.08933 6.76267 6.08933 8 5.732C9.23733 5.37467 10 4.71467 10 4C10 3.28533 9.23733 2.62533 8 2.268C6.76267 1.91067 5.23733 1.91067 4 2.268C2.76267 2.62533 2 3.28533 2 4ZM2 4V10.6667C2 11.2587 2.51467 11.6333 3.33333 12M2 7.33333C2 7.92533 2.51467 8.3 3.33333 8.66667"
+          stroke={color}
+          strokeOpacity={opacity}
+          strokeWidth="1.33333"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </Box>
+  );
+};
+
+export default CoinsIcon;

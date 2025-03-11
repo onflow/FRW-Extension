@@ -3,22 +3,9 @@ import { createPersistStore } from 'background/utils';
 import { type Contact } from '../../shared/types/network-types';
 
 interface AddressBookStore {
-  addressBook: Record<string, Contact[]>;
-  recent: Record<string, Contact[]>;
+  addressBook: Record<'mainnet' | 'testnet', Contact[]>;
+  recent: Record<'mainnet' | 'testnet', Contact[]>;
 }
-
-// const empty: Contact = {
-//   address: '',
-//   avatar: '',
-//   contactName: '',
-//   contactType: 0,
-//   domain: {
-//     domainType:0,
-//     value:'',
-//   },
-//   id: 0,
-//   username: '',
-// }
 
 class AddressBook {
   store!: AddressBookStore;
@@ -29,23 +16,21 @@ class AddressBook {
       template: {
         addressBook: {
           testnet: [],
-          crescendo: [],
           mainnet: [],
         },
         recent: {
           testnet: [],
-          crescendo: [],
           mainnet: [],
         },
       },
     });
   };
 
-  getAllContact = () => {
+  getAllContacts = (): AddressBookStore => {
     return this.store;
   };
 
-  getRecent = (network: string) => {
+  getRecent = (network: string): Contact[] => {
     return this.store.recent[network];
   };
 
@@ -58,11 +43,11 @@ class AddressBook {
       current.pop();
     }
     current.unshift(data);
-    const unique = this.uniqByKeepFirst(current, (it) => it.address);
+    const unique = this.uniqueByKeepFirst(current, (it) => it.address);
     this.store.recent[network] = unique;
   };
 
-  uniqByKeepFirst = (a, key) => {
+  uniqueByKeepFirst = (a: Contact[], key: (item: Contact) => string) => {
     const seen = new Set();
     return a.filter((item) => {
       const k = key(item);
@@ -70,7 +55,7 @@ class AddressBook {
     });
   };
 
-  getAddresBook = (network: string) => {
+  getAddressBook = (network: string): Contact[] => {
     return this.store.addressBook[network];
   };
 
@@ -82,12 +67,10 @@ class AddressBook {
     this.store = {
       addressBook: {
         testnet: [],
-        crescendo: [],
         mainnet: [],
       },
       recent: {
         testnet: [],
-        crescendo: [],
         mainnet: [],
       },
     };

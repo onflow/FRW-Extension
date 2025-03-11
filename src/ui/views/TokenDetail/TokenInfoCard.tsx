@@ -130,7 +130,6 @@ const TokenInfoCard = ({ price, token, setAccessible, accessible, tokenInfo, chi
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  background: 'linear-gradient(270deg, #282828, #121212)',
                   gap: '4px',
                   px: '8px',
                   py: '4px',

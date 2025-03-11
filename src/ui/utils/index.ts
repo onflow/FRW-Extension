@@ -154,3 +154,13 @@ export const HexToDecimalConverter = (hexValue) => {
   const decimalValue = convertHexToDecimal(hexValue);
   return decimalValue;
 };
+
+export const returnFilteredCollections = (contractList, NFT) => {
+  const searchName = NFT.collectionContractName || NFT.contractName;
+  if (!searchName) return undefined;
+
+  return contractList.find(
+    (collection) =>
+      collection.contractName === searchName || collection.contract_name === searchName
+  );
+};

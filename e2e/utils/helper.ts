@@ -377,7 +377,6 @@ export const test = base.extend<{
   context: async ({}, call) => {
     const pathToExtension = path.join(__dirname, '../../dist');
     const context = await chromium.launchPersistentContext('/tmp/test-user-data-dir', {
-      headless: true,
       channel: 'chromium',
       args: [
         `--disable-extensions-except=${pathToExtension}`,

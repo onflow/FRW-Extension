@@ -149,10 +149,6 @@ const SignTypedDataVersion = {
   V4: 'V4',
 } as const;
 
-function normalize(input: string): string {
-  return input.toLowerCase();
-}
-
 const TypedDataUtils = {
   eip712Hash(message: any, version: string): Buffer {
     const types = { ...message.types };
@@ -210,7 +206,7 @@ class ProviderController extends BaseController {
   };
 
   ethRequestAccounts = async ({ session: { origin, name, icon } }) => {
-    if (!permissionService.hasPermission(origin)) {
+    if (!permissionService.hasPermission(origin) || !(await Wallet.isUnlocked())) {
       const { defaultChain, signPermission } = await notificationService.requestApproval(
         {
           params: { origin, name, icon },
@@ -222,15 +218,16 @@ class ProviderController extends BaseController {
     }
 
     const currentWallet = await Wallet.getMainWallet();
-
-    let res: string | null;
+    let evmAddress: string = '';
     try {
       // Attempt to query the EVM address
-      res = await Wallet.queryEvmAddress(currentWallet);
-      console.log('Query successful:', res);
+      evmAddress = await Wallet.queryEvmAddress(currentWallet);
+      if (!isValidEthereumAddress(evmAddress)) {
+        throw new Error('Invalid EVM address');
+      }
     } catch (error) {
       // If an error occurs, request approval
-      console.error('Error querying EVM address:', error);
+      console.error('ethRequestAccounts - Error querying EVM address:', error);
 
       await notificationService.requestApproval(
         {
@@ -240,14 +237,13 @@ class ProviderController extends BaseController {
         { height: 599 }
       );
 
-      res = await Wallet.queryEvmAddress(currentWallet);
+      evmAddress = await Wallet.queryEvmAddress(currentWallet);
     }
 
-    res = ensureEvmAddressPrefix(res);
-    const account = res ? [res.toLowerCase()] : [];
+    const account = evmAddress ? [ensureEvmAddressPrefix(evmAddress)] : [];
+
     sessionService.broadcastEvent('accountsChanged', account);
     const connectSite = permissionService.getConnectedSite(origin);
-
     return account;
   };
   ethEstimateGas = async ({ data }) => {
@@ -293,7 +289,7 @@ class ProviderController extends BaseController {
   };
 
   ethAccounts = async ({ session: { origin } }) => {
-    if (!permissionService.hasPermission(origin) || !Wallet.isUnlocked()) {
+    if (!permissionService.hasPermission(origin) || !(await Wallet.isUnlocked())) {
       return [];
     }
 
@@ -316,11 +312,11 @@ class ProviderController extends BaseController {
       return;
     }
 
-    let res: string | null;
+    let evmAccount: string | null;
     try {
       // Attempt to query the EVM address
-      res = await Wallet.queryEvmAddress(currentWallet);
-      console.log('Query successful:', res);
+      evmAccount = await Wallet.queryEvmAddress(currentWallet);
+      console.log('Query successful:', evmAccount);
     } catch (error) {
       // If an error occurs, request approval
       console.error('Error querying EVM address:', error);
@@ -333,10 +329,10 @@ class ProviderController extends BaseController {
         { height: 599 }
       );
 
-      res = await Wallet.queryEvmAddress(currentWallet);
+      evmAccount = await Wallet.queryEvmAddress(currentWallet);
     }
 
-    const account = res ? [res.toLowerCase()] : [];
+    const account = evmAccount ? [evmAccount] : [];
     await sessionService.broadcastEvent('accountsChanged', account);
     await permissionService.getConnectedSite(origin);
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -439,10 +435,6 @@ class ProviderController extends BaseController {
     return result;
   };
 
-  private _checkAddress = async (address) => {
-    return normalize(address).toLowerCase();
-  };
-
   ethChainId = async ({ session }) => {
     const network = await Wallet.getNetwork();
     if (network === 'testnet') {
@@ -521,7 +513,7 @@ class ProviderController extends BaseController {
       currentChain = 747;
     }
 
-    const paramAddress = request.data.params?.[0].toLowerCase() || '';
+    const paramAddress = request.data.params?.[0] || '';
 
     if (isValidEthereumAddress(paramAddress)) {
       data = request.data.params[1];
@@ -531,14 +523,14 @@ class ProviderController extends BaseController {
       address = request.data.params[1];
     }
 
+    // Potentially shouldn't change the case to compare - we should be checking ERC-55 conformity
     if (
       ensureEvmAddressPrefix(evmaddress!.toLowerCase()) !==
       ensureEvmAddressPrefix(address.toLowerCase())
     ) {
-      console.log('evmaddress address ', evmaddress!.toLowerCase(), address.toLowerCase());
+      console.log('evmaddress address ', evmaddress!, address);
       throw new Error('Provided address does not match the current address');
     }
-    console.log('data address ', address, data);
     const message = typeof data === 'string' ? JSON.parse(data) : data;
 
     const signTypeMethod =
@@ -559,7 +551,6 @@ class ProviderController extends BaseController {
   };
 
   signTypeDataV1 = async (request) => {
-    console.log('eth_signTypedData_v1  ', request);
     let address;
     let data;
     let currentChain;
@@ -594,6 +585,7 @@ class ProviderController extends BaseController {
 
     console.log('evmaddress address ', address, evmaddress);
 
+    // Potentially shouldn't change the case to compare - we should be checking ERC-55 conformity
     if (
       ensureEvmAddressPrefix(evmaddress!.toLowerCase()) !==
       ensureEvmAddressPrefix(address.toLowerCase())

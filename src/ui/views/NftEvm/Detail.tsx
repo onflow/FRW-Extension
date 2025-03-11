@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
-import { StyledEngineProvider } from '@mui/material/styles';
-import { useWallet } from 'ui/utils';
-import { Typography, Container, Box, IconButton, Button, CardMedia } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
-import { PostMedia, MatchMediaType } from '@/ui/utils/url';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import { Typography, Container, Box, IconButton, Button, CardMedia } from '@mui/material';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
 import { saveAs } from 'file-saver';
-import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
-import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
-import fallback from 'ui/FRWAssets/image/errorImage.png';
-import MoveNftConfirmation from './SendNFT/MoveNftConfirmation';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+
 import nft from '@/background/service/nft';
+import { type PostMedia, MatchMediaType } from '@/ui/utils/url';
+import fallback from 'ui/FRWAssets/image/errorImage.png';
+import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
+import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
+import { useWallet } from 'ui/utils';
+
+import MoveNftConfirmation from './SendNFT/MoveNftConfirmation';
 
 const useStyles = makeStyles(() => ({
   pageContainer: {
@@ -126,7 +128,7 @@ const Detail = () => {
     }
   }, []);
 
-  const fetchNft = async () => {
+  const fetchNft = useCallback(async () => {
     const userInfo = await usewallet.getUserInfo(false);
     const currentAddress = await usewallet.getCurrentAddress();
     const evmAddress = await usewallet.getEvmAddress();
@@ -167,12 +169,11 @@ const Detail = () => {
     setContactOne(userOne);
     setContactTwo(userTwo);
 
-    console.log('userInfo ', userInfo);
     const evmEnabled = await usewallet.getEvmEnabled();
     setEvmEnabled(evmEnabled);
 
     await usewallet.setDashIndex(1);
-  };
+  }, [usewallet]);
 
   const replaceIPFS = (url: string | null): string => {
     if (!url) {
@@ -192,7 +193,7 @@ const Detail = () => {
 
   useEffect(() => {
     fetchNft();
-  }, []);
+  }, [fetchNft]);
 
   const downloadImage = (image_url, title) => {
     saveAs(image_url, title); // Put your image url here.
@@ -325,29 +326,6 @@ const Detail = () => {
           >
             <ArrowBackIcon sx={{ color: 'icon.navi' }} />
           </IconButton>
-          {/* {
-            nftDetail && 
-            <>
-              <IconButton onClick={handleClick} className={classes.extendMore}>
-                <MoreHorizIcon sx={{ color: 'icon.navi'}} />
-              </IconButton>
-              <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                  'aria-labelledby': 'basic-button',
-                }}
-              >
-                <MenuItem onClick={handleClose}>
-                  <a href={'https://lilico.app/nft/' + ownerAddress +'/'+ nftDetail.contract.address +'/'+ nftDetail.contract.name + '?tokenId=' + nftDetail.id.tokenId} target="_blank">
-                Share
-                  </a>
-                </MenuItem>
-              </Menu>
-            </>
-          } */}
         </Box>
 
         {nftDetail && (
@@ -363,7 +341,7 @@ const Detail = () => {
               }}
             >
               <Box className={classes.mediabox}>
-                {media && media?.video != null ? getMedia() : getUri()}
+                {media && media?.video !== null ? getMedia() : getUri()}
               </Box>
               <Box
                 sx={{
@@ -398,7 +376,7 @@ const Detail = () => {
                           width="20px"
                           style={{ marginRight: '6px', borderRadius: '50%' }}
                         />
-                        {nftDetail.collectionContractName}
+                        {nftDetail.contractName}
                         <ArrowForwardOutlinedIcon
                           sx={{
                             color: 'icon.navi',
@@ -460,9 +438,7 @@ const Detail = () => {
         )}
         {isAccessibleNft && (
           <Box sx={{ height: '42px', position: 'fixed', bottom: '32px', right: '18px' }}>
-            {!(
-              nftDetail?.collectionContractName === 'Domains' && media?.title?.includes('.meow')
-            ) && (
+            {!(nftDetail?.contractName === 'Domains' && media?.title?.includes('.meow')) && (
               <Button
                 sx={{
                   backgroundColor: '#FFFFFF33',

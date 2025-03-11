@@ -1,84 +1,60 @@
-import { Box, ListItemButton, Typography, ListItem, ListItemIcon, CardMedia } from '@mui/material';
-import React, { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  type SelectChangeEvent,
+  CircularProgress,
+} from '@mui/material';
+import React, { useState } from 'react';
 
 import { useWallet } from 'ui/utils';
 
-import mainnetIndicator from '../../../FRWAssets/svg/mainnetArrow.svg';
 import networkLink from '../../../FRWAssets/svg/networkLink.svg';
-import testnetIndicator from '../../../FRWAssets/svg/testnetArrow.svg';
 
-const NetworkList = ({ networkColor, currentNetwork }) => {
+const bgColor = (network: string) => {
+  switch (network) {
+    case 'mainnet':
+      return '#41CC5D14';
+    case 'testnet':
+      return '#FF8A0014';
+    case 'crescendo':
+      return '#CCAF2114';
+  }
+};
+
+interface NetworkListProps {
+  networkColor: (network: string) => string;
+  currentNetwork: string;
+}
+
+const NetworkList = ({ networkColor, currentNetwork }: NetworkListProps) => {
   const usewallet = useWallet();
 
-  const history = useHistory();
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const [indicatorRotation, setIndicatorRotation] = useState(180); // Initial rotation angle
-
-  const dropdownRef = useRef<HTMLLIElement>(null);
-
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-
-    // Add event listener for clicks
-    document.addEventListener('mousedown', handleClickOutside);
-
-    // Cleanup the event listener
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [dropdownRef]);
-
-  const rotateIndicator = () => {
-    setIndicatorRotation(indicatorRotation === 180 ? 0 : 180); // Toggle rotation angle
-  };
-
+  const [isSwitchingNetwork, setIsSwitchingNetwork] = useState(false);
   const switchNetwork = async (network: string) => {
-    // if (network === 'crescendo' && !isSandboxEnabled) {
-    //   return;
-    // }
+    setIsSwitchingNetwork(true);
+    try {
+      if (currentNetwork !== network) {
+        // Don't await it, because it will block the main thread
+        usewallet.switchNetwork(network);
 
-    usewallet.switchNetwork(network);
-
-    if (currentNetwork !== network) {
-      // TODO: replace it with better UX
-      history.push('/dashboard');
-      window.location.reload();
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error switching network:', error);
+    } finally {
+      setIsSwitchingNetwork(false);
     }
   };
 
-  const getIndicatorImage = () => {
-    switch (currentNetwork) {
-      case 'mainnet':
-        return mainnetIndicator;
-      case 'testnet':
-        return testnetIndicator;
-      default:
-        return mainnetIndicator; // Default to mainnet if no match
-    }
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    switchNetwork(event.target.value);
   };
 
-  const bgColor = (network: string) => {
-    switch (network) {
-      case 'mainnet':
-        return '#41CC5D14';
-      case 'testnet':
-        return '#FF8A0014';
-      case 'crescendo':
-        return '#CCAF2114';
-    }
-  };
   return (
-    <ListItem disablePadding sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
       <Box
         sx={{
           display: 'flex',
@@ -89,8 +65,8 @@ const NetworkList = ({ networkColor, currentNetwork }) => {
           flex: '1',
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <ListItemIcon
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box
             sx={{
               width: '24px',
               minWidth: '16px',
@@ -101,8 +77,8 @@ const NetworkList = ({ networkColor, currentNetwork }) => {
               marginRight: '12px',
             }}
           >
-            <CardMedia component="img" sx={{ width: '16px', height: '16px' }} image={networkLink} />
-          </ListItemIcon>
+            <img src={networkLink} alt="networkLink" />
+          </Box>
           <Typography
             variant="body1"
             component="div"
@@ -115,118 +91,113 @@ const NetworkList = ({ networkColor, currentNetwork }) => {
         </Box>
       </Box>
       <Box sx={{ flex: '1' }}></Box>
-      <ListItemButton
+      <FormControl
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          position: 'relative',
-          alignItems: 'center',
-          padding: '4px 12px',
-          borderRadius: '24px',
-          cursor: 'pointer',
-          height: '24px',
-          maxWidth: 'auto',
-          backgroundColor: bgColor(currentNetwork),
+          minWidth: '100px',
           marginRight: '16px',
         }}
-        onClick={() => {
-          rotateIndicator();
-          toggleDropdown();
-        }}
       >
-        <Typography
+        <Select
+          value={currentNetwork}
+          onChange={handleChange}
+          displayEmpty
+          variant="outlined"
+          disabled={isSwitchingNetwork}
+          renderValue={(selected) => (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {isSwitchingNetwork ? (
+                <CircularProgress size={12} />
+              ) : (
+                <Typography
+                  sx={{
+                    fontSize: '12px',
+                    fontWeight: '400',
+                    color: networkColor(selected as string),
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {selected}
+                </Typography>
+              )}
+            </Box>
+          )}
           sx={{
-            fontSize: '12px',
-            marginRight: '12px',
-            lineHeight: '24px',
-            fontWeight: '400',
-            color: networkColor(currentNetwork),
-            textTransform: 'capitalize',
+            height: '32px',
+            borderRadius: '24px',
+            backgroundColor: bgColor(currentNetwork),
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '& .MuiSelect-select': {
+              padding: '4px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '12px',
+              fontWeight: '400',
+              color: networkColor(currentNetwork),
+              textTransform: 'capitalize',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                backgroundColor: '#222222',
+                borderRadius: '8px',
+                marginTop: '4px',
+                zIndex: 2000,
+              },
+            },
+            sx: {
+              zIndex: 2000,
+            },
           }}
         >
-          {currentNetwork}
-        </Typography>
-        <CardMedia
-          component="img"
-          sx={{
-            width: '16px',
-            height: '16px',
-            transform: `rotate(${indicatorRotation}deg)`,
-          }}
-          image={getIndicatorImage()}
-        />
-        {showDropdown && (
-          <ListItem
-            ref={dropdownRef}
-            disablePadding
+          <MenuItem
+            value="mainnet"
             sx={{
-              position: 'absolute',
-              width: 'auto',
-              height: 'auto',
-              display: 'flex',
-              top: '28px',
-              py: '4px',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              zIndex: '2000',
-              textAlign: 'left',
-              left: '0',
-              backgroundColor: '#222222',
-              borderRadius: '8px',
+              padding: '4px 8px',
+              fontSize: '12px',
+              lineHeight: '16px',
+              fontWeight: '400',
+              '&:hover': {
+                color: networkColor('mainnet'),
+              },
+              '&.Mui-selected': {
+                backgroundColor: 'transparent',
+              },
+              '&.Mui-selected:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              },
             }}
           >
-            <ListItemButton
-              onClick={() => switchNetwork('mainnet')}
-              sx={{
-                padding: '4px 8px',
-                width: '100%',
-                '&:hover': {
-                  color: networkColor('mainnet'),
-                },
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '12px',
-                  lineHeight: '16px',
-                  fontWeight: '400',
-                  textAlign: 'left',
-                  '&:hover': {
-                    color: networkColor('mainnet'),
-                  },
-                }}
-              >
-                Mainnet
-              </Typography>
-            </ListItemButton>
-
-            <ListItemButton
-              onClick={() => switchNetwork('testnet')}
-              sx={{
-                padding: '4px 8px',
-                width: '100%',
-                '&:hover': {
-                  color: networkColor('testnet'),
-                },
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '12px',
-                  lineHeight: '16px',
-                  fontWeight: '400',
-                  '&:hover': {
-                    color: networkColor('testnet'),
-                  },
-                }}
-              >
-                Testnet
-              </Typography>
-            </ListItemButton>
-          </ListItem>
-        )}
-      </ListItemButton>
-    </ListItem>
+            Mainnet
+          </MenuItem>
+          <MenuItem
+            value="testnet"
+            sx={{
+              padding: '4px 8px',
+              fontSize: '12px',
+              lineHeight: '16px',
+              fontWeight: '400',
+              '&:hover': {
+                color: networkColor('testnet'),
+              },
+              '&.Mui-selected': {
+                backgroundColor: 'transparent',
+              },
+              '&.Mui-selected:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              },
+            }}
+          >
+            Testnet
+          </MenuItem>
+        </Select>
+      </FormControl>
+    </div>
   );
 };
 

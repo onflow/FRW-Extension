@@ -26,12 +26,14 @@ import {
 } from '@/background/utils/modules/publicPrivateKey';
 import eventBus from '@/eventBus';
 import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
+import { ContactType } from '@/shared/types/network-types';
 import { type TrackingEvents } from '@/shared/types/tracking-types';
 import { type TransferItem, type TransactionState } from '@/shared/types/transaction-types';
-import { type LoggedInAccount } from '@/shared/types/wallet-types';
+import { type ActiveChildType, type LoggedInAccount } from '@/shared/types/wallet-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress, withPrefix } from '@/shared/utils/address';
 import { getSignAlgo } from '@/shared/utils/algo';
 import { convertToIntegerAmount, validateAmount } from '@/shared/utils/number';
+import { retryOperation } from '@/shared/utils/retryOperation';
 import {
   keyringService,
   preferenceService,
@@ -51,11 +53,12 @@ import {
   proxyService,
   newsService,
   mixpanelTrack,
+  evmNftService,
 } from 'background/service';
 import i18n from 'background/service/i18n';
 import { type DisplayedKeryring, KEYRING_CLASS } from 'background/service/keyring';
 import type { CacheState } from 'background/service/pageStateCache';
-import { getScripts } from 'background/utils';
+import { getScripts, replaceNftKeywords } from 'background/utils';
 import emoji from 'background/utils/emoji.json';
 import fetchConfig from 'background/utils/remoteConfig';
 import { notification, storage } from 'background/webapi';
@@ -64,8 +67,9 @@ import { INTERNAL_REQUEST_ORIGIN, EVENTS, KEYRING_TYPE, EVM_ENDPOINT } from 'con
 
 import type {
   BlockchainResponse,
+  Contact,
   NFTData,
-  NFTModel,
+  NFTModel_depreciated,
   NFTModelV2,
   WalletResponse,
 } from '../../shared/types/network-types';
@@ -156,61 +160,11 @@ export class WalletController extends BaseController {
   resolveApproval = notificationService.resolveApproval;
   rejectApproval = notificationService.rejectApproval;
 
-  // initAlianNames = async () => {
-  //   await preferenceService.changeInitAlianNameStatus();
-  //   const keyrings = await keyringService.getAllTypedAccounts();
-  //   const walletConnectKeyrings = keyrings.filter(
-  //     (item) => item.type === 'WalletConnect'
-  //   );
-  //   const catergoryGroupAccount = keyrings.map((item) => ({
-  //     type: item.type,
-  //     accounts: item.accounts,
-  //   }));
-  //   let walletConnectList: DisplayedKeryring['accounts'] = [];
-  //   for (let i = 0; i < walletConnectKeyrings.length; i++) {
-  //     const keyring = walletConnectKeyrings[i];
-  //     walletConnectList = [...walletConnectList, ...keyring.accounts];
-  //   }
-  //   const groupedWalletConnectList = groupBy(walletConnectList, 'brandName');
-  //   if (keyrings.length > 0) {
-  //     console.log(
-  //       keyrings,
-  //       'keyrings',
-  //       groupedWalletConnectList,
-  //       '==================='
-  //     );
-  //     // Object.keys(groupedWalletConnectList).forEach((key) => {
-  //     //   groupedWalletConnectList[key].map((acc, index) => {
-  //     //     this.updateAlianName(
-  //     //       acc?.address,
-  //     //       `${WALLET_BRAND_CONTENT[acc?.brandName]} ${index + 1}`
-  //     //     );
-  //     //   });
-  //     // });
-  //     const catergories = groupBy(
-  //       catergoryGroupAccount.filter((group) => group.type !== 'WalletConnect'),
-  //       'type'
-  //     );
-  //     const result = Object.keys(catergories)
-  //       .map((key) =>
-  //         catergories[key].map((item) =>
-  //           item.accounts.map((acc) => ({
-  //             address: acc.address,
-  //             type: key,
-  //           }))
-  //         )
-  //       )
-  //       .map((item) => item.flat(1));
-  //     result.forEach((group) =>
-  //       group.forEach((acc, index) => {
-  //         this.updateAlianName(
-  //           acc?.address,
-  //           `${BRAND_ALIAN_TYPE_TEXT[acc?.type]} ${index + 1}`
-  //         );
-  //       })
-  //     );
-  //   }
-  // };
+  switchAccount = async (currentId: string) => {
+    await keyringService.switchKeyring(currentId);
+    const pubKey = await this.getPubKey();
+    await userWalletService.switchLogin(pubKey);
+  };
 
   unlock = async (password: string) => {
     await keyringService.submitPassword(password);
@@ -219,18 +173,47 @@ export class WalletController extends BaseController {
     await passwordService.setPassword(password);
     const pubKey = await this.getPubKey();
     await userWalletService.switchLogin(pubKey);
+    // Set up all the wallet data
+    await this.refreshWallets();
 
     sessionService.broadcastEvent('unlock');
   };
 
+  refreshWallets = async () => {
+    // Refresh all the wallets after unlocking or switching profiles
+    // Refresh the cadence scripts first
+    await this.getCadenceScripts();
+    // Refresh the main address
+    const mainAddress = await this.getMainAddress();
+    // Refresh the EVM wallet
+    await this.queryEvmAddress(mainAddress);
+    // Refresh the user wallets
+    await this.refreshUserWallets();
+    // Refresh the child wallets
+    await this.setChildWallet(await this.checkUserChildAccount());
+    // Refresh the logged in account
+    const [keys, pubKTuple] = await Promise.all([this.getAccount(), this.getPubKey()]);
+    // Check if a child wallet is active (it shouldn't be...)
+    const anyActiveChild = await this.getActiveWallet();
+    // Get the current wallet
+    const currentWallet = await this.getCurrentWallet();
+    if (!currentWallet) {
+      throw new Error('Current wallet is undefined');
+    }
+    // Refresh the user info
+    let userInfo = {};
+    try {
+      userInfo = await retryOperation(async () => this.getUserInfo(true), 3, 1000);
+    } catch (error) {
+      console.error('Error refreshing user info:', error);
+    }
+    // Refresh the user info
+    await openapiService.freshUserInfo(currentWallet, keys, pubKTuple, userInfo, anyActiveChild);
+  };
+
   retrievePk = async (password: string) => {
-    // const alianNameInited = await preferenceService.getInitAlianNameStatus();
-    // const alianNames = await preferenceService.getAllAlianName();
     const pk = await keyringService.retrievePk(password);
     return pk;
-    // if (!alianNameInited && Object.values(alianNames).length === 0) {
-    //   this.initAlianNames();
-    // }
   };
 
   extractKeys = (keyrings) => {
@@ -262,11 +245,15 @@ export class WalletController extends BaseController {
   };
 
   isUnlocked = async () => {
+    if (!this.isBooted()) {
+      return false;
+    }
+
     const isUnlocked = keyringService.memStore.getState().isUnlocked;
-    // TODO: Below probably never unlocks anything as the password is encrypted
     if (!isUnlocked) {
       let password = '';
       try {
+        // This uses google drive to decrypt the password
         password = await passwordService.getPassword();
       } catch {
         password = '';
@@ -291,6 +278,13 @@ export class WalletController extends BaseController {
     await userWalletService.clear();
     sessionService.broadcastEvent('accountsChanged', []);
     sessionService.broadcastEvent('lock');
+  };
+
+  signOutWallet = async () => {
+    await keyringService.updateKeyring();
+    await userWalletService.signOutCurrentUser();
+    await userWalletService.clear();
+    sessionService.broadcastEvent('accountsChanged', []);
   };
 
   // lockadd here
@@ -691,7 +685,7 @@ export class WalletController extends BaseController {
 
   getTypedAccounts = async (type) => {
     return Promise.all(
-      keyringService.keyrings
+      keyringService.currentKeyring
         .filter((keyring) => !type || keyring.type === type)
         .map((keyring) => keyringService.displayForKeyring(keyring))
     );
@@ -876,17 +870,14 @@ export class WalletController extends BaseController {
     return preferenceService.updateIsFirstOpen();
   };
   // userinfo
-  getUserInfo = async (forceRefresh: boolean) => {
-    const data = await userInfoService.getUserInfo();
-
-    if (forceRefresh) {
-      return await this.fetchUserInfo();
+  getUserInfo = async (forceRefresh: boolean = false) => {
+    if (!forceRefresh) {
+      const data = userInfoService.getUserInfo();
+      if (data.username.length) {
+        return data;
+      }
     }
-
-    if (data.username.length) {
-      return data;
-    }
-
+    // Either force refresh or the user info is not set
     return await this.fetchUserInfo();
   };
 
@@ -996,14 +987,6 @@ export class WalletController extends BaseController {
     const network = await this.getNetwork();
     const domain = await userInfoService.getMeow(network);
     return domain;
-  };
-
-  updateUserInfo = (data: UserInfoStore) => {
-    userInfoService.updateUserInfo(data);
-  };
-
-  removeUserInfo = () => {
-    userInfoService.removeUserInfo();
   };
 
   getDashIndex = async () => {
@@ -1450,14 +1433,14 @@ export class WalletController extends BaseController {
     addressBookService.setRecent(data, network);
   };
 
-  getRecent = async () => {
+  getRecent = async (): Promise<Contact[]> => {
     const network = await this.getNetwork();
     return addressBookService.getRecent(network);
   };
 
-  getAddressBook = async () => {
+  getAddressBook = async (): Promise<Contact[]> => {
     const network = await this.getNetwork();
-    const addressBook = await addressBookService.getAddresBook(network);
+    const addressBook = await addressBookService.getAddressBook(network);
     if (!addressBook) {
       return await this.refreshAddressBook();
     } else if (!addressBook[0]) {
@@ -1466,19 +1449,43 @@ export class WalletController extends BaseController {
     return addressBook;
   };
 
-  refreshAddressBook = async () => {
+  refreshAddressBook = async (): Promise<Contact[]> => {
     const network = await this.getNetwork();
     const { data } = await openapiService.getAddressBook();
     const list = data.contacts;
     if (list && list.length > 0) {
       list.forEach((addressBook, index) => {
-        if (list[index] && list[index].avatar) {
+        if (addressBook && addressBook.avatar) {
           list[index].avatar = this.addTokenForFirebaseImage(addressBook.avatar);
         }
       });
     }
     addressBookService.setAddressBook(list, network);
     return list;
+  };
+
+  searchByUsername = async (searchKey: string) => {
+    const apiResponse = await openapiService.searchUser(searchKey);
+    console.log('searchByUsername -apiResponse', apiResponse);
+
+    return (
+      apiResponse?.data?.users?.map((user, index): Contact => {
+        const address = withPrefix(user.address) || '';
+        return {
+          group: 'Flow Wallet User',
+          address: address,
+          contact_name: user.nickname,
+          username: user.username,
+          avatar: user.avatar,
+          domain: {
+            domain_type: 999,
+            value: '',
+          },
+          contact_type: ContactType.User,
+          id: index,
+        };
+      }) || []
+    );
   };
 
   checkAddress = async (address: string) => {
@@ -1598,21 +1605,47 @@ export class WalletController extends BaseController {
     return activeWallet;
   };
 
-  setActiveWallet = async (wallet: any, key: any, index = null) => {
-    await userWalletService.setActiveWallet(key);
+  /*
+   * Sets the active main wallet and current child wallet
+   * This is used to switch between main accounts or switch from main to child wallet
+   *
+   * wallet: BlockchainResponse, // The wallet to set as active
+   * key: ActiveChildType | null, // null for main wallet
+   * index: number | null = null // The index of the main wallet in the array to switch to
+   */
+  setActiveWallet = async (
+    wallet: BlockchainResponse,
+    key: ActiveChildType | null,
+    index: number | null = null
+  ) => {
+    userWalletService.setActiveWallet(key);
 
     const network = await this.getNetwork();
     await userWalletService.setCurrentWallet(wallet, key, network, index);
+
+    // Clear collections
+    this.clearNFTCollection();
+    this.clearEvmNFTList();
+    this.clearCoinList();
+
+    // If switching main wallet, refresh the EVM wallet
+    if (key === null) {
+      this.refreshEvmWallets();
+      await this.queryEvmAddress(wallet.address);
+    }
   };
 
   hasCurrentWallet = async () => {
     const wallet = await userWalletService.getCurrentWallet();
-    return wallet.address !== '';
+    return wallet?.address !== '';
   };
 
   getCurrentWallet = async (): Promise<BlockchainResponse | undefined> => {
+    if (!this.isBooted() || userWalletService.isLocked()) {
+      return;
+    }
     const wallet = await userWalletService.getCurrentWallet();
-    if (!wallet.address) {
+    if (!wallet?.address) {
       const network = await this.getNetwork();
       await this.refreshUserWallets();
       const data = await userWalletService.getUserWallets(network);
@@ -1633,7 +1666,7 @@ export class WalletController extends BaseController {
 
   getRawEvmAddressWithPrefix = async () => {
     const wallet = userWalletService.getEvmWallet();
-    return withPrefix(wallet.address) || '';
+    return withPrefix(wallet?.address) || '';
   };
 
   getEvmAddress = async () => {
@@ -1658,16 +1691,19 @@ export class WalletController extends BaseController {
   };
 
   getMainAddress = async () => {
+    if (!this.isBooted() || userWalletService.isLocked()) {
+      return '';
+    }
     const network = await this.getNetwork();
     const address = await userWalletService.getMainWallet(network);
     if (!address) {
       const data = await this.refreshUserWallets();
-      return withPrefix(data[0].blockchain[0].address);
+      return withPrefix(data[0].blockchain[0].address) || '';
     } else if (address.length < 3) {
       const data = await this.refreshUserWallets();
-      return withPrefix(data[0].blockchain[0].address);
+      return withPrefix(data[0].blockchain[0].address) || '';
     }
-    return withPrefix(address);
+    return withPrefix(address) || '';
   };
 
   sendTransaction = async (cadence: string, args: any[]): Promise<string> => {
@@ -2061,11 +2097,13 @@ export class WalletController extends BaseController {
     return txID;
   };
 
-  queryEvmAddress = async (address: string): Promise<string | null> => {
+  queryEvmAddress = async (address: string): Promise<string> => {
     if (address.length > 20) {
       return '';
     }
-
+    if (!(await this.isUnlocked())) {
+      return '';
+    }
     let evmAddress = '';
     try {
       evmAddress = await this.getRawEvmAddressWithPrefix();
@@ -2087,12 +2125,17 @@ export class WalletController extends BaseController {
       });
 
       if (result) {
-        await this.setEvmAddress(result);
-        return result;
+        // This is the COA address we get straight from the script
+        // This is where we encode the address in ERC-55 format
+        const checksummedAddress = ethUtil.toChecksumAddress(ensureEvmAddressPrefix(result));
+        await this.setEvmAddress(checksummedAddress);
+        return checksummedAddress;
       } else {
         return '';
       }
     } catch (error) {
+      console.trace('queryEvmAddress error', address);
+
       console.error('Error querying the script or setting EVM address:', error);
       return '';
     }
@@ -2467,20 +2510,16 @@ export class WalletController extends BaseController {
     );
   };
 
-  enableNFTStorageLocal = async (token: NFTModel) => {
+  enableNFTStorageLocal = async (token: NFTModelV2) => {
     const script = await getScripts('collection', 'enableNFTStorage');
-    if (token['contractName']) {
-      token.contract_name = token['contractName'];
-      token.path.storage_path = token['path']['storage'];
-      token.path.public_path = token['path']['public'];
-    }
+
     return await userWalletService.sendTransaction(
       script
-        .replaceAll('<NFT>', token.contract_name)
+        .replaceAll('<NFT>', token.contractName)
         .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
+        .replaceAll('<CollectionStoragePath>', token.path.storage)
+        .replaceAll('<CollectionPublicType>', token.path.public)
+        .replaceAll('<CollectionPublicPath>', token.path.public),
       []
     );
   };
@@ -2496,16 +2535,13 @@ export class WalletController extends BaseController {
       throw new Error(`Invaild token name - ${symbol}`);
     }
     const script = await getScripts('hybridCustody', 'transferChildFT');
+    const replacedScript = replaceNftKeywords(script, token);
 
-    const result = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<Token>', token.contractName)
-        .replaceAll('<TokenBalancePath>', token.path.balance)
-        .replaceAll('<TokenReceiverPath>', token.path.receiver)
-        .replaceAll('<TokenStoragePath>', token.path.vault)
-        .replaceAll('<TokenAddress>', token.address),
-      [fcl.arg(childAddress, t.Address), fcl.arg(path, t.String), fcl.arg(amount, t.UFix64)]
-    );
+    const result = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(childAddress, t.Address),
+      fcl.arg(path, t.String),
+      fcl.arg(amount, t.UFix64),
+    ]);
     mixpanelTrack.track('ft_transfer', {
       from_address: (await this.getCurrentAddress()) || '',
       to_address: childAddress,
@@ -2533,21 +2569,14 @@ export class WalletController extends BaseController {
     }
 
     const script = await getScripts('hybridCustody', 'sendChildFT');
+    const replacedScript = replaceNftKeywords(script, token);
 
-    const result = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<Token>', token.contractName)
-        .replaceAll('<TokenBalancePath>', token.path.balance)
-        .replaceAll('<TokenReceiverPath>', token.path.receiver)
-        .replaceAll('<TokenStoragePath>', token.path.vault)
-        .replaceAll('<TokenAddress>', token.address),
-      [
-        fcl.arg(childAddress, t.Address),
-        fcl.arg(receiver, t.Address),
-        fcl.arg(path, t.String),
-        fcl.arg(amount, t.UFix64),
-      ]
-    );
+    const result = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(childAddress, t.Address),
+      fcl.arg(receiver, t.Address),
+      fcl.arg(path, t.String),
+      fcl.arg(amount, t.UFix64),
+    ]);
     mixpanelTrack.track('ft_transfer', {
       from_address: childAddress,
       to_address: receiver,
@@ -2567,20 +2596,12 @@ export class WalletController extends BaseController {
     console.log('script is this ', nftContractAddress);
 
     const script = await getScripts('hybridCustody', 'transferChildNFT');
-
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [
-        fcl.arg(nftContractAddress, t.Address),
-        fcl.arg(nftContractName, t.String),
-        fcl.arg(ids, t.UInt64),
-      ]
-    );
+    const replacedScript = replaceNftKeywords(script, token);
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(nftContractAddress, t.Address),
+      fcl.arg(nftContractName, t.String),
+      fcl.arg(ids, t.UInt64),
+    ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: nftContractAddress,
@@ -2601,21 +2622,40 @@ export class WalletController extends BaseController {
     token
   ): Promise<string> => {
     const script = await getScripts('hybridCustody', 'sendChildNFT');
+    const replacedScript = replaceNftKeywords(script, token);
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(linkedAddress, t.Address),
+      fcl.arg(receiverAddress, t.Address),
+      fcl.arg(nftContractName, t.String),
+      fcl.arg(ids, t.UInt64),
+    ]);
+    mixpanelTrack.track('nft_transfer', {
+      tx_id: txID,
+      from_address: linkedAddress,
+      to_address: receiverAddress,
+      nft_identifier: token.contractName,
+      from_type: 'flow',
+      to_type: 'flow',
+      isMove: false,
+    });
+    return txID;
+  };
 
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [
-        fcl.arg(linkedAddress, t.Address),
-        fcl.arg(receiverAddress, t.Address),
-        fcl.arg(nftContractName, t.String),
-        fcl.arg(ids, t.UInt64),
-      ]
-    );
+  bridgeChildNFTToEvmAddress = async (
+    linkedAddress: string,
+    receiverAddress: string,
+    nftContractName: string,
+    id: number,
+    token
+  ): Promise<string> => {
+    const script = await getScripts('hybridCustody', 'bridgeChildNFTToEvmAddress');
+    const replacedScript = replaceNftKeywords(script, token);
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(nftContractName, t.String),
+      fcl.arg(linkedAddress, t.Address),
+      fcl.arg(id, t.UInt64),
+      fcl.arg(receiverAddress, t.String),
+    ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: linkedAddress,
@@ -2635,15 +2675,13 @@ export class WalletController extends BaseController {
     token
   ): Promise<string> => {
     const script = await getScripts('hybridCustody', 'transferNFTToChild');
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [fcl.arg(linkedAddress, t.Address), fcl.arg(path, t.String), fcl.arg(ids, t.UInt64)]
-    );
+    const replacedScript = replaceNftKeywords(script, token);
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(linkedAddress, t.Address),
+      fcl.arg(path, t.String),
+      fcl.arg(ids, t.UInt64),
+    ]);
+
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: linkedAddress,
@@ -2720,20 +2758,13 @@ export class WalletController extends BaseController {
     token
   ): Promise<string> => {
     const script = await getScripts('hybridCustody', 'batchTransferNFTToChild');
+    const replacedScript = replaceNftKeywords(script, token);
 
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [
-        fcl.arg(childAddr, t.Address),
-        fcl.arg(identifier, t.String),
-        fcl.arg(ids, t.Array(t.UInt64)),
-      ]
-    );
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(childAddr, t.Address),
+      fcl.arg(identifier, t.String),
+      fcl.arg(ids, t.Array(t.UInt64)),
+    ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: childAddr,
@@ -2753,19 +2784,13 @@ export class WalletController extends BaseController {
     token
   ): Promise<string> => {
     const script = await getScripts('hybridCustody', 'batchTransferChildNFT');
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [
-        fcl.arg(childAddr, t.Address),
-        fcl.arg(identifier, t.String),
-        fcl.arg(ids, t.Array(t.UInt64)),
-      ]
-    );
+    const replacedScript = replaceNftKeywords(script, token);
+
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(childAddr, t.Address),
+      fcl.arg(identifier, t.String),
+      fcl.arg(ids, t.Array(t.UInt64)),
+    ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: childAddr,
@@ -2786,21 +2811,14 @@ export class WalletController extends BaseController {
     token
   ): Promise<string> => {
     const script = await getScripts('hybridCustody', 'batchSendChildNFTToChild');
+    const replacedScript = replaceNftKeywords(script, token);
 
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [
-        fcl.arg(childAddr, t.Address),
-        fcl.arg(receiver, t.Address),
-        fcl.arg(identifier, t.String),
-        fcl.arg(ids, t.Array(t.UInt64)),
-      ]
-    );
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(childAddr, t.Address),
+      fcl.arg(receiver, t.Address),
+      fcl.arg(identifier, t.String),
+      fcl.arg(ids, t.Array(t.UInt64)),
+    ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: childAddr,
@@ -2820,20 +2838,12 @@ export class WalletController extends BaseController {
     token
   ): Promise<string> => {
     const script = await getScripts('hybridCustody', 'batchBridgeChildNFTToEvm');
-
-    const txID = await userWalletService.sendTransaction(
-      script
-        .replaceAll('<NFT>', token.contract_name)
-        .replaceAll('<NFTAddress>', token.address)
-        .replaceAll('<CollectionStoragePath>', token.path.storage_path)
-        .replaceAll('<CollectionPublicType>', token.path.public_type)
-        .replaceAll('<CollectionPublicPath>', token.path.public_path),
-      [
-        fcl.arg(identifier, t.String),
-        fcl.arg(childAddr, t.Address),
-        fcl.arg(ids, t.Array(t.UInt64)),
-      ]
-    );
+    const replacedScript = replaceNftKeywords(script, token);
+    const txID = await userWalletService.sendTransaction(replacedScript, [
+      fcl.arg(identifier, t.String),
+      fcl.arg(childAddr, t.Address),
+      fcl.arg(ids, t.Array(t.UInt64)),
+    ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
       from_address: childAddr,
@@ -3099,7 +3109,10 @@ export class WalletController extends BaseController {
 
     // setup fcl for the new network
     await userWalletService.setupFcl();
-    this.refreshAll();
+    await this.refreshAll();
+
+    // Reload everything
+    await this.refreshWallets();
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (!tabs || tabs.length === 0) {
@@ -3116,8 +3129,9 @@ export class WalletController extends BaseController {
   };
 
   checkNetwork = async () => {
-    const network = await this.getNetwork();
-    await this.switchNetwork(network);
+    if (!this.isBooted() || userWalletService.isLocked()) {
+      return;
+    }
   };
 
   switchMonitor = async (monitor: string) => {
@@ -3129,7 +3143,11 @@ export class WalletController extends BaseController {
   };
 
   refreshAll = async () => {
+    console.trace('refreshAll trace');
     console.log('refreshAll');
+    // Clear the active wallet if any
+    // If we don't do this, the user wallets will not be refreshed
+    userWalletService.setActiveWallet(null);
     await this.refreshUserWallets();
     this.clearNFT();
     this.refreshAddressBook();
@@ -3407,47 +3425,8 @@ export class WalletController extends BaseController {
     transactionService.clearPending(network);
   };
 
-  getNFTListCache = async (): Promise<NFTData> => {
-    const network = await this.getNetwork();
-    // const list =
-    // if (!list.length){
-    // const data = this.refreshNft(address);
-    // return data;
-    // }
-    return await nftService.getNft(network);
-  };
-
-  refreshNft = async (address: string, offset = 0): Promise<NFTData> => {
-    // change the address to real address after testing complete
-    // const address = await this.getCurrentAddress();
-    const limit = 24;
-    const network = await this.getNetwork();
-    const data = await openapiService.nftCatalogList(address!, limit, offset, network);
-    const nfts = data.nfts;
-    if (!nfts) {
-      return {
-        nfts: [],
-        nftCount: data.nftCount,
-      };
-    }
-    nfts.map((nft) => {
-      nft.unique_id = nft.collectionName + '_' + nft.id;
-    });
-    function getUniqueListBy(arr, key) {
-      return [...new Map(arr.map((item) => [item[key], item])).values()];
-    }
-    const unique_nfts = getUniqueListBy(nfts, 'unique_id');
-    const result = { nfts: unique_nfts, nftCount: data.nftCount };
-    nftService.setNft(result, network);
-    return result;
-  };
-
   clearNFT = () => {
     nftService.clear();
-  };
-
-  clearNFTList = async () => {
-    await nftService.clearNFTList();
   };
 
   clearNFTCollection = async () => {
@@ -3471,30 +3450,20 @@ export class WalletController extends BaseController {
     await storage.clear();
   };
 
-  getCollectionCache = async () => {
+  getSingleCollection = async (address: string, collectionId: string, offset = 0) => {
     const network = await this.getNetwork();
-    const list = await nftService.getCollectionList(network);
+    const list = await nftService.getSingleCollection(network, collectionId, offset);
     if (!list) {
-      return [];
-    }
-    const sortedList = list.sort((a, b) => b.count - a.count);
-    return sortedList;
-  };
-
-  getSingleCollectionCache = async (collectionId: string) => {
-    const network = await this.getNetwork();
-    const list = await nftService.getSingleCollection(collectionId, network);
-    if (!list) {
-      return [];
+      return this.refreshSingleCollection(address, collectionId, offset);
     }
     return list;
   };
 
-  getSingleCollection = async (address: string, contract: string, offset = 0) => {
+  refreshSingleCollection = async (address: string, collectionId: string, offset = 0) => {
     const network = await this.getNetwork();
     const data = await openapiService.nftCatalogCollectionList(
       address!,
-      contract,
+      collectionId,
       24,
       offset,
       network
@@ -3508,18 +3477,30 @@ export class WalletController extends BaseController {
     }
     const unique_nfts = getUniqueListBy(data.nfts, 'unique_id');
     data.nfts = unique_nfts;
+
+    nftService.setSingleCollection(data, collectionId, offset, network);
     return data;
   };
 
+  getCollectionCache = async (address: string) => {
+    const network = await this.getNetwork();
+    const list = await nftService.getCollectionList(network);
+    if (!list || list.length === 0) {
+      return await this.refreshCollection(address);
+    }
+    // Sort by count, maintaining the new collection structure
+    const sortedList = [...list].sort((a, b) => b.count - a.count);
+    return sortedList;
+  };
+
   refreshCollection = async (address: string) => {
-    // change the address to real address after testing complete
-    // const address = await this.getCurrentAddress();
     const network = await this.getNetwork();
     const data = await openapiService.nftCatalogCollections(address!, network);
-    if (!data) {
+    if (!data || !Array.isArray(data)) {
       return [];
     }
-    const sortedList = data.sort((a, b) => b.count - a.count);
+    // Sort by count, maintaining the new collection structure
+    const sortedList = [...data].sort((a, b) => b.count - a.count);
     nftService.setCollectionList(sortedList, network);
     return sortedList;
   };
@@ -3819,6 +3800,73 @@ export class WalletController extends BaseController {
     if (userId) {
       await storage.set('currentId', userId);
     }
+  };
+
+  refreshEvmNftIds = async (address: string) => {
+    if (!isValidEthereumAddress(address)) {
+      throw new Error('Invalid Ethereum address');
+    }
+    const network = await this.getNetwork();
+    const result = await openapiService.EvmNFTID(address);
+    await evmNftService.setNftIds(result, network);
+    return result;
+  };
+
+  getEvmNftId = async (address: string) => {
+    if (!isValidEthereumAddress(address)) {
+      throw new Error('Invalid Ethereum address');
+    }
+    const network = await this.getNetwork();
+    const cacheData = await evmNftService.getNftIds(network);
+    if (cacheData) {
+      return cacheData;
+    }
+    return this.refreshEvmNftIds(address);
+  };
+
+  refreshEvmNftCollectionList = async (
+    address: string,
+    collectionIdentifier: string,
+    limit = 24,
+    offset = 0
+  ) => {
+    if (!isValidEthereumAddress(address)) {
+      throw new Error('Invalid Ethereum address');
+    }
+    const network = await this.getNetwork();
+    const result = await openapiService.EvmNFTcollectionList(
+      address,
+      collectionIdentifier,
+      limit,
+      offset
+    );
+    await evmNftService.setSingleCollection(result, collectionIdentifier, offset, network);
+    return result;
+  };
+
+  getEvmNftCollectionList = async (
+    address: string,
+    collectionIdentifier: string,
+    limit = 24,
+    offset = 0
+  ) => {
+    if (!isValidEthereumAddress(address)) {
+      throw new Error('Invalid Ethereum address');
+    }
+    const network = await this.getNetwork();
+    const cacheData = await evmNftService.getSingleCollection(
+      network,
+      collectionIdentifier,
+      offset
+    );
+    if (cacheData) {
+      return cacheData;
+    }
+    return this.refreshEvmNftCollectionList(address, collectionIdentifier, limit, offset);
+  };
+
+  clearEvmNFTList = async () => {
+    await evmNftService.clearEvmNfts();
   };
 }
 

@@ -9,15 +9,15 @@ import {
   CardMedia,
   Grid,
   Skeleton,
-  ButtonGroup,
   Button,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
 
-import { type NFTModel } from '@/shared/types/network-types';
+import { type NFTModelV2, type NFTModel_depreciated } from '@/shared/types/network-types';
+import alertMark from '@/ui/FRWAssets/svg/alert.svg';
 import { LLHeader } from '@/ui/FRWComponent';
+import WarningSnackbar from '@/ui/FRWComponent/WarningSnackbar';
 import { useWallet } from 'ui/utils';
 
 import CollectionCard from './AddNFTCard';
@@ -59,35 +59,22 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export interface CollectionItem {
-  name?: string;
-  description?: string;
-  official_website?: string;
-  logo?: string;
-  address?: {
-    mainnet?: string;
-    testnet?: string;
-    crescendo?: string;
-  };
-  contract_name?: string;
-  banner?: string;
-  marketplace?: string;
+export interface CollectionItem extends NFTModelV2 {
   hidden?: boolean;
   added?: boolean;
 }
 
 const AddList = () => {
   const classes = useStyles();
-  const history = useHistory();
   const usewallet = useWallet();
-  const [collections, setCollections] = useState<Array<any>>([]);
+  const [collections, setCollections] = useState<Array<CollectionItem>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [statusLoading, setStatusLoading] = useState<boolean>(true);
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [filter, setFilter] = useState('all');
 
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
-  const [selectedNFT, setSelectedNFT] = useState<NFTModel | null>(null);
+  const [selectedNFT, setSelectedNFT] = useState<NFTModelV2 | null>(null);
 
   const filteredCollections = collections.filter((ele) => {
     if (filter === 'all') return true;
@@ -97,21 +84,29 @@ const AddList = () => {
   });
 
   const fetchList = useCallback(
-    async (data) => {
+    async (data: NFTModelV2[]) => {
       setStatusLoading(true);
       try {
         const enabledList = await usewallet.openapi.getEnabledNFTList();
-        if (enabledList.length > 0) {
-          data.map((item) => {
-            item.added =
-              enabledList.filter(
-                (enabled) =>
-                  enabled.contract_name === item.contractName && enabled.address === item.address
-              ).length > 0;
-          });
-        }
 
-        setCollections(data);
+        if (enabledList.length > 0) {
+          setCollections(
+            data.map((item) => {
+              return {
+                ...item,
+                added:
+                  enabledList.filter(
+                    (enabled) =>
+                      enabled.contractName === item.contractName && enabled.address === item.address
+                  ).length > 0,
+              };
+            })
+          );
+        } else {
+          setCollections(data);
+        }
+      } catch (error) {
+        console.error('Error fetching enabled NFT list:', error);
       } finally {
         setStatusLoading(false);
       }
@@ -119,7 +114,7 @@ const AddList = () => {
     [usewallet, setStatusLoading, setCollections]
   );
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (): Promise<NFTModelV2[]> => {
     try {
       setLoading(true);
       const nftList = await usewallet.openapi.getAllNft();
@@ -189,7 +184,7 @@ const AddList = () => {
               {[...Array(4).keys()].map((key) => (
                 <Card
                   key={key}
-                  sx={{ borderRadius: '12px', backgroundColor: '#000000', padding: '12px' }}
+                  sx={{ borderRadius: '12px', backgroundColor: 'transparent', padding: '12px' }}
                   className={classes.skeletonCard}
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -309,12 +304,18 @@ const AddList = () => {
 
       <AddNFTConfirmation
         isConfirmationOpen={isConfirmationOpen}
-        data={selectedNFT}
+        nftCollection={selectedNFT}
         handleCloseIconClicked={() => setConfirmationOpen(false)}
         handleCancelBtnClicked={() => setConfirmationOpen(false)}
         handleAddBtnClicked={() => {
           setConfirmationOpen(false);
         }}
+      />
+      <WarningSnackbar
+        open={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        alertIcon={alertMark}
+        message={chrome.i18n.getMessage('Could_not_enable_this_collection')}
       />
     </div>
   );

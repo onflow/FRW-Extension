@@ -15,7 +15,8 @@ const USER_CONTACT = {
 
 function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isEvm = false }) {
   const usewallet = useWallet();
-  const { mainAddress, evmAddress, childAccounts, currentWallet } = useProfiles();
+  const { mainAddress, evmAddress, evmWallet, childAccounts, parentWallet, currentWallet } =
+    useProfiles();
   const [first, setFirst] = useState<string>('');
   const [userInfo, setUser] = useState<any>(USER_CONTACT);
   const [firstEmoji, setFirstEmoji] = useState<any>(null);
@@ -23,34 +24,33 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
 
   const requestAddress = useCallback(async () => {
     const address = await usewallet.getCurrentAddress();
-    const eWallet = await usewallet.getEvmWallet();
 
     if (isChild) {
       const newWallet = {
         [mainAddress!]: {
-          name: currentWallet.name,
-          description: currentWallet.name,
+          name: parentWallet.name,
+          description: parentWallet.name,
           thumbnail: {
-            url: currentWallet.icon,
+            url: parentWallet.icon,
           },
         },
       };
 
-      let evmWallet = {};
+      let eWallet = {};
       if (evmAddress) {
-        evmWallet = {
+        eWallet = {
           [evmAddress!]: {
-            name: eWallet.name,
-            description: eWallet.name,
+            name: evmWallet.name,
+            description: evmWallet.name,
             thumbnail: {
-              url: eWallet.icon,
+              url: evmWallet.icon,
             },
           },
         };
       }
 
       // Merge wallet lists
-      const walletList = { ...childAccounts, ...newWallet, ...evmWallet };
+      const walletList = { ...childAccounts, ...newWallet, ...eWallet };
       delete walletList[address!];
       const firstWalletAddress = Object.keys(walletList)[0];
       const wallet = childAccounts[address!];
@@ -66,19 +66,19 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
       setUser(userContact);
       setFirst(address!);
     } else {
-      let evmWallet = {};
+      let eWallet = {};
       if (evmAddress) {
-        evmWallet = {
+        eWallet = {
           [evmAddress!]: {
-            name: eWallet.name,
-            description: eWallet.name,
+            name: evmWallet.name,
+            description: evmWallet.name,
             thumbnail: {
-              url: eWallet.icon,
+              url: evmWallet.icon,
             },
           },
         };
       }
-      const walletList = { ...childAccounts, ...evmWallet };
+      const walletList = { ...childAccounts, ...eWallet };
       setChildWallets(walletList);
       const firstWalletAddress = Object.keys(walletList)[0];
       if (firstWalletAddress) {
@@ -95,6 +95,8 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
     evmAddress,
     childAccounts,
     currentWallet,
+    parentWallet,
+    evmWallet,
   ]);
 
   useEffect(() => {

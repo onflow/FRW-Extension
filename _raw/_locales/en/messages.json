@@ -521,10 +521,10 @@
     "message": "Change Address"
   },
   "We__did__not__find__anything__here": {
-    "message": "We did not find anything here."
+    "message": "Your collection is waiting to shine!"
   },
   "Looking__forward__to__your__new__discovery": {
-    "message": "Looking forward to your new discovery."
+    "message": "Start exploring and add your first NFTs today."
   },
   "Grid": {
     "message": "Grid"
@@ -1214,10 +1214,10 @@
     "message": "Reset Your Wallet "
   },
   "Confirm_to_reset_Wallet": {
-    "message": "Confirm to reset Wallet "
+    "message": "Reset EVERY WALLET?"
   },
   "This_action_will_remove": {
-    "message": "This action will remove all your local data including your private key. Please make sure you have your private keys backed up. "
+    "message": "This action will remove ALL YOUR LOCAL DATA including your private key for ALL WALLETS - not just the current one. Please make sure you have your private keys backed up."
   },
   "Reveal_Private_Key": {
     "message": "Reveal Private Key "
@@ -1327,6 +1327,9 @@
   "enable_the_path_to_evm_on_flow": {
     "message": "Enable the Path to EVM on Flow"
   },
+  "What_type_of_assets_would_you_like_to_move": {
+    "message": "What type of assets would you like to move?"
+  },
   "Would_you_like_to_move": {
     "message": "Would you like to move your assets to your "
   },
@@ -1362,5 +1365,11 @@
   },
   "Deposit_warning_content": {
     "message": "Please make sure you deposit is ON FLOW EVM network, if your deposit via another network your assets may be lost."
+  },
+  "NFT_Not_onboarded": {
+    "message": "This NFT Collection has not yet been onboarded to Cadence. Use Flow Port to move and onboard NFTs from this NFT collection"
+  },
+  "Could_not_enable_this_collection": {
+    "message": "Could not enable this collection"
   }
 }

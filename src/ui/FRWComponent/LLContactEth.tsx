@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { ContactType } from '@/shared/types/network-types';
 import closex from 'ui/assets/closex.svg';
 import { useWallet, formatAddress } from 'ui/utils';
 
@@ -109,7 +110,7 @@ export const LLContactEth = ({ contact, hideCloseButton, isSend = false, isLoadi
           {!isLoading ? (
             <Typography variant="body1" sx={{ textAlign: 'start' }}>
               {contact.domain?.value || formatAddress(contact.contact_name)}{' '}
-              {contact.usernam && contact.usernam !== '' && (
+              {contact.username && contact.username !== '' && (
                 <Box display="inline" color="info.main">
                   {contact.username !== '' ? ' (@' + contact.username + ')' : ''}
                 </Box>
@@ -140,7 +141,7 @@ export const LLContactEth = ({ contact, hideCloseButton, isSend = false, isLoadi
           >
             <CardMedia sx={{ width: '11px', height: '11px' }} image={closex} />
           </IconButton>
-        ) : contact.type === 4 && !contactAdd ? (
+        ) : contact.contact_type === ContactType.User && !contactAdd ? (
           <IconButton
             onClick={(e) => {
               e.stopPropagation();

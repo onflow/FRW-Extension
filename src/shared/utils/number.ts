@@ -76,20 +76,24 @@ export const trimDecimalAmount = (
 
   // Are we displaying or passing the value to a function. i.e. clean up trailing zeros
   if (mode === 'clean') {
-    // If the value is an empty string, return '0'
+    // If the value is an empty string, return '0.0'
     if (trimmedValue === '') {
-      return '0';
+      return '0.0';
     }
     // The user is not in the process of entering the amount, clean the amount to remove trailing zeros
     if (trimmedValue.includes('.')) {
       const [integerPart, decimalPart] = trimmedValue.split('.');
       if (!decimalPart) {
-        return integerPart;
+        return `${integerPart}.0`;
       }
 
       const trimmedDecimal = decimalPart.replace(/0+$/, '');
-      trimmedValue = trimmedDecimal ? `${integerPart}.${trimmedDecimal}` : integerPart;
+      trimmedValue = trimmedDecimal ? `${integerPart}.${trimmedDecimal}` : `${integerPart}.0`;
+    } else {
+      // No decimal point, add one
+      trimmedValue = `${trimmedValue}.0`;
     }
+
     return trimmedValue;
   }
 
@@ -118,6 +122,7 @@ export const trimDecimalAmount = (
 };
 
 // Validate that a string is a valid transaction amount with the given max decimal places
+// Unless maxDecimals is zero, a decimal point is required
 // If exact is true, the amount must have exactly maxDecimals decimal places
 export const validateAmount = (amount: string, maxDecimals: number, exact = false): boolean => {
   const regex =
@@ -125,7 +130,8 @@ export const validateAmount = (amount: string, maxDecimals: number, exact = fals
       ? `^(0|[1-9]\\d*)$`
       : exact
         ? `^(0|[1-9]\\d*)\\.\\d{${maxDecimals}}$`
-        : `^(0|[1-9]\\d*)(\\.\\d{1,${maxDecimals}})?$`;
+        : `^(0|[1-9]\\d*)\\.\\d{1,${maxDecimals}}$`;
+
   return new RegExp(regex).test(amount);
 };
 

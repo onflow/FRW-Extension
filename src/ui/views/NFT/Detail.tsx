@@ -15,8 +15,8 @@ import DetailMove from 'ui/FRWAssets/svg/detailMove.svg';
 import SendIcon from 'ui/FRWAssets/svg/detailSend.svg';
 import { useWallet } from 'ui/utils';
 
+import MoveFromChild from './SendNFT/MoveFromChild';
 import MovefromParent from './SendNFT/MovefromParent';
-import MoveNftConfirmation from './SendNFT/MoveNftConfirmation';
 
 const useStyles = makeStyles(() => ({
   pageContainer: {
@@ -508,7 +508,7 @@ const Detail = () => {
 
         {moveOpen &&
           (childActive ? (
-            <MoveNftConfirmation
+            <MoveFromChild
               isConfirmationOpen={moveOpen}
               data={{
                 contact: contactTwo,
