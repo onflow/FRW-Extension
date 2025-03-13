@@ -1,7 +1,7 @@
 import { Typography, Button, CardMedia } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import appicon from '@/ui/FRWAssets/image/appicon.png';
 import create from '@/ui/FRWAssets/svg/create.svg';
@@ -10,6 +10,10 @@ import qr from '@/ui/FRWAssets/svg/scanIcon.svg';
 import RegisterHeader from '@/ui/FRWComponent/LandingPages/RegisterHeader';
 
 const Welcome = () => {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const isAddWallet = params.get('add') === 'true';
+
   return (
     <Box
       sx={{
@@ -101,7 +105,7 @@ const Welcome = () => {
               variant="contained"
               color="primary"
               component={Link}
-              to="/welcome/register"
+              to={isAddWallet ? '/welcome/register?add=true' : '/welcome/register'}
               size="large"
               sx={{
                 display: 'flex',

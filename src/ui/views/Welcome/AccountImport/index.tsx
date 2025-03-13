@@ -33,7 +33,6 @@ const AccountImport = () => {
   const [mnemonic, setMnemonic] = useState('');
   const [pk, setPk] = useState(null);
   const [username, setUsername] = useState('');
-  const [tempPassword, setTempPassword] = useState('');
   const [password, setPassword] = useState('');
   const [accounts, setAccounts] = useState<any>([]);
   const [errMessage, setErrorMessage] = useState(chrome.i18n.getMessage('No__backup__found'));
@@ -45,17 +44,6 @@ const AccountImport = () => {
   const getUsername = (username: string) => {
     setUsername(username.toLowerCase());
   };
-
-  const loadTempPassword = useCallback(async () => {
-    const temp = await storage.get('tempPassword');
-    if (temp) {
-      setTempPassword(temp);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadTempPassword();
-  }, [loadTempPassword]);
 
   const loadView = useCallback(async () => {
     usewallet
@@ -180,7 +168,6 @@ const AccountImport = () => {
                 <SetPassword
                   handleSwitchTab={() => setActiveTab(STEPS.GOOGLE_BACKUP)}
                   onSubmit={submitPassword}
-                  tempPassword={tempPassword}
                   isLogin={true}
                 />
               )}
@@ -190,7 +177,6 @@ const AccountImport = () => {
                   handleSwitchTab={() => setActiveTab(STEPS.GOOGLE_BACKUP)}
                   mnemonic={mnemonic}
                   pk={pk}
-                  tempPassword={tempPassword}
                   goLast={() => setActiveTab(STEPS.ALL_SET)}
                   accountKey={accounts}
                 />

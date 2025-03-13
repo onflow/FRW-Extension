@@ -124,8 +124,13 @@ export class WalletController extends BaseController {
 
   /* wallet */
   boot = async (password) => {
-    const result = await keyringService.boot(password);
-    return result;
+    const isBooted = await keyringService.isBooted();
+    if (isBooted) {
+      await keyringService.verifyPassword(password);
+      await keyringService.boot(password);
+    } else {
+      await keyringService.boot(password);
+    }
   };
   isBooted = () => keyringService.isBooted();
   loadMemStore = () => keyringService.loadMemStore();
@@ -161,9 +166,22 @@ export class WalletController extends BaseController {
   rejectApproval = notificationService.rejectApproval;
 
   switchAccount = async (currentId: string) => {
-    await keyringService.switchKeyring(currentId);
-    const pubKey = await this.getPubKey();
-    await userWalletService.switchLogin(pubKey);
+    try {
+      await keyringService.switchKeyring(currentId);
+      const pubKey = await this.getPubKey();
+      await userWalletService.switchLogin(pubKey);
+    } catch (error) {
+      throw new Error('Failed to switch account: ' + (error.message || 'Unknown error'));
+    }
+  };
+
+  checkAvailableAccount = async (currentId: string) => {
+    try {
+      await keyringService.checkAvailableAccount(currentId);
+    } catch (error) {
+      console.error('Error finding available account:', error);
+      throw new Error('Failed to find available account: ' + (error.message || 'Unknown error'));
+    }
   };
 
   unlock = async (password: string) => {
@@ -177,6 +195,10 @@ export class WalletController extends BaseController {
     await this.refreshWallets();
 
     sessionService.broadcastEvent('unlock');
+  };
+
+  submitPassword = async (password: string) => {
+    await keyringService.submitPassword(password);
   };
 
   refreshWallets = async () => {
@@ -291,13 +313,11 @@ export class WalletController extends BaseController {
   lockAdd = async () => {
     const switchingTo = 'mainnet';
 
-    const password = keyringService.getPassword();
-    await storage.set('tempPassword', password);
     await keyringService.setLocked();
     await passwordService.clear();
     sessionService.broadcastEvent('accountsChanged', []);
     sessionService.broadcastEvent('lock');
-    openIndexPage('welcome');
+    openIndexPage('welcome?add=true');
     await this.switchNetwork(switchingTo);
   };
 
@@ -332,8 +352,6 @@ export class WalletController extends BaseController {
   restoreWallet = async () => {
     const switchingTo = 'mainnet';
 
-    const password = keyringService.getPassword();
-    await storage.set('tempPassword', password);
     await keyringService.setLocked();
     await passwordService.clear();
 

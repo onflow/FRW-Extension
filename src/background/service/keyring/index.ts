@@ -52,6 +52,15 @@ export interface DisplayedKeryring {
   keyring: any;
 }
 
+interface EncryptedData {
+  data: string;
+  iv: string;
+  salt: string;
+}
+interface VaultEntry {
+  [uuid: string]: string;
+}
+
 interface KeyringData {
   0: {
     type: 'HD Key Tree' | 'Simple Key Pair';
@@ -1274,6 +1283,42 @@ class KeyringService extends EventEmitter {
 
     // Store in keyrings array
     this.keyringList = decryptedKeyrings;
+  }
+
+  async checkAvailableAccount(currentId: string): Promise<VaultEntry[]> {
+    let vaultArray = this.store.getState().vault as VaultEntry[] | VaultEntry | null | undefined;
+    console.log('vaultArray ', vaultArray, currentId);
+
+    // If vaultArray is not an array, convert it to one
+    if (!Array.isArray(vaultArray)) {
+      vaultArray = vaultArray ? [vaultArray] : [];
+    }
+
+    // Check if an entry with the given currentId exists
+    const foundEntry = vaultArray.find(
+      (entry) =>
+        entry && typeof entry === 'object' && Object.prototype.hasOwnProperty.call(entry, currentId)
+    );
+
+    if (foundEntry) {
+      console.log('Found account with ID:', currentId);
+      await storage.set('currentId', currentId);
+      try {
+        const encryptedDataString = foundEntry[currentId];
+        const encryptedData = JSON.parse(encryptedDataString) as EncryptedData;
+
+        // Validate that it has the expected structure
+        if (!encryptedData.data || !encryptedData.iv || !encryptedData.salt) {
+          console.warn('Encrypted data is missing required fields');
+        }
+      } catch (error) {
+        console.error('Error parsing encrypted data:', error);
+      }
+
+      return [foundEntry];
+    } else {
+      throw new Error('No account found with ID: ' + currentId);
+    }
   }
 }
 

@@ -21,18 +21,10 @@ const AllSet = ({ handleSwitchTab, variant = 'register' }: AllSetProps) => {
   }, [usewallet, variant]);
 
   useEffect(() => {
-    const removeTempPass = () => {
-      if (variant === 'add') {
-        storage.set('tempPassword', '');
-      }
-    };
-
     if (variant === 'register') {
       loadScript().then(() => {
         usewallet.trackAccountRecovered();
       });
-    } else if (variant === 'add') {
-      removeTempPass();
     }
   }, [variant, loadScript, usewallet]);
 

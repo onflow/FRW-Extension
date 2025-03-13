@@ -36,17 +36,6 @@ const Google: React.FC<GoogleProps> = ({ accounts, onBack }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const loadTempPassword = useCallback(async () => {
-    const temp = await storage.get('tempPassword');
-    if (temp) {
-      setPassword(temp);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadTempPassword();
-  }, [loadTempPassword]);
-
   const goBack = () => {
     switch (activeTab) {
       case STEPS.DECRYPT:

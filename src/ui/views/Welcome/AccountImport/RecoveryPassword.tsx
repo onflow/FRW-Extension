@@ -128,14 +128,14 @@ const PasswordIndicator = (props) => {
   );
 };
 
-const RecoveryPassword = ({ handleSwitchTab, mnemonic, pk, tempPassword, goLast, accountKey }) => {
+const RecoveryPassword = ({ handleSwitchTab, mnemonic, pk, goLast, accountKey }) => {
   const classes = useStyles();
   const usewallet = useWallet();
 
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [username, setUsername] = useState('');
 
-  const [password, setPassword] = useState(tempPassword);
+  const [password, setPassword] = useState('');
   const [newKey, setKeyNew] = useState(true);
 
   const [isLoading, setLoading] = useState(false);

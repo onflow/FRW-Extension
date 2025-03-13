@@ -86,9 +86,7 @@ const DecryptWallet = ({ handleSwitchTab, setMnemonic, username }) => {
 
   const decryptWallet = async () => {
     setLoading(true);
-    // await wallet.boot(password);
-    // const formatted = mnemonic.trim().split(/\s+/g).join(' ');
-    // await wallet.createKeyringWithMnemonics(formatted);
+
     try {
       const mnemonic = await usewallet.restoreAccount(username, password);
       // console.log('mnemonic ->', mnemonic);
