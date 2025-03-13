@@ -58,12 +58,6 @@ export const moveTokenCoaHomepage = async ({ page, tokenname, amount = '0.000000
   await waitForTransaction({ page, successtext: 'success', amount });
 };
 
-test.beforeEach(async ({ page, extensionId }) => {
-  // Login to our sender account
-  await loginToSenderAccount({ page, extensionId });
-  // switch to EVM account
-  await switchToEvm({ page, extensionId });
-});
 //Send Fts from COA to COA
 test('send Flow COA to COA', async ({ page }) => {
   // Send FLOW token from COA to COA
@@ -170,7 +164,3 @@ test('move USDC token COA to FLOW homepage', async ({ page }) => {
     amount: '0.000123',
   });
 }); */
-//Send NFT from COA to COA
-//Send NFT from COA to FLOW
-//Send NFT from COA to EOA
-//Move NFT from COA to FLOW
