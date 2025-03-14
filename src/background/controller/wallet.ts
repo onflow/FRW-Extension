@@ -50,7 +50,6 @@ import {
   transactionService,
   nftService,
   googleDriveService,
-  passwordService,
   proxyService,
   newsService,
   mixpanelTrack,
@@ -125,8 +124,14 @@ export class WalletController extends BaseController {
 
   /* wallet */
   boot = async (password) => {
-    const result = await keyringService.boot(password);
-    return result;
+    // When wallet first initializes through install, it will add a encrypted password to boot state. If is boot is false, it means there's no password set.
+    const isBooted = await keyringService.isBooted();
+    if (isBooted) {
+      await keyringService.verifyPassword(password);
+      await keyringService.updateUnlocked(password);
+    } else {
+      await keyringService.boot(password);
+    }
   };
   isBooted = () => keyringService.isBooted();
   loadMemStore = () => keyringService.loadMemStore();
@@ -171,7 +176,6 @@ export class WalletController extends BaseController {
     await keyringService.submitPassword(password);
 
     // only password is correct then we store it
-    await passwordService.setPassword(password);
     const pubKey = await this.getPubKey();
     await userWalletService.switchLogin(pubKey);
     // Set up all the wallet data
@@ -251,30 +255,11 @@ export class WalletController extends BaseController {
     }
 
     const isUnlocked = keyringService.memStore.getState().isUnlocked;
-    if (!isUnlocked) {
-      let password = '';
-      try {
-        // This uses google drive to decrypt the password
-        password = await passwordService.getPassword();
-      } catch {
-        password = '';
-      }
-      if (password && password.length > 0) {
-        try {
-          await this.unlock(password);
-          return keyringService.memStore.getState().isUnlocked;
-        } catch {
-          passwordService.clear();
-          return false;
-        }
-      }
-    }
     return isUnlocked;
   };
 
   lockWallet = async () => {
     await keyringService.setLocked();
-    await passwordService.clear();
     await userWalletService.signOutCurrentUser();
     await userWalletService.clear();
     sessionService.broadcastEvent('accountsChanged', []);
@@ -292,13 +277,10 @@ export class WalletController extends BaseController {
   lockAdd = async () => {
     const switchingTo = 'mainnet';
 
-    const password = keyringService.getPassword();
-    await storage.set('tempPassword', password);
     await keyringService.setLocked();
-    await passwordService.clear();
     sessionService.broadcastEvent('accountsChanged', []);
     sessionService.broadcastEvent('lock');
-    openIndexPage('welcome');
+    openIndexPage('welcome?add=true');
     await this.switchNetwork(switchingTo);
   };
 
@@ -321,8 +303,6 @@ export class WalletController extends BaseController {
     await keyringService.resetKeyRing();
     await keyringService.setLocked();
 
-    await passwordService.clear();
-
     sessionService.broadcastEvent('accountsChanged', []);
     sessionService.broadcastEvent('lock');
     // Redirect to welcome so that users can import their account again
@@ -333,10 +313,7 @@ export class WalletController extends BaseController {
   restoreWallet = async () => {
     const switchingTo = 'mainnet';
 
-    const password = keyringService.getPassword();
-    await storage.set('tempPassword', password);
     await keyringService.setLocked();
-    await passwordService.clear();
 
     sessionService.broadcastEvent('accountsChanged', []);
     sessionService.broadcastEvent('lock');

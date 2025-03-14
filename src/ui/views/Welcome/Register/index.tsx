@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import * as bip39 from 'bip39';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { getAccountKey } from '@/shared/utils/address';
 import AllSet from '@/ui/FRWComponent/LandingPages/AllSet';
@@ -28,11 +28,21 @@ type StepType = (typeof STEPS)[keyof typeof STEPS];
 const Register = () => {
   const history = useHistory();
   const usewallet = useWallet();
+
   const [activeTab, setActiveTab] = useState<StepType>(STEPS.USERNAME);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [mnemonic] = useState(bip39.generateMnemonic());
-  const [tempPassword, setTempPassword] = useState('');
+  const [isAddWallet, setIsAddWallet] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkWalletStatus = async () => {
+      const isBooted = await usewallet.isBooted();
+      setIsAddWallet(isBooted);
+    };
+
+    checkWalletStatus();
+  }, [usewallet]);
 
   const getUsername = (username: string) => {
     setUsername(username.toLowerCase());
@@ -51,13 +61,6 @@ const Register = () => {
       });
   }, [usewallet, history]);
 
-  const loadTempPassword = useCallback(async () => {
-    const temp = await storage.get('tempPassword');
-    if (temp) {
-      setTempPassword(temp);
-    }
-  }, []);
-
   const submitPassword = useCallback(
     async (newPassword: string) => {
       setPassword(newPassword);
@@ -68,17 +71,17 @@ const Register = () => {
       await usewallet.saveIndex(username);
       // the account is the public key of the account. It's derived from the mnemonic
       const accountKey = getAccountKey(mnemonic);
+
+      // We're booting the keyring with the new password
+      // This does not update the vault, it simply sets the password / cypher methods we're going to use to store our private keys in the vault
+
+      await usewallet.boot(newPassword);
       // We're then registering the account with the public key
       // This calls our backend API which gives us back an account id
       // This register call ALSO sets the currentId in local storage
       // In addition, it will sign us in to the new account with our auth (Firebase) on our backend
       // Note this auth is different to unlocking the wallet with the password.
       await usewallet.openapi.register(accountKey, username);
-
-      // We're booting the keyring with the new password
-      // This does not update the vault, it simply sets the password / cypher methods we're going to use to store our private keys in the vault
-
-      await usewallet.boot(newPassword);
       // We're removing the pre-mnemonic from storage (TB: I have no idea why this is here)
       storage.remove('premnemonic');
       // We're creating the keyring with the mnemonic. This will encypt the private keys and store them in the keyring vault and deepVault
@@ -114,8 +117,7 @@ const Register = () => {
 
   useEffect(() => {
     loadView();
-    loadTempPassword();
-  }, [loadView, loadTempPassword]);
+  }, [loadView]);
 
   return (
     <LandingComponents
@@ -148,9 +150,9 @@ const Register = () => {
             handleSwitchTab={() => setActiveTab(STEPS.BACKUP)}
             onSubmit={submitPassword}
             username={username}
-            tempPassword={tempPassword}
             showTerms={true}
             autoFocus={true}
+            isLogin={isAddWallet}
           />
         )}
 

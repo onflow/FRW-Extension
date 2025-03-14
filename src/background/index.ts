@@ -32,7 +32,6 @@ import {
   nftService,
   evmNftService,
   googleSafeHostService,
-  passwordService,
   mixpanelTrack,
 } from './service';
 import { getFirbaseConfig } from './utils/firebaseConfig';
@@ -125,7 +124,6 @@ async function restoreAppState() {
   await nftService.init();
   await evmNftService.init();
   await googleSafeHostService.init();
-  await passwordService.init();
   await mixpanelTrack.init();
   // rpcCache.start();
 

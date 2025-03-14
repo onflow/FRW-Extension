@@ -33,7 +33,6 @@ interface SetPasswordProps {
   handleSwitchTab: () => void;
   onSubmit: (password: string) => Promise<void>;
   username?: string;
-  tempPassword?: string;
   showTerms?: boolean;
   title?: string | React.ReactNode;
   subtitle?: string;
@@ -45,7 +44,6 @@ const SetPassword: React.FC<SetPasswordProps> = ({
   handleSwitchTab,
   onSubmit,
   username,
-  tempPassword = '',
   showTerms = false,
   title,
   subtitle,
@@ -56,7 +54,7 @@ const SetPassword: React.FC<SetPasswordProps> = ({
 
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [password, setPassword] = useState(tempPassword);
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isCharacters, setCharacters] = useState(false);
   const [isMatch, setMatch] = useState(false);
@@ -66,16 +64,6 @@ const SetPassword: React.FC<SetPasswordProps> = ({
   const [showError, setShowError] = useState(false);
   const [helperText, setHelperText] = useState(<div />);
   const [helperMatch, setHelperMatch] = useState(<div />);
-
-  const loadTempPassword = useCallback(async () => {
-    if (tempPassword) {
-      setPassword(tempPassword);
-    }
-  }, [tempPassword]);
-
-  useEffect(() => {
-    loadTempPassword();
-  }, [loadTempPassword]);
 
   const successInfo = (message: string) => (
     <Box
@@ -139,24 +127,22 @@ const SetPassword: React.FC<SetPasswordProps> = ({
   }, [password]);
 
   useEffect(() => {
-    if (!tempPassword) {
-      if (confirmPassword === password) {
-        setHelperMatch(successInfo(chrome.i18n.getMessage('Passwords__match')));
-        setMatch(true);
-      } else {
-        setMatch(false);
-        setHelperMatch(errorInfo(chrome.i18n.getMessage('Your__passwords__do__not__match')));
-      }
+    if (confirmPassword === password) {
+      setHelperMatch(successInfo(chrome.i18n.getMessage('Passwords__match')));
+      setMatch(true);
     } else {
-      setMatch(true); // Auto-match when using tempPassword
+      setMatch(false);
+      setHelperMatch(errorInfo(chrome.i18n.getMessage('Your__passwords__do__not__match')));
     }
-  }, [confirmPassword, password, tempPassword]);
+  }, [confirmPassword, password]);
 
   return (
     <>
       <Box className="registerBox">
         <Typography variant="h4">
-          {title || (
+          {isLogin ? (
+            chrome.i18n.getMessage('Confirm__Password')
+          ) : (
             <>
               {chrome.i18n.getMessage('Create')}
               <Box display="inline" color="primary.main">
@@ -179,7 +165,6 @@ const SetPassword: React.FC<SetPasswordProps> = ({
               onChange={setPassword}
               isVisible={isPasswordVisible}
               setVisible={setPasswordVisible}
-              readOnly={tempPassword ? !(password.length < 8) : false}
               className={classes.inputBox}
               autoFocus={autoFocus}
             />
@@ -187,7 +172,7 @@ const SetPassword: React.FC<SetPasswordProps> = ({
               <Box style={{ marginBottom: '24px' }}>{helperText}</Box>
             </SlideRelative>
 
-            {!tempPassword && (
+            {!isLogin && (
               <Box sx={{ pb: '30px', marginTop: password ? '0px' : '24px' }}>
                 <PasswordInput
                   value={confirmPassword}
@@ -210,7 +195,7 @@ const SetPassword: React.FC<SetPasswordProps> = ({
         <SubmitButton
           onClick={handleSubmit}
           isLoading={isLoading}
-          disabled={!(isMatch && isCharacters && isCheck)}
+          disabled={isLogin ? !isCharacters : !(isMatch && isCharacters && isCheck)}
           isLogin={isLogin}
         />
       </Box>

@@ -29,13 +29,6 @@ const Recover = () => {
   const [, setPassword] = useState(null);
   const [dataArray, setArray] = useState<any[]>([]);
 
-  const loadTempPassword = async () => {
-    const temp = await storage.get('tempPassword');
-    if (temp) {
-      setPassword(temp);
-    }
-  };
-
   const loadView = useCallback(async () => {
     // console.log(wallet);
     wallet
@@ -66,10 +59,6 @@ const Recover = () => {
       history.goBack();
     }
   };
-
-  useEffect(() => {
-    loadTempPassword();
-  }, []);
 
   const handleErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {

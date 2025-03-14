@@ -1,7 +1,7 @@
 import { Typography, Button, CardMedia } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import appicon from '@/ui/FRWAssets/image/appicon.png';
 import create from '@/ui/FRWAssets/svg/create.svg';

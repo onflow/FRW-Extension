@@ -11,7 +11,6 @@ export { default as addressBookService } from './addressBook';
 export { default as userWalletService } from './userWallet';
 export { default as proxyService } from './proxy';
 export { default as transactionService } from './transaction';
-export { default as passwordService } from './password';
 export { default as nftService } from './nft';
 export { default as evmNftService } from './evmNfts';
 export { default as googleDriveService } from './googleDrive';
