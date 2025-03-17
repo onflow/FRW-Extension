@@ -1,0 +1,16 @@
+{
+  "contracts": {},
+  "networks": {
+    "emulator": "127.0.0.1:3569"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "key": {
+        "type": "file",
+        "location": "e2e-emulator-account.pkey"
+      }
+    }
+  },
+  "deployments": {}
+}
