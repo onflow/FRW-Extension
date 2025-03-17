@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
 import { List, ListItemText, ListItem, ListSubheader, ListItemAvatar, Input } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import { makeStyles } from '@mui/styles';
 import _ from 'lodash';
+import React, { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   customInputLabel: {

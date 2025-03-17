@@ -1,12 +1,13 @@
+import { Typography, Button } from '@mui/material';
+import Box from '@mui/material/Box';
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import Box from '@mui/material/Box';
-import { Typography, Button } from '@mui/material';
 // import { useRouteMatch } from 'react-router-dom';
-import IconCopy from '../../../../components/iconfont/IconCopy';
-import { useWallet } from 'ui/utils';
 import { LLHeader } from '@/ui/FRWComponent';
+import { useWallet } from 'ui/utils';
+
+import IconCopy from '../../../../components/iconfont/IconCopy';
 
 interface State {
   password: string;

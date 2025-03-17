@@ -3,6 +3,7 @@
  */
 
 import { EventEmitter } from 'events';
+
 import { ethErrors } from 'eth-rpc-errors';
 
 abstract class Message extends EventEmitter {

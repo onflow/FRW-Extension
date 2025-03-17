@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useWallet } from 'ui/utils';
 import { Typography, Box } from '@mui/material';
 import { ButtonBase } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+
+import { useWallet } from 'ui/utils';
+
 import Claim from '../../FRWAssets/image/claim.png';
 
 const ClaimTokenCard = ({ token }) => {

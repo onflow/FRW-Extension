@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
 import QrScanner from 'qr-scanner';
+import React, { useEffect, useRef, useState } from 'react';
 
 const QrScannerComponent = ({ setUrl }) => {
   const videoRef = useRef(null);

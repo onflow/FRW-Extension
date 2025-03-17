@@ -1,17 +1,19 @@
+import { Box, Grid, IconButton } from '@mui/material';
+import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { Box, Grid, IconButton } from '@mui/material';
-import { Typography } from '@mui/material';
-import IconCopy from '../../../../components/iconfont/IconCopy';
-import { useWallet } from 'ui/utils';
 import { LLHeader } from '@/ui/FRWComponent';
-import sequence from '../../../FRWAssets/image/sequence.png';
-import hash from '../../../FRWAssets/image/hash.png';
-import weight from '../../../FRWAssets/image/weight.png';
-import key from '../../../FRWAssets/image/key.png';
+import { useWallet } from 'ui/utils';
+
+import IconCopy from '../../../../components/iconfont/IconCopy';
 import curve from '../../../FRWAssets/image/curve.png';
+import hash from '../../../FRWAssets/image/hash.png';
+import key from '../../../FRWAssets/image/key.png';
+import sequence from '../../../FRWAssets/image/sequence.png';
 import toggle from '../../../FRWAssets/image/toggle.png';
+import weight from '../../../FRWAssets/image/weight.png';
+
 import RevokePage from './RevokePage';
 
 interface State {

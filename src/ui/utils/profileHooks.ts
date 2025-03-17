@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useWallet } from 'ui/utils';
+
 import eventBus from '@/eventBus';
+import { useWallet } from 'ui/utils';
 
 const tempEmoji = [
   {

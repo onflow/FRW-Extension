@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react';
-import { Link, useRouteMatch } from 'react-router-dom';
-import Box from '@mui/material/Box';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   Typography,
   List,
@@ -10,10 +8,14 @@ import {
   ListItemButton,
   Divider,
 } from '@mui/material';
-import IconEnd from '../../../components/iconfont/IconAVector11Stroke';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Box from '@mui/material/Box';
+import React, { useEffect } from 'react';
+import { Link, useRouteMatch } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
+
 import { useWallet } from 'ui/utils';
+
+import IconEnd from '../../../components/iconfont/IconAVector11Stroke';
 
 const Security = () => {
   const { url } = useRouteMatch();

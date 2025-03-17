@@ -3843,6 +3843,112 @@ export class WalletController extends BaseController {
   clearEvmNFTList = async () => {
     await evmNftService.clearEvmNfts();
   };
+
+  getTokenInfosByUsername = async (
+    username: string,
+    network?: string,
+    currency: string = 'USD'
+  ): Promise<{ tokens: CoinItem[]; address: string; currency: string } | null> => {
+    try {
+      // Search for the user by username
+      const apiResponse = await openapiService.searchUser(username);
+      const users = apiResponse?.data?.users || [];
+
+      if (users.length === 0) {
+        console.log(`No user found with username: ${username}`);
+        return null;
+      }
+
+      // Get the first matching user
+      const user = users[0];
+      const address = user.address;
+
+      // If network is not provided, use the current network
+      if (!network) {
+        network = await this.getNetwork();
+      }
+
+      // Get token list for the user's address
+      const tokenList = await openapiService.getEnabledTokenList(network);
+
+      // Get token balances
+      let allBalanceMap;
+      try {
+        allBalanceMap = await openapiService.getTokenListBalance(address, tokenList);
+      } catch (error) {
+        console.error('Error getting token list balance:', error);
+        return null;
+      }
+
+      // Get token prices
+      const data = await openapiService.getTokenPrices('pricesMap');
+
+      // Get prices for each token
+      const pricesPromises = tokenList.map(async (token) => {
+        try {
+          if (Object.keys(data).length === 0 && data.constructor === Object) {
+            return { price: { last: '0.0', change: { percentage: '0.0' } } };
+          } else {
+            return await this.tokenPrice(token.symbol, token.address, data, token.contractName);
+          }
+        } catch (error) {
+          console.error(`Error fetching price for token ${token.address}:`, error);
+          return null;
+        }
+      });
+
+      const pricesResults = await Promise.allSettled(pricesPromises);
+      const allPrice = pricesResults.map((result) =>
+        result.status === 'fulfilled' ? result.value : null
+      );
+
+      // Get account info for available flow balance
+      let availableFlowBalance: string | undefined = undefined;
+      try {
+        const accountInfo = await openapiService.getFlowAccountInfo(address);
+        availableFlowBalance = accountInfo.availableBalance;
+      } catch (error) {
+        console.error('Error getting flow account info:', error);
+      }
+
+      // Map tokens to CoinItem format
+      const coins = tokenList.map((token, index): CoinItem => {
+        const tokenId = `A.${token.address.slice(2)}.${token.contractName}`;
+        const isFlow = token.symbol.toLowerCase() === 'flow';
+
+        return {
+          coin: token.name,
+          unit: token.symbol.toLowerCase(),
+          icon: token['logoURI'] || '',
+          balance: allBalanceMap[tokenId] || '0',
+          availableBalance: isFlow ? availableFlowBalance : undefined,
+          price: allPrice[index] === null ? 0 : new BN(allPrice[index].price.last).toNumber(),
+          change24h:
+            allPrice[index] === null || !allPrice[index].price || !allPrice[index].price.change
+              ? 0
+              : new BN(allPrice[index].price.change.percentage).multipliedBy(100).toNumber(),
+          total:
+            allPrice[index] === null
+              ? 0
+              : this.currencyBalance(allBalanceMap[tokenId] || '0', allPrice[index].price.last),
+        };
+      });
+
+      // Sort coins by total value
+      coins.sort((a, b) => {
+        if (b.total === a.total) {
+          return new BN(b.balance).minus(new BN(a.balance)).toNumber();
+        } else {
+          return b.total - a.total;
+        }
+      });
+
+      return { tokens: coins, address, currency };
+    } catch (error) {
+      console.error('Error in getTokenInfosByUsername:', error);
+      return null;
+    }
+  };
 }
 
 export default new WalletController();
