@@ -1,9 +1,29 @@
 {
-  "features": { "free_gas": true },
+  "features": {
+    "free_gas": true
+  },
   "payer": {
-    "mainnet": { "address": "0x319e67f2ef9d937f", "keyId": 0 },
-    "testnet": { "address": "0xcb1cf3196916f9e2", "keyId": 0 },
-    "crescendo": { "address": "0xcb1cf3196916f9e2", "keyId": 0 },
-    "previewnet": { "address": "0xa460a24643b45e74", "keyId": 0 }
+    "mainnet": {
+      "address": "0x319e67f2ef9d937f",
+      "keyId": 0
+    },
+    "testnet": {
+      "address": "0xcb1cf3196916f9e2",
+      "keyId": 0
+    },
+    "previewnet": {
+      "address": "0xa460a24643b45e74",
+      "keyId": 0
+    }
+  },
+  "bridgeFeePayer": {
+    "mainnet": {
+      "address": "0xc33b4f1884ae1ea4",
+      "keyId": 0
+    },
+    "testnet": {
+      "address": "0xb8028ddb6592deec",
+      "keyId": 0
+    }
   }
 }

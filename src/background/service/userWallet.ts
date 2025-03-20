@@ -314,17 +314,30 @@ class UserWallet {
     }
     return 'unknown_script';
   };
-  sendTransaction = async (cadence: string, args: any[]): Promise<string> => {
+  sendTransaction = async (
+    cadence: string,
+    args: any[],
+    shouldCoverFee: boolean = false
+  ): Promise<string> => {
     const scriptName = this.extractScriptName(cadence);
     //add proxy
     try {
       const allowed = await wallet.allowLilicoPay();
+      const payerFunction = shouldCoverFee
+        ? this.bridgeFeePayerAuthFunction
+        : allowed
+          ? this.payerAuthFunction
+          : this.authorizationFunction;
       const txID = await fcl.mutate({
         cadence: cadence,
         args: (arg, t) => args,
         proposer: this.authorizationFunction,
-        authorizations: [this.authorizationFunction],
-        payer: allowed ? this.payerAuthFunction : this.authorizationFunction,
+        authorizations: [
+          this.authorizationFunction,
+          shouldCoverFee ? this.bridgeFeePayerAuthFunction : null,
+          // eslint-disable-next-line eqeqeq
+        ].filter((auth) => auth != null),
+        payer: payerFunction,
         limit: 9999,
       });
 
@@ -486,6 +499,14 @@ class UserWallet {
     };
   };
 
+  signBridgeFeePayer = async (signable: any): Promise<string> => {
+    const tx = signable.voucher;
+    const message = signable.message;
+    const envelope = await openapiService.signBridgeFeePayer(tx, message);
+    const signature = envelope.envelopeSigs.sig;
+    return signature;
+  };
+
   signPayer = async (signable: any): Promise<string> => {
     const tx = signable.voucher;
     const message = signable.message;
@@ -543,6 +564,31 @@ class UserWallet {
         // Singing functions are passed a signable and need to return a composite signature
         // signable.message is a hex string of what needs to be signed.
         const signature = await this.signPayer(signable);
+        return {
+          addr: fcl.withPrefix(ADDRESS), // needs to be the same as the account.addr but this time with a prefix, eventually they will both be with a prefix
+          keyId: Number(KEY_ID), // needs to be the same as account.keyId, once again make sure its a number and not a string
+          signature: signature, // this needs to be a hex string of the signature, where signable.message is the hex value that needs to be signed
+        };
+      },
+    };
+  };
+
+  bridgeFeePayerAuthFunction = async (account: any = {}) => {
+    // authorization function need to return an account
+    const bridgeFeePayer = await wallet.getBridgeFeePayerAddressAndKeyId();
+    const address = fcl.withPrefix(bridgeFeePayer.address);
+    const ADDRESS = fcl.withPrefix(address);
+    // TODO: FIX THIS
+    const KEY_ID = bridgeFeePayer.keyId;
+    return {
+      ...account, // bunch of defaults in here, we want to overload some of them though
+      tempId: `${ADDRESS}-${KEY_ID}`, // tempIds are more of an advanced topic, for 99% of the times where you know the address and keyId you will want it to be a unique string per that address and keyId
+      addr: fcl.sansPrefix(ADDRESS), // the address of the signatory, currently it needs to be without a prefix right now
+      keyId: Number(KEY_ID), // this is the keyId for the accounts registered key that will be used to sign, make extra sure this is a number and not a string
+      signingFunction: async (signable) => {
+        // Singing functions are passed a signable and need to return a composite signature
+        // signable.message is a hex string of what needs to be signed.
+        const signature = await this.signBridgeFeePayer(signable);
         return {
           addr: fcl.withPrefix(ADDRESS), // needs to be the same as the account.addr but this time with a prefix, eventually they will both be with a prefix
           keyId: Number(KEY_ID), // needs to be the same as account.keyId, once again make sure its a number and not a string

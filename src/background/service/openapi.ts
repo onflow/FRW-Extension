@@ -777,6 +777,20 @@ class OpenApiService {
     return data;
   };
 
+  signBridgeFeePayer = async (transaction, message: string) => {
+    const messages = {
+      envelope_message: message,
+    };
+    const data = await this.sendRequest(
+      'POST',
+      '/api/signAsBridgeFeePayer',
+      {},
+      { transaction, message: messages },
+      WEB_NEXT_URL
+    );
+    // (config.method, config.path, {}, { transaction, message: messages });
+    return data;
+  };
   signProposer = async (transaction, message: string) => {
     const messages = {
       envelope_message: message,
