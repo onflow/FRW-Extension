@@ -56,11 +56,6 @@ export const moveTokenFlowHomepage = async ({
   // Wait for the transaction to be completed
   await waitForTransaction({ page, successtext: 'sealed', amount, ingoreFlowCharge });
 };
-
-test.beforeEach(async ({ page, extensionId }) => {
-  // Login to our sender account
-  await loginToSenderAccount({ page, extensionId });
-});
 //Send FLOW token from Flow to Flow
 test('send FLOW flow to flow', async ({ page }) => {
   // This can take a while
