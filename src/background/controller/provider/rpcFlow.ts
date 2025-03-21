@@ -35,7 +35,7 @@ const flowContext = flow
     if (!providerController[ctx.mapMethod]) {
       // TODO: make rpc whitelist
       try {
-        const result = await providerController.ethRpc(ctx.request.data);
+        const { result } = await providerController.ethRpc(ctx.request.data);
         return result;
       } catch (error) {
         // Catch any error and throw the custom error

@@ -444,51 +444,6 @@ class ProviderController extends BaseController {
     }
   };
 
-  ethGetBalance = async (request) => {
-    const result = await this.ethRpc(request.data);
-    return result.result;
-  };
-
-  ethGetCode = async (request) => {
-    const result = await this.ethRpc(request.data);
-    return result.result;
-  };
-
-  ethGasPrice = async (request) => {
-    const result = await this.ethRpc(request.data);
-    return result.result;
-  };
-
-  ethBlockNumber = async (request) => {
-    const result = await this.ethRpc(request.data);
-    return result.result;
-  };
-
-  ethCall = async (request) => {
-    const result = await this.ethRpc(request.data);
-    return result.result;
-  };
-
-  ethGetTransactionReceipt = async (request) => {
-    const result = await this.ethRpc(request.data);
-    return result.result;
-  };
-
-  ethSignTypedData = async (request) => {
-    const result = await this.signTypeDataV1(request);
-    return result;
-  };
-
-  ethSignTypedDataV3 = async (request) => {
-    const result = await this.signTypeData(request);
-    return result;
-  };
-
-  ethSignTypedDataV4 = async (request) => {
-    const result = await this.signTypeData(request);
-    return result;
-  };
-
   signTypeData = async (request) => {
     console.log('eth_signTypedData_v4  ', request);
     let address;
@@ -604,6 +559,56 @@ class ProviderController extends BaseController {
       origin: request.session.origin,
       type: 'ethSignTypedDataV1',
     });
+    return result;
+  };
+
+  ethGetTransactionByHash = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethGetBalance = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethGetCode = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethGasPrice = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethBlockNumber = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethCall = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethGetTransactionReceipt = async (request) => {
+    const result = await this.ethRpc(request.data);
+    return result.result;
+  };
+
+  ethSignTypedData = async (request) => {
+    const result = await this.signTypeDataV1(request);
+    return result;
+  };
+
+  ethSignTypedDataV3 = async (request) => {
+    const result = await this.signTypeData(request);
+    return result;
+  };
+
+  ethSignTypedDataV4 = async (request) => {
+    const result = await this.signTypeData(request);
     return result;
   };
 }

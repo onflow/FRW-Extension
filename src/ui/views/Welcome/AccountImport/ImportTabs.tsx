@@ -68,7 +68,6 @@ const ImportTabs = ({
     setMnemonic(mnemonic);
     const formatted = mnemonic.trim().split(/\s+/g).join(' ');
     setMnemonicValid(true);
-    storage.set('premnemonic', formatted);
   };
 
   const handleNotFoundPopup = async () => {

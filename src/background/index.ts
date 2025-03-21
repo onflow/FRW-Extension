@@ -98,6 +98,7 @@ async function restoreAppState() {
 
   // clear premnemonic in storage
   storage.remove('premnemonic');
+  storage.remove('tempPassword');
   // enable free gas fee
   storage.get('freeGas').then((value) => {
     if (value === null || value === undefined) {
