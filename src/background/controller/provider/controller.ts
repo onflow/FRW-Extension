@@ -243,9 +243,9 @@ class ProviderController extends BaseController {
     const account = evmAddress ? [ensureEvmAddressPrefix(evmAddress)] : [];
 
     sessionService.broadcastEvent('accountsChanged', account);
-    const connectSite = permissionService.getConnectedSite(origin);
     return account;
   };
+
   ethEstimateGas = async ({ data }) => {
     const network = await Wallet.getNetwork();
     const url = EVM_ENDPOINT[network];
@@ -301,18 +301,10 @@ class ProviderController extends BaseController {
       // If an error occurs, request approval
       console.error('Error querying EVM address:', error);
 
-      await notificationService.requestApproval(
-        {
-          params: { origin },
-          approvalComponent: 'EthConnect',
-        },
-        { height: 599 }
-      );
-
       return;
     }
 
-    let evmAccount: string | null;
+    let evmAccount: string | null = null;
     try {
       // Attempt to query the EVM address
       evmAccount = await Wallet.queryEvmAddress(currentWallet);
@@ -320,24 +312,19 @@ class ProviderController extends BaseController {
     } catch (error) {
       // If an error occurs, request approval
       console.error('Error querying EVM address:', error);
-
-      await notificationService.requestApproval(
-        {
-          params: { origin },
-          approvalComponent: 'EthConnect',
-        },
-        { height: 599 }
-      );
-
-      evmAccount = await Wallet.queryEvmAddress(currentWallet);
     }
 
-    const account = evmAccount ? [evmAccount] : [];
-    await sessionService.broadcastEvent('accountsChanged', account);
-    await permissionService.getConnectedSite(origin);
+    const account = evmAccount ? [evmAccount.toLowerCase()] : [];
+    try {
+      await sessionService.broadcastEvent('accountsChanged', account);
+    } catch (error) {
+      console.warn('Error broadcasting accountsChanged event:', error);
+      // Continue despite the error
+    }
+
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    await delay(2000);
+    await delay(200);
 
     return account;
   };
