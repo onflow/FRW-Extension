@@ -17,7 +17,7 @@ import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import type { ChildAccount, UserInfoResponse, WalletType } from '@/shared/types/network-types';
+import type { ChildAccountMap, UserInfoResponse, WalletType } from '@/shared/types/network-types';
 import {
   type LoggedInAccount,
   type LoggedInAccountWithIndex,
@@ -55,7 +55,7 @@ interface MenuDrawerProps {
   switchAccount: (account: LoggedInAccountWithIndex) => Promise<void>;
   togglePop: () => void;
   walletList: WalletType[];
-  childAccounts: ChildAccount | null;
+  childAccounts: ChildAccountMap | null;
   current: WalletType;
   createWalletList: (props: WalletType) => React.ReactNode;
   setWallets: (

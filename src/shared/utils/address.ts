@@ -1,6 +1,6 @@
 import HDWallet from 'ethereum-hdwallet';
 
-import { type AccountKey } from '@/shared/types/network-types';
+import { type AccountKeyRequest } from '@/shared/types/network-types';
 
 export function sansPrefix(address) {
   if (!address) return null;
@@ -19,7 +19,7 @@ export function display(address) {
 export const getAccountKey = (mnemonic) => {
   const hdwallet = HDWallet.fromMnemonic(mnemonic);
   const publicKey = hdwallet.derive("m/44'/539'/0'/0/0").getPublicKey().toString('hex');
-  const key: AccountKey = {
+  const key: AccountKeyRequest = {
     hash_algo: 1,
     sign_algo: 2,
     weight: 1000,

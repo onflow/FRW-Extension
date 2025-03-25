@@ -18,9 +18,9 @@ import { getHashAlgo, getSignAlgo } from '@/shared/utils/algo';
 import type {
   WalletResponse,
   BlockchainResponse,
-  ChildAccount,
   DeviceInfoRequest,
   FlowNetwork,
+  ChildAccountMap,
 } from '../../shared/types/network-types';
 import { fclConfig } from '../fclConfig';
 import {
@@ -34,7 +34,7 @@ interface UserWalletStore {
   wallets: Record<string, WalletResponse[]>;
   currentWallet: BlockchainResponse;
   evmWallet: BlockchainResponse;
-  childAccount: ChildAccount;
+  childAccount: ChildAccountMap;
   network: string;
   monitor: string;
   activeChild: ActiveChildType;
@@ -108,7 +108,7 @@ class UserWallet {
     }
   };
 
-  setChildWallet = (wallet: ChildAccount) => {
+  setChildWallet = (wallet: ChildAccountMap) => {
     this.store.childAccount = wallet;
   };
 

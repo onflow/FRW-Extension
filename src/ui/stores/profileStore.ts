@@ -2,7 +2,11 @@ import { create } from 'zustand';
 
 import { type LoggedInAccountWithIndex, type LoggedInAccount } from '@/shared/types/wallet-types';
 
-import type { ChildAccount, WalletType, UserInfoResponse } from '../../shared/types/network-types';
+import type {
+  ChildAccountMap,
+  WalletType,
+  UserInfoResponse,
+} from '../../shared/types/network-types';
 
 interface ProfileState {
   mainAddress: string;
@@ -14,7 +18,7 @@ interface ProfileState {
   initialStart: boolean;
   currentWallet: WalletType;
   mainAddressLoading: boolean;
-  childAccounts: ChildAccount;
+  childAccounts: ChildAccountMap;
   evmLoading: boolean;
   listLoading: boolean;
   userInfo: UserInfoResponse | null;
@@ -29,7 +33,7 @@ interface ProfileState {
   setInitial: (initial: boolean) => void;
   setCurrent: (current: any) => void;
   setMainLoading: (mainAddressLoading: boolean) => void;
-  setChildAccount: (childAccount: ChildAccount) => void;
+  setChildAccount: (childAccount: ChildAccountMap) => void;
   setEvmLoading: (evmLoading: boolean) => void;
   setListLoading: (listLoading: boolean) => void;
   setUserInfo: (info: UserInfoResponse | null) => void;

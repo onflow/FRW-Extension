@@ -24,6 +24,7 @@ import {
   type DeviceInfo,
   type DeviceInfoRequest,
   type AccountKey,
+  type AccountKeyRequest,
 } from '@/shared/types/network-types';
 import { FCLWalletConnectMethod } from '@/shared/utils/type';
 import { LLPrimaryButton, LLSecondaryButton } from 'ui/FRWComponent';
@@ -200,7 +201,7 @@ const WalletConnect = (props: RevokePageProps) => {
         };
 
         // Extracting and mapping the accountKey
-        const accountKey: AccountKey = {
+        const accountKey: AccountKeyRequest = {
           sign_algo: signAlgo,
           public_key: publicKey,
           weight: accountKeyData.weight,

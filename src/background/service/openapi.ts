@@ -46,9 +46,10 @@ import {
   Period,
   PriceProvider,
   type BlockchainResponse,
-  type AccountInfo,
   type Contact,
   type NFTModelV2,
+  type AccountKeyRequest,
+  type AccountBalanceInfo,
 } from '../../shared/types/network-types';
 
 import {
@@ -641,7 +642,7 @@ class OpenApiService {
     return data;
   };
 
-  register = async (account_key: AccountKey, username: string) => {
+  register = async (account_key: AccountKeyRequest, username: string) => {
     // Track the time until account_created is called
     mixpanelTrack.time('account_created');
 
@@ -1214,7 +1215,7 @@ class OpenApiService {
     };
   };
 
-  getFlowAccountInfo = async (address: string): Promise<AccountInfo> => {
+  getFlowAccountInfo = async (address: string): Promise<AccountBalanceInfo> => {
     const script = await getScripts('basic', 'getAccountInfo');
 
     const result = await fcl.query({

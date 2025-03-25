@@ -1,3 +1,7 @@
+// Import the fcl types
+
+export type { Account, AccountKey } from '@onflow/typedefs';
+
 export interface CheckResponse {
   unique: boolean;
   username: string;
@@ -155,14 +159,17 @@ export interface StorageInfo {
 }
 
 // All UFix64 decimal values
-export interface AccountInfo {
+// This is similar to the fcl Account type but not exactly the same
+// The fcl Account type uses a 10^8 number for the balance and does not include availableBalance or storageUsed
+export interface AccountBalanceInfo {
   address: string;
   balance: string;
   availableBalance: string;
   storageUsed: string;
   storageCapacity: string;
 }
-export interface AccountKey {
+// This is an underscore case version of the fcl AccountKey type
+export interface AccountKeyRequest {
   hash_algo: number;
   public_key: string;
   sign_algo: number;
@@ -226,7 +233,7 @@ export interface AccountDetails {
   thumbnail: Thumbnail;
 }
 
-export interface ChildAccount {
+export interface ChildAccountMap {
   [key: string]: AccountDetails;
 }
 
@@ -383,7 +390,7 @@ export interface DeviceInfoRequest {
 }
 
 export interface DeviceInfo {
-  account_key: AccountKey;
+  account_key: AccountKeyRequest;
   device_info: DeviceInfoRequest;
 }
 
@@ -394,3 +401,5 @@ export {
   type NewsDisplayType,
   type NewsConditionType,
 } from '@/shared/types/news-types';
+
+export type NetworkType = 'mainnet' | 'testnet';

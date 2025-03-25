@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import type {
-  ChildAccount,
+  ChildAccountMap,
   BlockchainResponse,
   WalletResponse,
 } from '@/shared/types/network-types';
@@ -214,7 +214,7 @@ export const useProfiles = () => {
   const fetchUserWallet = useCallback(async () => {
     if (!usewallet || !walletLoaded) return;
     freshUserInfo();
-    const childresp: ChildAccount = await usewallet.checkUserChildAccount();
+    const childresp: ChildAccountMap = await usewallet.checkUserChildAccount();
     setChildAccount(childresp);
     usewallet.setChildWallet(childresp);
   }, [freshUserInfo, usewallet, setChildAccount, walletLoaded]);
