@@ -53,3 +53,25 @@ export type LoggedInAccount = {
 export type LoggedInAccountWithIndex = LoggedInAccount & {
   indexInLoggedInAccounts: number;
 };
+
+// This is the account returned by the indexer
+// It's the account that is associated with a specific profile's public key
+
+export type PublicKeyAccount = {
+  // The address of the account
+  address: string;
+  // The public key of the account
+  publicKey: string;
+  // The index of the key in the account
+  keyIndex: number;
+  // The weight of the key
+  weight: number;
+  // The signature algorithm of the key
+  signAlgo: number;
+  // The signature algorithm of the key
+  signAlgoString: SignAlgoString;
+  // The hash algorithm of the key
+  hashAlgo: number;
+  // The hash algorithm of the key
+  hashAlgoString: HashAlgoString;
+};
