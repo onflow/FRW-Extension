@@ -10,7 +10,7 @@ import openapiService from '@/background/service/openapi';
 import { getLoggedInAccount } from '@/background/utils/getLoggedInAccount';
 import { signWithKey, seed2PubKey } from '@/background/utils/modules/publicPrivateKey';
 import createPersistStore from '@/background/utils/persisitStore';
-import { type HashAlgoType, type SignAlgoType } from '@/shared/types/algo-types';
+import { type HashAlgoString, type SignAlgoString } from '@/shared/types/algo-types';
 import { type LoggedInAccount, type ActiveChildType } from '@/shared/types/wallet-types';
 import { withPrefix } from '@/shared/utils/address';
 import { getHashAlgo, getSignAlgo } from '@/shared/utils/algo';
@@ -358,8 +358,8 @@ class UserWallet {
 
     // The issue is here in using getStoragedAccount()
     let account: Partial<LoggedInAccount> & {
-      hashAlgo: HashAlgoType;
-      signAlgo: SignAlgoType;
+      hashAlgo: HashAlgoString;
+      signAlgo: SignAlgoString;
       pubKey: string;
       weight: number;
     };

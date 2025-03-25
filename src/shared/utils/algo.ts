@@ -1,4 +1,4 @@
-import type { HashAlgoType, SignAlgoType } from '@/shared/types/algo-types';
+import type { HashAlgoString, SignAlgoString } from '@/shared/types/algo-types';
 
 export function getHashAlgo(value: string): number {
   switch (value) {
@@ -34,7 +34,7 @@ export function getSignAlgo(value: string): number {
   }
 }
 
-export function getStringFromHashAlgo(value: number): HashAlgoType {
+export function getStringFromHashAlgo(value: number): HashAlgoString {
   switch (value) {
     case 0:
       return 'unknown';
@@ -51,7 +51,7 @@ export function getStringFromHashAlgo(value: number): HashAlgoType {
   }
 }
 
-export function getStringFromSignAlgo(value: number): SignAlgoType {
+export function getStringFromSignAlgo(value: number): SignAlgoString {
   switch (value) {
     case 0:
       return 'unknown';

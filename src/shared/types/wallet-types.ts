@@ -1,4 +1,4 @@
-import { type HashAlgoType, type SignAlgoType } from './algo-types';
+import { type HashAlgoString, type SignAlgoString } from './algo-types';
 
 // Matches exactly 16 hex characters, with optional 0x prefix
 export type FlowAddress = `0x${string & { length: 16 }}` | `${string & { length: 16 }}`;
@@ -38,14 +38,14 @@ export type LoggedInAccount = {
   // The creation date of the account
   created: string;
   // The hash algorithm of the account
-  hashAlgo: HashAlgoType;
+  hashAlgo: HashAlgoString;
   // Anonymous mode of the account.
   // If 1, the account is NOT anonymous. If 2, the account is anonymous.
   private: number;
   // The public key of the account
   pubKey: string;
   // The signature algorithm of the account
-  signAlgo: SignAlgoType;
+  signAlgo: SignAlgoString;
   // The weight of the account. Usually 1000
   weight: number;
 };
