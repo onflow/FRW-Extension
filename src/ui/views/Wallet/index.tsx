@@ -203,7 +203,7 @@ const WalletTab = ({ network }) => {
         console.log('Wallet is locked');
         return;
       }
-      if (!(await usewallet.getMainWallet())) {
+      if (!(await usewallet.getParentAddress())) {
         console.log('Wallet Tab - No main wallet yet');
         return;
       }

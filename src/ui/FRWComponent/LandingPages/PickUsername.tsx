@@ -9,7 +9,8 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 import EmailIcon from '@/ui/assets/alternate-email.svg';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
@@ -39,7 +40,15 @@ const useStyles = makeStyles((_theme) => ({
   },
 }));
 
-const PickUsername = ({ handleSwitchTab, savedUsername, getUsername }) => {
+const PickUsername = ({
+  handleSwitchTab,
+  username,
+  setUsername,
+}: {
+  handleSwitchTab: () => void;
+  username: string;
+  setUsername: (username: string) => void;
+}) => {
   const classes = useStyles();
   const wallet = useWallet();
   const [isLoading, setLoading] = useState(false);
@@ -96,87 +105,100 @@ const PickUsername = ({ handleSwitchTab, savedUsername, getUsername }) => {
     []
   );
 
-  const [username, setUsername] = useState(savedUsername || '');
-  const [helperText, setHelperText] = useState(<div />);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const setErrorMessage = useCallback(
-    (message: string) => {
-      setLoading(false);
-      setUsernameValid(false);
-      setHelperText(usernameError(message));
-    },
-    [setLoading, setUsernameValid, setHelperText]
-  );
+  const isMounted = useRef(true);
 
-  const runCheckUsername = useCallback(
-    (username) => {
-      wallet.openapi
-        .checkUsername(username.toLowerCase())
-        .then((response) => {
-          setLoading(false);
-          if (response.data.username !== username.toLowerCase()) {
-            setLoading(false);
+  const validateUsername = useCallback(
+    (newUsername: string) => {
+      const runCheckUsername = async () => {
+        if (isMounted.current) {
+          setLoading(true);
+        }
+        try {
+          const response = await wallet.openapi.checkUsername(newUsername.toLowerCase());
+          if (response.data.username !== newUsername.toLowerCase()) {
             return;
           }
-          if (response.data.unique) {
-            setUsernameValid(true);
-            setHelperText(usernameCorrect);
-          } else {
-            if (response.message === 'Username is reserved') {
-              setErrorMessage(
-                chrome.i18n.getMessage('This__username__is__reserved__Please__contact')
-              );
+          if (isMounted.current) {
+            if (response.data.unique) {
+              setUsernameValid(true);
+              setErrorMessage('');
             } else {
-              setErrorMessage(chrome.i18n.getMessage('This__name__is__taken'));
+              setUsernameValid(false);
+              if (response.message === 'Username is reserved') {
+                setErrorMessage(
+                  chrome.i18n.getMessage('This__username__is__reserved__Please__contact')
+                );
+              } else {
+                setErrorMessage(chrome.i18n.getMessage('This__name__is__taken'));
+              }
             }
           }
-        })
-        .catch(() => {
-          setErrorMessage(chrome.i18n.getMessage('Oops__unexpected__error'));
-        });
-    },
-    [setErrorMessage, setUsernameValid, setHelperText, usernameCorrect, wallet.openapi]
-  );
+        } catch (error) {
+          console.error('error', error);
+          if (isMounted.current) {
+            setErrorMessage(chrome.i18n.getMessage('Oops__unexpected__error'));
+          }
+        } finally {
+          if (isMounted.current) {
+            setLoading(false);
+          }
+        }
+      };
 
-  useEffect(() => {
-    setUsernameValid(false);
-    setHelperText(usernameLoading);
-    setLoading(true);
-    const delayDebounceFn = setTimeout(() => {
-      if (username.length < 3) {
+      if (newUsername.length < 3) {
         setErrorMessage(chrome.i18n.getMessage('Too__short'));
-        setLoading(false);
+        setUsernameValid(false);
         return;
       }
 
-      if (username.length > 15) {
+      if (newUsername.length > 15) {
         setErrorMessage(chrome.i18n.getMessage('Too__long'));
-        setLoading(false);
+        setUsernameValid(false);
         return;
       }
 
       const regex = /^[A-Za-z0-9]{3,15}$/;
-      if (!regex.test(username)) {
+      if (!regex.test(newUsername)) {
         setErrorMessage(
           chrome.i18n.getMessage('Your__username__can__only__contain__letters__and__numbers')
         );
-        setLoading(false);
+        setUsernameValid(false);
         return;
       }
+      if (isMounted.current) {
+        // Async check username
+        runCheckUsername();
+      }
+    },
+    [wallet.openapi]
+  );
 
-      runCheckUsername(username);
-    }, 500);
+  const handleUsernameChange = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newUsername = event.target.value;
+      // Set the username
+      setUsername(newUsername);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [username]);
+      // Validate username
+      validateUsername(newUsername);
+    },
+    500
+  );
 
-  const msgBgColor = useCallback(() => {
-    if (isLoading) {
-      return 'neutral.light';
-    }
-    return usernameValid ? 'success.light' : 'error.light';
-  }, [isLoading, usernameValid]);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
+  const handleClearUsername = useCallback(() => {
+    setUsername('');
+  }, [setUsername]);
+
+  const msgBgColor = isLoading ? 'neutral.light' : usernameValid ? 'success.light' : 'error.light';
   return (
     <>
       <Box className="registerBox">
@@ -200,10 +222,9 @@ const PickUsername = ({ handleSwitchTab, savedUsername, getUsername }) => {
               autoFocus
               fullWidth
               disableUnderline
-              value={username}
-              onChange={(event) => {
-                setUsername(event.target.value);
-              }}
+              // Making uncontrolled component
+              defaultValue={username}
+              onChange={handleUsernameChange}
               startAdornment={
                 <InputAdornment position="start">
                   <img src={EmailIcon} />
@@ -213,9 +234,7 @@ const PickUsername = ({ handleSwitchTab, savedUsername, getUsername }) => {
                 <InputAdornment position="end">
                   <IconButton
                     sx={{ color: '#e3e3e3', padding: '0px' }}
-                    onClick={() => {
-                      setUsername('');
-                    }}
+                    onClick={handleClearUsername}
                   >
                     <CancelIcon size={24} color={'#E3E3E3'} />
                   </IconButton>
@@ -226,12 +245,16 @@ const PickUsername = ({ handleSwitchTab, savedUsername, getUsername }) => {
               <Box
                 sx={{
                   width: '95%',
-                  backgroundColor: msgBgColor(),
+                  backgroundColor: msgBgColor,
                   mx: 'auto',
                   borderRadius: '0 0 12px 12px',
                 }}
               >
-                <Box sx={{ p: '4px' }}>{helperText}</Box>
+                <Box sx={{ p: '4px' }}>
+                  {!errorMessage && isLoading && usernameLoading}
+                  {!errorMessage && !isLoading && usernameCorrect}
+                  {errorMessage && usernameError(errorMessage)}
+                </Box>
               </Box>
             </SlideRelative>
           </FormControl>
@@ -240,7 +263,6 @@ const PickUsername = ({ handleSwitchTab, savedUsername, getUsername }) => {
         <Button
           onClick={() => {
             handleSwitchTab();
-            getUsername(username);
           }}
           disabled={!usernameValid}
           variant="contained"

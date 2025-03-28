@@ -7,19 +7,17 @@ import encryptor from 'browser-passworder';
 import * as ethUtil from 'ethereumjs-util';
 import log from 'loglevel';
 
-import eventBus from '@/eventBus';
-import {
-  normalizeAddress,
-  setPageStateCacheWhenPopupClose,
-  hasWalletConnectPageStateCache,
-} from 'background/utils';
+import { seed2PublicPrivateKey, pk2PubKey } from '@/background/utils/modules/publicPrivateKey';
+import { type PublicKeyTuple } from '@/shared/types/key-types';
+import { FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
+import { getCurrentProfileId, returnCurrentProfileId } from '@/shared/utils/current-id';
+import { normalizeAddress } from 'background/utils';
 import { KEYRING_TYPE } from 'consts';
 
 import { storage } from '../../webapi';
 import i18n from '../i18n';
 import preference from '../preference';
 
-import type DisplayKeyring from './display';
 import { HDKeyring } from './hdKeyring';
 import { SimpleKeyring } from './simpleKeyring';
 
@@ -61,57 +59,23 @@ interface VaultEntry {
   [uuid: string]: string;
 }
 
+export type KeyringType = 'HD Key Tree' | 'Simple Key Pair';
+export type Keyring = SimpleKeyring | HDKeyring;
+
 interface KeyringData {
   0: {
-    type: 'HD Key Tree' | 'Simple Key Pair';
+    type: KeyringType;
     data:
       | {
           mnemonic?: string;
           activeIndexes?: number[];
           publicKey?: string;
+          derivationPath?: string;
+          passphrase?: string;
         }
       | string[];
   };
   id: string;
-}
-
-interface HDWallet {
-  provider: null;
-  address: string;
-  publicKey: string;
-  fingerprint: string;
-  parentFingerprint: string;
-  mnemonic: {
-    phrase: string;
-    password: string;
-    wordlist: {
-      locale: string;
-    };
-    entropy: string;
-  };
-  chainCode: string;
-  path: string;
-  index: number;
-  depth: number;
-}
-
-interface SimpleKeyPairWallet {
-  privateKey: {
-    type: 'Buffer';
-    data: number[];
-  };
-}
-
-interface Keyring {
-  type: 'HD Key Tree' | 'Simple Key Pair';
-  hdWallet?: HDWallet;
-  wallets?: SimpleKeyPairWallet[];
-  mnemonic?: string;
-  activeIndexes?: number[];
-  getAccounts(): Promise<string[]>;
-  addAccounts(n: number): Promise<string[]>;
-  removeAccount(address: string, brand?: string): void;
-  serialize(): Promise<any>;
 }
 
 class SimpleStore<T> {
@@ -147,11 +111,12 @@ class KeyringService extends EventEmitter {
   //
   // PUBLIC METHODS
   //
-  keyringTypes: any[];
+  keyringTypes: (typeof SimpleKeyring | typeof HDKeyring)[];
   store!: SimpleStore<any>;
   memStore: SimpleStore<MemStoreState>;
   currentKeyring: Keyring[];
   keyringList: KeyringData[];
+  publicKeyCache: Map<string, PublicKeyTuple> = new Map();
   encryptor: typeof encryptor = encryptor;
   password: string | null = null;
 
@@ -185,6 +150,105 @@ class KeyringService extends EventEmitter {
     const encryptBooted = await this.encryptor.encrypt(password, 'true');
     this.store.updateState({ booted: encryptBooted });
   }
+  /**
+   * Get keyring ids
+   * @returns {Promise<string[]>} The keyring ids
+   */
+  getKeyringIds = async (): Promise<string[]> => {
+    const keyringIds = this.keyringList.map((keyring) => keyring.id);
+    return keyringIds;
+  };
+
+  /**
+   * Ensure valid currentId
+   * @param currentId - The id of the keyring to switch to.
+   * @returns {Promise<string>} The currentId
+   */
+  ensureValidKeyringId = async (id: string | null): Promise<string> => {
+    const keyringIds = await this.getKeyringIds();
+    if (keyringIds.length === 0) {
+      throw new Error('KeyringController - No keyrings found');
+    }
+    if (!id || !keyringIds.includes(id)) {
+      // Data has been corrupted somehow. Switch to the first keyring
+      const firstKeyringId = keyringIds[0];
+      return firstKeyringId;
+    }
+    return id;
+  };
+  /**
+   * Get the private key from the current keyring
+   * @returns {Promise<string>} The private key as a hex string
+   * @throws {Error} If no private key is found
+   */
+  getKeyringPrivateKey = async (keyrings: Keyring[]): Promise<string> => {
+    let privateKey: string | undefined;
+
+    for (const keyring of keyrings) {
+      if (keyring instanceof SimpleKeyring) {
+        // If a private key is found, extract it and break the loop
+        privateKey = keyring.wallets[0].privateKey.toString('hex');
+        if (privateKey) break;
+      } else if (keyring instanceof HDKeyring) {
+        // Get a copy of the keyring data
+        const serialized = await keyring.serialize();
+        if (serialized.mnemonic) {
+          // If mnemonic is found, derive the private key
+          const { SECP256K1 } = await seed2PublicPrivateKey(serialized.mnemonic);
+          privateKey = SECP256K1.pk;
+          break;
+        }
+      } else if (
+        (keyring as any).wallets &&
+        (keyring as any).wallets.length > 0 &&
+        (keyring as any).wallets[0].privateKey
+      ) {
+        // If a private key is found, extract it and break the loop
+        privateKey = (keyring as any).wallets[0].privateKey.toString('hex');
+        if (privateKey) break;
+      }
+    }
+
+    if (!privateKey) {
+      throw new Error('No private key found in any of the keyrings.');
+    }
+
+    return privateKey;
+  };
+  /**
+   * Get the private key from the current keyring
+   * @returns {Promise<string>} The private key as a hex string
+   * @throws {Error} If no private key is found
+   */
+  getCurrentPrivateKey = async (): Promise<string> => {
+    return this.getKeyringPrivateKey(this.currentKeyring);
+  };
+
+  /**
+   * Get the public key tuple from the current keyring
+   * @returns {Promise<PublicKeyTuple>} The public key tuple
+   */
+  getKeyringPublicKeyTuple = async (keyrings: Keyring[]): Promise<PublicKeyTuple> => {
+    try {
+      // Get the private key
+      const privateKey = await this.getKeyringPrivateKey(keyrings);
+
+      // Generate public key tuple from private key
+      const pubKTuple = await pk2PubKey(privateKey);
+      return pubKTuple;
+    } catch (error) {
+      console.error('Failed to get public key tuple:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Get the public key tuple from the current keyring
+   * @returns {Promise<PublicKeyTuple>} The public key tuple
+   */
+  getCurrentPublicKeyTuple = async (): Promise<PublicKeyTuple> => {
+    return this.getKeyringPublicKeyTuple(this.currentKeyring);
+  };
 
   /**
    * Unlock Keyrings without emitting event because the new keyring is not added yet
@@ -321,7 +385,11 @@ class KeyringService extends EventEmitter {
    * @param {string} seed - The BIP44-compliant seed phrase.
    * @returns {Promise<Object>} A Promise that resolves to the state.
    */
-  async createKeyringWithMnemonics(seed: string): Promise<any> {
+  async createKeyringWithMnemonics(
+    seed: string,
+    derivationPath = FLOW_BIP44_PATH,
+    passphrase = ''
+  ): Promise<any> {
     if (!bip39.validateMnemonic(seed)) {
       return Promise.reject(new Error(i18n.t('mnemonic phrase is invalid')));
     }
@@ -331,6 +399,8 @@ class KeyringService extends EventEmitter {
         return this.addNewKeyring('HD Key Tree', {
           mnemonic: seed,
           activeIndexes: [0],
+          derivationPath,
+          passphrase,
         });
       })
       .then((firstKeyring) => {
@@ -349,7 +419,7 @@ class KeyringService extends EventEmitter {
       .then(() => keyring);
   }
 
-  async addKeyring(keyring) {
+  async addKeyring(keyring: SimpleKeyring | HDKeyring) {
     return keyring
       .getAccounts()
       .then((accounts) => {
@@ -456,9 +526,12 @@ class KeyringService extends EventEmitter {
    * @param {Object} opts - The constructor options for the keyring.
    * @returns {Promise<Keyring>} The new keyring.
    */
-  addNewKeyring(type: string, opts?: unknown): Promise<any> {
-    const Keyring = this.getKeyringClassForType(type);
-    const keyring = new Keyring(opts);
+  addNewKeyring(type: KeyringType, opts?: unknown): Promise<any> {
+    const KeyringClass = this.getKeyringClassForType(type);
+    if (!KeyringClass) {
+      throw new Error(`Keyring type ${type} not found`);
+    }
+    const keyring = new KeyringClass(opts as typeof KeyringClass.arguments);
     return this.addKeyring(keyring);
   }
 
@@ -866,9 +939,6 @@ class KeyringService extends EventEmitter {
    * @returns {Promise<Array<Keyring>>} The keyrings.
    */
   async unlockKeyrings(password: string): Promise<any[]> {
-    // Note that currentAccountIndex is only used in keyring for old accounts that don't have an id stored in the keyring removing in 2.7.6
-    // currentId always takes precedence
-    const currentId = await storage.get('currentId');
     let vaultArray = this.store.getState().vault;
 
     // Ensure vaultArray is an array and filter out null/undefined entries
@@ -876,7 +946,18 @@ class KeyringService extends EventEmitter {
 
     await this.decryptVaultArray(vaultArray, password);
     this.password = password;
-    const keyrings = await this.switchKeyring(currentId);
+
+    // Validate currentId
+
+    // Note that currentAccountIndex is only used in keyring for old accounts that don't have an id stored in the keyring removing in 2.7.6
+    // currentId always takes precedence
+    const currentId = await returnCurrentProfileId();
+    // Validate the currentId to ensure it's a valid keyring id (Note switchKeyring also does this)
+    const validCurrentId = await this.ensureValidKeyringId(currentId);
+    // switch to the keyring with the currentId
+    const keyrings = await this.switchKeyring(validCurrentId);
+
+    // Return the current keyring
     return keyrings;
   }
 
@@ -886,27 +967,62 @@ class KeyringService extends EventEmitter {
    * Attempts to switch the keyring based on the given id,
    * Set the new keyring to ram.
    *
-   * @param {string} currentId - The id of the keyring to switch to.
+   * @param {string} id - The id of the keyring to switch to.
    * @returns {Promise<Array<Keyring>>} The keyring.
    */
-  async switchKeyring(currentId: string): Promise<any[]> {
-    // useCurrentId to find the keyring in the keyringList
-    const selectedKeyring = this.keyringList.find((keyring) => keyring.id === currentId);
+  async switchKeyring(id: string): Promise<Keyring[]> {
+    // Ensure the id is valid
+    const validKeyringId = await this.ensureValidKeyringId(id);
+    // Find the keyring in the keyringList
+    const selectedKeyringIndex = this.keyringList.findIndex(
+      (keyring) => keyring.id === validKeyringId
+    );
+    // If the keyring is not found, throw an error
+    if (selectedKeyringIndex === -1) {
+      throw new Error(
+        'somehow the keyring is not found in the keyringList when we have a valid id'
+      );
+    }
+    const selectedKeyring = this.keyringList[selectedKeyringIndex];
     // remove the keyring of the previous account
     await this.clearKeyrings();
 
-    await Promise.all(
-      [selectedKeyring].map(async (keyring) => {
-        try {
-          await this._restoreKeyring(keyring?.[0]); // Access the first property which contains type and data
-        } catch (error) {
-          console.error('Failed to restore keyring:', error);
-          throw error;
-        }
-      })
-    );
+    // Look for any legacy path and passphrase data and add it to the keyring
+    if (
+      selectedKeyring[0].data &&
+      typeof selectedKeyring[0].data === 'object' &&
+      'mnemonic' in selectedKeyring[0].data
+    ) {
+      const hdKeyringData = selectedKeyring[0].data;
+
+      if (!hdKeyringData.derivationPath) {
+        // Check legacy derivation path
+        const pathKeyIndex = `user${selectedKeyringIndex}_path`;
+        const pathKeyId = `user${id}_path`;
+
+        hdKeyringData.derivationPath =
+          (await storage.get(pathKeyId)) ?? (await storage.get(pathKeyIndex)) ?? FLOW_BIP44_PATH;
+      }
+
+      if (!hdKeyringData.passphrase) {
+        // Check legacy derivation path
+        const phraseKeyIndex = `user${selectedKeyringIndex}_phrase`;
+        const phraseKeyId = `user${id}_phrase`;
+
+        hdKeyringData.passphrase =
+          (await storage.get(phraseKeyId)) ?? (await storage.get(phraseKeyIndex)) ?? '';
+      }
+
+      await this._restoreKeyring({
+        type: selectedKeyring[0].type,
+        data: hdKeyringData,
+      });
+    } else {
+      await this._restoreKeyring(selectedKeyring[0]);
+    }
 
     await this._updateMemStoreKeyrings();
+    // Return the current keyring
     return this.currentKeyring;
   }
 
@@ -1015,15 +1131,19 @@ class KeyringService extends EventEmitter {
   async _restoreKeyring(serialized: any): Promise<any> {
     const { type, data } = serialized;
     const Keyring = this.getKeyringClassForType(type);
+    if (!Keyring) {
+      throw new Error(`Keyring type ${type} not found`);
+    }
     const keyring = new Keyring();
 
     try {
       // For HD Key Tree, initialize with just the mnemonic and indexes
       if (type === 'HD Key Tree' && data) {
-        await keyring.deserialize({
-          mnemonic: data.mnemonic,
-          activeIndexes: data.activeIndexes || [0],
-          hdPath: 'm',
+        await (keyring as HDKeyring).deserialize({
+          mnemonic: (data.mnemonic as string) || '',
+          activeIndexes: (data.activeIndexes as number[]) || [0],
+          derivationPath: data.derivationPath || FLOW_BIP44_PATH,
+          passphrase: data.passphrase || '',
         });
       } else {
         await keyring.deserialize(data);
@@ -1049,7 +1169,7 @@ class KeyringService extends EventEmitter {
    * @param {string} type - The type whose class to get.
    * @returns {Keyring|undefined} The class, if it exists.
    */
-  getKeyringClassForType(type: string): any {
+  getKeyringClassForType(type: KeyringType) {
     return this.keyringTypes.find((kr) => kr.type === type);
   }
 
@@ -1091,9 +1211,9 @@ class KeyringService extends EventEmitter {
    * Returns the key ring of current storage
    * managed by all currently unlocked keyrings.
    *
-   * @returns {Promise<Array<string>>} The array of accounts.
+   * @returns {Promise<Array<Keyring>>} The array of keyrings.
    */
-  async getKeyring(): Promise<any[]> {
+  async getKeyring(): Promise<Keyring[]> {
     const keyrings = this.currentKeyring || [];
     return keyrings;
   }

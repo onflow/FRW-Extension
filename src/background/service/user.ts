@@ -1,98 +1,64 @@
-import { createPersistStore } from 'background/utils';
+import { type UserInfoResponse } from '@/shared/types/network-types';
+import { getCurrentProfileId } from '@/shared/utils/current-id';
+import { createSessionStore } from 'background/utils';
 
-import { mixpanelTrack } from './mixpanel';
+class UserInfoService {
+  store!: Map<string, UserInfoResponse>;
 
-export interface UserInfoStore {
-  avatar: string;
-  nickname: string;
-  username: string;
-  dashboardIndex: number;
-  private: number;
-  user_id: string;
-  created_at: string;
-  meow: Meows;
-}
-
-interface Meows {
-  mainnet: string;
-  testnet: string;
-}
-
-const template = {
-  avatar: '',
-  nickname: '',
-  username: '',
-  dashboardIndex: 0,
-  private: 0,
-  user_id: '',
-  created_at: '',
-  meow: {
-    mainnet: '',
-    testnet: '',
-  },
-};
-
-class UserInfo {
-  store!: UserInfoStore;
-
+  // TODO: remove this
+  dashboardIndex = 0;
   init = async () => {
-    this.store = await createPersistStore<UserInfoStore>({
-      name: 'userInfo',
-      template: template,
-    });
+    this.store = new Map<string, UserInfoResponse>();
   };
 
-  getUserInfo = () => {
-    return this.store;
+  getUserInfo = (userId: string): UserInfoResponse => {
+    return this.store[userId];
   };
 
-  addUserInfo = (data: UserInfoStore) => {
-    this.store.nickname = data['nickname'];
-    this.store.private = data['private'];
-    this.store.username = data['username'];
+  getCurrentUserInfo = async (): Promise<UserInfoResponse> => {
+    const currentId = await getCurrentProfileId();
+    return this.getUserInfo(currentId);
+  };
 
-    const url = new URL(data['avatar']);
+  setCurrentUserInfo = async (userInfo: UserInfoResponse) => {
+    const currentId = await getCurrentProfileId();
+
+    let avatar = userInfo.avatar;
+    const url = new URL(userInfo.avatar);
+
     if (url.host === 'firebasestorage.googleapis.com') {
       url.searchParams.append('alt', 'media');
       url.searchParams.append('token', process.env.FB_TOKEN!);
-      this.store.avatar = url.toString();
-    }
-    this.store.avatar = data['avatar'];
-
-    // identify the user
-    if (this.store.user_id) {
-      mixpanelTrack.identify(this.store.user_id, this.store.username);
+      avatar = url.toString();
     }
 
-    // TODO: track the user info if not in private mode
-  };
+    const userInfoWithAvatar: UserInfoResponse = { ...userInfo, avatar };
 
-  addUserId = (userId: string) => {
-    this.store.user_id = userId;
-    if (this.store.user_id) {
-      mixpanelTrack.identify(this.store.user_id);
+    if (this.store[currentId]) {
+      // Assign so that it maintains the reference
+      Object.assign(this.store[currentId], userInfoWithAvatar);
+    } else {
+      // Create a new session store
+      this.store[currentId] = createSessionStore<UserInfoResponse>({
+        name: `user-info-${currentId}`,
+        template: userInfoWithAvatar,
+      });
     }
   };
 
   removeUserInfo = () => {
-    this.store = template;
+    // Note this removes the linkage to the store...
+    this.store = new Map<string, UserInfoResponse>();
   };
 
+  // Todo remove this...
   setDashIndex = (data: number) => {
-    this.store.dashboardIndex = data;
+    this.dashboardIndex = data;
   };
 
   getDashIndex = () => {
-    return this.store.dashboardIndex;
-  };
-
-  setMeow = (domain: string, network: string) => {
-    this.store.meow[network] = domain;
-  };
-
-  getMeow = (network: string) => {
-    return this.store.meow[network];
+    return this.dashboardIndex;
   };
 }
 
-export default new UserInfo();
+export default new UserInfoService();

@@ -4,12 +4,13 @@ import { Box, Typography, Drawer, Stack, Grid, CardMedia, IconButton, Button } f
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { type AccountDetails } from '@/shared/types/network-types';
+import { type AccountDetails } from '@/shared/types/wallet-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useTransferList } from '@/ui/hooks/useTransferListHook';
 import { MatchMediaType } from '@/ui/utils/url';
 import { useStorageCheck } from '@/ui/utils/useStorageCheck';
 import { LLSpinner, FRWChildProfile, FRWDropdownProfileCard } from 'ui/FRWComponent';
@@ -29,13 +30,13 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
   console.log('MoveNftConfirmation');
   const usewallet = useWallet();
   const { mainAddress, childAccounts, evmWallet, parentWallet } = useProfiles();
+  const { occupied } = useTransferList();
   const history = useHistory();
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
   const [, setErrorMessage] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
-  const [occupied, setOccupied] = useState(false);
   const [childWallet, setChildWallet] = useState<AccountDetails | null>(null);
   const [selectedAccount, setSelectedChildAccount] = useState(null);
   const [childWallets, setChildWallets] = useState({});
@@ -48,17 +49,6 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
 
   const isLowStorage = isSufficient !== undefined && !isSufficient; // isSufficient is undefined when the storage check is not yet completed
   const isLowStorageAfterAction = sufficientAfterAction !== undefined && !sufficientAfterAction;
-
-  const getPending = useCallback(async () => {
-    const pending = await usewallet.getPendingTx();
-    if (pending.length > 0) {
-      setOccupied(true);
-    }
-  }, [usewallet]);
-
-  const updateOccupied = useCallback(() => {
-    setOccupied(false);
-  }, []);
 
   const replaceIPFS = (url: string | null): string => {
     if (!url) {
@@ -138,29 +128,22 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
       });
   };
 
-  const transactionDoneHandler = useCallback(
-    (request) => {
-      if (request.msg === 'transactionDone') {
-        updateOccupied();
-      }
-      if (request.msg === 'transactionError') {
-        setFailed(true);
-        setErrorMessage(request.errorMessage);
-        setErrorCode(request.errorCode);
-      }
-      return true;
-    },
-    [updateOccupied]
-  );
+  const transactionDoneHandler = useCallback((request) => {
+    if (request.msg === 'transactionError') {
+      setFailed(true);
+      setErrorMessage(request.errorMessage);
+      setErrorCode(request.errorCode);
+    }
+    return true;
+  }, []);
 
   useEffect(() => {
-    getPending();
     chrome.runtime.onMessage.addListener(transactionDoneHandler);
 
     return () => {
       chrome.runtime.onMessage.removeListener(transactionDoneHandler);
     };
-  }, [getPending, props.data.contact, transactionDoneHandler]);
+  }, [props.data.contact, transactionDoneHandler]);
 
   const getChildResp = useCallback(async () => {
     const newWallet = {

@@ -115,7 +115,7 @@ const RemoveWallet = ({ hideBackButton = false }) => {
 
   const setUserWallet = useCallback(async () => {
     const userInfo = await usewallet.getUserInfo(true);
-    const wallet = await usewallet.getUserWallets();
+    const wallet = await usewallet.getMainAccounts();
     await setWallet(wallet);
     await setUserInfo(userInfo);
   }, [usewallet]);

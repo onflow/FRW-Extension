@@ -1,7 +1,8 @@
 import { type TokenInfo } from 'flow-native-token-registry';
 
+import { type CoinItem } from './coin-types';
 import { type Contact } from './network-types';
-import { type CoinItem, type WalletAddress } from './wallet-types';
+import { type WalletAddress } from './wallet-types';
 
 // Define the base token types
 export type TokenType = 'FT' | 'Flow';

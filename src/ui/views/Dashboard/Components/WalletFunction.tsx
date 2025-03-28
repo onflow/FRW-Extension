@@ -2,8 +2,11 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { ListItem, ListItemButton, ListItemIcon, Typography, Box } from '@mui/material';
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { type WalletType } from '@/shared/types/network-types';
-import { type ActiveChildType, type WalletAddress } from '@/shared/types/wallet-types';
+import {
+  type WalletAccount,
+  type ActiveChildType,
+  type WalletAddress,
+} from '@/shared/types/wallet-types';
 import { useWallet } from 'ui/utils';
 
 import IconEnd from '../../../../components/iconfont/IconAVector11Stroke';
@@ -15,16 +18,16 @@ interface WalletFunctionProps {
   icon: string;
   color: string;
   setWallets: (
-    walletInfo: WalletType,
+    walletInfo: WalletAccount,
     key: ActiveChildType | null,
     index?: number | null
   ) => Promise<void>;
   currentWalletIndex: number;
-  currentWallet: WalletType;
+  currentWallet: WalletAccount;
   mainAddress: string;
   setExpandAccount: React.Dispatch<React.SetStateAction<boolean>>;
   expandAccount: boolean;
-  walletList: WalletType[];
+  walletList: WalletAccount[];
 }
 
 const WalletFunction = (props: WalletFunctionProps) => {

@@ -51,11 +51,11 @@ importers:
         specifier: ^1.7.1
         version: 1.7.1
       '@onflow/fcl':
-        specifier: ^1.13.3
-        version: 1.13.3(@types/react@18.3.14)(google-protobuf@3.21.4)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)
+        specifier: ^1.14.1
+        version: 1.14.1(@types/react@18.3.14)(google-protobuf@3.21.4)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)
       '@onflow/fcl-wc':
-        specifier: ^5.5.3
-        version: 5.5.3(@onflow/fcl-core@1.13.3(google-protobuf@3.21.4))(@types/react@18.3.14)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)
+        specifier: ^5.6.3
+        version: 5.6.3(@onflow/fcl-core@1.15.1(google-protobuf@3.21.4))(@types/react@18.3.14)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)
       '@onflow/transport-http':
         specifier: 1.10.2
         version: 1.10.2
@@ -299,6 +299,9 @@ importers:
       tsparticles:
         specifier: ~3.6.0
         version: 3.6.0
+      use-debounce:
+        specifier: ^10.0.4
+        version: 10.0.4(react@18.3.1)
       util:
         specifier: ^0.12.5
         version: 0.12.5
@@ -2180,16 +2183,16 @@ packages:
   '@onflow/config@1.5.1':
     resolution: {integrity: sha512-BmD67EhZEqMRePa3y/WIpC5hH/YF9gV9uv5bPSN39P3laYxd93Ojhdf6v0fXkjO/d3WaHylLPoXYgpW/g5seWA==}
 
-  '@onflow/fcl-core@1.13.3':
-    resolution: {integrity: sha512-E+UVVQpPqP5TSimpeU8AUfFCTCCHuwKIVbhpxFcSGH/cUA6rDlEVQQSYDN5gtil8Cdkb9KxCfm1j5Os3n+PZTQ==}
+  '@onflow/fcl-core@1.15.1':
+    resolution: {integrity: sha512-niMxLUYLn0l+5bW9GJ1yUrT5pj6NI6OYdBoZxC3PRvH//cuPYGPlnM+hm7zcmmBE+JOHi7G76fq0pSB9TWylbA==}
 
-  '@onflow/fcl-wc@5.5.3':
-    resolution: {integrity: sha512-nVpG++C6ldVbYsSmeMgRh5R96hIJS1d71vxwUjy7i9MPOaQSKGdtD+yBldEYihxBZ/lUx+3JBerxXSnfEXfGyw==}
+  '@onflow/fcl-wc@5.6.3':
+    resolution: {integrity: sha512-fhoRq+XDqT911YNq09HzG2wMiXtwNOdrNl84hNU0iPrUGq3hN3cPyvlzSttNj+IljC9xLIJyiwsV1/5hD6dcPg==}
     peerDependencies:
-      '@onflow/fcl-core': 1.13.3
+      '@onflow/fcl-core': 1.15.1
 
-  '@onflow/fcl@1.13.3':
-    resolution: {integrity: sha512-14CxR7idFljwoNI183BtpXtBNO+T3JgdLajiuPWsnDI5SlMkKfbwLsvhrgX6rauVnm/NDTOUtpBlsYA1GvDcyQ==}
+  '@onflow/fcl@1.14.1':
+    resolution: {integrity: sha512-9kWlj02f7GKQuM2CivWXh0hDY/s8NvAJ3pFn6hVO6lQNH9VQB7f3zNNqu7hHQcG9HvXJ22ntpTFxA4j1m8CvUw==}
 
   '@onflow/interaction@0.0.11':
     resolution: {integrity: sha512-Xuq1Mmx6Wyba/F/L+QLQs0yJeQDsIDwy5SKk5vrCuVgIj0yD8k506g5L8ODrbM1LWll8i0tQsoOi0F85vNl5sA==}
@@ -2197,17 +2200,17 @@ packages:
   '@onflow/rlp@1.2.3':
     resolution: {integrity: sha512-Mm1jSzDhdTofMGhg3NtUD8uKntj7u1dSMr+Q4VwOw2YQhwGTGJrzsHc7qgkJxwDnjU0Ra8VQfqd54bZzX0R2aQ==}
 
-  '@onflow/sdk@1.5.5':
-    resolution: {integrity: sha512-79h56lYB/4vi1Tn+QrICUpQZ0Jh8O5d8I0IC/3adAf2zU8xfxvkypw7Tfx58Zr03vip+0h83Ri3DwyZpqIM2sw==}
+  '@onflow/sdk@1.6.1':
+    resolution: {integrity: sha512-SVEjOMuyYDRcxosHyGmW7QHbUre3s0GAxuQC8xSsCFU5ZmYEGPfGAHWiIkemU4mhOprdoQYGOzDI4m6i0NpBfA==}
 
   '@onflow/transport-http@1.10.2':
     resolution: {integrity: sha512-dXi4pe1K29kJ4AbHH4eBIZ3JhYoo68sl5vlJzm5w1MMApHUWDIeDDDFh1opvqyvE3W8uBCe7+hVrigMZAZyHJA==}
 
-  '@onflow/transport-http@1.10.4':
-    resolution: {integrity: sha512-yZNqNEISnCaP7bsB+pwBjHT7+AYjADxUQpj8SccrTWnWlM6LEDIcNVCr8eBzrANug3o2Y1LuqSOhMiWYtbXs7w==}
+  '@onflow/transport-http@1.11.0':
+    resolution: {integrity: sha512-ZF+UZqqeiha3Bf6lMzc1fJ59mwQfcH23JQxaqnMRHmREP0YArlUWDYyWNEyYiGufZ+IjvUhLSJfnZFqvNl1vcg==}
 
-  '@onflow/typedefs@1.4.0':
-    resolution: {integrity: sha512-7b4C3F4Ztayx6XdQz/7YoHMzZ6kzy37dLxdVCV/PAsAunq9Jfu32HQaf8a0NCk0L0aM7FS2zT1Om4k7b5KP4Xg==}
+  '@onflow/typedefs@1.4.1':
+    resolution: {integrity: sha512-/IBw1LLJIPQWTbHe8Ayc6tRi2W+MtbyTmX8obaBVmNWZfZEd8C5D+8PgQX5AwHM+xpph7WKIccvFu+ovhefZqA==}
 
   '@onflow/types@1.4.1':
     resolution: {integrity: sha512-oKKaNTPfb9OJos4C6RoK3sql9Bx8mi+8ytTc7wLJbjv+n6YUov2zRGkGsPzj2QxL2Xf48CLYtPNn7cBNr3v39w==}
@@ -6785,6 +6788,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -9470,6 +9474,12 @@ packages:
     resolution: {integrity: sha512-oCwdVC7mTuWiPyjLUz/COz5TLk6wgp0RCsN+wHZ2Ekneac9w8uuV0njcbbie2ME+Vs+d6duwmYuR3HgQXs1fOg==}
     engines: {node: '>= 0.4'}
 
+  use-debounce@10.0.4:
+    resolution: {integrity: sha512-6Cf7Yr7Wk7Kdv77nnJMf6de4HuDE4dTxKij+RqE9rufDsI6zsbjyAxcH5y2ueJCQAnfgKbzXbZHYlkFwmBlWkw==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      react: '*'
+
   use-sync-external-store@1.2.0:
     resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
     peerDependencies:
@@ -9984,6 +9994,18 @@ packages:
 
   ws@8.18.0:
     resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
+  ws@8.18.1:
+    resolution: {integrity: sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -12336,15 +12358,15 @@ snapshots:
       - '@onflow/util-config'
       - supports-color
 
-  '@onflow/fcl-core@1.13.3(google-protobuf@3.21.4)':
+  '@onflow/fcl-core@1.15.1(google-protobuf@3.21.4)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@improbable-eng/grpc-web': 0.15.0(google-protobuf@3.21.4)
       '@onflow/config': 1.5.1
       '@onflow/interaction': 0.0.11
       '@onflow/rlp': 1.2.3
-      '@onflow/sdk': 1.5.5
-      '@onflow/transport-http': 1.10.4
+      '@onflow/sdk': 1.6.1
+      '@onflow/transport-http': 1.11.0
       '@onflow/types': 1.4.1
       '@onflow/util-actor': 1.3.4
       '@onflow/util-address': 1.2.3
@@ -12363,11 +12385,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@onflow/fcl-wc@5.5.3(@onflow/fcl-core@1.13.3(google-protobuf@3.21.4))(@types/react@18.3.14)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)':
+  '@onflow/fcl-wc@5.6.3(@onflow/fcl-core@1.15.1(google-protobuf@3.21.4))(@types/react@18.3.14)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@onflow/config': 1.5.1
-      '@onflow/fcl-core': 1.13.3(google-protobuf@3.21.4)
+      '@onflow/fcl-core': 1.15.1(google-protobuf@3.21.4)
       '@onflow/util-invariant': 1.2.4
       '@onflow/util-logger': 1.3.3
       '@walletconnect/modal': 2.7.0(@types/react@18.3.14)(react@18.3.1)
@@ -12403,15 +12425,15 @@ snapshots:
       - tsx
       - utf-8-validate
 
-  '@onflow/fcl@1.13.3(@types/react@18.3.14)(google-protobuf@3.21.4)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)':
+  '@onflow/fcl@1.14.1(@types/react@18.3.14)(google-protobuf@3.21.4)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@onflow/config': 1.5.1
-      '@onflow/fcl-core': 1.13.3(google-protobuf@3.21.4)
-      '@onflow/fcl-wc': 5.5.3(@onflow/fcl-core@1.13.3(google-protobuf@3.21.4))(@types/react@18.3.14)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)
+      '@onflow/fcl-core': 1.15.1(google-protobuf@3.21.4)
+      '@onflow/fcl-wc': 5.6.3(@onflow/fcl-core@1.15.1(google-protobuf@3.21.4))(@types/react@18.3.14)(jiti@2.4.1)(postcss@8.4.49)(react@18.3.1)
       '@onflow/interaction': 0.0.11
       '@onflow/rlp': 1.2.3
-      '@onflow/sdk': 1.5.5
+      '@onflow/sdk': 1.6.1
       '@onflow/types': 1.4.1
       '@onflow/util-actor': 1.3.4
       '@onflow/util-address': 1.2.3
@@ -12460,13 +12482,13 @@ snapshots:
       '@babel/runtime': 7.26.0
       buffer: 6.0.3
 
-  '@onflow/sdk@1.5.5':
+  '@onflow/sdk@1.6.1':
     dependencies:
       '@babel/runtime': 7.26.0
       '@onflow/config': 1.5.1
       '@onflow/rlp': 1.2.3
-      '@onflow/transport-http': 1.10.4
-      '@onflow/typedefs': 1.4.0
+      '@onflow/transport-http': 1.11.0
+      '@onflow/typedefs': 1.4.1
       '@onflow/util-actor': 1.3.4
       '@onflow/util-address': 1.2.3
       '@onflow/util-invariant': 1.2.4
@@ -12501,7 +12523,7 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@onflow/transport-http@1.10.4':
+  '@onflow/transport-http@1.11.0':
     dependencies:
       '@babel/runtime': 7.26.0
       '@onflow/util-address': 1.2.3
@@ -12511,15 +12533,15 @@ snapshots:
       abort-controller: 3.0.0
       cross-fetch: 4.0.0
       events: 3.3.0
-      isomorphic-ws: 5.0.0(ws@8.18.0)
-      ws: 8.18.0
+      isomorphic-ws: 5.0.0(ws@8.18.1)
+      ws: 8.18.1
     transitivePeerDependencies:
       - '@onflow/util-config'
       - bufferutil
       - encoding
       - utf-8-validate
 
-  '@onflow/typedefs@1.4.0':
+  '@onflow/typedefs@1.4.1':
     dependencies:
       '@babel/runtime': 7.26.0
 
@@ -18048,6 +18070,10 @@ snapshots:
     dependencies:
       ws: 8.18.0
 
+  isomorphic-ws@5.0.0(ws@8.18.1):
+    dependencies:
+      ws: 8.18.1
+
   isows@1.0.3(ws@8.13.0):
     dependencies:
       ws: 8.13.0
@@ -21887,6 +21913,10 @@ snapshots:
       punycode: 1.4.1
       qs: 6.13.1
 
+  use-debounce@10.0.4(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
   use-sync-external-store@1.2.0(react@18.3.1):
     dependencies:
       react: 18.3.1
@@ -22671,6 +22701,8 @@ snapshots:
   ws@8.17.1: {}
 
   ws@8.18.0: {}
+
+  ws@8.18.1: {}
 
   xdg-basedir@3.0.0: {}
 

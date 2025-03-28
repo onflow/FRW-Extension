@@ -23,7 +23,7 @@ import { useHistory } from 'react-router-dom';
 import {
   type DeviceInfo,
   type DeviceInfoRequest,
-  type AccountKey,
+  type AccountKeyRequest,
 } from '@/shared/types/network-types';
 import { FCLWalletConnectMethod } from '@/shared/utils/type';
 import { LLPrimaryButton, LLSecondaryButton } from 'ui/FRWComponent';
@@ -107,8 +107,7 @@ const WalletConnect = (props: RevokePageProps) => {
   async function onSessionProposal({ id, params }: Web3WalletTypes.SessionProposal) {
     console.log('params ', params);
     try {
-      const wallet = await usewallet.getUserWallets();
-      const address = wallet[0].blockchain[0].address;
+      const address = await usewallet.getParentAddress();
       // ------- namespaces builder util ------------ //
       const namespaces = Object.entries(params.requiredNamespaces)
         .map(([key, namespace]) => {
@@ -139,12 +138,11 @@ const WalletConnect = (props: RevokePageProps) => {
     if (params.request.method === FCLWalletConnectMethod.accountInfo) {
       try {
         const userInfo = await usewallet.getUserInfo(false);
-        const wallet = await usewallet.getUserWallets();
-        const address = wallet[0].blockchain[0].address;
+        const address = await usewallet.getParentAddress();
 
         // Respond with an empty message
         const jsonString = {
-          userId: userInfo.user_id,
+          userId: userInfo.id,
           userAvatar: userInfo.avatar,
           userName: userInfo.username,
           walletAddress: address,
@@ -200,7 +198,7 @@ const WalletConnect = (props: RevokePageProps) => {
         };
 
         // Extracting and mapping the accountKey
-        const accountKey: AccountKey = {
+        const accountKey: AccountKeyRequest = {
           sign_algo: signAlgo,
           public_key: publicKey,
           weight: accountKeyData.weight,

@@ -1,11 +1,14 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
+import storage, { type AreaName, type StorageChange } from '@/background/webapi/storage';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useTransferListStore } from '@/ui/stores/transferListStore';
-import { useWallet } from '@/ui/utils';
+import { useWallet, debug } from '@/ui/utils';
 
 export const useTransferList = () => {
   const usewallet = useWallet();
+  const mountedRef = useRef(true);
+  const pendingCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const setTransactions = useTransferListStore((state) => state.setTransactions);
   const setMonitor = useTransferListStore((state) => state.setMonitor);
@@ -22,8 +25,59 @@ export const useTransferList = () => {
   const loading = useTransferListStore((state) => state.loading);
   const showButton = useTransferListStore((state) => state.showButton);
   const count = useTransferListStore((state) => state.count);
-
+  const [occupied, setOccupied] = useState(false);
   const { currentWallet } = useProfiles();
+
+  // Setup localStorage event listener
+  useEffect(() => {
+    // Function to check pending transactions
+    const checkPendingTransactions = async () => {
+      try {
+        const pending = await usewallet.getPendingTx();
+        debug('useTransferListHook', 'Checking pending transactions', { count: pending.length });
+
+        if (mountedRef.current) {
+          setOccupied(pending.length > 0);
+        }
+      } catch (error) {
+        console.error('Error checking pending transactions:', error);
+      }
+    };
+
+    // Initial check
+    checkPendingTransactions();
+
+    // Set up interval to periodically check for pending transactions
+    pendingCheckIntervalRef.current = setInterval(checkPendingTransactions, 1000);
+
+    // Listen for storage events (when localStorage changes in other tabs)
+    const handleStorageChange = (
+      changes: { [key: string]: StorageChange },
+      namespace: AreaName
+    ) => {
+      if (namespace === 'local') {
+        debug('useTransferListHook', 'Storage change detected', {
+          changes,
+          namespace,
+        });
+        if (changes['transaction'] || changes['transaction'] === null) {
+          debug(
+            'useTransferListHook',
+            'Transaction storage changed, checking pending transactions'
+          );
+          checkPendingTransactions();
+        }
+      }
+    };
+
+    storage.addStorageListener(handleStorageChange);
+
+    // Cleanup
+    return () => {
+      mountedRef.current = false;
+      storage.removeStorageListener(handleStorageChange);
+    };
+  }, [usewallet]);
 
   const fetchTransactions = useCallback(
     async (forceRefresh = false) => {
@@ -68,6 +122,7 @@ export const useTransferList = () => {
 
   return {
     fetchTransactions,
+    occupied,
     transactions,
     monitor,
     flowscanURL,

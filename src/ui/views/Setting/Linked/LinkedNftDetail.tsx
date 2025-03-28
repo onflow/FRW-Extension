@@ -119,8 +119,7 @@ const LinkedNftDetail = () => {
     async (ownerAddresss) => {
       const userInfo = await usewallet.getUserInfo(false);
       const currentAddress = ownerAddresss;
-      const userWallets = await usewallet.getUserWallets();
-      const parentAddress = userWallets[0].blockchain[0].address;
+      const parentAddress = await usewallet.getParentAddress();
       const isChild = true;
       const userTemplate = {
         avatar: userInfo.avatar,

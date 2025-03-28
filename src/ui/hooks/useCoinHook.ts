@@ -1,35 +1,44 @@
 import BN from 'bignumber.js';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 
-import { withPrefix } from '@/shared/utils/address';
+import storage, { type AreaName, type StorageChange } from '@/background/webapi/storage';
+import { type CoinItem } from '@/shared/types/coin-types';
+import { withPrefix, isValidEthereumAddress } from '@/shared/utils/address';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useCoinStore } from '@/ui/stores/coinStore';
+import { debug } from '@/ui/utils';
 import { useWallet, useWalletLoaded } from '@/ui/utils/WalletContext';
-
 const DEFAULT_MIN_AMOUNT = '0.001';
 
 export const useCoins = () => {
   const usewallet = useWallet();
   const walletLoaded = useWalletLoaded();
-  const { mainAddress } = useProfiles();
+  const { mainAddress, currentWallet } = useProfiles();
+  const { network } = useNetwork();
 
+  const refreshInProgressRef = useRef(false);
+  const calculationInProgressRef = useRef(false);
+  const lastRefreshTimeRef = useRef(0);
+  const lastTotalFlowRef = useRef('');
+  const mountedRef = useRef(true);
+
+  // Replace Zustand state with React state
+  const [coins, setCoins] = useState<CoinItem[]>([]);
+  const [balance, setBalance] = useState<string>('0');
+  const [totalFlow, setTotalFlow] = useState<string>('0');
+  const [availableFlow, setAvailableFlow] = useState<string>('0');
   const [coinsLoaded, setCoinsLoaded] = useState(false);
 
-  // Action selectors
-  const setCoinData = useCoinStore((state) => state.setCoinData);
-  const setBalance = useCoinStore((state) => state.setBalance);
-  const setTotalFlow = useCoinStore((state) => state.setTotalFlow);
-  const setAvailableFlow = useCoinStore((state) => state.setAvailableFlow);
-  const clearCoins = useCoinStore((state) => state.clearCoins);
-
-  // State selectors
-  const coins = useCoinStore((state) => state.coins);
-  const balance = useCoinStore((state) => state.balance);
-  const totalFlow = useCoinStore((state) => state.totalFlow);
-  const availableFlow = useCoinStore((state) => state.availableFlow);
-
   const handleStorageData = useCallback(
-    async (storageData) => {
+    async (data) => {
+      const storageData = data.sort((a, b) => {
+        if (b.total === a.total) {
+          return new BN(b.balance).minus(new BN(a.balance)).toNumber();
+        } else {
+          return new BN(b.total).minus(new BN(a.total)).toNumber();
+        }
+      });
       if (!storageData) return;
 
       // Create a map for faster lookups
@@ -57,94 +66,104 @@ export const useCoins = () => {
 
       // Batch updates
       await Promise.all([
-        setCoinData(Array.from(uniqueTokenMap.values())),
+        setCoins(Array.from(uniqueTokenMap.values())),
         setTotalFlow(flowBalance.toString()),
+        setAvailableFlow(flowBalance.toString()),
         setBalance(`$ ${sum.toFixed(2)}`),
       ]);
     },
-    [setCoinData, setTotalFlow, setBalance]
+    [setCoins, setTotalFlow, setBalance]
   );
 
-  const calculateAvailableBalance = useCallback(async () => {
-    try {
-      // Make sure the wallet is unlocked
-      if (!(await usewallet.isUnlocked())) {
-        console.log('calculateAvailableBalance - Wallet is locked');
-        return;
-      }
-      if (!(await usewallet.getMainWallet())) {
-        console.log('calculateAvailableBalance - No main wallet yet');
-        return;
-      }
+  // Setup localStorage event listener
+  useEffect(() => {
+    // Function to check pending transactions
+    const loadCoinList = async () => {
+      try {
+        const coinList = await storage.get('coinList');
+        const userWallet = await storage.get('userWallets');
+        // check for nettwork type
+        let refreshedCoinlist;
 
-      const address = withPrefix(mainAddress) || '';
-      // TODO: need a controller for this
-      const minAmount = new BN(
-        (await usewallet.openapi.getAccountMinFlow(address)) || DEFAULT_MIN_AMOUNT
-      );
-      const total = new BN(totalFlow);
-      const availableFlow = total.minus(minAmount).toString();
-      setAvailableFlow(availableFlow);
-    } catch (error) {
-      console.error('Error calculating available balance:', error);
-      setAvailableFlow('0');
-    }
-  }, [usewallet, totalFlow, mainAddress, setAvailableFlow]);
-
-  const sortWallet = useCallback(
-    (data) => {
-      const sorted = data.sort((a, b) => {
-        if (b.total === a.total) {
-          return new BN(b.balance).minus(new BN(a.balance)).toNumber();
+        if (isValidEthereumAddress(userWallet.currentAddress)) {
+          refreshedCoinlist = coinList['evm'][network];
         } else {
-          return new BN(b.total).minus(new BN(a.total)).toNumber();
+          refreshedCoinlist = coinList['coinItem'][network];
         }
-      });
-      handleStorageData(sorted);
-    },
-    [handleStorageData]
-  );
+        if (Array.isArray(refreshedCoinlist) && refreshedCoinlist.length > 0) {
+          handleStorageData(refreshedCoinlist);
+          setCoinsLoaded(true);
+        }
+      } catch (error) {
+        console.error('Error checking pending transactions:', error);
+      }
+    };
+
+    // Listen for storage events (when localStorage changes in other tabs)
+    const handleStorageChange = (
+      changes: { [key: string]: StorageChange },
+      namespace: AreaName
+    ) => {
+      if (namespace === 'local') {
+        if (changes['coinList'] || changes['coinList'] === null) {
+          debug('useCoinHook', 'useCoinHook storage changed, checking pending transactions');
+          loadCoinList();
+        }
+      }
+    };
+
+    loadCoinList();
+
+    storage.addStorageListener(handleStorageChange);
+
+    // Cleanup
+    return () => {
+      mountedRef.current = false;
+      storage.removeStorageListener(handleStorageChange);
+    };
+  }, [usewallet, network, handleStorageData]);
 
   const refreshCoinData = useCallback(async () => {
-    if (!usewallet || !walletLoaded) return;
-
-    // Make sure the wallet is unlocked
-    if (!(await usewallet.isUnlocked())) {
-      console.log('Wallet is locked');
+    // Prevent concurrent refreshes and throttle calls
+    if (refreshInProgressRef.current) {
       return;
     }
-    if (!(await usewallet.getMainWallet())) {
-      console.log('No main wallet yet');
+
+    const now = Date.now();
+    if (now - lastRefreshTimeRef.current < 5000) {
+      // 5 second throttle
+      return;
+    }
+
+    if (!usewallet || !walletLoaded) {
       return;
     }
 
     try {
-      const refreshedCoinlist = await usewallet.refreshCoinList(60000);
-      if (Array.isArray(refreshedCoinlist) && refreshedCoinlist.length > 0) {
-        sortWallet(refreshedCoinlist);
-        setCoinsLoaded(true);
+      refreshInProgressRef.current = true;
+      lastRefreshTimeRef.current = now;
+
+      // Make sure the wallet is unlocked
+      if (!(await usewallet.isUnlocked())) {
+        return;
       }
+
+      if (!(await usewallet.getParentAddress())) {
+        return;
+      }
+
+      console.log('refreshedCoinlist');
+      await usewallet.refreshCoinList(60000);
     } catch (error) {
       console.error('Error refreshing coin data:', error);
+    } finally {
+      refreshInProgressRef.current = false;
     }
-  }, [usewallet, sortWallet, walletLoaded]);
-
-  useEffect(() => {
-    if (usewallet && walletLoaded) {
-      refreshCoinData();
-    }
-  }, [refreshCoinData, usewallet, walletLoaded]);
-
-  useEffect(() => {
-    if (walletLoaded) {
-      calculateAvailableBalance();
-    }
-  }, [totalFlow, calculateAvailableBalance, walletLoaded]);
+  }, [usewallet, walletLoaded]);
 
   return {
     refreshCoinData,
     handleStorageData,
-    clearCoins,
     coins,
     balance,
     totalFlow,

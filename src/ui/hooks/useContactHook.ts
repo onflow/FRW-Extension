@@ -109,7 +109,7 @@ export function useContacts() {
         ...evmWallet,
         address: evmAddress,
         avatar: evmWallet.icon,
-        contact_name: evmWallet.name,
+        contact_name: evmWallet.name || '',
       };
       setEvmAccounts([evmData]);
     }

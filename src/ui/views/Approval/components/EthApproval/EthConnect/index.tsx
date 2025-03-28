@@ -58,7 +58,7 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
     let currentWallet;
     try {
       // Attempt to query the address
-      currentWallet = await usewallet.getMainWallet();
+      currentWallet = await usewallet.getParentAddress();
     } catch (error) {
       // If an error occurs, request approval
       console.error('Error querying EVM address:', error);
@@ -76,6 +76,7 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
         id: 1,
         icon: icon,
         color: '#282828',
+        chain: 747,
       };
       await usewallet.setActiveWallet(walletInfo, 'evm');
     }
@@ -110,7 +111,7 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
   const transactionDoneHandler = useCallback(
     async (request) => {
       if (request.msg === 'transactionDone') {
-        const mainWallet = await usewallet.getMainWallet();
+        const mainWallet = await usewallet.getParentAddress();
         if (!mainWallet) {
           throw new Error('Main wallet is undefined');
         }

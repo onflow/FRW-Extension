@@ -9,6 +9,7 @@ import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
 import { useContact } from '@/ui/hooks/useContactHook';
+import { useTransferList } from '@/ui/hooks/useTransferListHook';
 import { useStorageCheck } from '@/ui/utils/useStorageCheck';
 import IconNext from 'ui/FRWAssets/svg/next.svg';
 import { LLSpinner } from 'ui/FRWComponent';
@@ -31,6 +32,7 @@ const TransferConfirmation = ({
 }: TransferConfirmationProps) => {
   const wallet = useWallet();
   const history = useHistory();
+  const { occupied } = useTransferList();
   const fromContactData =
     useContact(transactionState.fromContact?.address || '') || transactionState.fromContact;
   const toContactData =
@@ -40,7 +42,6 @@ const TransferConfirmation = ({
   const [, setErrorMessage] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
-  const [occupied, setOccupied] = useState(false);
   const [tid, setTid] = useState<string>('');
   const [count, setCount] = useState(0);
 
@@ -86,17 +87,6 @@ const TransferConfirmation = ({
     }
   }, [transactionState.toAddress, isConfirmationOpen]);
 
-  const getPending = useCallback(async () => {
-    const pending = await wallet.getPendingTx();
-    if (pending.length > 0) {
-      setOccupied(true);
-    }
-  }, [wallet]);
-
-  const updateOccupied = useCallback(() => {
-    setOccupied(false);
-  }, []);
-
   const transferTokens = useCallback(async () => {
     try {
       // Set the sending state to true
@@ -134,30 +124,23 @@ const TransferConfirmation = ({
     }
   }, [transactionState, wallet, history]);
 
-  const transactionDoneHandler = useCallback(
-    (request) => {
-      if (request.msg === 'transactionDone') {
-        updateOccupied();
-      }
-      if (request.msg === 'transactionError') {
-        setFailed(true);
-        setErrorMessage(request.errorMessage);
-        setErrorCode(request.errorCode);
-      }
-      return true;
-    },
-    [updateOccupied]
-  );
+  const transactionDoneHandler = useCallback((request) => {
+    if (request.msg === 'transactionError') {
+      setFailed(true);
+      setErrorMessage(request.errorMessage);
+      setErrorCode(request.errorCode);
+    }
+    return true;
+  }, []);
 
   useEffect(() => {
     startCount();
-    getPending();
     chrome.runtime.onMessage.addListener(transactionDoneHandler);
 
     return () => {
       chrome.runtime.onMessage.removeListener(transactionDoneHandler);
     };
-  }, [getPending, startCount, transactionDoneHandler]);
+  }, [startCount, transactionDoneHandler]);
 
   return (
     <>

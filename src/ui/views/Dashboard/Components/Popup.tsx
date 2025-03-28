@@ -16,8 +16,12 @@ import CircularProgress, { circularProgressClasses } from '@mui/material/Circula
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import type { UserInfoResponse, WalletType } from '@/shared/types/network-types';
-import { type LoggedInAccountWithIndex, type LoggedInAccount } from '@/shared/types/wallet-types';
+import type { UserInfoResponse } from '@/shared/types/network-types';
+import {
+  type LoggedInAccountWithIndex,
+  type LoggedInAccount,
+  type WalletAccount,
+} from '@/shared/types/wallet-types';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import iconCheck from 'ui/FRWAssets/svg/iconCheck.svg';
 import popAdd from 'ui/FRWAssets/svg/popAdd.svg';
@@ -31,7 +35,7 @@ interface TransferConfirmationProps {
   handleCancelBtnClicked: () => void;
   handleAddBtnClicked: () => void;
   userInfo: UserInfoResponse;
-  current: WalletType;
+  current: WalletAccount;
   switchAccount: (account: LoggedInAccountWithIndex) => Promise<void>;
   loggedInAccounts: LoggedInAccount[];
   switchLoading: boolean;

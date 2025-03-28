@@ -1,19 +1,17 @@
 import { Snackbar, Alert, Box } from '@mui/material';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { getHashAlgo, getSignAlgo } from '@/shared/utils/algo';
+import { FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
 import AllSet from '@/ui/FRWComponent/LandingPages/AllSet';
 import GoogleBackup from '@/ui/FRWComponent/LandingPages/GoogleBackup';
 import LandingComponents from '@/ui/FRWComponent/LandingPages/LandingComponents';
 import PickUsername from '@/ui/FRWComponent/LandingPages/PickUsername';
 import SetPassword from '@/ui/FRWComponent/LandingPages/SetPassword';
-import { storage } from 'background/webapi';
 import { useWallet } from 'ui/utils';
 
 import Google from './Google';
 import ImportTabs from './ImportTabs';
-import RecoveryPassword from './RecoveryPassword';
 
 const STEPS = {
   IMPORT: 'import',
@@ -31,7 +29,7 @@ const AccountImport = () => {
   const usewallet = useWallet();
 
   const [mnemonic, setMnemonic] = useState('');
-  const [pk, setPk] = useState(null);
+  const [pk, setPk] = useState<string | null>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [accounts, setAccounts] = useState<any>([]);
@@ -41,9 +39,9 @@ const AccountImport = () => {
   const [showGoogleImport, setShowGoogleImport] = useState(false);
   const [googleAccounts, setGoogleAccounts] = useState<string[]>([]);
 
-  const getUsername = (username: string) => {
-    setUsername(username.toLowerCase());
-  };
+  // For seed phrase import
+  const [path, setPath] = useState(FLOW_BIP44_PATH);
+  const [phrase, setPhrase] = useState('');
 
   const loadView = useCallback(async () => {
     usewallet
@@ -70,40 +68,28 @@ const AccountImport = () => {
   };
 
   const submitPassword = async (newPassword: string) => {
+    // Note this handles both creating a new profile and importing an existing profile
     setPassword(newPassword);
-    const accountKeyStruct = {
-      public_key: accounts[0].pubK,
-      sign_algo: getSignAlgo(accounts[0].signAlgo),
-      hash_algo: getHashAlgo(accounts[0].hashAlgo),
-      weight: 1000,
-    };
-
-    const installationId = await usewallet.openapi.getInstallationId();
-
-    const device_info = {
-      device_id: installationId,
-      device_name: navigator.userAgent,
-      device_type: 'extension',
-      push_token: '',
-      platform: 'chrome',
-    };
-
-    const address = accounts[0].address.replace(/^0x/, '');
-    await usewallet.openapi.importKey(accountKeyStruct, device_info, username, {}, address);
-    await usewallet.boot(newPassword);
-    storage.remove('premnemonic');
-    await usewallet.saveIndex(username);
-    if (pk) {
-      await usewallet.importPrivateKey(pk);
-      setActiveTab(STEPS.ALL_SET);
-    } else {
-      await usewallet.createKeyringWithMnemonics(mnemonic);
-      setActiveTab(STEPS.GOOGLE_BACKUP);
+    try {
+      if (pk) {
+        await usewallet.importProfileUsingPrivateKey(username, newPassword, pk);
+        // Go to done
+        setActiveTab(STEPS.ALL_SET);
+      } else if (mnemonic) {
+        await usewallet.importProfileUsingMnemonic(username, newPassword, mnemonic, path, phrase);
+        // Go to backup
+        setActiveTab(STEPS.GOOGLE_BACKUP);
+      } else {
+        throw new Error('No mnemonic or private key provided');
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(error.message);
+      setShowError(true);
     }
   };
 
   const goBack = () => {
-    console.log('activeTab', activeTab);
     switch (activeTab) {
       case STEPS.PICK_USERNAME:
         setActiveTab(STEPS.IMPORT);
@@ -153,35 +139,28 @@ const AccountImport = () => {
                   setErrorMessage={setErrorMessage}
                   setShowError={setShowError}
                   handleGoogleAccountsFound={handleGoogleAccountsFound}
+                  path={path}
+                  setPath={setPath}
+                  phrase={phrase}
+                  setPhrase={setPhrase}
                 />
               )}
 
               {activeTab === STEPS.PICK_USERNAME && (
                 <PickUsername
                   handleSwitchTab={() => setActiveTab(STEPS.SET_PASSWORD)}
-                  savedUsername={username}
-                  getUsername={getUsername}
+                  username={username}
+                  setUsername={setUsername}
                 />
               )}
 
-              {activeTab === STEPS.SET_PASSWORD && (
+              {(activeTab === STEPS.SET_PASSWORD || activeTab === STEPS.RECOVER_PASSWORD) && (
                 <SetPassword
-                  handleSwitchTab={() => setActiveTab(STEPS.GOOGLE_BACKUP)}
+                  handleSwitchTab={() => {}}
                   onSubmit={submitPassword}
-                  isLogin={true}
+                  isLogin={activeTab === STEPS.RECOVER_PASSWORD}
                 />
               )}
-
-              {activeTab === STEPS.RECOVER_PASSWORD && (
-                <RecoveryPassword
-                  handleSwitchTab={() => setActiveTab(STEPS.GOOGLE_BACKUP)}
-                  mnemonic={mnemonic}
-                  pk={pk}
-                  goLast={() => setActiveTab(STEPS.ALL_SET)}
-                  accountKey={accounts}
-                />
-              )}
-
               {activeTab === STEPS.GOOGLE_BACKUP && (
                 <GoogleBackup
                   handleSwitchTab={() => setActiveTab(STEPS.ALL_SET)}

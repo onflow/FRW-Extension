@@ -14,16 +14,18 @@ import {
   type User,
 } from 'firebase/auth/web-extension';
 import { getInstallations, getId } from 'firebase/installations';
-import type { TokenInfo } from 'flow-native-token-registry';
 import log from 'loglevel';
 
 import { storage } from '@/background/webapi';
+import type { TokenInfo, BalanceMap } from '@/shared/types/coin-types';
 import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
 import {
   type LoggedInAccountWithIndex,
   type LoggedInAccount,
   type FlowAddress,
   type ActiveChildType,
+  type PublicKeyAccount,
+  isEvmAccountType,
 } from '@/shared/types/wallet-types';
 import { isValidFlowAddress, isValidEthereumAddress } from '@/shared/utils/address';
 import { getStringFromHashAlgo, getStringFromSignAlgo } from '@/shared/utils/algo';
@@ -34,7 +36,7 @@ import fetchConfig from 'background/utils/remoteConfig';
 import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from 'consts';
 
 import {
-  type AccountKey,
+  type AccountKeyRequest,
   type CheckResponse,
   type SignInResponse,
   type UserInfoResponse,
@@ -45,8 +47,7 @@ import {
   type NewsConditionType,
   Period,
   PriceProvider,
-  type BlockchainResponse,
-  type AccountInfo,
+  type AccountBalanceInfo,
   type Contact,
   type NFTModelV2,
 } from '../../shared/types/network-types';
@@ -107,7 +108,9 @@ onAuthStateChanged(auth, (user: User | null) => {
     if (user.isAnonymous) {
       console.log('User is anonymous');
     } else {
-      mixpanelTrack.identify(user.uid, user.displayName ?? user.uid);
+      if (mixpanelTrack) {
+        mixpanelTrack.identify(user.uid, user.displayName ?? user.uid);
+      }
       console.log('User is signed in');
     }
   } else {
@@ -641,7 +644,7 @@ class OpenApiService {
     return data;
   };
 
-  register = async (account_key: AccountKey, username: string) => {
+  register = async (account_key: AccountKeyRequest, username: string) => {
     // Track the time until account_created is called
     mixpanelTrack.time('account_created');
 
@@ -688,14 +691,6 @@ class OpenApiService {
       await storage.set('currentId', result.data.id);
     }
     return result;
-  };
-
-  proxyKey = async (token: any, userId: any) => {
-    if (token) {
-      await this._signWithCustom(token);
-      await storage.set('currentId', userId);
-    }
-    return;
   };
 
   proxytoken = async () => {
@@ -745,7 +740,8 @@ class OpenApiService {
 
   userInfo = async (): Promise<UserInfoResponse> => {
     const config = this.store.config.user_info;
-    return await this.sendRequest(config.method, config.path);
+    const { data } = await this.sendRequest(config.method, config.path);
+    return data;
   };
 
   createFlowAddress = async () => {
@@ -817,9 +813,9 @@ class OpenApiService {
   };
 
   getNFTList = async (network: string): Promise<NFTModelV2[]> => {
-    const childType = await userWalletService.getActiveWallet();
+    const childType = await userWalletService.getActiveAccountType();
     let chainType = 'flow';
-    if (childType === 'evm') {
+    if (isEvmAccountType(childType)) {
       chainType = 'evm';
     }
 
@@ -1188,7 +1184,7 @@ class OpenApiService {
     // FIX ME: Get defaultTokenList from firebase remote config
     const address = await userWalletService.getCurrentAddress();
     const tokenInfo = await this.getTokenInfo(tokenSymbol);
-    if (!tokenInfo) {
+    if (!tokenInfo || !address) {
       return;
     }
     return await this.isTokenStorageEnabled(address, tokenInfo);
@@ -1198,7 +1194,7 @@ class OpenApiService {
     // FIX ME: Get defaultTokenList from firebase remote config
     const address = await userWalletService.getCurrentAddress();
     const tokenInfo = await this.getTokenInfo(tokenSymbol);
-    if (!tokenInfo) {
+    if (!tokenInfo || !address) {
       return;
     }
     return await this.getTokenBalanceWithModel(address, tokenInfo);
@@ -1228,7 +1224,7 @@ class OpenApiService {
     };
   };
 
-  getFlowAccountInfo = async (address: string): Promise<AccountInfo> => {
+  getFlowAccountInfo = async (address: string): Promise<AccountBalanceInfo> => {
     const script = await getScripts('basic', 'getAccountInfo');
 
     const result = await fcl.query({
@@ -1311,8 +1307,8 @@ class OpenApiService {
   };
 
   getTokenList = async (network) => {
-    const childType = await userWalletService.getActiveWallet();
-    const chainType = childType === 'evm' ? 'evm' : 'flow';
+    const childType = await userWalletService.getActiveAccountType();
+    const chainType = isEvmAccountType(childType) ? 'evm' : 'flow';
 
     const ftList = await storage.getExpiry(`TokenList${network}${chainType}`);
     if (ftList) return ftList;
@@ -1380,15 +1376,16 @@ class OpenApiService {
     }
     const tokenList = await this.getTokenList(network);
     let values;
-    const isChild = await userWalletService.getActiveWallet();
+    const isChild = await userWalletService.getActiveAccountType();
     try {
       if (isChild && isChild !== 'evm') {
         values = await this.isLinkedAccountTokenListEnabled(address);
       } else if (!isChild) {
-        values = await this.isTokenListEnabled(address);
+        values = await this.getTokenBalanceStorage(address);
+        console.log('values ->', values);
       }
     } catch (error) {
-      console.error('Error isTokenListEnabled token:');
+      console.error('Error getting enabled token list:');
       values = {};
     }
 
@@ -1396,22 +1393,12 @@ class OpenApiService {
     const tokenMap = {};
     if (isChild !== 'evm') {
       tokenList.forEach((token) => {
-        const tokenId = `A.${token.address.slice(2)}.${token.contractName}`;
-        // console.log(tokenMap,'tokenMap',values)
+        const tokenId = `A.${token.address.slice(2)}.${token.contractName}.Vault`;
         if (!!values[tokenId]) {
           tokenMap[token.name] = token;
         }
       });
     }
-
-    // const data = values.map((value, index) => ({isEnabled: value, token: tokenList[index]}))
-    // return values
-    //   .map((value, index) => {
-    //     if (value) {
-    //       return tokens[index];
-    //     }
-    //   })
-    //   .filter((item) => item);
 
     Object.keys(tokenMap).map((key, idx) => {
       const item = tokenMap[key];
@@ -1457,11 +1444,18 @@ class OpenApiService {
     return isEnabledList;
   };
 
-  getTokenListBalance = async (address: string, allTokens: TokenInfo[]) => {
-    const network = await userWalletService.getNetwork();
-
-    const tokens = allTokens.filter((token) => token.address);
+  getTokenListBalance = async (address: string, allTokens: TokenInfo[]): Promise<BalanceMap> => {
     const script = await getScripts('ft', 'getTokenListBalance');
+    const balanceList = await fcl.query({
+      cadence: script,
+      args: (arg, t) => [arg(address, t.Address)],
+    });
+
+    return balanceList;
+  };
+
+  getTokenBalanceStorage = async (address: string): Promise<BalanceMap> => {
+    const script = await getScripts('ft', 'getTokenBalanceStorage');
     const balanceList = await fcl.query({
       cadence: script,
       args: (arg, t) => [arg(address, t.Address)],
@@ -1476,6 +1470,7 @@ class OpenApiService {
 
   getEnabledNFTList = async (): Promise<{ address: string; contractName: string }[]> => {
     const address = await userWalletService.getCurrentAddress();
+    if (!address) return [];
 
     const promiseResult = await this.checkNFTListEnabled(address);
     // const network = await userWalletService.getNetwork();
@@ -1792,16 +1787,14 @@ class OpenApiService {
     return data;
   };
 
-  putDeviceInfo = async (walletData) => {
+  putDeviceInfo = async (walletData: PublicKeyAccount[]) => {
     try {
-      const testnetId = walletData.find((item) => item.chain_id === 'testnet')?.id;
-      const mainnetId = walletData.find((item) => item.chain_id === 'mainnet')?.id;
       const installationId = await this.getInstallationId();
       // console.log('location ', userlocation);
 
       await this.addDevice({
-        wallet_id: mainnetId ? mainnetId.toString() : '',
-        wallettest_id: testnetId ? testnetId.toString() : '',
+        wallet_id: '',
+        wallettest_id: '',
         device_info: {
           device_id: installationId,
           district: '',
@@ -1869,7 +1862,7 @@ class OpenApiService {
   };
 
   freshUserInfo = async (
-    currentWallet: BlockchainResponse,
+    mainAddress: FlowAddress,
     keys: FclAccount,
     pubKTuple,
     wallet,
@@ -1900,10 +1893,10 @@ class OpenApiService {
       await storage.set('pubKey', keyInfo.publicKey);
       // Make sure the address is a FlowAddress
 
-      if (!isValidFlowAddress(currentWallet.address)) {
+      if (!isValidFlowAddress(mainAddress)) {
         throw new Error('Invalid Flow address');
       }
-      const flowAddress: FlowAddress = currentWallet.address as FlowAddress;
+      const flowAddress: FlowAddress = mainAddress;
       const updatedWallet: LoggedInAccount = {
         ...wallet,
         address: flowAddress,

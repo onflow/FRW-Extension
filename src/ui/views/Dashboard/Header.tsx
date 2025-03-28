@@ -20,8 +20,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { storage } from '@/background/webapi';
-import { type WalletType } from '@/shared/types/network-types';
 import {
+  type WalletAccount,
   type WalletAddress,
   type ActiveChildType,
   type LoggedInAccountWithIndex,
@@ -62,7 +62,6 @@ const Header = ({ _loading = false }) => {
   const history = useHistory();
   const location = useLocation();
 
-  const { clearCoins } = useCoins();
   const { network, developerMode } = useNetwork();
   const {
     mainAddress,
@@ -135,9 +134,8 @@ const Header = ({ _loading = false }) => {
         }
         await usewallet.signOutWallet();
         await usewallet.clearWallet();
-        await usewallet.switchAccount(account.id);
+        await usewallet.switchProfile(account.id);
         await usewallet.switchNetwork(switchingTo);
-        clearCoins();
         clearProfileData();
       } catch (error) {
         console.error('Error during account switch:', error);
@@ -148,11 +146,11 @@ const Header = ({ _loading = false }) => {
         setSwitchLoading(false);
       }
     },
-    [usewallet, history, clearCoins, clearProfileData]
+    [usewallet, history, clearProfileData]
   );
 
   const setWallets = async (
-    walletInfo: WalletType,
+    walletInfo: WalletAccount,
     key: ActiveChildType | null,
     index: number | null = null
   ) => {
@@ -251,7 +249,7 @@ const Header = ({ _loading = false }) => {
     return `${repoUrl}/commits`;
   }, []);
 
-  const createWalletList = (props: WalletType) => {
+  const createWalletList = (props: WalletAccount) => {
     return (
       <List component="nav" key={props.id} sx={{ mb: '0', padding: 0 }}>
         <WalletFunction
@@ -263,7 +261,7 @@ const Header = ({ _loading = false }) => {
           setWallets={setWallets}
           currentWalletIndex={currentWalletIndex}
           currentWallet={currentWallet}
-          mainAddress={mainAddress}
+          mainAddress={mainAddress!}
           setExpandAccount={setExpandAccount}
           expandAccount={expandAccount}
           walletList={walletList}

@@ -122,8 +122,10 @@ const MoveFromChild = (props: MoveBoardProps) => {
     setIsLoading(true);
     try {
       const address = await usewallet.getCurrentAddress();
-      const parentaddress = await usewallet.getMainWallet();
-
+      const parentaddress = await usewallet.getParentAddress();
+      if (!parentaddress) {
+        throw new Error('Parent address not found');
+      }
       const activec = await usewallet.getChildAccountAllowTypes(parentaddress, address!);
       const cadenceResult = await fetchCollectionCache(address!);
       const filteredCadenceResult = cadenceResult!.filter((nft) =>

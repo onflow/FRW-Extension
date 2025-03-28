@@ -1,12 +1,13 @@
 import { type TokenInfo } from 'flow-native-token-registry';
 import { describe, expect, it } from 'vitest';
 
+import { type CoinItem } from '@/shared/types/coin-types';
 import {
   type NetworkType,
   type TokenType,
   type TransactionState,
 } from '@/shared/types/transaction-types';
-import { type CoinItem, type WalletAddress } from '@/shared/types/wallet-types';
+import { type WalletAddress } from '@/shared/types/wallet-types';
 
 import {
   INITIAL_TRANSACTION_STATE,
@@ -99,6 +100,7 @@ describe('Transaction Reducer', () => {
       };
 
       const mockCoinInfo: CoinItem = {
+        id: 'test',
         coin: 'test',
         unit: 'TEST',
         balance: '100',

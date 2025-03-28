@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { CoinItem } from '@/shared/types/wallet-types';
+import type { CoinItem } from '@/shared/types/coin-types';
 
 interface CoinStore {
   coins: CoinItem[];

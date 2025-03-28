@@ -188,10 +188,15 @@ export const registerAccount = async ({ page, extensionId, username, password })
     .click();
 
   // fill
-  await page.getByPlaceholder('Create a password').clear();
-  await page.getByPlaceholder('Create a password').fill(password);
-  await page.getByPlaceholder('Confirm your password').clear();
-  await page.getByPlaceholder('Confirm your password').fill(password);
+
+  if (await page.getByPlaceholder('Create a password').isVisible()) {
+    await page.getByPlaceholder('Create a password').clear();
+    await page.getByPlaceholder('Create a password').fill(password);
+  }
+  if (await page.getByPlaceholder('Confirm your password').isVisible()) {
+    await page.getByPlaceholder('Confirm your password').clear();
+    await page.getByPlaceholder('Confirm your password').fill(password);
+  }
 
   await page.getByLabel("I agree to Flow Wallet's").click();
 
@@ -275,7 +280,7 @@ export const importAccountBySeedPhrase = async ({
 
   if (step.includes('4')) {
     // We've already imported the account before
-    const confirmPasswordField = await page.getByPlaceholder('Confirm Password');
+    const confirmPasswordField = await page.getByPlaceholder('Confirm your password');
     const confirmPasswordValue = await confirmPasswordField.inputValue();
     if (!confirmPasswordValue) {
       await confirmPasswordField.fill(password);
@@ -289,10 +294,15 @@ export const importAccountBySeedPhrase = async ({
     await page.getByRole('button', { name: 'Next' }).click();
 
     // fill in the password
-    await page.getByPlaceholder('Create a password').clear();
-    await page.getByPlaceholder('Create a password').fill(password);
-    await page.getByPlaceholder('Confirm your password').clear();
-    await page.getByPlaceholder('Confirm your password').fill(password);
+    if (await page.getByPlaceholder('Create a password').isVisible()) {
+      await page.getByPlaceholder('Create a password').clear();
+      await page.getByPlaceholder('Create a password').fill(password);
+    }
+    if (await page.getByPlaceholder('Confirm your password').isVisible()) {
+      await page.getByPlaceholder('Confirm your password').clear();
+      await page.getByPlaceholder('Confirm your password').fill(password);
+    }
+
     await page.getByRole('button', { name: 'Login' }).click();
   }
 

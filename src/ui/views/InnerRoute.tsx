@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Switch, withRouter, type RouteComponentProps } from 'react-router-dom';
 
 import { useInitHook } from '@/ui/hooks';
@@ -70,28 +70,33 @@ const InnerRoute = (props: RouteComponentProps) => {
   const walletLoaded = useWalletLoaded();
   const { initializeStore } = useInitHook();
 
+  const initRef = useRef(false);
+
   const fetch = useCallback(async () => {
-    if (!walletLoaded) {
+    if (!walletLoaded || initRef.current) {
       return;
     }
-    // TODO: Look into why this code exists...
-    const dashIndex = await usewallet.getDashIndex();
-    if (dashIndex) {
-      setValue(dashIndex);
-    } else {
-      setValue(0);
-      await usewallet.setDashIndex(0);
+
+    try {
+      initRef.current = true;
+      const dashIndex = await usewallet.getDashIndex();
+      if (dashIndex) {
+        setValue(dashIndex);
+      } else {
+        setValue(0);
+        await usewallet.setDashIndex(0);
+      }
+      await initializeStore();
+    } finally {
+      initRef.current = false;
     }
-    initializeStore();
   }, [usewallet, initializeStore, walletLoaded]);
 
   useEffect(() => {
-    if (!walletLoaded) {
-      return;
+    if (walletLoaded) {
+      fetch();
     }
-
-    fetch();
-  }, [fetch, walletLoaded]);
+  }, [walletLoaded, fetch]);
 
   useEffect(() => {
     if (!walletLoaded) {

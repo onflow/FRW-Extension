@@ -23,13 +23,6 @@ const STEPS = {
 
 type StepType = (typeof STEPS)[keyof typeof STEPS];
 
-interface AccountKey {
-  hashAlgo: number;
-  publicKey: string;
-  signAlgo: number;
-  weight: number;
-}
-
 interface DeviceInfoRequest {
   deviceId: string;
   ip: string;

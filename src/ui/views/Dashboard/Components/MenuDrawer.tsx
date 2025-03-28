@@ -17,11 +17,13 @@ import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import type { ChildAccount, UserInfoResponse, WalletType } from '@/shared/types/network-types';
+import type { UserInfoResponse } from '@/shared/types/network-types';
 import {
   type LoggedInAccount,
   type LoggedInAccountWithIndex,
   type ActiveChildType,
+  type WalletAccount,
+  type ChildAccountMap,
 } from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
@@ -54,17 +56,17 @@ interface MenuDrawerProps {
   otherAccounts: LoggedInAccount[];
   switchAccount: (account: LoggedInAccountWithIndex) => Promise<void>;
   togglePop: () => void;
-  walletList: WalletType[];
-  childAccounts: ChildAccount | null;
-  current: WalletType;
-  createWalletList: (props: WalletType) => React.ReactNode;
+  walletList: WalletAccount[];
+  childAccounts: ChildAccountMap | null;
+  current: WalletAccount;
+  createWalletList: (props: WalletAccount) => React.ReactNode;
   setWallets: (
-    walletInfo: WalletType,
+    walletInfo: WalletAccount,
     key: ActiveChildType | null,
     index?: number | null
   ) => Promise<void>;
   currentNetwork: string;
-  evmWallet: WalletType;
+  evmWallet: WalletAccount;
   networkColor: (network: string) => string;
   evmLoading: boolean;
   modeOn: boolean;
@@ -289,11 +291,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     {
                       name: 'evm',
                       address: props.evmWallet.address,
-                      chain_id: props.currentNetwork,
-                      coins: ['flow'],
+                      chain: props.evmWallet.chain,
                       id: 1,
-                      icon: props.evmWallet.icon,
-                      color: props.evmWallet.color,
+                      icon: props.evmWallet.icon || '',
+                      color: props.evmWallet.color || '',
                     },
                     'evm'
                   )
@@ -388,8 +389,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       {
                         name: props.childAccounts[key]?.name ?? key,
                         address: key,
-                        chain_id: props.currentNetwork,
-                        coins: ['flow'],
+                        chain: props.current.chain,
                         id: 1,
                         icon:
                           props.childAccounts?.[key]?.thumbnail?.url ??

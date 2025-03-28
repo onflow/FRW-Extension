@@ -13,7 +13,7 @@ import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { type CoinItem } from '@/shared/types/wallet-types';
+import { type CoinItem } from '@/shared/types/coin-types';
 import { formatLargeNumber } from '@/shared/utils/number';
 
 import IconCreate from '../../../components/iconfont/IconCreate';

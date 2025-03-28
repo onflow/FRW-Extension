@@ -132,8 +132,10 @@ const LinkedDetail = () => {
       setKey(key);
       const catalog = await usewallet.getNftCatalog();
 
-      const parentaddress = await usewallet.getMainWallet();
-
+      const parentaddress = await usewallet.getParentAddress();
+      if (!parentaddress) {
+        throw new Error('Parent address not found');
+      }
       const activec = await usewallet.getChildAccountAllowTypes(parentaddress, key!);
       setActiveCollection(activec);
       await setCatalog(catalog);

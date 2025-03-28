@@ -2,7 +2,6 @@ import { Box } from '@mui/system';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-// import { useInitHook } from '@/ui/hooks';
 import { useWallet, useApproval, useWalletLoaded } from 'ui/utils';
 
 // import Header from '../Dashboard/Header';
@@ -14,7 +13,6 @@ const Approval = () => {
   const history = useHistory();
   // const [account, setAccount] = useState('');
   const usewallet = useWallet();
-  // const { initializeStore } = useInitHook();
   const [getApproval, resolveApproval, rejectApproval] = useApproval();
   const [approval, setApproval] = useState<null | Awaited<ReturnType<typeof getApproval>>>(null);
 

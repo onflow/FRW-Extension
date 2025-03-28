@@ -7,6 +7,7 @@ vi.mock('@/background/service/userWallet', async () => {
       ...actual,
       getNetwork: vi.fn().mockResolvedValue('testnet'),
       getActiveWallet: vi.fn().mockResolvedValue('test-address'),
+      getActiveAccountType: vi.fn().mockReturnValue(null),
       setupFcl: vi.fn(),
       reSign: vi.fn(),
       clear: vi.fn(),
@@ -233,6 +234,13 @@ describe('OpenApiService', () => {
           if (networkHeader) {
             vi.mocked(userWalletService.getNetwork).mockResolvedValueOnce(
               networkHeader.toLowerCase()
+            );
+            // Also update the headers in the mock storage
+            mockStorage.local.get.mockImplementationOnce(() =>
+              Promise.resolve({
+                auth: { token: 'mock-token' },
+                network: networkHeader.toLowerCase(),
+              })
             );
           }
 

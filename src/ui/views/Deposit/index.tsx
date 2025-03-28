@@ -132,7 +132,7 @@ const Deposit = () => {
         result.map((ele, idx) => ({
           id: idx,
           name: chrome.i18n.getMessage('Wallet'),
-          address: withPrefix(ele?.blockchain[0]?.address),
+          address: withPrefix(ele?.blockchain[0]?.address ?? ''),
         }))
       );
     } else if (isChild) {

@@ -11,6 +11,7 @@ import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useTransferList } from '@/ui/hooks/useTransferListHook';
 import { type MatchMedia, MatchMediaType } from '@/ui/utils/url';
 import { useStorageCheck } from '@/ui/utils/useStorageCheck';
 import erc721 from 'background/utils/erc721.abi.json';
@@ -41,12 +42,12 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
   const wallet = useWallet();
   const history = useHistory();
   const { childAccounts, currentWallet } = useProfiles();
+  const { occupied } = useTransferList();
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
   const [, setErrorMessage] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
-  const [occupied, setOccupied] = useState(false);
   const [isChild, setIsChild] = useState(false);
   const [erc721Contract, setErcContract] = useState<any>(null);
   const [count, setCount] = useState(0);
@@ -85,17 +86,6 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
       clearInterval(intervalId);
     }
   }, [props?.data?.contact?.address]);
-
-  const getPending = useCallback(async () => {
-    const pending = await wallet.getPendingTx();
-    if (pending.length > 0) {
-      setOccupied(true);
-    }
-  }, [wallet]);
-
-  const updateOccupied = useCallback(() => {
-    setOccupied(false);
-  }, []);
 
   const replaceIPFS = (url?: string | null): string => {
     if (!url) {
@@ -275,31 +265,24 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
       });
   };
 
-  const transactionDoneHandler = useCallback(
-    (request) => {
-      if (request.msg === 'transactionDone') {
-        updateOccupied();
-      }
-      // Handle error
-      if (request.msg === 'transactionError') {
-        setFailed(true);
-        setErrorMessage(request.errorMessage);
-        setErrorCode(request.errorCode);
-      }
-      return true;
-    },
-    [updateOccupied]
-  );
+  const transactionDoneHandler = useCallback((request) => {
+    // Handle error
+    if (request.msg === 'transactionError') {
+      setFailed(true);
+      setErrorMessage(request.errorMessage);
+      setErrorCode(request.errorCode);
+    }
+    return true;
+  }, []);
 
   useEffect(() => {
     startCount();
-    getPending();
     chrome.runtime.onMessage.addListener(transactionDoneHandler);
 
     return () => {
       chrome.runtime.onMessage.removeListener(transactionDoneHandler);
     };
-  }, [getPending, props.data.contact, startCount, transactionDoneHandler]);
+  }, [props.data.contact, startCount, transactionDoneHandler]);
 
   const checkChild = useCallback(async () => {
     const isChild = await wallet.getActiveWallet();

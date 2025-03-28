@@ -1,6 +1,7 @@
 import { Core } from '@walletconnect/core';
 import SignClient from '@walletconnect/sign-client';
 
+import { getCurrentProfileId } from '@/shared/utils/current-id';
 import { FCLWalletConnectMethod } from '@/shared/utils/type';
 import wallet from 'background/controller/wallet';
 import { keyringService, openapiService } from 'background/service';
@@ -8,11 +9,9 @@ import { keyringService, openapiService } from 'background/service';
 import { type DeviceInfoRequest } from '../../shared/types/network-types';
 import { storage } from '../webapi';
 
-class Proxy {
-  proxySign = async (token: string, userId: string) => {
-    return wallet.openapi.proxyKey(token, userId);
-  };
+import { HDKeyring } from './keyring/hdKeyring';
 
+class Proxy {
   requestJwt = async () => {
     return wallet.openapi.proxytoken();
   };
@@ -22,8 +21,9 @@ class Proxy {
     const keyrings = await wallet.getKeyrings(password || '');
     for (const keyring of keyrings) {
       console.log('checkProxy');
-      if (keyring.type === 'HD Key Tree') {
-        if (keyring.activeIndexes[0] === 1) {
+      if (keyring instanceof HDKeyring && keyring.type === 'HD Key Tree') {
+        const serialized = await keyring.serialize();
+        if (serialized.activeIndexes[0] === 1) {
           console.log('checkProxy is true');
           return true;
         }
@@ -97,7 +97,7 @@ class Proxy {
   };
 
   proxyLoginRequest = async () => {
-    const currentId = await storage.get('currentId');
+    const currentId = await getCurrentProfileId();
     const topicId = await storage.get(`${currentId}Topic`);
     try {
       const signwallet = await SignClient.init({

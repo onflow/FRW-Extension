@@ -1,5 +1,6 @@
 import { initWasm } from '@trustwallet/wallet-core';
 
+import { type PublicPrivateKeyTuple, type PublicKeyTuple } from '@/shared/types/key-types';
 import { getStringFromHashAlgo, getStringFromSignAlgo } from '@/shared/utils/algo';
 
 import { FLOW_BIP44_PATH, HASH_ALGO, SIGN_ALGO } from '../../../shared/utils/algo-constants';
@@ -20,7 +21,7 @@ const jsonToKey = async (json: string, password: string) => {
   }
 };
 
-const pk2PubKey = async (pk: string) => {
+const pk2PubKey = async (pk: string): Promise<PublicKeyTuple> => {
   const { PrivateKey } = await initWasm();
   const privateKey = PrivateKey.createWithData(Buffer.from(pk, 'hex'));
 
@@ -33,16 +34,14 @@ const pk2PubKey = async (pk: string) => {
   return {
     P256: {
       pubK: p256PubK,
-      pk,
     },
     SECP256K1: {
       pubK: secp256PubK,
-      pk,
     },
   };
 };
 
-const formPubKey = async (pubKey) => {
+const formPubKey = async (pubKey: string): Promise<PublicKeyTuple> => {
   return {
     P256: {
       pubK: pubKey,
@@ -53,31 +52,30 @@ const formPubKey = async (pubKey) => {
   };
 };
 
-const seed2PubKey = async (seed: string) => {
+const formPubKeyTuple = (pkTuple: PublicKeyTuple | PublicPrivateKeyTuple): PublicKeyTuple => {
+  return {
+    P256: {
+      pubK: pkTuple.P256.pubK,
+    },
+    SECP256K1: {
+      pubK: pkTuple.SECP256K1.pubK,
+    },
+  };
+};
+
+const seedWithPathAndPhrase2PublicPrivateKey = async (
+  seed: string,
+  derivationPath: string = FLOW_BIP44_PATH,
+  passphrase: string = ''
+): Promise<PublicPrivateKeyTuple> => {
   const { HDWallet, Curve } = await initWasm();
 
-  const currentId = (await storage.get('currentId')) ?? 0;
-
-  // Note that currentAccountIndex is only used in keyring for old accounts that don't have an id stored in the keyring
-  // currentId always takes precedence
-  const accountIndex = (await storage.get('currentAccountIndex')) ?? 0;
-  const pathKeyIndex = `user${accountIndex}_path`;
-  const phraseKeyIndex = `user${accountIndex}_phrase`;
-
-  const pathKeyId = `user${currentId}_path`;
-  const phraseKeyId = `user${currentId}_phrase`;
-
-  const path =
-    (await storage.get(pathKeyId)) ?? (await storage.get(pathKeyIndex)) ?? FLOW_BIP44_PATH;
-
-  const passphrase = (await storage.get(phraseKeyId)) ?? (await storage.get(phraseKeyIndex)) ?? '';
-
   const wallet = HDWallet.createWithMnemonic(seed, passphrase);
-  const p256PK = wallet.getKeyByCurve(Curve.nist256p1, path);
+  const p256PK = wallet.getKeyByCurve(Curve.nist256p1, derivationPath);
   const p256PubK = Buffer.from(p256PK.getPublicKeyNist256p1().uncompressed().data())
     .toString('hex')
     .replace(/^04/, '');
-  const SECP256PK = wallet.getKeyByCurve(Curve.secp256k1, path);
+  const SECP256PK = wallet.getKeyByCurve(Curve.secp256k1, derivationPath);
   const secp256PubK = Buffer.from(SECP256PK.getPublicKeySecp256k1(false).data())
     .toString('hex')
     .replace(/^04/, '');
@@ -93,7 +91,27 @@ const seed2PubKey = async (seed: string) => {
   };
 };
 
-const seed2PubKeyTemp = async (seed: string) => {
+const seed2PublicPrivateKey = async (seed: string): Promise<PublicPrivateKeyTuple> => {
+  const currentId = (await storage.get('currentId')) ?? 0;
+
+  // Note that currentAccountIndex is only used in keyring for old accounts that don't have an id stored in the keyring
+  // currentId always takes precedence
+  const accountIndex = (await storage.get('currentAccountIndex')) ?? 0;
+  const pathKeyIndex = `user${accountIndex}_path`;
+  const phraseKeyIndex = `user${accountIndex}_phrase`;
+
+  const pathKeyId = `user${currentId}_path`;
+  const phraseKeyId = `user${currentId}_phrase`;
+
+  const derivationPath =
+    (await storage.get(pathKeyId)) ?? (await storage.get(pathKeyIndex)) ?? FLOW_BIP44_PATH;
+
+  const passphrase = (await storage.get(phraseKeyId)) ?? (await storage.get(phraseKeyIndex)) ?? '';
+
+  return seedWithPathAndPhrase2PublicPrivateKey(seed, derivationPath, passphrase);
+};
+
+const seed2PublicPrivateKeyTemp = async (seed: string): Promise<PublicPrivateKeyTuple> => {
   const { HDWallet, Curve } = await initWasm();
 
   const path = (await storage.get('temp_path')) || FLOW_BIP44_PATH;
@@ -148,9 +166,11 @@ const signWithKey = async (message, signAlgo, hashAlgo, pk) => {
 export {
   jsonToKey,
   pk2PubKey,
-  seed2PubKey,
+  seed2PublicPrivateKey,
   signMessageHash,
   signWithKey,
-  seed2PubKeyTemp,
+  seed2PublicPrivateKeyTemp,
+  seedWithPathAndPhrase2PublicPrivateKey,
   formPubKey,
+  formPubKeyTuple,
 };

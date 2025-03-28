@@ -6,6 +6,9 @@ vi.mock('react', async () => {
     useEffect: vi.fn((fn) => fn()),
     useCallback: vi.fn((fn) => fn),
     useState: vi.fn((initialValue) => [initialValue, vi.fn()]),
+    useRef: vi.fn((initialValue) => ({
+      current: initialValue,
+    })),
   };
 });
 
@@ -86,7 +89,7 @@ vi.mock('@/ui/utils/WalletContext', () => ({
       type: 'flow',
       blockchain: 'flow',
     }),
-    returnMainWallet: vi.fn().mockReturnValue({
+    returnParentWallet: vi.fn().mockReturnValue({
       name: 'Test Wallet',
       address: '0x138c20de202897fb',
       type: 'flow',

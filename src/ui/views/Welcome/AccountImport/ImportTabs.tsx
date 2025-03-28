@@ -2,6 +2,7 @@ import { Box, Tabs, Tab, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
 import { storage } from '@/background/webapi';
+import { FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
 import ErrorModel from '@/ui/FRWComponent/PopupModal/errorModel';
 import { useWallet } from '@/ui/utils';
 import Googledrive from '@/ui/views/Welcome/AccountImport/ImportComponents/Googledrive';
@@ -38,6 +39,27 @@ const ImportTabs = ({
   setErrorMessage,
   setShowError,
   handleGoogleAccountsFound,
+  path,
+  setPath,
+  phrase,
+  setPhrase,
+}: {
+  setMnemonic: (mnemonic: string) => void;
+  setPk: (pk: string) => void;
+  setAccounts: (accounts: any[]) => void;
+  accounts: any[];
+  mnemonic: string | null;
+  pk: string | null;
+  setUsername: (username: string) => void;
+  goPassword: () => void;
+  handleSwitchTab: () => void;
+  setErrorMessage: (errorMessage: string) => void;
+  setShowError: (showError: boolean) => void;
+  handleGoogleAccountsFound: (accounts: string[]) => void;
+  path: string;
+  setPath: (path: string) => void;
+  phrase: string;
+  setPhrase: (phrase: string) => void;
 }) => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [mnemonicValid, setMnemonicValid] = useState(true);
@@ -52,22 +74,18 @@ const ImportTabs = ({
 
   const handleImport = async (accountKey?: any) => {
     setAccounts(accountKey);
-    const result = await usewallet.openapi.checkImport(accountKey[0].pubK);
+    const result = await usewallet.openapi.checkImport(accountKey[0].publicKey);
     if (result.status === 409) {
+      // The account has been previously imported, so just retrieve the current user name
       goPassword();
     } else {
+      // The key has never been imported before, we need to set a username and confirm / create a password
       if (!accountKey[0].address) {
         handleNotFoundPopup();
         return;
       }
       handleSwitchTab();
     }
-  };
-
-  const setmnemonic = (mnemonic) => {
-    setMnemonic(mnemonic);
-    const formatted = mnemonic.trim().split(/\s+/g).join(' ');
-    setMnemonicValid(true);
   };
 
   const handleNotFoundPopup = async () => {
@@ -123,8 +141,12 @@ const ImportTabs = ({
         <SeedPhraseImport
           onOpen={handleNotFoundPopup}
           onImport={handleImport}
-          setmnemonic={setmnemonic}
+          setMnemonic={setMnemonic}
           isSignLoading={isSignLoading}
+          path={path}
+          setPath={setPath}
+          phrase={phrase}
+          setPhrase={setPhrase}
         />
       </TabPanel>
       <TabPanel value={selectedTab} index={3}>

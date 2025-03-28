@@ -76,11 +76,19 @@ const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
   },
 }));
 
-const KeyPathInput = (props) => {
+const KeyPathInput = ({
+  path,
+  setPath,
+  phrase,
+  setPhrase,
+}: {
+  path: string;
+  setPath: (path: string) => void;
+  phrase: string;
+  setPhrase: (phrase: string) => void;
+}) => {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
-  const [path, setPath] = useState("m/44'/539'/0'/0/0");
-  const [phrase, setPhrase] = useState('');
 
   const handleAccordionChange = () => (event, isExpanded) => {
     setExpanded(isExpanded ? true : false);

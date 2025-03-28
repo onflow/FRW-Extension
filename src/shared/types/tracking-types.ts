@@ -1,6 +1,6 @@
 import type {
-  HashAlgoType,
-  SignAlgoType,
+  HashAlgoString,
+  SignAlgoString,
   ImportKeyType,
   RecoveryMechanismType,
 } from './algo-types';
@@ -96,8 +96,8 @@ export type TrackingEvents = {
   account_created: {
     public_key: string; // The public key used for creating the new account
     key_type?: ImportKeyType; // The key type of the account (if available)
-    sign_algo: SignAlgoType; // Signature algorithm of the key
-    hash_algo: HashAlgoType; // Hash algo Hash algorithm of the key
+    sign_algo: SignAlgoString; // Signature algorithm of the key
+    hash_algo: HashAlgoString; // Hash algo Hash algorithm of the key
   };
 
   account_creation_time: {

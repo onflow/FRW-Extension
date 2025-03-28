@@ -1,69 +1,26 @@
-import { findAddressWithKey, findAddressOnlyKey } from './findAddressWithPubKey';
-import { pk2PubKey, seed2PubKey, seed2PubKeyTemp } from './publicPrivateKey';
+import { type PublicPrivateKeyTuple } from '@/shared/types/key-types';
+import { type PublicKeyAccount } from '@/shared/types/wallet-types';
+import { FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
 
-export const findAddress = async (pubKTuple, address) => {
-  const { P256, SECP256K1 } = pubKTuple;
-  const p256Accounts = (await findAddressWithKey(P256.pubK, address)) || [];
-  const sepc256k1Accounts = (await findAddressWithKey(SECP256K1.pubK, address)) || [];
-  const pA = p256Accounts.map((s) => ({ ...s, pk: P256.pk }));
-  const pS = sepc256k1Accounts.map((s) => ({ ...s, pk: SECP256K1.pk }));
-  const accounts = pA.concat(pS);
+import { getOrCheckAddressByPublicKeyTuple } from './findAddressWithPubKey';
+import { pk2PubKey, seedWithPathAndPhrase2PublicPrivateKey } from './publicPrivateKey';
 
-  if (!accounts || accounts.length === 0) {
-    SECP256K1['weight'] = 1000;
-    SECP256K1['hashAlgo'] = 'SHA2_256';
-    SECP256K1['signAlgo'] = 'ECDSA_secp256k1';
-    SECP256K1['keyIndex'] = 0;
-    return [SECP256K1];
-  }
-  return accounts;
-};
-
-export const findAddressWithNetwork = async (pubKTuple, network) => {
-  const { P256, SECP256K1 } = pubKTuple;
-  const p256Accounts = (await findAddressOnlyKey(P256.pubK, network)) || [];
-  const sepc256k1Accounts = (await findAddressOnlyKey(SECP256K1.pubK, network)) || [];
-  const pA = p256Accounts.map((s) => ({ ...s, pk: P256.pk }));
-  const pS = sepc256k1Accounts.map((s) => ({ ...s, pk: SECP256K1.pk }));
-  const accounts = pA.concat(pS);
-
-  // console.log('accounts 222 ==>', accounts);
-  if (!accounts || accounts.length === 0) {
-    return [
-      {
-        ...SECP256K1,
-        weight: 1000,
-        hashAlgo: 'SHA2_256',
-        signAlgo: 'ECDSA_secp256k1',
-        keyIndex: 0,
-      },
-    ];
-  }
-
-  const account = accounts.find((account) => account.weight >= 1000);
-  return account ? accounts : null;
-};
-
-export const findAddressWithPK = async (pk, address) => {
+export const findAddressWithPK = async (pk: string, address: string) => {
   const pubKTuple = await pk2PubKey(pk);
-  return await findAddress(pubKTuple, address);
+  return await getOrCheckAddressByPublicKeyTuple(pubKTuple, address);
 };
 
-export const findAddressWithSeed = async (seed, address, isTemp = false) => {
-  let pubKTuple: {
-    P256: {
-      pubK: string;
-      pk: string;
-    };
-    SECP256K1: {
-      pubK: string;
-      pk: string;
-    };
-  };
-  if (isTemp) {
-    pubKTuple = await seed2PubKeyTemp(seed);
-  } else {
-    pubKTuple = await seed2PubKey(seed);
-  }
-  return await findAddress(pubKTuple, address);
+export const findAddressWithSeed = async (
+  seed: string,
+  address: string | null = null,
+  derivationPath: string = FLOW_BIP44_PATH,
+  passphrase: string = ''
+): Promise<PublicKeyAccount[]> => {
+  const pubKTuple: PublicPrivateKeyTuple = await seedWithPathAndPhrase2PublicPrivateKey(
+    seed,
+    derivationPath,
+    passphrase
+  );
+
+  return await getOrCheckAddressByPublicKeyTuple(pubKTuple, address);
 };

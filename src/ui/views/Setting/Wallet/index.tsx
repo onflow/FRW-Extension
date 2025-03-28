@@ -93,7 +93,7 @@ const Wallet = () => {
   const setUserWallet = useCallback(async () => {
     await usewallet.setDashIndex(3);
     const emojires = await usewallet.getEmoji();
-    const wallet = await usewallet.getUserWallets();
+    const wallet = await usewallet.getMainAccounts();
     const fectechdWallet = await fetchBalances(wallet);
     setCurrentWallet(currentWallet.address);
     const evmWallet = await usewallet.getEvmWallet();

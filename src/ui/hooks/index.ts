@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useWalletLoaded } from '../utils/WalletContext';
 
@@ -7,19 +7,25 @@ import { useProfiles } from './useProfileHook';
 
 export const useInitHook = () => {
   const walletLoaded = useWalletLoaded();
-  const { fetchProfileData, freshUserWallet, fetchUserWallet } = useProfiles();
+  const { fetchProfileData } = useProfiles();
   const { refreshCoinData } = useCoins();
+  const isInitializing = useRef(false);
 
   const initializeStore = useCallback(async () => {
-    if (!walletLoaded) {
+    if (!walletLoaded || isInitializing.current) {
+      console.log('Skipping initialization - wallet not loaded or already initializing');
       return;
     }
 
-    await fetchProfileData();
-    await freshUserWallet();
-    await fetchUserWallet();
-    await refreshCoinData();
-  }, [fetchProfileData, freshUserWallet, fetchUserWallet, refreshCoinData, walletLoaded]);
+    try {
+      isInitializing.current = true;
+
+      await fetchProfileData();
+      await refreshCoinData();
+    } finally {
+      isInitializing.current = false;
+    }
+  }, [fetchProfileData, refreshCoinData, walletLoaded]);
 
   return { initializeStore };
 };

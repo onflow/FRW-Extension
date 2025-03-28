@@ -22,9 +22,9 @@ export const FRWProfile = ({ contact, isLoading = false, isEvm = false, fromEvm 
     if (isEvm) {
       console.log('getEvmWallet ', evmWallet);
       const emojiObject = tempEmoji;
-      emojiObject.emoji = evmWallet.icon;
-      emojiObject.name = evmWallet.name;
-      emojiObject.bgcolor = evmWallet.color;
+      emojiObject.emoji = evmWallet.icon || '';
+      emojiObject.name = evmWallet.name || '';
+      emojiObject.bgcolor = evmWallet.color || '';
       emojiObject['type'] = 'evm';
       setEmoji(emojiObject);
       setLoad(false);
