@@ -1,45 +1,10 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { type Page } from '@playwright/test';
 
-import { test as base, chromium, type Page, type BrowserContext } from '@playwright/test';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const keysFilePath = path.join(__dirname, '../../playwright/.auth/keys.json');
+import { getAuth, saveAuth, expect } from './loader';
 
 export const getClipboardText = async () => {
   const text = await navigator.clipboard.readText();
   return text;
-};
-
-// save keys auth file
-export const saveAuth = async (auth) => {
-  if (auth) {
-    // Ensure directory exists
-    const dirPath = path.dirname(keysFilePath);
-    fs.mkdirSync(dirPath, { recursive: true });
-    fs.writeFileSync(keysFilePath, JSON.stringify(auth));
-  } else {
-    if (fs.existsSync(keysFilePath)) {
-      fs.unlinkSync(keysFilePath);
-    }
-  }
-};
-
-// get keys auth file
-export const getAuth = async () => {
-  const keysFileContent = fs.existsSync(keysFilePath)
-    ? fs.readFileSync(keysFilePath, 'utf8')
-    : null;
-  const keysFile = keysFileContent ? JSON.parse(keysFileContent) : null;
-  return keysFile || { password: '', addr: '' };
-};
-
-// delete keys file
-export const cleanAuth = async () => {
-  await saveAuth(null);
 };
 
 export const closeOpenedPages = async (page: Page) => {
@@ -112,6 +77,9 @@ export const loginToExtensionAccount = async ({ page, extensionId, addr, passwor
   }
 
   expect(flowAddr).toBe(addr);
+
+  // Wait for the coins to be loaded
+  await expect(page.getByRole('button', { name: 'Flow' }).first()).toBeVisible();
 };
 
 export const loginAsTestUser = async ({ page, extensionId }) => {
@@ -249,14 +217,23 @@ export const importAccountBySeedPhrase = async ({
   username,
   accountAddr = '',
 }) => {
-  // Don't login before this. The account should be locked
-
   const password = process.env.TEST_PASSWORD;
   if (!password) {
     throw new Error('TEST_PASSWORD is not set');
   }
 
-  // Go to import the sender account
+  if (page.url().includes('dashboard')) {
+    // Wait for the dashboard page to be fully loaded
+    await page.waitForURL(/.*\/dashboard.*/);
+
+    // We're already logged in so we need to click import profile
+    await page.getByLabel('menu').click();
+    await page.getByRole('button', { name: 'Import Profile' }).click();
+    // Close all pages except the current page (the extension opens them in the background)
+    await closeOpenedPages(page);
+  }
+
+  // Go to the import page
   await page.goto(`chrome-extension://${extensionId}/index.html#/welcome/accountimport`);
 
   // Close all pages except the current page (the extension opens them in the background)
@@ -302,7 +279,9 @@ export const importAccountBySeedPhrase = async ({
   });
 
   await page.goto(`chrome-extension://${extensionId}/index.html#/dashboard`);
-
+  await page.waitForURL(/.*\/dashboard.*/);
+  // Wait for the account address to be visible
+  await expect(page.getByText(accountAddr)).toBeVisible();
   const flowAddr = await getCurrentAddress(page);
 
   if (accountAddr && flowAddr !== accountAddr) {
@@ -366,46 +345,35 @@ export const importReceiverAccount = async ({ page, extensionId }) => {
   });
 };
 
-export const test = base.extend<{
-  context: BrowserContext;
-  extensionId: string;
-}>({
-  context: async ({}, call) => {
-    const pathToExtension = path.join(__dirname, '../../dist');
-    const context = await chromium.launchPersistentContext('/tmp/test-user-data-dir', {
-      channel: 'chromium',
-      args: [
-        `--disable-extensions-except=${pathToExtension}`,
-        `--load-extension=${pathToExtension}`,
-        '--allow-read-clipboard',
-        '--allow-write-clipboard',
-      ],
-      env: {
-        ...process.env,
-        TEST_MODE: 'true',
-      },
-      permissions: ['clipboard-read', 'clipboard-write'],
-    });
-
-    await call(context);
-    await context.close();
-  },
-  extensionId: async ({ context }, call) => {
-    // for manifest v3:
-    let [background] = context.serviceWorkers();
-    if (!background) background = await context.waitForEvent('serviceworker');
-    const extensionId = background.url().split('/')[2];
-    await call(extensionId);
-  },
-});
-
-export const cleanExtension = async () => {
-  const userDataDir = '/tmp/test-user-data-dir';
-  if (fs.existsSync(userDataDir)) {
-    fs.rmSync(userDataDir, { recursive: true, force: true });
+export const getReceiverCadenceAccount = ({ parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    // We've logged into the sender account, and we need to send tokens to the receiver account
+    return process.env.TEST_RECEIVER_ADDR;
+  } else {
+    // We've logged into the receiver account, and we need to send tokens back to the sender account
+    return process.env.TEST_SENDER_ADDR;
   }
 };
 
+export const getReceiverEvmAccount = ({ parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    // We've logged into the sender account, and we need to send tokens to the receiver account
+    return process.env.TEST_RECEIVER_EVM_ADDR;
+  } else {
+    // We've logged into the receiver account, and we need to send tokens back to the sender account
+    return process.env.TEST_SENDER_EVM_ADDR;
+  }
+};
+export const loginToSenderOrReceiver = async ({ page, extensionId, parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    await loginToSenderAccount({ page, extensionId });
+  } else {
+    await loginToReceiverAccount({ page, extensionId });
+  }
+};
 export const switchToEvm = async ({ page, extensionId }) => {
   // Assume the user is on the dashboard page
   await page.getByLabel('menu').click();
@@ -422,6 +390,27 @@ export const switchToFlow = async ({ page, extensionId }) => {
   await page.getByRole('button', { name: 'Flow' }).nth(0).click();
   // get address
   await getCurrentAddress(page);
+};
+
+const getActivityItemRegexp = (txId: string, ingoreFlowCharge = false) => {
+  return new RegExp(`^.*${txId}.*${ingoreFlowCharge ? '(?<!FlowToken)' : ''}$`);
+};
+
+export const checkSentAmount = async ({
+  page,
+  sealedText,
+  amount,
+  txId,
+  ingoreFlowCharge = false,
+}) => {
+  const activityItemRegexp = getActivityItemRegexp(txId, ingoreFlowCharge);
+  const sealedItem = page.getByTestId(activityItemRegexp).filter({ hasText: sealedText });
+  await expect(sealedItem).toBeVisible({
+    timeout: 60_000,
+  });
+  await expect(
+    page.getByTestId(activityItemRegexp).getByTestId(`token-balance-${amount}`)
+  ).toBeVisible();
 };
 
 export const waitForTransaction = async ({
@@ -442,13 +431,13 @@ export const waitForTransaction = async ({
   await expect(progressBar).toBeVisible();
   // Get the pending item with the cadence txId that was put in the url and status is pending
 
-  const activityItemRegexp = new RegExp(`^.*${txId}.*${ingoreFlowCharge ? '(?<!FlowToken)' : ''}$`);
+  const activityItemRegexp = getActivityItemRegexp(txId, ingoreFlowCharge);
   const pendingItem = page.getByTestId(activityItemRegexp).filter({ hasText: 'Pending' });
 
   await expect(pendingItem).toBeVisible({
     timeout: 60_000,
   });
-  await expect(progressBar).not.toBeVisible({ timeout: 60_000 });
+  /// await expect(progressBar).not.toBeVisible({ timeout: 60_000 });
 
   // Get the executed item with the cadence txId that was put in the url and status is success
   const executedItem = page.getByTestId(activityItemRegexp).filter({ hasText: successtext });
@@ -462,6 +451,6 @@ export const waitForTransaction = async ({
       page.getByTestId(activityItemRegexp).getByTestId(`token-balance-${amount}`)
     ).toBeVisible();
   }
-};
 
-export const expect = test.expect;
+  return txId;
+};

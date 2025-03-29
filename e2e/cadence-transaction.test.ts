@@ -1,4 +1,12 @@
-import { test, loginToSenderAccount, getCurrentAddress, waitForTransaction } from './utils/helper';
+import {
+  getCurrentAddress,
+  waitForTransaction,
+  loginToSenderOrReceiver,
+  getReceiverEvmAccount,
+  getReceiverCadenceAccount,
+  checkSentAmount,
+} from './utils/helper';
+import { test } from './utils/loader';
 export const sendTokenFlow = async ({
   page,
   tokenname,
@@ -18,7 +26,8 @@ export const sendTokenFlow = async ({
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'Send' }).click();
   // Wait for the transaction to be completed
-  await waitForTransaction({ page, successtext: 'sealed', amount, ingoreFlowCharge });
+  const txId = await waitForTransaction({ page, successtext: 'Executed', ingoreFlowCharge });
+  return { txId, tokenname, amount, ingoreFlowCharge };
 };
 
 export const moveTokenFlow = async ({
@@ -36,7 +45,8 @@ export const moveTokenFlow = async ({
   await page.getByRole('button', { name: 'Move' }).click();
 
   // Wait for the transaction to be completed
-  await waitForTransaction({ page, successtext: 'sealed', amount, ingoreFlowCharge });
+  const txId = await waitForTransaction({ page, successtext: 'Executed', ingoreFlowCharge });
+  return { txId, tokenname, amount, ingoreFlowCharge };
 };
 
 export const moveTokenFlowHomepage = async ({
@@ -54,110 +64,103 @@ export const moveTokenFlowHomepage = async ({
   await page.getByPlaceholder('Amount').fill(amount);
   await page.getByRole('button', { name: 'Move' }).click();
   // Wait for the transaction to be completed
-  await waitForTransaction({ page, successtext: 'sealed', amount, ingoreFlowCharge });
+  const txId = await waitForTransaction({ page, successtext: 'Executed', ingoreFlowCharge });
+  return { txId, tokenname, amount, ingoreFlowCharge };
 };
 
 test.beforeEach(async ({ page, extensionId }) => {
   // Login to our sender account
-  await loginToSenderAccount({ page, extensionId });
+  await loginToSenderOrReceiver({ page, extensionId, parallelIndex: test.info().parallelIndex });
 });
+
+const txList: { txId: string; tokenname: string; amount: string; ingoreFlowCharge: boolean }[] = [];
+
 //Send FLOW token from Flow to Flow
 test('send FLOW flow to flow', async ({ page }) => {
   // This can take a while
-  await sendTokenFlow({
+  const tx = await sendTokenFlow({
     page,
     tokenname: /^FLOW \$/i,
-    receiver: process.env.TEST_RECEIVER_ADDR!,
+    receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     amount: '0.00123456',
   });
+  txList.push(tx);
 });
 
 //Send StFlow from Flow to Flow
 test('send stFlow flow to flow', async ({ page }) => {
-  await sendTokenFlow({
+  const tx = await sendTokenFlow({
     page,
     tokenname: 'Liquid Staked Flow $',
-    receiver: process.env.TEST_RECEIVER_ADDR!,
+    receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     amount: '0.00123456',
   });
+  txList.push(tx);
 });
 
 //Send FLOW token from Flow to COA
 test('send FLOW flow to COA', async ({ page }) => {
   // This can take a while
-  await sendTokenFlow({
+  const tx = await sendTokenFlow({
     page,
     tokenname: /^FLOW \$/i,
-    receiver: process.env.TEST_RECEIVER_EVM_ADDR!,
+    receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     amount: '0.00123456',
   });
+  txList.push(tx);
 });
 //Send USDC from Flow to Flow
 test('send USDC flow to COA', async ({ page }) => {
-  await sendTokenFlow({
+  const tx = await sendTokenFlow({
     page,
     tokenname: 'USDC.e (Flow) $',
-    receiver: process.env.TEST_RECEIVER_EVM_ADDR!,
+    receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     ingoreFlowCharge: true,
     amount: '0.00123456',
   });
+  txList.push(tx);
 });
 
 //Send FLOW token from Flow to EOA
 test('send FLOW flow to EOA', async ({ page }) => {
   // This can take a while
-  await sendTokenFlow({
+  const tx = await sendTokenFlow({
     page,
     tokenname: /^FLOW \$/i,
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
     amount: '0.00123456',
   });
+  txList.push(tx);
 });
 
 //Send BETA from Flow to EOA
 test('send BETA flow to EOA', async ({ page }) => {
-  await sendTokenFlow({
+  const tx = await sendTokenFlow({
     page,
     tokenname: 'BETA $',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
     ingoreFlowCharge: true,
     amount: '0.00123456',
   });
-});
-/* //Move FTs from  Flow to COA
-test('move Flow Flow to COA', async ({ page }) => {
-  // Move FLOW token from FLOW to COA
-  await moveTokenFlow({
-    page,
-    tokenname: /^FLOW \$/i,
-  });
+  txList.push(tx);
 });
 
-test('move USDC token FLOW to COA', async ({ page }) => {
-  // Move USDC token from FLOW to COA
-  await moveTokenFlow({
-    page,
-    tokenname: 'USDC.e (Flow)',
-    ingoreFlowCharge: true,
-  });
-});
+test('check all sealed transactions', async ({ page, extensionId }) => {
+  await loginToSenderOrReceiver({ page, extensionId, parallelIndex: test.info().parallelIndex });
+  // Go to the activity page
+  await page.goto(`chrome-extension://${extensionId}/index.html#/dashboard?activity=1`);
+  await page.waitForURL(/.*\/dashboard.*/);
 
-//Move from main page
-test('move Flow Flow to COA homepage', async ({ page }) => {
-  // Move FLOW token from FLOW to COA
-  await moveTokenFlowHomepage({
-    page,
-    tokenname: 'Flow',
-  });
+  // Check the amounts that were sent for each transaction
+  await Promise.all(
+    txList.map(async (tx) => {
+      await checkSentAmount({
+        page,
+        txId: tx.txId,
+        amount: tx.amount,
+        sealedText: 'sealed',
+        ingoreFlowCharge: tx.ingoreFlowCharge,
+      });
+    })
+  );
 });
-
-test('move USDC token Flow to COA homepage', async ({ page }) => {
-  // Move USDC token from FLOW to COA
-  await moveTokenFlowHomepage({
-    page,
-    tokenname: 'USDC.e (Flow)',
-    amount: '0.0000123',
-    ingoreFlowCharge: true,
-  });
-});
- */

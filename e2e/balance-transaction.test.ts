@@ -1,16 +1,7 @@
 import BN from 'bignumber.js';
 
-import {
-  test as setup,
-  loginAsTestUser,
-  registerTestUser,
-  importReceiverAccount,
-  importSenderAccount,
-  lockExtension,
-  expect,
-  switchToEvm,
-  loginToSenderAccount,
-} from './helper';
+import { switchToEvm, loginToSenderAccount, loginToReceiverAccount } from './utils/helper';
+import { test, expect } from './utils/loader';
 
 // Define minimum required balances for each token
 const REQUIRED_BALANCES_CADENCE = {
@@ -50,54 +41,40 @@ const checkTokenBalance = (tokenName: string, actualBalance: string, requiredBal
   ).toBeTruthy();
 };
 
-// for user register and login
-setup('setup new wallet or login if already registered', async ({ page, extensionId }) => {
-  // let playwright know this is going to be slow
-  // Wait up to 10 minutes to setup an account
-  setup.setTimeout(600_000);
-  // Create a new page and navigate to extension
-  // Navigate and wait for network to be idle
-
-  await page.goto(`chrome-extension://${extensionId}/index.html#/dashboard`);
-
-  await page.waitForLoadState('domcontentloaded');
-
-  await page.waitForURL(/.*unlock|.*welcome/);
-  const pageUrl = page.url();
-  const isUnlockPage = pageUrl.includes('unlock');
-
-  // Create or login using our test user
-  if (isUnlockPage) {
-    // We're not starting from a fresh install, so login
-    await loginAsTestUser({ page, extensionId });
-  } else {
-    await registerTestUser({ page, extensionId });
-  }
-});
-
-setup('Import sender and receiver accounts', async ({ page, extensionId }) => {
-  // Lock the extension and import sender and receiver accounts
-  await importSenderAccount({ page, extensionId });
-  await lockExtension({ page });
-  await importReceiverAccount({ page, extensionId });
-});
-
-setup('Verify sufficient token balances for transaction tests', async ({ page, extensionId }) => {
+test('Verify sufficient token balances for sender account', async ({ page, extensionId }) => {
   // Login to sender account
   await loginToSenderAccount({ page, extensionId });
 
   // First check Cadence wallet balances
-  console.log('Checking Cadence wallet balances...');
   for (const [tokenName, requiredBalance] of Object.entries(REQUIRED_BALANCES_CADENCE)) {
     const balance = await getTokenBalance(page, tokenName);
     checkTokenBalance(tokenName, balance, requiredBalance);
   }
 
   // Switch to EVM wallet and check balances
-  await switchToEvm({ page, extensionId: '' });
-  console.log('Checking EVM wallet balances...');
+  await switchToEvm({ page, extensionId });
   for (const [tokenName, requiredBalance] of Object.entries(REQUIRED_BALANCES_EVM)) {
     const balance = await getTokenBalance(page, tokenName);
     checkTokenBalance(tokenName, balance, requiredBalance);
   }
+  console.log('Sender balance verified...');
+});
+
+test('Verify sufficient token balances for receiver account', async ({ page, extensionId }) => {
+  // Login to sender account
+  await loginToReceiverAccount({ page, extensionId });
+
+  // First check Cadence wallet balances
+  for (const [tokenName, requiredBalance] of Object.entries(REQUIRED_BALANCES_CADENCE)) {
+    const balance = await getTokenBalance(page, tokenName);
+    checkTokenBalance(tokenName, balance, requiredBalance);
+  }
+
+  // Switch to EVM wallet and check balances
+  await switchToEvm({ page, extensionId });
+  for (const [tokenName, requiredBalance] of Object.entries(REQUIRED_BALANCES_EVM)) {
+    const balance = await getTokenBalance(page, tokenName);
+    checkTokenBalance(tokenName, balance, requiredBalance);
+  }
+  console.log('Receiver balance verified...');
 });

@@ -1,10 +1,14 @@
 import {
-  test,
   loginToSenderAccount,
   getCurrentAddress,
   switchToEvm,
   waitForTransaction,
+  loginToSenderOrReceiver,
+  getReceiverEvmAccount,
+  getReceiverCadenceAccount,
 } from './utils/helper';
+import { test } from './utils/loader';
+
 export const sendTokenCOA = async ({
   page,
   tokenname,
@@ -60,7 +64,7 @@ export const moveTokenCoaHomepage = async ({ page, tokenname, amount = '0.000000
 
 test.beforeEach(async ({ page, extensionId }) => {
   // Login to our sender account
-  await loginToSenderAccount({ page, extensionId });
+  await loginToSenderOrReceiver({ page, extensionId, parallelIndex: test.info().parallelIndex });
   // switch to EVM account
   await switchToEvm({ page, extensionId });
 });
@@ -70,7 +74,7 @@ test('send Flow COA to COA', async ({ page }) => {
   await sendTokenCOA({
     page,
     tokenname: /^FLOW \$/i,
-    receiver: process.env.TEST_RECEIVER_EVM_ADDR!,
+    receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: 'success',
     amount: '0.12345678', // 8 decimal places
   });
@@ -81,7 +85,7 @@ test('send Staked Flow COA to COA', async ({ page }) => {
   await sendTokenCOA({
     page,
     tokenname: 'Liquid Staked Flow $',
-    receiver: process.env.TEST_RECEIVER_EVM_ADDR!,
+    receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: 'success',
     amount: '0.00000112134354678',
   });
@@ -94,7 +98,7 @@ test('send Flow COA to FLOW', async ({ page }) => {
   await sendTokenCOA({
     page,
     tokenname: /^FLOW \$/i,
-    receiver: process.env.TEST_RECEIVER_ADDR!,
+    receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: 'success',
     amount: '0.00123456', // 8 decimal places
   });
@@ -105,7 +109,7 @@ test('send USDC token COA to FLOW', async ({ page }) => {
   await sendTokenCOA({
     page,
     tokenname: 'Bridged USDC (Celer) $',
-    receiver: process.env.TEST_RECEIVER_ADDR!,
+    receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: 'success',
     amount: '0.002468', // 6 decimal places
   });

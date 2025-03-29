@@ -54,35 +54,8 @@ class Transaction {
     });
   };
 
-  clear = () => {
-    this.store = {
-      expiry: now.getTime(),
-      total: 0,
-      transactionItem: {
-        mainnet: [],
-        crescendo: [],
-        testnet: [],
-      },
-      pendingItem: {
-        mainnet: [],
-        testnet: [],
-        crescendo: [],
-      },
-    };
-    this.session = {
-      expiry: now.getTime(),
-      total: 0,
-      transactionItem: {
-        mainnet: [],
-        testnet: [],
-        crescendo: [],
-      },
-      pendingItem: {
-        mainnet: [],
-        testnet: [],
-        crescendo: [],
-      },
-    };
+  clear = async () => {
+    await this.init();
   };
 
   setPending = (txId: string, address: string, network, icon, title) => {

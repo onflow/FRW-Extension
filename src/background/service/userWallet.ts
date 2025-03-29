@@ -1,5 +1,6 @@
 import * as secp from '@noble/secp256k1';
 import * as fcl from '@onflow/fcl';
+import type { Account as FclAccount } from '@onflow/typedefs';
 import { getApp } from 'firebase/app';
 import { getAuth, signInAnonymously } from 'firebase/auth/web-extension';
 
@@ -476,7 +477,7 @@ class UserWallet {
     return await this.sigInWithPk(privateKey);
   };
 
-  authorizationFunction = async (account: any = {}) => {
+  authorizationFunction = async (account: FclAccount) => {
     // authorization function need to return an account
     const address = fcl.withPrefix(await wallet.getMainAddress());
     const ADDRESS = fcl.withPrefix(address);
