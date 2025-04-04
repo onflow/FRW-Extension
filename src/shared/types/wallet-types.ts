@@ -82,6 +82,7 @@ export type WalletAccount = {
   name: string;
   icon: string;
   color: string;
+  balance?: string;
 };
 export type WalletAccountWithBalance = WalletAccount & {
   balance: string;

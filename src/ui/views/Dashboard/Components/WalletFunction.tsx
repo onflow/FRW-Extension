@@ -27,37 +27,14 @@ interface WalletFunctionProps {
   mainAddress: string;
   setExpandAccount: React.Dispatch<React.SetStateAction<boolean>>;
   expandAccount: boolean;
+  balance: string;
   walletList: WalletAccount[];
 }
 
 const WalletFunction = (props: WalletFunctionProps) => {
-  const usewallet = useWallet();
-  const [currentBalance, setCurrentBalance] = useState<string | null>(null);
-
-  const walletFlowBalance = useCallback(
-    async (address: string) => {
-      const balance = await usewallet.getFlowBalance(address);
-      return balance;
-    },
-    [usewallet]
-  );
-
   const toggleExpand = () => {
     props.setExpandAccount((prev) => !prev);
   };
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        const balance = await walletFlowBalance(props.address);
-        setCurrentBalance(balance);
-      } catch (error) {
-        console.error('Error fetching balance:', error);
-      }
-    };
-
-    fetchBalance();
-  }, [props.address, walletFlowBalance]);
 
   return props.address === props.mainAddress || props.expandAccount ? (
     <ListItem
@@ -130,9 +107,7 @@ const WalletFunction = (props: WalletFunctionProps) => {
             color={'text.nonselect'}
             sx={{ fontSize: '12px', textTransform: 'uppercase' }}
           >
-            {currentBalance !== null
-              ? `${(Number(currentBalance) / 100000000).toFixed(3)} FLOW`
-              : 'Loading...'}
+            {props.balance !== null ? `${props.balance} FLOW` : 'Loading...'}
           </Typography>
         </Box>
         <Box sx={{ flex: '1' }}></Box>

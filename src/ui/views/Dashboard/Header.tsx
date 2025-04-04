@@ -264,6 +264,7 @@ const Header = ({ _loading = false }) => {
           mainAddress={mainAddress!}
           setExpandAccount={setExpandAccount}
           expandAccount={expandAccount}
+          balance={props.balance || '0.000'}
           walletList={walletList}
         />
       </List>
