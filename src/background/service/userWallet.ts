@@ -217,6 +217,14 @@ class UserWallet {
     };
   };
 
+  getAccountsWithPublicKey = async (
+    publicKey: string,
+    network: string
+  ): Promise<PublicKeyAccount[]> => {
+    const accounts = await openapiService.getAccountsWithPublicKey(publicKey, network);
+    return accounts;
+  };
+
   setChildAccounts = async (
     childAccountMap: ChildAccountMap,
     address: FlowAddress,

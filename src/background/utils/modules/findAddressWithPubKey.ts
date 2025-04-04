@@ -42,21 +42,6 @@ export const getAccountsByPublicKeyTuple = async (
   return accounts;
 };
 
-type KeyIndexerAccountResponse = {
-  address: string;
-  keyId: number;
-  weight: number;
-  sigAlgo: number;
-  hashAlgo: number;
-  signing: SignAlgoString;
-  hashing: HashAlgoString;
-};
-
-type KeyIndexerProfileResponse = {
-  publicKey: string;
-  accounts: KeyIndexerAccountResponse[];
-};
-
 /*
  * Connect to the indexer to get all accounts associated with a public key
  * This is used to get the accounts for the current user
@@ -69,26 +54,7 @@ async function getAccountsWithPublicKey(
   publicKey: string,
   network: string
 ): Promise<PublicKeyAccount[]> {
-  const url =
-    network === 'testnet'
-      ? `https://staging.key-indexer.flow.com/key/${publicKey}`
-      : `https://production.key-indexer.flow.com/key/${publicKey}`;
-  const result = await fetch(url);
-  const json: KeyIndexerProfileResponse = await result.json();
-
-  // Now massage the data to match the type we want
-  const accounts: PublicKeyAccount[] = json.accounts.map((account) => ({
-    address: account.address,
-    publicKey: json.publicKey,
-    keyIndex: account.keyId,
-    weight: account.weight,
-    signAlgo: account.sigAlgo,
-    signAlgoString: account.signing,
-    hashAlgo: account.hashAlgo,
-    hashAlgoString: account.hashing,
-  }));
-
-  return accounts;
+  return userWalletService.getAccountsWithPublicKey(publicKey, network);
 }
 
 const getPublicKeyInfoForAccount = async (

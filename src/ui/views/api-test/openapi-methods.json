@@ -1056,5 +1056,14 @@
     "usesFetchDirectly": false,
     "basicSignature": "async getUserTokens(address: string, network?: string)",
     "params": ["address", "network"]
+  },
+  {
+    "name": "getAccountsWithPublicKey",
+    "isAsync": true,
+    "fullBody": "async (publicKey: string, network: string) => {\n    const accounts = await userWalletService.getAccountsWithPublicKey(publicKey, network);\n    return accounts;\n  }",
+    "usesSendRequest": true,
+    "usesFetchDirectly": false,
+    "basicSignature": "async (publicKey: string, network: string)",
+    "params": ["publicKey", "network"]
   }
 ]
