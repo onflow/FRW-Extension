@@ -28,10 +28,29 @@ const NftSearch: React.FC<NftSearchProps> = ({
     }
 
     const searchLower = searchTerm.toLowerCase();
-    const filteredItems = items.filter(
-      (nft) =>
-        nft.name?.toLowerCase().includes(searchLower) || nft.id?.toLowerCase().includes(searchLower)
-    );
+    const filteredItems = items.filter((nft) => {
+      // Check basic NFT properties
+      const basicMatch =
+        nft.name?.toLowerCase().includes(searchLower) ||
+        nft.id?.toLowerCase().includes(searchLower) ||
+        nft.description?.toLowerCase().includes(searchLower);
+
+      // If already matched by basic properties, return true
+      if (basicMatch) return true;
+
+      // Check traits if they exist
+      if (nft.traits && Array.isArray(nft.traits)) {
+        // Return true if any trait value matches the search term
+        return nft.traits.some(
+          (trait) =>
+            trait.value?.toString().toLowerCase().includes(searchLower) ||
+            trait.name?.toLowerCase().includes(searchLower)
+        );
+      }
+
+      // No matches found
+      return false;
+    });
     return filteredItems;
   }, [items, searchTerm]);
 
