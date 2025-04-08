@@ -1,6 +1,7 @@
 export { default as Connect } from './Connect';
 export { default as Confirmation } from './Confirmation';
 export { default as SignMessage } from './SignMessage';
+export { default as Block } from './Block';
 
 export { default as EthConnect } from './EthApproval/EthConnect';
 export { default as EthSuggest } from './EthApproval/EthSuggest';

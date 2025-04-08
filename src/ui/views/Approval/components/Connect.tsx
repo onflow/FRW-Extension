@@ -168,19 +168,17 @@ const Connect = ({ params: { /*icon, origin,*/ tabId } }: ConnectProps) => {
 
   const checkNetwork = useCallback(async () => {
     const address = await wallet.getCurrentAddress();
-    console.log('address currentAddress ', address);
     setCurrentAddress(address!);
 
     const network = await wallet.getNetwork();
 
-    console.log(' msgNetwork ', msgNetwork, network, showSwitch);
     setCurrent(network);
     if (msgNetwork !== network && msgNetwork) {
       setShowSwitch(true);
     } else {
       setShowSwitch(false);
     }
-  }, [wallet, msgNetwork, showSwitch]);
+  }, [wallet, msgNetwork]);
 
   useEffect(() => {
     checkNetwork();
