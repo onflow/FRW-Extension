@@ -55,3 +55,46 @@ export const getActiveAccountsByUserWallet = async (): Promise<ActiveAccountsSto
     : undefined;
   return activeAccounts;
 };
+
+// Preferences
+export const preferencesKey = 'preference';
+
+export interface PreferenceAccount {
+  type: string;
+  address: string;
+  brandName: string;
+  alianName?: string;
+  displayBrandName?: string;
+  index?: number;
+  balance?: number;
+}
+
+export interface PreferenceStore {
+  currentAccount: PreferenceAccount | undefined | null;
+  externalLinkAck: boolean;
+  hiddenAddresses: PreferenceAccount[];
+  balanceMap: {
+    [address: string]: any;
+  };
+  useLedgerLive: boolean;
+  locale: string;
+  watchAddressPreference: Record<string, number>;
+  isDefaultWallet: boolean;
+  lastTimeSendToken: Record<string, any>;
+  walletSavedList: [];
+  alianNames: Record<string, string>;
+  initAlianNames: boolean;
+  // gasCache: GasCache;
+  currentVersion: string;
+  firstOpen: boolean;
+  pinnedChain: string[];
+  // addedToken: addedToken;
+  // lilico Preference
+  isDeveloperModeEnabled: boolean;
+  network: FlowNetwork;
+  isFreeGasFeeEnabled: boolean;
+}
+
+export const getPreferenceData = async (): Promise<PreferenceStore | undefined> => {
+  return await getUserData<PreferenceStore>(preferencesKey);
+};

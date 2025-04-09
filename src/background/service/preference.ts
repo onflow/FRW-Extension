@@ -2,63 +2,14 @@ import compareVersions from 'compare-versions';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { storage } from '@/background/webapi';
-import eventBus from '@/eventBus';
+import { type PreferenceStore, type PreferenceAccount } from '@/shared/utils/user-data-keys';
 import { createPersistStore } from 'background/utils';
-import { EVENTS } from 'consts';
 
-import { type FlowNetwork, MAINNET_NETWORK } from '../../shared/types/network-types';
+import { MAINNET_NETWORK } from '../../shared/types/network-types';
 
-import { keyringService, sessionService, i18n } from './index';
+import { keyringService, i18n } from './index';
 
 const version = process.env.release || '0';
-export interface PreferenceAccount {
-  type: string;
-  address: string;
-  brandName: string;
-  alianName?: string;
-  displayBrandName?: string;
-  index?: number;
-  balance?: number;
-}
-// export interface ChainGas {
-//   gasPrice?: number | null; // custom cached gas price
-//   gasLevel?: string | null; // cached gasLevel
-//   lastTimeSelect?: 'gasLevel' | 'gasPrice'; // last time selection, 'gasLevel' | 'gasPrice'
-// }
-// export interface GasCache {
-//   [chainId: string]: ChainGas;
-// }
-// export interface addedToken {
-//   [address: string]: string[];
-// }
-interface PreferenceStore {
-  currentAccount: PreferenceAccount | undefined | null;
-  externalLinkAck: boolean;
-  hiddenAddresses: PreferenceAccount[];
-  balanceMap: {
-    [address: string]: any;
-  };
-  useLedgerLive: boolean;
-  locale: string;
-  watchAddressPreference: Record<string, number>;
-  isDefaultWallet: boolean;
-  lastTimeSendToken: Record<string, any>;
-  walletSavedList: [];
-  alianNames: Record<string, string>;
-  initAlianNames: boolean;
-  // gasCache: GasCache;
-  currentVersion: string;
-  firstOpen: boolean;
-  pinnedChain: string[];
-  // addedToken: addedToken;
-
-  // lilico Preference
-  isDeveloperModeEnabled: boolean;
-  network: FlowNetwork;
-  isFreeGasFeeEnabled: boolean;
-}
-
-const SUPPORT_LOCALES = ['en'];
 
 class PreferenceService {
   store!: PreferenceStore;

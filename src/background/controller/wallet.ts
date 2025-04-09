@@ -80,6 +80,7 @@ import {
   type CadenceScripts,
   type NetworkScripts,
 } from '@/shared/utils/script-types';
+import type { PreferenceAccount } from '@/shared/utils/user-data-keys';
 import {
   keyringService,
   preferenceService,
@@ -130,7 +131,6 @@ import { HDKeyring } from '../service/keyring/hdKeyring';
 import { SimpleKeyring } from '../service/keyring/simpleKeyring';
 import { getScripts } from '../service/openapi';
 import type { ConnectedSite } from '../service/permission';
-import type { PreferenceAccount } from '../service/preference';
 import { type EvaluateStorageResult, StorageEvaluator } from '../service/storage-evaluator';
 import { loadChildAccountsOfParent } from '../service/userWallet';
 import {

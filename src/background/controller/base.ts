@@ -1,7 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
+import { type PreferenceAccount } from '@/shared/utils/user-data-keys';
 import { preferenceService, keyringService } from 'background/service';
-import { type PreferenceAccount } from 'background/service/preference';
 
 class BaseController {
   getCurrentAccount = async () => {
