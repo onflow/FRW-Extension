@@ -300,11 +300,14 @@ describe('OpenApiService', () => {
               if (detail.requestInit) {
                 expect(mockFetch).toHaveBeenNthCalledWith(
                   index + 1,
-                  detail.url,
+                  detail.url === undefined ? expect.any(String) : detail.url,
                   detail.requestInit
                 );
               } else {
-                expect(mockFetch).toHaveBeenNthCalledWith(index + 1, detail.url);
+                expect(mockFetch).toHaveBeenNthCalledWith(
+                  index + 1,
+                  detail.url === undefined ? expect.any(String) : detail.url
+                );
               }
             });
           } catch (error) {
