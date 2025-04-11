@@ -2253,7 +2253,7 @@ class OpenApiService {
 
     const response: FlowApiResponse = await this.sendRequest(
       'GET',
-      `/api/v4/cadence/tokens/ft/${address}`,
+      `/api/v4/cadence/tokens/ft/${address}?network=${network}`,
       {},
       {},
       WEB_NEXT_URL
@@ -2308,7 +2308,7 @@ class OpenApiService {
 
     const userEvmTokenList: EvmApiResponse = await this.sendRequest(
       'GET',
-      `/api/v4/evm/tokens/ft/${formattedEvmAddress}`,
+      `/api/v4/evm/tokens/ft/${formattedEvmAddress}?network=${network}`,
       {},
       {},
       WEB_NEXT_URL

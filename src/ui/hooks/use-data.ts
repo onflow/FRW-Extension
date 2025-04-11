@@ -51,6 +51,7 @@ export const useUserData = <T>(key: string | undefined | null): T | undefined =>
     const fetchData = async () => {
       if (!key) return;
       const data = await storage.get(key);
+      console.log('useUserData - fetchData', key, data);
       if (mounted) {
         setData(data as T);
       }
@@ -64,6 +65,7 @@ export const useUserData = <T>(key: string | undefined | null): T | undefined =>
 
       if (namespace === 'local' || namespace === 'sync') {
         if (changes[key]) {
+          console.log('useUserData - handleStorageChange', key, changes[key]);
           if (mounted) {
             setData(changes[key].newValue as T);
           }

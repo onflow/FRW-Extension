@@ -165,3 +165,11 @@ export const fclEnsureNetwork = async (network: string) => {
     await fclConfig(network as FlowNetwork);
   }
 };
+
+export const fclConfirmNetwork = async (network: string) => {
+  if (!isValidNetwork(network)) {
+    throw new Error(`Invalid network: ${network}`);
+  }
+  const currentNetwork = await fcl.config().get('flow.network');
+  return currentNetwork === network;
+};

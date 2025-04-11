@@ -453,7 +453,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           }}
         >
           {props.modeOn && (
-            <NetworkList networkColor={props.networkColor} currentNetwork={props.currentNetwork} />
+            <NetworkList
+              networkColor={props.networkColor}
+              currentNetwork={props.currentNetwork}
+              onClose={props.toggleDrawer}
+            />
           )}
           <ListItem
             disablePadding

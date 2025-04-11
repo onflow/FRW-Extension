@@ -10,6 +10,7 @@ import {
   transferListRefreshRegex,
 } from '@/shared/utils/cache-data-keys';
 
+import { fclConfirmNetwork } from '../fclConfig';
 import { getInvalidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
 
 interface TransactionStore {
@@ -313,6 +314,15 @@ class Transaction {
     offset: string = '0',
     limit: string = '15'
   ): Promise<TransferListStore> => {
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return {
+        count: 0,
+        pendingCount: 0,
+        list: [],
+      };
+    }
     if (isValidFlowAddress(address)) {
       // Get the flow transactions
       const flowResult = await openapiService.getTransfers(

@@ -6,6 +6,7 @@ import {
   evmNftIdsRefreshRegex,
 } from '@/shared/utils/cache-data-keys';
 
+import { fclConfirmNetwork } from '../fclConfig';
 import { registerRefreshListener, setCachedData } from '../utils/data-cache';
 
 import { openapiService } from '.';
@@ -17,6 +18,11 @@ class EvmNfts {
   };
 
   loadEvmNftIds = async (network: string, address: string) => {
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return [];
+    }
     const result = await openapiService.EvmNFTID(network, address);
 
     setCachedData(evmNftIdsKey(network, address), result);
@@ -31,6 +37,12 @@ class EvmNfts {
   ) => {
     if (!isValidEthereumAddress(address)) {
       throw new Error('Invalid Ethereum address');
+    }
+
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return [];
     }
 
     const result = await openapiService.EvmNFTcollectionList(

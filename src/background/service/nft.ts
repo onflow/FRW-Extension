@@ -13,7 +13,7 @@ import {
 import { getValidData, registerRefreshListener, setCachedData } from 'background/utils/data-cache';
 
 import { type NFTCollectionData, type NFTCollections } from '../../shared/types/nft-types';
-import { fclEnsureNetwork } from '../fclConfig';
+import { fclConfirmNetwork, fclEnsureNetwork } from '../fclConfig';
 
 import openapiService, { getScripts } from './openapi';
 
@@ -26,7 +26,11 @@ class NFT {
   };
 
   loadChildAccountNFTs = async (network: string, address: string) => {
-    await fclEnsureNetwork(network);
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return undefined;
+    }
     const script = await getScripts(network, 'hybridCustody', 'getAccessibleChildAccountNFTs');
 
     const result = await fcl.query({
@@ -45,7 +49,11 @@ class NFT {
     parentAddress: string,
     childAddress: string
   ) => {
-    await fclEnsureNetwork(network);
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return undefined;
+    }
     const script = await getScripts(network, 'hybridCustody', 'getChildAccountAllowTypes');
     const result = await fcl.query({
       cadence: script,
@@ -59,6 +67,11 @@ class NFT {
     network: string,
     address: string
   ): Promise<NFTCollections[]> => {
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return [];
+    }
     const data = await openapiService.nftCatalogCollections(address!, network);
     if (!data || !Array.isArray(data)) {
       return [];
@@ -75,7 +88,12 @@ class NFT {
     address: string,
     collectionId: string,
     offset: string
-  ): Promise<NFTCollectionData> => {
+  ): Promise<NFTCollectionData | undefined> => {
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return undefined;
+    }
     const offsetNumber = parseInt(offset) || 0;
     const data = await openapiService.nftCatalogCollectionList(
       address!,

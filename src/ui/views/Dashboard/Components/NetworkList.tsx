@@ -27,9 +27,10 @@ const bgColor = (network: string) => {
 interface NetworkListProps {
   networkColor: (network: string) => string;
   currentNetwork: string;
+  onClose: () => void;
 }
 
-const NetworkList = ({ networkColor, currentNetwork }: NetworkListProps) => {
+const NetworkList = ({ networkColor, currentNetwork, onClose }: NetworkListProps) => {
   const usewallet = useWallet();
 
   const [isSwitchingNetwork, setIsSwitchingNetwork] = useState(false);
@@ -39,8 +40,7 @@ const NetworkList = ({ networkColor, currentNetwork }: NetworkListProps) => {
       if (currentNetwork !== network) {
         // Don't await it, because it will block the main thread
         usewallet.switchNetwork(network);
-
-        window.location.reload();
+        onClose();
       }
     } catch (error) {
       console.error('Error switching network:', error);
