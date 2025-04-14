@@ -122,7 +122,7 @@ const Register = () => {
             handleSwitchTab={() => setActiveTab(STEPS.BACKUP)}
             onSubmit={submitPassword}
             username={username}
-            showTerms={true}
+            showTerms={isAddWallet}
             autoFocus={true}
             isLogin={isAddWallet}
           />
