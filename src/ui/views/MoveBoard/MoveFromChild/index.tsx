@@ -6,6 +6,8 @@ import { isValidEthereumAddress } from '@/shared/utils/address';
 import { NFTDrawer } from '@/ui/FRWComponent/GeneralPages';
 import WarningSnackbar from '@/ui/FRWComponent/WarningSnackbar';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useStorageCheck } from '@/ui/utils/useStorageCheck';
 import alertMark from 'ui/FRWAssets/svg/alertMark.svg';
@@ -14,7 +16,6 @@ import { useWallet } from 'ui/utils';
 import AccountMainBox from '../AccountMainBox';
 import MoveCollectionSelect from '../MoveCollectionSelect';
 import NFTLoader from '../NFTLoader';
-
 interface MoveBoardProps {
   showMoveBoard: boolean;
   handleCloseIconClicked: () => void;
@@ -40,7 +41,12 @@ const checkContractAddressInCollections = (nft, activec) => {
 const MoveFromChild = (props: MoveBoardProps) => {
   const usewallet = useWallet();
   const history = useHistory();
-  const { mainAddress, evmWallet } = useProfiles();
+
+  const { network } = useNetwork();
+
+  const { currentWallet, mainAddress, evmWallet } = useProfiles();
+  const nftCollections = useNftCatalogCollections(network, currentWallet.address);
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [collectionList, setCollectionList] = useState<any>(null);
   const [selectedCollection, setSelected] = useState<string>('');
@@ -82,41 +88,9 @@ const MoveFromChild = (props: MoveBoardProps) => {
     if (collectionList) {
       const collection = collectionList.find((collection) => collection.id === selectedCollection);
       setCurrentCollection(collection);
+      setIsLoading(false);
     }
   }, [collectionList, selectedCollection]);
-
-  const fetchLatestCollection = useCallback(
-    async (address: string) => {
-      try {
-        const list = await usewallet.refreshCollection(address);
-        if (list && list.length > 0) {
-          return list;
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [usewallet]
-  );
-
-  const fetchCollectionCache = useCallback(
-    async (address: string) => {
-      try {
-        const list = await usewallet.getCollectionCache(address);
-        if (list && list.length > 0) {
-          return list;
-        } else {
-          const list = await fetchLatestCollection(address);
-          return list;
-        }
-      } catch {
-        fetchLatestCollection(address);
-      } finally {
-        console.log('done');
-      }
-    },
-    [fetchLatestCollection, usewallet]
-  );
 
   const requestCadenceNft = useCallback(async () => {
     setIsLoading(true);
@@ -127,7 +101,7 @@ const MoveFromChild = (props: MoveBoardProps) => {
         throw new Error('Parent address not found');
       }
       const activec = await usewallet.getChildAccountAllowTypes(parentaddress, address!);
-      const cadenceResult = await fetchCollectionCache(address!);
+      const cadenceResult = nftCollections;
       const filteredCadenceResult = cadenceResult!.filter((nft) =>
         checkContractAddressInCollections(nft, activec)
       );
@@ -151,7 +125,7 @@ const MoveFromChild = (props: MoveBoardProps) => {
       setCollectionList(null);
       setIsLoading(false);
     }
-  }, [fetchCollectionCache, usewallet]);
+  }, [nftCollections, usewallet]);
 
   const requestCollectionInfo = useCallback(async () => {
     if (selectedCollection) {

@@ -27,7 +27,6 @@ import {
 } from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
-import { useCoins } from '@/ui/hooks/useCoinHook';
 import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useNews } from '@/ui/utils/NewsContext';
@@ -35,11 +34,11 @@ import { useWallet, formatAddress, useWalletLoaded } from 'ui/utils';
 
 import IconCopy from '../../../components/iconfont/IconCopy';
 
+import MainAccountsComponent from './Components/MainAccountsComponent';
 import MenuDrawer from './Components/MenuDrawer';
 import NewsView from './Components/NewsView';
 import Popup from './Components/Popup';
 import SwitchAccountCover from './Components/SwitchAccountCover';
-import WalletFunction from './Components/WalletFunction';
 
 const useStyles = makeStyles(() => ({
   appBar: {
@@ -152,7 +151,7 @@ const Header = ({ _loading = false }) => {
     await usewallet.setActiveWallet(walletInfo, key, index);
 
     // Navigate if needed
-    //   history.push('/dashboard');
+    history.push('/dashboard');
     setDrawer(false);
     //  window.location.reload();
   };
@@ -248,7 +247,8 @@ const Header = ({ _loading = false }) => {
   const createWalletList = (props: WalletAccount) => {
     return (
       <List component="nav" key={props.id} sx={{ mb: '0', padding: 0 }}>
-        <WalletFunction
+        <MainAccountsComponent
+          network={network}
           props_id={props.id}
           name={props.name}
           address={props.address as WalletAddress}
@@ -402,50 +402,53 @@ const Header = ({ _loading = false }) => {
           }}
         >
           <Tooltip title={chrome.i18n.getMessage('Copy__Address')} arrow>
-            <Button
-              disabled={!haveAddress}
-              onClick={() => {
-                if (haveAddress) {
-                  navigator.clipboard.writeText(props.address);
-                }
-              }}
-              variant="text"
-            >
-              <Box
-                component="div"
-                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            <span>
+              <Button
+                data-testid="copy-address-button"
+                disabled={!haveAddress}
+                onClick={() => {
+                  if (haveAddress) {
+                    navigator.clipboard.writeText(props.address);
+                  }
+                }}
+                variant="text"
               >
-                <Typography
-                  variant="overline"
-                  color="text"
-                  align="center"
-                  display="block"
-                  sx={{ lineHeight: '1.5' }}
+                <Box
+                  component="div"
+                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
                 >
-                  {haveAddress ? (
-                    `${props.name === 'Flow' ? 'Wallet' : props.name}${
-                      isValidEthereumAddress(props.address) ? ' EVM' : ''
-                    }`
-                  ) : (
-                    <Skeleton variant="text" width={40} />
-                  )}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
                   <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ textTransform: 'none' }}
+                    variant="overline"
+                    color="text"
+                    align="center"
+                    display="block"
+                    sx={{ lineHeight: '1.5' }}
                   >
                     {haveAddress ? (
-                      formatAddress(props.address)
+                      `${props.name === 'Flow' ? 'Wallet' : props.name}${
+                        isValidEthereumAddress(props.address) ? ' EVM' : ''
+                      }`
                     ) : (
-                      <Skeleton variant="text" width={120} />
+                      <Skeleton variant="text" width={40} />
                     )}
                   </Typography>
-                  <IconCopy fill="icon.navi" width="12px" />
+                  <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ textTransform: 'none' }}
+                    >
+                      {haveAddress ? (
+                        formatAddress(props.address)
+                      ) : (
+                        <Skeleton variant="text" width={120} />
+                      )}
+                    </Typography>
+                    <IconCopy fill="icon.navi" width="12px" />
+                  </Box>
                 </Box>
-              </Box>
-            </Button>
+              </Button>
+            </span>
           </Tooltip>
         </Box>
 

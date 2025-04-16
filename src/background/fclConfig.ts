@@ -1,7 +1,7 @@
 import * as fcl from '@onflow/fcl';
 import { send as httpSend } from '@onflow/transport-http';
 
-import { type FlowNetwork } from '../shared/types/network-types';
+import { isValidNetwork, type FlowNetwork } from '../shared/types/network-types';
 
 import { storage } from './webapi';
 
@@ -154,4 +154,22 @@ export const fclConfig = async (network: FlowNetwork, emulatorMode?: boolean) =>
     // Default to mainnet
     await fclMainnetConfig(emulatorMode);
   }
+};
+
+export const fclEnsureNetwork = async (network: string) => {
+  if (!isValidNetwork(network)) {
+    throw new Error(`Invalid network: ${network}`);
+  }
+  const currentNetwork = await fcl.config().get('flow.network');
+  if (currentNetwork !== network) {
+    await fclConfig(network as FlowNetwork);
+  }
+};
+
+export const fclConfirmNetwork = async (network: string) => {
+  if (!isValidNetwork(network)) {
+    throw new Error(`Invalid network: ${network}`);
+  }
+  const currentNetwork = await fcl.config().get('flow.network');
+  return currentNetwork === network;
 };

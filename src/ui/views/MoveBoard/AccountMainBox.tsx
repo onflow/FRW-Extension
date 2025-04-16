@@ -1,13 +1,14 @@
-import { Typography, Box, CardMedia } from '@mui/material';
+import { Typography, Box, CardMedia, Avatar } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { type Contact } from '@/shared/types/network-types';
 import { ensureEvmAddressPrefix } from '@/shared/utils/address';
+import { useContacts } from '@/ui/hooks/useContactHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import accountMove from 'ui/FRWAssets/svg/accountMove.svg';
 import { FWMoveDropdown } from 'ui/FRWComponent';
 import { useWallet } from 'ui/utils';
-
 const USER_CONTACT = {
   contact_name: '',
   avatar: '',
@@ -15,53 +16,29 @@ const USER_CONTACT = {
 
 function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isEvm = false }) {
   const usewallet = useWallet();
-  const { mainAddress, evmAddress, evmWallet, childAccounts, parentWallet, currentWallet } =
-    useProfiles();
+  const { childAccountsContacts, evmAccounts, mainAccountContact } = useContacts();
+  const { mainAddress, evmAddress, evmWallet, currentWallet } = useProfiles();
   const [first, setFirst] = useState<string>('');
   const [userInfo, setUser] = useState<any>(USER_CONTACT);
   const [firstEmoji, setFirstEmoji] = useState<any>(null);
-  const [childWallets, setChildWallets] = useState({});
+  const [childWallets, setChildWallets] = useState<Contact[]>([]);
 
   const requestAddress = useCallback(async () => {
     const address = await usewallet.getCurrentAddress();
 
     if (isChild) {
-      const newWallet = {
-        [mainAddress!]: {
-          name: parentWallet.name,
-          description: parentWallet.name,
-          thumbnail: {
-            url: parentWallet.icon,
-          },
-        },
-      };
-
-      let eWallet = {};
-      if (evmAddress) {
-        eWallet = {
-          [evmAddress!]: {
-            name: evmWallet.name,
-            description: evmWallet.name,
-            thumbnail: {
-              url: evmWallet.icon,
-            },
-          },
-        };
-      }
-
       // Merge wallet lists
-      const walletList = { ...childAccounts, ...newWallet, ...eWallet };
-      delete walletList[address!];
-      const firstWalletAddress = Object.keys(walletList)[0];
-      const wallet = childAccounts?.[address!];
+      const walletList = [...childAccountsContacts, ...mainAccountContact, ...evmAccounts].filter(
+        (account) => account.address !== currentWallet.address
+      );
       setChildWallets(walletList);
 
       const userContact = {
-        avatar: wallet.thumbnail.url,
-        contact_name: wallet.name,
+        avatar: currentWallet.icon,
+        contact_name: currentWallet.name,
       };
-      if (firstWalletAddress) {
-        setSelectedChildAccount(walletList[firstWalletAddress]);
+      if (walletList && walletList.length > 0) {
+        setSelectedChildAccount(walletList[0]);
       }
       setUser(userContact);
       setFirst(address!);
@@ -78,11 +55,12 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
           },
         };
       }
-      const walletList = { ...childAccounts, ...eWallet };
+
+      const walletList = [...childAccountsContacts, ...evmAccounts];
       setChildWallets(walletList);
-      const firstWalletAddress = Object.keys(walletList)[0];
-      if (firstWalletAddress) {
-        setSelectedChildAccount(walletList[firstWalletAddress]);
+
+      if (walletList && walletList.length > 0) {
+        setSelectedChildAccount(walletList[0]);
       }
       setFirst(mainAddress!);
       setFirstEmoji(currentWallet);
@@ -93,10 +71,11 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
     setSelectedChildAccount,
     mainAddress,
     evmAddress,
-    childAccounts,
     currentWallet,
-    parentWallet,
     evmWallet,
+    childAccountsContacts,
+    evmAccounts,
+    mainAccountContact,
   ]);
 
   useEffect(() => {
@@ -136,15 +115,14 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
                   {firstEmoji.icon}
                 </Typography>
               ) : (
-                <CardMedia
+                <Avatar
+                  src={userInfo.avatar}
                   sx={{
-                    margin: '0 auto',
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '20px',
-                    display: 'block',
+                    height: '32px',
+                    width: '32px',
+                    borderRadius: '32px',
+                    marginRight: '4px',
                   }}
-                  image={userInfo.avatar}
                 />
               )}
             </Box>
@@ -179,7 +157,6 @@ function AccountMainBox({ isChild, setSelectedChildAccount, selectedAccount, isE
         >
           {selectedAccount && (
             <FWMoveDropdown
-              contact={selectedAccount}
               contacts={childWallets}
               setSelectedChildAccount={setSelectedChildAccount}
             />

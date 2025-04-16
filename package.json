@@ -1,6 +1,6 @@
 {
   "name": "flow-reference-wallet",
-  "version": "2.7.9",
+  "version": "2.8.0-beta.2",
   "description": "Digital wallet created for everyone.",
   "type": "module",
   "scripts": {
@@ -125,7 +125,6 @@
     "react-qrcode-logo": "^2.10.0",
     "react-router-dom": "^5.3.4",
     "react-spring": "^8.0.27",
-    "react-swipeable-views": "^0.14.0",
     "react-use": "^17.5.1",
     "react-window": "^1.8.10",
     "recharts": "^2.13.3",

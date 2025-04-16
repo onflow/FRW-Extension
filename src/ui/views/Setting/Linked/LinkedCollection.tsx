@@ -207,9 +207,9 @@ const LinkedCollection = (props) => {
     try {
       const res = await getCollection(address, collection_name);
       console.log('res   ', res);
-      setInfo(res.collection);
-      setTotal(res.nftCount);
-      setLists(res.nfts);
+      setInfo(res?.collection);
+      setTotal(res?.nftCount || 0);
+      setLists(res?.nfts || []);
     } catch (err) {
       console.log('err   ', err);
       // Handle the error if needed
@@ -227,10 +227,10 @@ const LinkedCollection = (props) => {
     try {
       const res = await getCollection(address, collection_name, offset);
 
-      setInfo(res.collection);
-      setTotal(res.nftCount);
+      setInfo(res?.collection);
+      setTotal(res?.nftCount || 0);
 
-      if (res.nfts) {
+      if (res?.nfts) {
         const newPage = pageIndex + 1;
         setPage(newPage);
         const newList: any[] = [];

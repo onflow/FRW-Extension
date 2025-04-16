@@ -67,6 +67,13 @@ import {
   getCachedNftCatalogCollections,
   nftCatalogCollectionsKey,
   coinListKey,
+  childAccountAllowTypesKey,
+  childAccountNFTsKey,
+  type ChildAccountNFTsStore,
+  evmNftIdsKey,
+  type EvmNftIdsStore,
+  type EvmNftCollectionListStore,
+  evmNftCollectionListKey,
 } from '@/shared/utils/cache-data-keys';
 import { getCurrentProfileId } from '@/shared/utils/current-id';
 import {
@@ -123,6 +130,7 @@ import {
 import type {
   AccountKeyRequest,
   Contact,
+  FlowNetwork,
   NFTModelV2,
   UserInfoResponse,
 } from '../../shared/types/network-types';
@@ -231,10 +239,35 @@ export class WalletController extends BaseController {
     await this.createKeyringWithMnemonics(password, mnemonic);
     // We're creating the Flow address for the account
     // Only after this, do we have a valid wallet with a Flow address
-    await openapiService.createFlowAddress();
+    const result = await openapiService.createFlowAddressV2();
+    this.checkForNewAddress(result.data.txid);
+  };
 
-    // Finally set the current pubkey in userWallet
-    userWalletService.setCurrentPubkey(accountKey.public_key);
+  checkForNewAddress = async (txid: string): Promise<FclAccount | null> => {
+    try {
+      const txResult = await fcl.tx(txid).onceSealed();
+
+      // Find the AccountCreated event and extract the address
+      const accountCreatedEvent = txResult.events.find(
+        (event) => event.type === 'flow.AccountCreated'
+      );
+
+      if (!accountCreatedEvent) {
+        throw new Error('Account creation event not found in transaction');
+      }
+
+      const newAddress = accountCreatedEvent.data.address;
+
+      const account = await fcl.account(newAddress);
+      if (!account) {
+        throw new Error('Fcl account not found');
+      }
+
+      userWalletService.registerCurrentPubkey(account.keys[0].publicKey, account);
+      return account;
+    } catch (error) {
+      throw new Error(`Account creation failed: ${error.message || 'Unknown error'}`);
+    }
   };
 
   /**
@@ -429,6 +462,11 @@ export class WalletController extends BaseController {
   retrievePk = async (password: string) => {
     const pk = await keyringService.retrievePk(password);
     return pk;
+  };
+
+  revealKeyring = async (password: string) => {
+    const keyring = await keyringService.revealKeyring(password);
+    return keyring;
   };
 
   // This is not used anymore
@@ -1029,14 +1067,14 @@ export class WalletController extends BaseController {
   };
 
   checkAccessibleNft = async (childAccount) => {
-    try {
-      const nfts = await openapiService.checkChildAccountNFT(childAccount);
-
-      return nfts;
-    } catch (error) {
-      console.error(error, 'error ===');
-      return [];
+    const network = userWalletService.getNetwork();
+    const validData = getValidData<ChildAccountNFTsStore>(
+      childAccountNFTsKey(network, childAccount)
+    );
+    if (validData) {
+      return validData;
     }
+    return await nftService.loadChildAccountNFTs(network, childAccount);
   };
 
   checkAccessibleFt = async (childAccount) => {
@@ -1073,14 +1111,14 @@ export class WalletController extends BaseController {
   };
 
   initCoinListSession = async (address: string) => {
-    console.log('initCoinListSession', address);
     const network = await this.getNetwork();
     await coinListService.initCoinList(network, address);
   };
 
   reqeustEvmNft = async () => {
     const address = await this.getEvmAddress();
-    const evmList = await openapiService.EvmNFTID(address);
+    const network = await this.getNetwork();
+    const evmList = await openapiService.EvmNFTID(network, address);
     return evmList;
   };
 
@@ -2340,9 +2378,13 @@ export class WalletController extends BaseController {
       'hybridCustody',
       'transferNFTToChild'
     );
+    const walletAddress = withPrefix(linkedAddress);
+    if (!walletAddress) {
+      throw new Error(`Invalid linked address - ${linkedAddress}`);
+    }
     const replacedScript = replaceNftKeywords(script, token);
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(linkedAddress, t.Address),
+      fcl.arg(walletAddress, t.Address),
       fcl.arg(path, t.String),
       fcl.arg(ids, t.UInt64),
     ]);
@@ -2359,17 +2401,16 @@ export class WalletController extends BaseController {
     return txID;
   };
 
-  getChildAccountAllowTypes = async (parent: string, child: string) => {
-    const script = await getScripts(
-      userWalletService.getNetwork(),
-      'hybridCustody',
-      'getChildAccountAllowTypes'
+  getChildAccountAllowTypes = async (parent: string, child: string): Promise<string[]> => {
+    const network = userWalletService.getNetwork();
+
+    const cachedData = await getValidData<string[]>(
+      childAccountAllowTypesKey(network, parent, child)
     );
-    const result = await fcl.query({
-      cadence: script,
-      args: (arg, t) => [arg(parent, t.Address), arg(child, t.Address)],
-    });
-    return result;
+    if (cachedData) {
+      return cachedData;
+    }
+    return nftService.loadChildAccountAllowTypes(network, parent, child);
   };
 
   checkChildLinkedVault = async (parent: string, child: string, path: string): Promise<string> => {
@@ -2411,6 +2452,7 @@ export class WalletController extends BaseController {
   };
 
   batchBridgeNftFromEvm = async (flowIdentifier: string, ids: Array<number>): Promise<string> => {
+    console.log('batchBridgeNftFromEvm', flowIdentifier, ids);
     const shouldCoverBridgeFee = await openapiService.getFeatureFlag('cover_bridge_fee');
     const scriptName = shouldCoverBridgeFee
       ? 'batchBridgeNFTFromEvmWithPayer'
@@ -2778,11 +2820,10 @@ export class WalletController extends BaseController {
   }
 
   switchNetwork = async (network: string) => {
+    // setup fcl for the new network
+    await userWalletService.switchFclNetwork(network as FlowNetwork);
     await userWalletService.setNetwork(network);
     eventBus.emit('switchNetwork', network);
-
-    // setup fcl for the new network
-    await userWalletService.setupFcl();
 
     // Reload everything
     await this.refreshWallets();
@@ -3123,7 +3164,7 @@ export class WalletController extends BaseController {
     address: string,
     collectionId: string,
     offset = 0
-  ): Promise<NFTCollectionData> => {
+  ): Promise<NFTCollectionData | undefined> => {
     const network = await this.getNetwork();
     const list = await getCachedNftCollection(network, address, collectionId, offset);
     if (!list) {
@@ -3136,7 +3177,7 @@ export class WalletController extends BaseController {
     address: string,
     collectionId: string,
     offset: number
-  ): Promise<NFTCollectionData> => {
+  ): Promise<NFTCollectionData | undefined> => {
     const network = await this.getNetwork();
 
     return nftService.loadSingleNftCollection(network, address, collectionId, `${offset || 0}`);
@@ -3144,7 +3185,7 @@ export class WalletController extends BaseController {
 
   getCollectionCache = async (address: string) => {
     const network = await this.getNetwork();
-    const list = await getCachedNftCatalogCollections(network, address);
+    const list = await getValidData<NFTCollections[]>(nftCatalogCollectionsKey(network, address));
     if (!list || list.length === 0) {
       return await this.refreshCollection(address);
     }
@@ -3361,7 +3402,7 @@ export class WalletController extends BaseController {
     coin?: string; // coin name
     movingBetweenEVMAndFlow?: boolean; // are we moving between EVM and Flow?
   } = {}): Promise<EvaluateStorageResult> => {
-    const address = await this.getCurrentAddress();
+    const address = await this.getParentAddress();
     const isFreeGasFeeEnabled = await this.allowLilicoPay();
     const result = await this.storageEvaluator.evaluateStorage(
       address!,
@@ -3430,46 +3471,16 @@ export class WalletController extends BaseController {
     }
   };
 
-  refreshEvmNftIds = async (address: string) => {
-    if (!isValidEthereumAddress(address)) {
-      throw new Error('Invalid Ethereum address');
-    }
-    const network = await this.getNetwork();
-    const result = await openapiService.EvmNFTID(address);
-    await evmNftService.setNftIds(result, network);
-    return result;
-  };
-
   getEvmNftId = async (address: string) => {
     if (!isValidEthereumAddress(address)) {
       throw new Error('Invalid Ethereum address');
     }
     const network = await this.getNetwork();
-    const cacheData = await evmNftService.getNftIds(network);
+    const cacheData = await getValidData<EvmNftIdsStore>(evmNftIdsKey(network, address));
     if (cacheData) {
       return cacheData;
     }
-    return this.refreshEvmNftIds(address);
-  };
-
-  refreshEvmNftCollectionList = async (
-    address: string,
-    collectionIdentifier: string,
-    limit = 50,
-    offset = 0
-  ) => {
-    if (!isValidEthereumAddress(address)) {
-      throw new Error('Invalid Ethereum address');
-    }
-    const network = await this.getNetwork();
-    const result = await openapiService.EvmNFTcollectionList(
-      address,
-      collectionIdentifier,
-      limit,
-      offset
-    );
-    await evmNftService.setSingleCollection(result, collectionIdentifier, offset, network);
-    return result;
+    return evmNftService.loadEvmNftIds(network, address);
   };
 
   getEvmNftCollectionList = async (
@@ -3482,15 +3493,13 @@ export class WalletController extends BaseController {
       throw new Error('Invalid Ethereum address');
     }
     const network = await this.getNetwork();
-    const cacheData = await evmNftService.getSingleCollection(
-      network,
-      collectionIdentifier,
-      offset
+    const cacheData = await getValidData<EvmNftCollectionListStore>(
+      evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`)
     );
     if (cacheData) {
       return cacheData;
     }
-    return this.refreshEvmNftCollectionList(address, collectionIdentifier, limit, offset);
+    return evmNftService.loadEvmCollectionList(network, address, collectionIdentifier, `${offset}`);
   };
 
   clearEvmNFTList = async () => {

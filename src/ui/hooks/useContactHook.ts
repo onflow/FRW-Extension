@@ -19,7 +19,8 @@ export function useContacts() {
   const [addressBookContacts, setAddressBookContacts] = useState<Contact[]>([]);
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
   const [cadenceAccounts, setCadenceAccounts] = useState<Contact[]>([]);
-  const [childAccounts, setChildAccounts] = useState<Contact[]>([]);
+  const [mainAccountContact, setMainAccount] = useState<Contact[]>([]);
+  const [childAccountsContacts, setChildAccounts] = useState<Contact[]>([]);
   const [evmAccounts, setEvmAccounts] = useState<Contact[]>([]);
 
   useEffect(() => {
@@ -85,15 +86,35 @@ export function useContacts() {
           }))
         : []
     );
+
+    setMainAccount(
+      walletList
+        ? walletList
+            .filter((item) => item.address === mainAddress)
+            .map((item) => ({
+              id: item.id,
+              contact_name: item.name,
+              username: '',
+              avatar: item.icon,
+              address: withPrefix(item.address) || '',
+              contact_type: ContactType.User,
+              bgColor: item.color,
+              domain: {
+                domain_type: 0,
+                value: '',
+              },
+            }))
+        : []
+    );
     // List out child accounts
     setChildAccounts(
       childAccountsProfile
-        ? Object.entries(childAccountsProfile).map(([address, accountDetails], index) => ({
+        ? childAccountsProfile.map((accountDetails, index) => ({
             id: index,
-            contact_name: accountDetails.name || address,
+            contact_name: accountDetails.name || accountDetails.address,
             username: '', // We don't have the proper username from this call
             avatar: accountDetails.icon,
-            address: address,
+            address: accountDetails.address,
             contact_type: ContactType.AddressBook,
             domain: {
               domain_type: 999,
@@ -120,18 +141,24 @@ export function useContacts() {
     recentContacts,
     cadenceAccounts,
     evmAccounts,
-    childAccounts,
+    childAccountsContacts,
+    mainAccountContact,
   };
 }
 
 export const useContact = (address: WalletAddress | string): Contact => {
-  const { addressBookContacts, recentContacts, cadenceAccounts, evmAccounts, childAccounts } =
-    useContacts();
+  const {
+    addressBookContacts,
+    recentContacts,
+    cadenceAccounts,
+    evmAccounts,
+    childAccountsContacts,
+  } = useContacts();
 
   return (
     cadenceAccounts.find((c) => c.address === address) ||
     evmAccounts.find((c) => c.address === address) ||
-    childAccounts.find((c) => c.address === address) ||
+    childAccountsContacts.find((c) => c.address === address) ||
     addressBookContacts.find((c) => c.address === address) ||
     recentContacts.find((c) => c.address === address) || {
       // If nothing found then just return an empty contact with the address

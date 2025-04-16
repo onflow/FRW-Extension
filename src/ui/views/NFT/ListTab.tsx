@@ -10,17 +10,19 @@ import {
   Box,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { forwardRef, useImperativeHandle, useEffect, useState, useCallback } from 'react';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { type NFTCollections } from '@/shared/types/nft-types';
+import { refreshNftCatalogCollections } from '@/shared/utils/cache-data-keys';
 import ListSkeleton from '@/ui/FRWComponent/NFTs/ListSkeleton';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from '@/ui/utils/WalletContext';
 import placeholder from 'ui/FRWAssets/image/placeholder.png';
 
 import EmptyStatus from '../EmptyStatus';
-
 interface ListTabProps {
   data: any;
   setCount: (count: any) => void;
@@ -79,229 +81,173 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const CollectionView = ({
+  name,
+  logo,
+  count,
+  index,
+  contract_name,
+  ownerAddress,
+  isAccessible,
+}: {
+  name: string;
+  logo: string;
+  count: number;
+  index: number;
+  contract_name: string;
+  ownerAddress: string;
+  isAccessible: boolean;
+}) => {
+  const history = useHistory();
+  const classes = useStyles();
+
+  const handleClick = () => {
+    console.log('handleClick', ownerAddress, contract_name, count);
+    history.push({
+      pathname: `/dashboard/nested/collectiondetail/${ownerAddress}.${contract_name}.${count}`,
+      state: {
+        collection: { name, logo, count, index, contract_name, ownerAddress, isAccessible },
+        ownerAddress,
+        accessible: isAccessible,
+      },
+    });
+  };
+  return (
+    <Card
+      key={name}
+      sx={{ borderRadius: '12px', backgroundColor: '#000000' }}
+      className={classes.collectionCard}
+    >
+      <CardActionArea
+        sx={{
+          borderRadius: '12px',
+          paddingRight: '8px',
+        }}
+        className={classes.actionarea}
+        onClick={isAccessible ? handleClick : undefined}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+          <CardMedia
+            component="img"
+            sx={{
+              width: '48px',
+              height: '48px',
+              padding: '8px',
+              borderRadius: '12px',
+              justifyContent: 'center',
+              mt: '8px',
+            }}
+            image={logo || placeholder}
+            alt={name}
+          />
+          <CardContent sx={{ flex: '1 0 auto', padding: '8px 4px' }}>
+            <Grid container justifyContent="space-between" alignItems="center" sx={{ pr: 2 }}>
+              <Grid item sx={{ flex: 1 }}>
+                <Typography component="div" variant="body1" color="#fff" sx={{ mb: 0 }}>
+                  {name}
+                </Typography>
+                {isAccessible ? (
+                  <Typography
+                    variant="body1"
+                    sx={{ fontSize: '14px' }}
+                    color="#B2B2B2"
+                    component="div"
+                  >
+                    {count} {chrome.i18n.getMessage('collectibles')}
+                  </Typography>
+                ) : (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      color: 'neutral.text',
+                      fontSize: '10px',
+                      width: '80px',
+                      fontFamily: 'Inter, sans-serif',
+                    }}
+                  >
+                    {chrome.i18n.getMessage('Inaccessible')}
+                  </Box>
+                )}
+              </Grid>
+              <Grid item>
+                <ArrowForwardIcon color="primary" />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Box>
+      </CardActionArea>
+    </Card>
+  );
+};
+
+const extractContractAddress = (collection) => {
+  return collection.split('.')[2];
+};
+
+const checkContractAddressInCollections = (
+  nftCollections: NFTCollections,
+  activeCollection: any
+) => {
+  console.log('checkContractAddressInCollections', nftCollections, activeCollection);
+  const contractAddressWithout0x = nftCollections.collection.contract_name;
+  const isActiveCollect = activeCollection.some((collection) => {
+    const extractedAddress = extractContractAddress(collection);
+    if (extractedAddress === contractAddressWithout0x) {
+      console.log('nft is ', contractAddressWithout0x, extractedAddress);
+    }
+    return extractedAddress === contractAddressWithout0x;
+  });
+  return isActiveCollect;
+};
+
 const ListTab = forwardRef((props: ListTabProps, ref) => {
   const history = useHistory();
   const classes = useStyles();
   const usewallet = useWallet();
+
   const { currentWallet } = useProfiles();
-  const [state, setState] = useState<State>({
-    collectionLoading: true,
-    collections: [],
-    isCollectionEmpty: true,
-    ownerAddress: '',
-  });
+  const { network } = useNetwork();
+  const nftCollectionsList = useNftCatalogCollections(network, currentWallet.address);
+  const collectionLoading = nftCollectionsList === undefined;
 
-  const fetchLatestCollection = useCallback(
-    async (address: string) => {
-      if (!address) return;
+  const isCollectionEmpty = nftCollectionsList?.length === 0;
+  const ownerAddress = currentWallet.address;
 
-      try {
-        const list = await usewallet.refreshCollection(address);
-        setState((prev) => ({
-          ...prev,
-          collectionLoading: false,
-          collections: list || [],
-          isCollectionEmpty: !list || list.length === 0,
-        }));
-      } catch (err) {
-        setState((prev) => ({
-          ...prev,
-          collectionLoading: false,
-          collections: [],
-          isCollectionEmpty: true,
-        }));
-      }
+  useImperativeHandle(ref, () => ({
+    reload: () => {
+      refreshNftCatalogCollections(network, currentWallet.address);
     },
-    [usewallet]
-  );
-
-  const fetchCollectionCache = useCallback(
-    async (address: string) => {
-      if (!address || address === state.ownerAddress) return;
-
-      try {
-        setState((prev) => ({ ...prev, collectionLoading: true, ownerAddress: address }));
-
-        const list = await usewallet.getCollectionCache(address);
-
-        if (list && list.length > 0) {
-          setState((prev) => ({
-            ...prev,
-            collections: list,
-            isCollectionEmpty: false,
-            collectionLoading: false,
-          }));
-        } else {
-          await fetchLatestCollection(address);
-        }
-      } catch (error) {
-        await fetchLatestCollection(address);
-      }
-    },
-    [fetchLatestCollection, usewallet, state.ownerAddress]
-  );
-
-  useEffect(() => {
-    const newAddress = currentWallet.address;
-    let mounted = true;
-
-    if (newAddress && newAddress !== state.ownerAddress) {
-      fetchCollectionCache(newAddress).then(() => {
-        if (!mounted) return;
-      });
-    }
-
-    return () => {
-      mounted = false;
-    };
-  }, [currentWallet, state.ownerAddress, fetchCollectionCache]);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      reload: () => {
-        usewallet.clearNFTCollection();
-        setState((prev) => ({
-          ...prev,
-          collections: [],
-          collectionLoading: true,
-        }));
-        if (state.ownerAddress) {
-          fetchLatestCollection(state.ownerAddress);
-        }
-      },
-    }),
-    [usewallet, fetchLatestCollection, state.ownerAddress]
-  );
-
-  const extractContractAddress = (collection) => {
-    return collection.split('.')[2];
-  };
-
-  const checkContractAddressInCollections = (nft) => {
-    if (props.isActive) {
-      return true;
-    }
-    const contractAddressWithout0x = nft.collection.contract_name;
-    const isActiveCollect = props.activeCollection.some((collection) => {
-      const extractedAddress = extractContractAddress(collection);
-      if (extractedAddress === contractAddressWithout0x) {
-        console.log('nft is ', contractAddressWithout0x, extractedAddress);
-      }
-      return extractedAddress === contractAddressWithout0x;
-    });
-    return isActiveCollect;
-  };
-
-  const CollectionView = (data) => {
-    const handleClick = () => {
-      history.push({
-        pathname: `/dashboard/nested/collectiondetail/${data.ownerAddress}.${data.contract_name}.${data.count}`,
-        state: {
-          collection: data,
-          ownerAddress: data.ownerAddress,
-          accessible: props.accessible,
-        },
-      });
-    };
-    return (
-      <Card
-        sx={{ borderRadius: '12px', backgroundColor: '#000000' }}
-        className={classes.collectionCard}
-      >
-        <CardActionArea
-          sx={{
-            borderRadius: '12px',
-            paddingRight: '8px',
-          }}
-          className={classes.actionarea}
-          onClick={data.isAccessible && handleClick}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            <CardMedia
-              component="img"
-              sx={{
-                width: '48px',
-                height: '48px',
-                padding: '8px',
-                borderRadius: '12px',
-                justifyContent: 'center',
-                mt: '8px',
-              }}
-              image={data.logo || placeholder}
-              alt={data.name}
-            />
-            <CardContent sx={{ flex: '1 0 auto', padding: '8px 4px' }}>
-              <Grid container justifyContent="space-between" alignItems="center" sx={{ pr: 2 }}>
-                <Grid item sx={{ flex: 1 }}>
-                  <Typography component="div" variant="body1" color="#fff" sx={{ mb: 0 }}>
-                    {data.name}
-                  </Typography>
-                  {data.isAccessible ? (
-                    <Typography
-                      variant="body1"
-                      sx={{ fontSize: '14px' }}
-                      color="#B2B2B2"
-                      component="div"
-                    >
-                      {data.count} {chrome.i18n.getMessage('collectibles')}
-                    </Typography>
-                  ) : (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        color: 'neutral.text',
-                        fontSize: '10px',
-                        width: '80px',
-                        fontFamily: 'Inter, sans-serif',
-                      }}
-                    >
-                      {chrome.i18n.getMessage('Inaccessible')}
-                    </Box>
-                  )}
-                </Grid>
-                <Grid item>
-                  <ArrowForwardIcon color="primary" />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Box>
-        </CardActionArea>
-      </Card>
-    );
-  };
-
-  const createListCard = (props, index) => {
-    const isAccessible = checkContractAddressInCollections(props);
-    return (
-      <CollectionView
-        name={props.collection ? props.collection.name : props.name}
-        logo={props.collection ? props.collection.logo : props.logo}
-        key={props.collection ? props.collection.name : props.name}
-        count={props.count}
-        index={index}
-        contract_name={props.collection ? props.collection.id : props.id}
-        ownerAddress={state.ownerAddress}
-        isAccessible={isAccessible}
-      />
-    );
-  };
+  }));
 
   return (
     <Container className={classes.collectionContainer}>
-      {state.collectionLoading ? (
+      {collectionLoading ? (
         <ListSkeleton />
-      ) : state.isCollectionEmpty ? (
+      ) : isCollectionEmpty ? (
         <EmptyStatus />
       ) : (
-        state.collections.map(createListCard)
+        nftCollectionsList.map((collections, index) => (
+          <CollectionView
+            key={collections.collection.name}
+            name={collections.collection.name}
+            logo={collections.collection.logo}
+            count={collections.count}
+            index={index}
+            contract_name={collections.collection.id}
+            ownerAddress={ownerAddress}
+            isAccessible={
+              props.isActive ||
+              checkContractAddressInCollections(collections, props.activeCollection)
+            }
+          />
+        ))
       )}
     </Container>
   );
 });
 
-export default React.memo(ListTab);
+export default ListTab;

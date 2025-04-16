@@ -4,7 +4,8 @@ import { useHistory, useParams, useLocation } from 'react-router-dom';
 
 import CollectionDetailGrid from '@/ui/FRWComponent/NFTs/CollectionDetailGrid';
 import GridView from '@/ui/FRWComponent/NFTs/GridView';
-import { useNftHook } from '@/ui/hooks/useNftHook';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import { useEvmNftCollectionList, useNftHook } from '@/ui/hooks/useNftHook';
 import { type PostMedia } from '@/ui/utils/url';
 import { useWallet } from 'ui/utils';
 
@@ -158,6 +159,7 @@ const NftEvmCollectionDetail = () => {
   const location = useParams();
   const uselocation = useLocation<CollectionDetailState>();
   const history = useHistory();
+  const { network } = useNetwork();
 
   const [ownerAddress, setOwnerAddress] = useState<any>(null);
   const [filteredList, setFilteredList] = useState<any[]>([]);
@@ -170,6 +172,7 @@ const NftEvmCollectionDetail = () => {
   const collection_name = collection_info[1];
   const nftCount = collection_info[2];
 
+  const evmNftCollectionList = useEvmNftCollectionList(network, address, collection_name, 0);
   const getCollection = useCallback(
     async (ownerAddress, collection, offset) => {
       return await usewallet.getEvmNftCollectionList(ownerAddress, collection, 50, offset);
@@ -239,7 +242,7 @@ const NftEvmCollectionDetail = () => {
         data={data}
         blockList={[]}
         accessible={uselocation.state ? uselocation.state.accessible : []}
-        key={data.unique_id}
+        key={data.unique_id || data.id}
         index={index}
         ownerAddress={ownerAddress}
         isEvm={true}

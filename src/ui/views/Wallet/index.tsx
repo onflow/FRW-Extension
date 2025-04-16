@@ -2,7 +2,6 @@ import { Typography, Button, Skeleton, Drawer, CardMedia, Tabs, Tab } from '@mui
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import SwipeableViews from 'react-swipeable-views';
 
 import { IconActivity, IconNfts } from '@/components/iconfont';
 import eventBus from '@/eventBus';
@@ -380,36 +379,26 @@ const WalletTab = ({ network }) => {
         />
       </Tabs>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <SwipeableViews
-          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-          index={value}
-          onChangeIndex={handleChangeIndex}
-          style={{ height: '100%', width: '100%' }}
-          containerStyle={{ height: '100%' }}
-          resistance
-          disabled
-        >
-          <TabPanel value={value} index={0}>
-            <Box sx={{ height: '100%', overflow: 'auto' }}>
-              {value === 0 && (
-                <CoinList
-                  tokenList={coins}
-                  ableFt={accessible}
-                  isActive={isActive}
-                  childType={childType}
-                />
-              )}
-            </Box>
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <Box sx={{ height: '100%', overflow: 'auto' }}>
-              {value === 1 && (childType === 'evm' ? <NftEvm /> : <NFTTab />)}
-            </Box>
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            <Box sx={{ height: '100%', overflow: 'auto' }}>{value === 2 && <TransferList />}</Box>
-          </TabPanel>
-        </SwipeableViews>
+        <TabPanel value={value} index={0}>
+          <Box sx={{ height: '100%', overflow: 'auto' }}>
+            {value === 0 && (
+              <CoinList
+                tokenList={coins}
+                ableFt={accessible}
+                isActive={isActive}
+                childType={childType}
+              />
+            )}
+          </Box>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <Box sx={{ height: '100%', overflow: 'auto' }}>
+            {value === 1 && (childType === 'evm' ? <NftEvm /> : <NFTTab />)}
+          </Box>
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <Box sx={{ height: '100%', overflow: 'auto' }}>{value === 2 && <TransferList />}</Box>
+        </TabPanel>
       </Box>
       <LLComingSoon alertOpen={alertOpen} handleCloseIconClicked={() => setAlertOpen(false)} />
 

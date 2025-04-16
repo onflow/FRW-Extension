@@ -9,7 +9,7 @@ import { getCurrentProfileId, returnCurrentProfileId } from '@/shared/utils/curr
 import storage from '@/shared/utils/storage';
 import { createSessionStore } from 'background/utils';
 
-import { registerRefreshListener } from '../utils/data-cache';
+import { getValidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
 
 import openapiService from './openapi';
 
@@ -54,6 +54,7 @@ class UserInfoService {
     });
   };
   loadUserInfoByUserId = async (userId: string) => {
+    console.trace('loadUserInfoByUserId', userId);
     const currentId = await returnCurrentProfileId();
 
     const userInfo: UserInfoResponse | undefined =
@@ -65,20 +66,28 @@ class UserInfoService {
           this.userList.find((user) => user.id === userId);
 
     if (userInfo) {
-      this.store[userId] = createSessionStore<UserInfoStore>({
-        name: userInfoCachekey(userId),
-        template: userInfo,
-      });
+      setCachedData(userInfoCachekey(userId), userInfo);
     }
+    return userInfo;
   };
 
-  getUserInfo = (userId: string): UserInfoResponse => {
-    return this.store[userId];
+  getUserInfo = async (userId: string): Promise<UserInfoResponse | undefined> => {
+    const userInfo = await getValidData<UserInfoStore>(userInfoCachekey(userId));
+    if (!userInfo) {
+      return await this.loadUserInfoByUserId(userId);
+    }
+
+    return userInfo;
   };
 
   getCurrentUserInfo = async (): Promise<UserInfoResponse> => {
     const currentId = await getCurrentProfileId();
-    return this.getUserInfo(currentId);
+    const userInfo = await this.getUserInfo(currentId);
+    if (!userInfo) {
+      throw new Error('User info not found');
+    }
+
+    return userInfo;
   };
 
   setCurrentUserInfo = async (userInfo: UserInfoResponse) => {

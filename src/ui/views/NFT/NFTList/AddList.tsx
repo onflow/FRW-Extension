@@ -169,7 +169,6 @@ const AddList = () => {
             className={classes.inputBox}
             placeholder={chrome.i18n.getMessage('Seach__NFT__Collection')}
             autoFocus
-            disableUnderline
             startAdornment={
               <InputAdornment position="start">
                 <SearchIcon color="primary" sx={{ ml: '10px', my: '5px', fontSize: '24px' }} />

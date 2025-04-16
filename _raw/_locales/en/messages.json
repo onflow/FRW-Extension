@@ -7,6 +7,14 @@
     "message": "Digital wallet created for everyone.",
     "description": "Application Descrtipion"
   },
+  "appNameBeta": {
+    "message": "Flow Wallet BETA",
+    "description": "Application Name"
+  },
+  "appDescriptionBeta": {
+    "message": "THIS EXTENSION IS FOR BETA TESTING. USE AT YOUR OWN RISK.",
+    "description": "Application Descrtipion"
+  },
   "Send": {
     "message": "Send"
   },

@@ -10,7 +10,12 @@ import {
   transferListRefreshRegex,
 } from '@/shared/utils/cache-data-keys';
 
-import { getInvalidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
+import {
+  getInvalidData,
+  getValidData,
+  registerRefreshListener,
+  setCachedData,
+} from '../utils/data-cache';
 
 interface TransactionStore {
   pendingItem: {
@@ -33,6 +38,16 @@ class Transaction {
 
   clear = async () => {};
 
+  // Remove pending items older than 120 seconds
+  private removeExpiredPendingItems = (network: string, address: string) => {
+    const timeNow = new Date().getTime();
+    const pendingList = this.store.pendingItem[network][address];
+    if (pendingList.length > 0) {
+      const filteredList = pendingList.filter((item) => item.time + 120_000 > timeNow);
+      this.store.pendingItem[network][address] = structuredClone(filteredList);
+    }
+  };
+
   private getPendingList = (network: string, address: string): TransferItem[] => {
     // Always return a clone of the pending list
     if (
@@ -43,6 +58,9 @@ class Transaction {
     ) {
       return [];
     }
+    // Remove expired pending items from the list
+    this.removeExpiredPendingItems(network, address);
+    // Return a clone of the pending list
     return structuredClone(this.store.pendingItem[network][address]);
   };
 
@@ -300,6 +318,15 @@ class Transaction {
     offset: string = '0',
     limit: string = '15'
   ): Promise<TransferListStore> => {
+    if (openapiService.getNetwork() !== network) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return {
+        count: 0,
+        pendingCount: 0,
+        list: [],
+      };
+    }
     if (isValidFlowAddress(address)) {
       // Get the flow transactions
       const flowResult = await openapiService.getTransfers(
@@ -343,30 +370,29 @@ class Transaction {
   listAllTransactions = async (
     network: string,
     address: string,
-    offset: string,
-    limit: string
+    offset: string = '0',
+    limit: string = '15'
   ): Promise<TransferListStore> => {
+    const offsetString = offset ?? '0';
+    const limitString = limit ?? '15';
     // Get the cached transaction list
-    const transactionListStore = (await getCachedData<TransferListStore>(
-      transferListKey(network, address, offset, limit)
-    )) || {
-      count: 0,
-      pendingCount: 0,
-      list: [],
-    };
+    const transactionListStore = await getValidData<TransferListStore>(
+      transferListKey(network, address, offsetString, limitString)
+    );
+    if (!transactionListStore) {
+      return await this.loadTransactions(network, address, offsetString, limitString);
+    }
     return transactionListStore;
   };
 
   listTransactions = async (
     network: string,
     address: string,
-    offset: string,
-    limit: string
+    offset: string = '0',
+    limit: string = '15'
   ): Promise<TransferItem[]> => {
-    const transactionList = await getCachedData<TransferListStore>(
-      transferListKey(network, address, offset, limit)
-    );
-    return transactionList?.list || [];
+    const transactionListStore = await this.listAllTransactions(network, address, offset, limit);
+    return transactionListStore.list;
   };
 
   listPending = async (network: string, address: string): Promise<TransferItem[]> => {
@@ -379,10 +405,8 @@ class Transaction {
     offset: string,
     limit: string
   ): Promise<number> => {
-    const transactionList = await getCachedData<TransferListStore>(
-      transferListKey(network, address, offset, limit)
-    );
-    return transactionList?.count || 0;
+    const transactionList = await this.listAllTransactions(network, address, offset, limit);
+    return transactionList.count;
   };
 }
 

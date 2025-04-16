@@ -27,6 +27,7 @@ import {
   type MainAccount,
 } from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
+import { useAccountBalance } from '@/ui/hooks/use-account-hooks';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import importIcon from 'ui/FRWAssets/svg/importIcon.svg';
 import popLock from 'ui/FRWAssets/svg/popLock.svg';
@@ -79,9 +80,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   const usewallet = useWallet();
   const history = useHistory();
   const classes = useStyles();
-  const [evmMode, setEvmMode] = useState(true);
-  const [isEvm, setIsEvm] = useState(false);
-  const [evmBalance, setEvmBalance] = useState(0);
+  const evmBalance = useAccountBalance(props.currentNetwork, props.evmWallet.address);
   const { clearProfileData } = useProfiles();
 
   interface EvmADDComponentProps {
@@ -121,33 +120,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     history.push('/dashboard/enable');
   };
 
-  const checkEvmMode = useCallback(async () => {
-    const activeChild = await usewallet.getActiveAccountType();
-    if (activeChild === 'evm') {
-      setIsEvm(true);
-    } else {
-      setIsEvm(false);
-    }
-    setEvmMode(true);
-  }, [usewallet]);
-
-  const getEvmAddress = useCallback(async () => {
-    if (isValidEthereumAddress(props.evmWallet.address)) {
-      const result = await usewallet.getEvmBalance(props.evmWallet.address);
-      const readBalance = parseFloat(result) / 1e18;
-      setEvmBalance(readBalance);
-    }
-  }, [props.evmWallet, usewallet]);
-
   const hasChildAccounts = props.childAccounts && Object.keys(props.childAccounts).length > 0;
-
-  useEffect(() => {
-    checkEvmMode();
-  }, [checkEvmMode]);
-
-  useEffect(() => {
-    getEvmAddress();
-  }, [getEvmAddress, props.evmWallet]);
 
   return (
     <Drawer
@@ -199,8 +172,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
             </Box>
           </Box>
         </ListItem>
-        {evmMode && !props.evmLoading && !isValidEthereumAddress(props.evmWallet.address) && (
-          <ListItem sx={{ display: 'flex', justifyCOntent: 'space-between', padding: '16px' }}>
+        {!props.evmLoading && !isValidEthereumAddress(props.evmWallet.address) && (
+          <ListItem sx={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
             <ListItemButton
               sx={{
                 borderRadius: '12px',
@@ -284,7 +257,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
               <ListItem
                 sx={{
                   display: 'flex',
-                  justifyCOntent: 'space-between',
+                  justifyContent: 'space-between',
                   padding: '16px 0 0',
                   cursor: 'pointer',
                 }}
@@ -332,7 +305,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       component="span"
                       fontWeight={'semi-bold'}
                       display="flex"
-                      color={isEvm ? 'text.title' : 'text.nonselect'}
+                      color={
+                        props.evmWallet.address === props.current.address
+                          ? 'text.title'
+                          : 'text.nonselect'
+                      }
                     >
                       <Typography variant="body1" component="span" color="#FFF" fontSize={'12px'}>
                         {props.evmWallet.name}
@@ -354,7 +331,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       >
                         EVM
                       </Typography>
-                      {isEvm && (
+                      {props.evmWallet.address === props.current.address && (
                         <ListItemIcon style={{ display: 'flex', alignItems: 'center' }}>
                           <FiberManualRecordIcon
                             style={{
@@ -366,7 +343,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                         </ListItemIcon>
                       )}
                     </Typography>
-                    <EvmADDComponent myString={evmBalance} />
+                    <EvmADDComponent myString={evmBalance || '0.00000000'} />
                   </Box>
                 </ListItemButton>
               </ListItem>
@@ -476,7 +453,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           }}
         >
           {props.modeOn && (
-            <NetworkList networkColor={props.networkColor} currentNetwork={props.currentNetwork} />
+            <NetworkList
+              networkColor={props.networkColor}
+              currentNetwork={props.currentNetwork}
+              onClose={props.toggleDrawer}
+            />
           )}
           <ListItem
             disablePadding

@@ -62,13 +62,6 @@ class fetchRemoteConfig {
     }
   }
 
-  async nftCollection(): Promise<NFTModelV2[]> {
-    const network = await userWalletService.getNetwork();
-    // TODO: currently the nft is cached in storage, so we don't need a cache state here
-
-    return await openapi.getNFTList(network);
-  }
-
   async remoteConfig() {
     const expire = this.configState.expireTime;
     const now = new Date();

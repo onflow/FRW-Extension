@@ -8,6 +8,7 @@ import {
   type ActiveChildType_depreciated,
 } from '@/shared/types/wallet-types';
 import LLComingSoon from '@/ui/FRWComponent/LLComingSoonWarning';
+import { useProfiles } from '@/ui/hooks/useProfileHook';
 import moveft from 'ui/FRWAssets/image/moveft.png';
 import movenft from 'ui/FRWAssets/image/movenft.png';
 import moveftbg from 'ui/FRWAssets/svg/moveftbg.svg';
@@ -28,18 +29,16 @@ interface MoveBoardProps {
 const MoveBoard = (props: MoveBoardProps) => {
   const usewallet = useWallet();
   const history = useHistory();
+  const { activeAccountType } = useProfiles();
   const [showSelectNft, setSelectBoard] = useState<boolean>(false);
-  const [childType, setChildType] = useState<ActiveAccountType>('main');
   const [network, setNetwork] = useState<string>('');
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   // console.log('props.loggedInAccounts', props.current)
 
   const requestChildType = useCallback(async () => {
-    const result = await usewallet.getActiveAccountType();
     const currentNetwork = await usewallet.getNetwork();
     setNetwork(currentNetwork);
-    setChildType(result);
   }, [usewallet]);
 
   useEffect(() => {
@@ -47,7 +46,7 @@ const MoveBoard = (props: MoveBoardProps) => {
   }, [requestChildType]);
 
   const renderMoveComponent = () => {
-    if (childType === 'evm') {
+    if (activeAccountType === 'evm') {
       // EVM child address
       return (
         <MoveEvm
@@ -60,7 +59,7 @@ const MoveBoard = (props: MoveBoardProps) => {
       );
     }
 
-    if (childType === 'child') {
+    if (activeAccountType === 'child') {
       // We are moving FROM a flow child address
       return (
         <MoveFromChild

@@ -7,6 +7,7 @@ import { useWallet } from '@/ui/utils/WalletContext';
 import { LLSpinner } from 'ui/FRWComponent';
 
 import KeyPathInput from '../../../../FRWComponent/KeyPathInputs';
+import PasswordTextarea from '../../../../FRWComponent/PasswordTextarea';
 import { FLOW_BIP44_PATH, KEY_TYPE } from '../../../../utils/modules/constants';
 
 const useStyles = makeStyles(() => ({
@@ -87,11 +88,11 @@ const SeedPhraseImport = ({
   return (
     <Box sx={{ padding: '0' }}>
       <form id="seed" onSubmit={handleImport} className={classes.form}>
-        <TextareaAutosize
-          minRows={6}
+        <PasswordTextarea
+          minRows={4}
           placeholder={chrome.i18n.getMessage('Import_12_or_24_words')}
-          className={classes.textarea}
           required
+          sx={{ marginBottom: '16px' }}
         />
         <TextareaAutosize
           placeholder={chrome.i18n.getMessage('Enter_your_flow_address')}

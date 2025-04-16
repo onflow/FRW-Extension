@@ -4,7 +4,12 @@
  */
 import { type ExtendedTokenInfo } from '../types/coin-types';
 import { type UserInfoResponse } from '../types/network-types';
-import { type NFTCollections, type NFTCollectionData } from '../types/nft-types';
+import {
+  type NFTCollections,
+  type NFTCollectionData,
+  type EvmNFTIds,
+  type EvmNFTCollectionList,
+} from '../types/nft-types';
 import { type TransferItem } from '../types/transaction-types';
 import {
   type MainAccount,
@@ -14,12 +19,12 @@ import {
   type WalletAccount,
 } from '../types/wallet-types';
 
-import { getCachedData } from './cache-data-access';
+import { getCachedData, triggerRefresh } from './cache-data-access';
 import { type NetworkScripts } from './script-types';
 
 // Utiltiy function to create the refresh key for a given key function
 const refreshKey = (keyFunction: (...args: string[]) => string) =>
-  ((args: string[] = ['(.*)', '(.*)', '(.*)', '(.*)']) =>
+  ((args: string[] = ['(.+)', '(.+)', '(.+)', '(.+)']) =>
     new RegExp(`${keyFunction(...args)}-refresh`))();
 
 /*
@@ -56,6 +61,7 @@ export type MainAccountStore = MainAccount[];
 export const getCachedMainAccounts = async (network: string, publicKey: string) => {
   return getCachedData<MainAccountStore>(mainAccountsKey(network, publicKey));
 };
+
 /*
  * --------------------------------------------------------------------
  * Account level keys (keyed by network & MAIN FLOW account address)
@@ -84,6 +90,11 @@ export type EvmAccountStore = WalletAccount;
 export const getCachedEvmAccount = async (network: string, mainAccountAddress: string) => {
   return getCachedData<EvmAccountStore>(evmAccountKey(network, mainAccountAddress));
 };
+
+export const accountBalanceKey = (network: string, address: string) =>
+  `account-balance-${network}-${address}`;
+
+export const accountBalanceRefreshRegex = refreshKey(accountBalanceKey);
 
 // Transfer list
 export const transferListKey = (
@@ -133,12 +144,70 @@ export const getCachedNftCatalogCollections = async (network: string, address: s
   return getCachedData<NftCatalogCollectionsStore>(nftCatalogCollectionsKey(network, address));
 };
 
+export const refreshNftCatalogCollections = async (network: string, address: string) => {
+  // Should rarely be used
+  triggerRefresh(nftCatalogCollectionsKey(network, address));
+};
+
+export const childAccountAllowTypesKey = (network: string, parent: string, child: string) =>
+  `child-account-allow-types-${network}-${parent}-${child}`;
+
+export const childAccountAllowTypesRefreshRegex = refreshKey(childAccountAllowTypesKey);
+export type ChildAccountAllowTypesStore = string[];
+
+export const getCachedChildAccountAllowTypes = async (
+  network: string,
+  parent: string,
+  child: string
+) => {
+  return getCachedData<ChildAccountAllowTypesStore>(
+    childAccountAllowTypesKey(network, parent, child)
+  );
+};
+
+export const childAccountNFTsKey = (network: string, address: string) =>
+  `child-account-nfts-${network}-${address}`;
+
+export const childAccountNFTsRefreshRegex = refreshKey(childAccountNFTsKey);
+export type ChildAccountNFTsStore = { [address: string]: string[] };
+
+export const getCachedChildAccountNFTs = async (network: string, address: string) => {
+  return getCachedData<ChildAccountNFTsStore>(childAccountNFTsKey(network, address));
+};
+
+// EVM NFTs
+export const evmNftIdsKey = (network: string, address: string) =>
+  `evm-nft-ids-${network}-${address}`;
+
+export const evmNftIdsRefreshRegex = refreshKey(evmNftIdsKey);
+export type EvmNftIdsStore = EvmNFTIds[];
+
+export const evmNftCollectionListKey = (
+  network: string,
+  address: string,
+  collectionIdentifier: string,
+  offset: string
+) => `evm-nft-collection-list-${network}-${address}-${collectionIdentifier}-${offset}`;
+
+export const evmNftCollectionListRefreshRegex = refreshKey(evmNftCollectionListKey);
+export type EvmNftCollectionListStore = EvmNFTCollectionList[];
+
+export const getCachedEvmNftCollectionList = async (
+  network: string,
+  address: string,
+  collectionIdentifier: string,
+  offset: number
+) => {
+  return getCachedData<EvmNftCollectionListStore>(
+    evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`)
+  );
+};
 //Coin list
-export const coinListKey = (network: string, publicKey: string, currency = 'usd') =>
-  `coin-list-${network}-${publicKey}-${currency}`;
+export const coinListKey = (network: string, address: string, currency = 'usd') =>
+  `coin-list-${network}-${address}-${currency}`;
 
 export const coinListRefreshRegex = refreshKey(coinListKey);
 
-export const getCachedCoinList = async (network: string, publicKey: string, currency = 'usd') => {
-  return getCachedData<ExtendedTokenInfo[]>(coinListKey(network, publicKey, currency));
+export const getCachedCoinList = async (network: string, address: string, currency = 'usd') => {
+  return getCachedData<ExtendedTokenInfo[]>(coinListKey(network, address, currency));
 };

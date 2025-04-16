@@ -45,7 +45,11 @@ export const registerRefreshListener = (
   loader: (...args: string[]) => Promise<unknown>
 ) => {
   chrome.storage.onChanged.addListener(async (changes, namespace) => {
-    const changedKeys = Object.keys(changes);
+    // Filter out timestamp changes
+    const changedKeys = Object.keys(changes).filter((key) => !key.includes('timestamp'));
+    if (changedKeys.length === 0) {
+      return;
+    }
     const key = changedKeys.find((key) => keyRegex.test(key));
     if (namespace === 'session' && key) {
       // Check that the old value is undefined, and the new value is a number
@@ -63,7 +67,7 @@ export const registerRefreshListener = (
       }
 
       // Remove the refresh key
-      storage.removeSession(`${key}-refresh`);
+      await storage.removeSession(`${key}`);
     }
   });
 };

@@ -20,7 +20,6 @@ import { useTheme, StyledEngineProvider } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import SwipeableViews from 'react-swipeable-views';
 
 import { type Contact } from '@/shared/types/network-types';
 import { type WalletAddress } from '@/shared/types/wallet-types';
@@ -285,30 +284,23 @@ const SendAddress = () => {
                 flexGrow: 1,
               }}
             >
-              <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={tabValue}
-                onChangeIndex={(index: number) => setTabValue(index)}
-                style={{ height: '100%', width: '100%' }}
-              >
-                <TabPanel value={tabValue} index={0} dir={theme.direction}>
-                  <RecentList
-                    filteredContacts={recentContacts}
-                    isLoading={isLoading}
-                    handleClick={handleContactClick}
-                  />
-                </TabPanel>
-                <TabPanel value={tabValue} index={1} dir={theme.direction}>
-                  <AddressBookList
-                    filteredContacts={filteredContacts}
-                    isLoading={isLoading}
-                    handleClick={handleContactClick}
-                  />
-                </TabPanel>
-                <TabPanel value={tabValue} index={2} dir={theme.direction}>
-                  <AccountsList handleClick={handleContactClick} />
-                </TabPanel>
-              </SwipeableViews>
+              <TabPanel value={tabValue} index={0} dir={theme.direction}>
+                <RecentList
+                  filteredContacts={recentContacts}
+                  isLoading={isLoading}
+                  handleClick={handleContactClick}
+                />
+              </TabPanel>
+              <TabPanel value={tabValue} index={1} dir={theme.direction}>
+                <AddressBookList
+                  filteredContacts={filteredContacts}
+                  isLoading={isLoading}
+                  handleClick={handleContactClick}
+                />
+              </TabPanel>
+              <TabPanel value={tabValue} index={2} dir={theme.direction}>
+                <AccountsList handleClick={handleContactClick} />
+              </TabPanel>
             </Box>
           </div>
         ) : (

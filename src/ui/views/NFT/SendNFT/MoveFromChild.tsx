@@ -4,11 +4,13 @@ import { Box, Typography, Drawer, Stack, Grid, CardMedia, IconButton, Button } f
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { type Contact } from '@/shared/types/network-types';
 import { type WalletAccount, type AccountDetails } from '@/shared/types/wallet-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
+import { useContacts } from '@/ui/hooks/useContactHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useTransferList } from '@/ui/hooks/useTransferListHook';
 import { MatchMediaType } from '@/ui/utils/url';
@@ -17,7 +19,6 @@ import { LLSpinner, FRWChildProfile, FRWDropdownProfileCard } from 'ui/FRWCompon
 import { useWallet, returnFilteredCollections } from 'ui/utils';
 
 import IconFlow from '../../../../components/iconfont/IconFlow';
-
 interface SendNFTConfirmationProps {
   isConfirmationOpen: boolean;
   data: any;
@@ -27,9 +28,9 @@ interface SendNFTConfirmationProps {
 }
 
 const MoveFromChild = (props: SendNFTConfirmationProps) => {
-  console.log('MoveNftConfirmation');
   const usewallet = useWallet();
-  const { mainAddress, childAccounts, evmWallet, parentWallet } = useProfiles();
+  const { childAccountsContacts, evmAccounts, mainAccountContact } = useContacts();
+  const { childAccounts } = useProfiles();
   const { occupied } = useTransferList();
   const history = useHistory();
   const [sending, setSending] = useState(false);
@@ -38,8 +39,8 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
   const [childWallet, setChildWallet] = useState<WalletAccount | null>(null);
-  const [selectedAccount, setSelectedChildAccount] = useState(null);
-  const [childWallets, setChildWallets] = useState({});
+  const [selectedAccount, setSelectedChildAccount] = useState<Contact | null>(null);
+  const [childWallets, setChildWallets] = useState<Contact[]>([]);
   const { sufficient: isSufficient, sufficientAfterAction } = useStorageCheck({
     transferAmount: 0,
     movingBetweenEVMAndFlow: selectedAccount
@@ -146,36 +147,13 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
   }, [props.data.contact, transactionDoneHandler]);
 
   const getChildResp = useCallback(async () => {
-    const newWallet = {
-      [mainAddress!]: {
-        name: parentWallet.name,
-        description: parentWallet.name,
-        thumbnail: {
-          url: parentWallet.icon,
-        },
-      },
-    };
-
-    let ewallet = {};
-    if (evmWallet.address) {
-      ewallet = {
-        [evmWallet.address!]: {
-          name: evmWallet.name,
-          description: evmWallet.name,
-          thumbnail: {
-            url: evmWallet.icon,
-          },
-        },
-      };
-    }
-    // Merge usewallet lists
-    const walletList = { ...newWallet, ...childAccounts, ...ewallet };
+    const walletList = [...mainAccountContact, ...childAccountsContacts, ...evmAccounts];
     setChildWallets(walletList);
-    const firstWalletAddress = Object.keys(walletList)[0];
-    if (firstWalletAddress) {
-      setSelectedChildAccount(walletList[firstWalletAddress]);
+    if (walletList && walletList.length > 0) {
+      const firstWalletAddress = walletList[0];
+      setSelectedChildAccount(firstWalletAddress);
     }
-  }, [mainAddress, childAccounts, evmWallet, parentWallet]);
+  }, [evmAccounts, childAccountsContacts, mainAccountContact]);
 
   const getUserContact = useCallback(async () => {
     if (props.data.userContact) {
@@ -275,7 +253,6 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
           {/* <FRWProfileCard contact={props.data.contact} /> */}
           {selectedAccount && (
             <FRWDropdownProfileCard
-              contact={selectedAccount}
               contacts={childWallets}
               setSelectedChildAccount={setSelectedChildAccount}
             />

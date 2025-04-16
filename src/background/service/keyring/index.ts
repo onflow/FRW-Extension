@@ -998,7 +998,6 @@ class KeyringService extends EventEmitter {
   async retrievePk(password: string): Promise<RetrievePkResult[]> {
     // Verify the password
     await this.verifyPassword(password);
-
     // Extract the private key and mnemonic from the decrypted vault
     const extractedData = this.keyringList.map((entry, index): RetrievePkResult => {
       const keyringKeyData = entry.decryptedData[0];
@@ -1026,6 +1025,34 @@ class KeyringService extends EventEmitter {
       }
       throw new Error(`Unsupported keyring type`);
     });
+
+    return extractedData;
+  }
+
+  /**
+   * Reveal the decrypted data from vault
+   *
+   * Doesn't unlock the keyrings or save it to the state
+   * Return all the privatekey stored in vault.
+   *
+   * @param {string} password - The keyring controller password.
+   * @returns {Promise<Array<Keyring>>} The keyrings.
+   */
+
+  async revealKeyring(password: string): Promise<KeyringData[]> {
+    try {
+      await this.verifyPassword(password);
+    } catch (error) {
+      throw new Error('Authentication failed. Please check your password and try again.');
+    }
+
+    let vaultArray = this.store.getState().vault;
+    if (!vaultArray) {
+      throw new Error('No vault data found');
+    }
+    vaultArray = Array.isArray(vaultArray) ? vaultArray.filter(Boolean) : [vaultArray];
+
+    const extractedData = await this.revealVaultArray(vaultArray, password);
 
     return extractedData;
   }
@@ -1319,6 +1346,63 @@ class KeyringService extends EventEmitter {
     return this.loadStore(keyringState);
   }
 
+  private isValidKeyringKeyDataArray(data: any): data is KeyringKeyData[] {
+    return (
+      Array.isArray(data) &&
+      data.every(
+        (item) => typeof item === 'object' && typeof item.type === 'string' && 'data' in item
+      )
+    );
+  }
+
+  /**
+   * Only reveal the decrypted data for user to retrieve when login fail
+   *
+   * Doesn't unlock the keyrings
+   *
+   */
+  private async revealVaultArray(
+    vaultArray: VaultEntryV2[],
+    password: string
+  ): Promise<KeyringData[]> {
+    const decryptedKeyrings: KeyringData[] = [];
+
+    for (const entry of vaultArray) {
+      try {
+        // Validate entry is a proper object
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+          console.error('Invalid vault entry format');
+          continue;
+        }
+
+        const id = entry.id;
+        const encryptedData = entry.encryptedData;
+
+        if (!encryptedData) {
+          console.error(`No encrypted data found for entry with ID ${id}`);
+          continue;
+        }
+
+        const decryptedData = await this.encryptor.decrypt(password, encryptedData);
+
+        if (!this.isValidKeyringKeyDataArray(decryptedData)) {
+          throw new Error('Invalid keyring data format');
+        }
+
+        const keyringData = {
+          id,
+          decryptedData: decryptedData,
+        };
+        decryptedKeyrings.push(keyringData);
+      } catch (err) {
+        // Don't print the error as it may contain sensitive data
+        console.error(`Failed to process vault entry`);
+        // Continue with next entry
+      }
+    }
+    return decryptedKeyrings;
+  }
+
   private async decryptVaultArray(vaultArray: VaultEntryV2[], password: string): Promise<void> {
     const decryptedKeyrings: KeyringData[] = [];
 
@@ -1326,7 +1410,7 @@ class KeyringService extends EventEmitter {
       try {
         // Validate entry is a proper object
         if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-          console.error('Invalid vault entry format:', entry);
+          console.error('Invalid vault entry format');
           continue;
         }
 

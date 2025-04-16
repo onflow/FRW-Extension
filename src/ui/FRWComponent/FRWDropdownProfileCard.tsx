@@ -6,41 +6,41 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
+  type SelectChangeEvent,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 
-import { isValidEthereumAddress } from '@/shared/utils/address';
-import { useWallet, formatAddress, isEmoji } from 'ui/utils';
+import { type Contact } from '@/shared/types/network-types';
+import { formatAddress, isEmoji } from 'ui/utils';
 
 export const FRWDropdownProfileCard = ({
-  contact,
   contacts,
   setSelectedChildAccount,
   isLoading = false,
+}: {
+  contacts: Contact[];
+  setSelectedChildAccount: (account: Contact) => void;
+  isLoading?: boolean;
 }) => {
-  const usewallet = useWallet();
-
-  const contactKeys = Object.keys(contacts);
-  const [selectedChild, setSelectedChild] = React.useState(
-    contactKeys.length > 0 ? contactKeys[0] : ''
+  const [selectedChild, setSelectedChild] = React.useState<string>(
+    contacts.length > 0 ? contacts[0].address : ''
   );
-
   useEffect(() => {
     if (selectedChild) {
-      const select = contacts[selectedChild];
-      select['address'] = selectedChild;
-      setSelectedChildAccount(select);
+      const select = contacts.find((contact) => contact.address === selectedChild);
+      if (select) {
+        setSelectedChildAccount(select);
+      }
     }
   }, [selectedChild, contacts, setSelectedChildAccount]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
     const selectedAddress = event.target.value;
     setSelectedChild(selectedAddress);
-    const select = contacts[selectedChild];
-    select['address'] = selectedChild;
-    setSelectedChildAccount(select);
+    const select = contacts.find((contact) => contact.address === selectedAddress);
+    if (select) {
+      setSelectedChildAccount(select);
+    }
   };
 
   const getName = (name: string) => {
@@ -70,8 +70,7 @@ export const FRWDropdownProfileCard = ({
           <Select
             labelId="child-wallet-select-label"
             value={selectedChild}
-            onChange={handleChange}
-            disableUnderline
+            onChange={handleChange as any}
             sx={{
               '& .MuiSelect-select': {
                 display: 'flex',
@@ -85,11 +84,11 @@ export const FRWDropdownProfileCard = ({
               height: '40px',
             }}
           >
-            {Object.keys(contacts).map((address) => (
-              <MenuItem key={address} value={address}>
+            {contacts.map((contact) => (
+              <MenuItem key={contact.address} value={contact.address}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   {!isLoading ? (
-                    isEmoji(contacts[address].thumbnail.url) ? (
+                    isEmoji(contact.avatar) ? (
                       <Typography
                         sx={{
                           mr: '13px',
@@ -104,12 +103,12 @@ export const FRWDropdownProfileCard = ({
                           fontSize: '24px', // Adjust font size to fit within the box
                         }}
                       >
-                        {contacts[address].thumbnail.url}
+                        {contact.avatar}
                       </Typography>
                     ) : (
                       <Avatar
-                        alt={contacts[address]}
-                        src={contacts[address].thumbnail.url}
+                        alt={contact.contact_name}
+                        src={contact.avatar}
                         sx={{
                           mr: '13px',
                           color: 'primary.main',
@@ -118,7 +117,7 @@ export const FRWDropdownProfileCard = ({
                           height: '40px',
                         }}
                       >
-                        {getName(contacts[address].name)}
+                        {getName(contact.contact_name)}
                       </Avatar>
                     )
                   ) : (
@@ -126,7 +125,7 @@ export const FRWDropdownProfileCard = ({
                   )}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <Typography sx={{ textAlign: 'start', color: '#FFFFFF', fontSize: '12px' }}>
-                      {contacts[address].name}
+                      {contact.contact_name}
                     </Typography>
                     <Typography
                       sx={{
@@ -137,7 +136,7 @@ export const FRWDropdownProfileCard = ({
                       }}
                       color="#FFFFFFCC"
                     >
-                      {formatAddress(address)}
+                      {formatAddress(contact.address)}
                     </Typography>
                   </Box>
                 </Box>

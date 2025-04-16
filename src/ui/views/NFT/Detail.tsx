@@ -98,7 +98,7 @@ const Detail = () => {
   const location = useLocation();
   const history = useHistory();
   const usewallet = useWallet();
-  const { childAccounts, mainAddress, currentWallet, userInfo } = useProfiles();
+  const { childAccounts, mainAddress, currentWallet, userInfo, activeAccountType } = useProfiles();
   const [nftDetail, setDetail] = useState<any>(null);
   const [metadata, setMetadata] = useState<any>(null);
   const [mediaLoading, setMediaLoading] = useState(true);
@@ -106,7 +106,6 @@ const Detail = () => {
   const [ownerAddress, setOwnerAddress] = useState<any>(null);
   const [media, setMedia] = useState<PostMedia | null>(null);
   const [moveOpen, setMoveOpen] = useState<boolean>(false);
-  const [childActive, setChildActive] = useState<boolean>(false);
   const [contactOne, setContactOne] = useState<any>(emptyContact);
   const [contactTwo, setContactTwo] = useState<any>(emptyContact);
   const [isAccessibleNft, setisAccessibleNft] = useState<any>(false);
@@ -139,7 +138,6 @@ const Detail = () => {
   const fetchNft = useCallback(async () => {
     const currentAddress = currentWallet.address;
     const parentAddress = mainAddress;
-    const accountType = await usewallet.getActiveAccountType();
     const userTemplate = {
       avatar: userInfo!.avatar,
       domain: {
@@ -150,7 +148,7 @@ const Detail = () => {
 
     let userOne, userTwo;
 
-    if (accountType === 'child' && currentAddress) {
+    if (activeAccountType === 'child' && currentAddress) {
       const childAccount = childAccounts?.[currentAddress!];
       userOne = {
         avatar: childAccount?.icon ?? '',
@@ -180,7 +178,6 @@ const Detail = () => {
     }
     setContactOne(userOne);
     setContactTwo(userTwo);
-    setChildActive(accountType ? true : false);
 
     await usewallet.setDashIndex(1);
   }, [
@@ -191,7 +188,7 @@ const Detail = () => {
     userInfo,
     setContactOne,
     setContactTwo,
-    setChildActive,
+    activeAccountType,
   ]);
 
   useEffect(() => {
@@ -507,8 +504,8 @@ const Detail = () => {
         </Box>
 
         {moveOpen &&
-          (childActive ? (
-            <MoveFromChild
+          (activeAccountType === 'main' ? (
+            <MovefromParent
               isConfirmationOpen={moveOpen}
               data={{
                 contact: contactTwo,
@@ -524,7 +521,7 @@ const Detail = () => {
               }}
             />
           ) : (
-            <MovefromParent
+            <MoveFromChild
               isConfirmationOpen={moveOpen}
               data={{
                 contact: contactTwo,

@@ -28,6 +28,7 @@ import { storage } from '@/background/webapi';
 import type { ExtendedTokenInfo, BalanceMap } from '@/shared/types/coin-types';
 import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
 import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
+import { type NFTCollections } from '@/shared/types/nft-types';
 import {
   type LoggedInAccountWithIndex,
   type LoggedInAccount,
@@ -37,7 +38,12 @@ import {
 } from '@/shared/types/wallet-types';
 import { isValidFlowAddress, isValidEthereumAddress } from '@/shared/utils/address';
 import { getStringFromHashAlgo, getStringFromSignAlgo } from '@/shared/utils/algo';
-import { cadenceScriptsKey, cadenceScriptsRefreshRegex } from '@/shared/utils/cache-data-keys';
+import {
+  cadenceScriptsKey,
+  cadenceScriptsRefreshRegex,
+  childAccountNFTsKey,
+  ChildAccountNFTsStore,
+} from '@/shared/utils/cache-data-keys';
 import { getPeriodFrequency } from '@/shared/utils/getPeriodFrequency';
 import { type NetworkScripts } from '@/shared/utils/script-types';
 import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from 'consts';
@@ -251,6 +257,11 @@ const dataConfig: Record<string, OpenApiConfigValue> = {
     method: 'post',
     params: [],
   },
+  create_flow_address_v2: {
+    path: '/v2/user/address',
+    method: 'post',
+    params: [],
+  },
   loginv3: {
     path: '/v3/login',
     method: 'post',
@@ -447,32 +458,16 @@ const recordFetch = async (response, responseData, ...args: Parameters<typeof fe
 };
 
 class OpenApiService {
-  store!: OpenApiStore;
-
-  // request = rateLimit(axios.create(), { maxRPS });
-
-  setHost = async (host: string) => {
-    this.store.host = host;
-    await this.init();
-
-    // Register refresh listener for cadence scripts
-    registerRefreshListener(cadenceScriptsRefreshRegex, this._loadCadenceScripts);
+  store: OpenApiStore = {
+    host: INITIAL_OPENAPI_URL,
+    config: dataConfig,
   };
 
-  getHost = () => {
-    return this.store.host;
+  getNetwork = () => {
+    return userWalletService.getNetwork();
   };
 
   init = async () => {
-    this.store = await createPersistStore({
-      name: 'openapi',
-      template: {
-        host: INITIAL_OPENAPI_URL,
-        config: dataConfig,
-      },
-      fromStorage: false, // Debug only
-    });
-
     await userWalletService.setupFcl();
   };
 
@@ -616,6 +611,7 @@ class OpenApiService {
    * Use getUserTokens instead. It will have token info and price.
    */
   getTokenPrices = async (storageKey: string) => {
+    // TODO: move to new data cache service
     const cachedPrices = await storage.getExpiry(storageKey);
     if (cachedPrices) {
       return cachedPrices;
@@ -791,14 +787,36 @@ class OpenApiService {
    * @param userId - The user id to load the cadence scripts for
    * @returns The cadence scripts for the current user
    */
+  private _cadenceScriptsPromise: Promise<NetworkScripts> | null = null;
+
   private _loadCadenceScripts = async (): Promise<NetworkScripts> => {
+    // Try to get from cache first
     const cadenceScripts = await getValidData<NetworkScripts>(cadenceScriptsKey());
     if (cadenceScripts) {
       return cadenceScripts;
     }
-    const cadenceScriptsV2 = await this.cadenceScriptsV2();
-    setCachedData(cadenceScriptsKey(), cadenceScriptsV2, 1000 * 60 * 60); // set to 1 hour
-    return cadenceScriptsV2;
+
+    // If there's already a request in progress, return that promise instead of making a new request
+    if (this._cadenceScriptsPromise) {
+      return this._cadenceScriptsPromise;
+    }
+
+    // Create a new promise
+    const promise = this.cadenceScriptsV2().then((result) => {
+      // Store in cache on success
+      setCachedData(cadenceScriptsKey(), result, 1000 * 60 * 60); // 1 hour
+      return result;
+    });
+
+    this._cadenceScriptsPromise = promise;
+
+    promise.finally(() => {
+      if (this._cadenceScriptsPromise === promise) {
+        this._cadenceScriptsPromise = null;
+      }
+    });
+
+    return promise;
   };
 
   getCadenceScripts = async (): Promise<NetworkScripts> => {
@@ -915,6 +933,12 @@ class OpenApiService {
     return data;
   };
 
+  createFlowAddressV2 = async () => {
+    const config = this.store.config.create_flow_address_v2;
+    const data = await this.sendRequest(config.method, config.path);
+    return data;
+  };
+
   getMoonpayURL = async (url) => {
     const baseURL = getFirbaseFunctionUrl();
     const response = await this.sendRequest('POST', '/moonPaySignature', {}, { url: url }, baseURL);
@@ -984,6 +1008,7 @@ class OpenApiService {
       chainType = 'evm';
     }
 
+    // TODO: move to new data cache service
     const nftList = await storage.getExpiry(`NFTList${network}${chainType}`);
     if (nftList && nftList.length > 0) {
       return nftList;
@@ -1149,21 +1174,6 @@ class OpenApiService {
     } catch (err) {
       return null;
     }
-  };
-
-  checkChildAccountNFT = async (address: string) => {
-    const script = await getScripts(
-      userWalletService.getNetwork(),
-      'hybridCustody',
-      'getAccessibleChildAccountNFTs'
-    );
-
-    const result = await fcl.query({
-      cadence: script,
-      args: (arg, t) => [arg(address, t.Address)],
-    });
-    console.log(result, 'check child nft info result----=====');
-    return result;
   };
 
   getFlownsAddress = async (domain: string, root = 'fn') => {
@@ -1372,8 +1382,8 @@ class OpenApiService {
   };
 
   getAllNft = async (filterNetwork = true): Promise<NFTModelV2[]> => {
-    const list = await remoteFetch.nftCollection();
-    // const network = await userWalletService.getNetwork();
+    const network = await userWalletService.getNetwork();
+    const list = await this.getNFTList(network);
     return list;
   };
 
@@ -1854,7 +1864,7 @@ class OpenApiService {
     return data;
   };
 
-  nftCatalogCollections = async (address: string, network: string) => {
+  nftCatalogCollections = async (address: string, network: string): Promise<NFTCollections[]> => {
     const { data } = await this.sendRequest(
       'GET',
       `/api/v2/nft/id?address=${address}&network=${network}`,
@@ -1964,8 +1974,7 @@ class OpenApiService {
     return data;
   };
 
-  EvmNFTID = async (address: string) => {
-    const network = await userWalletService.getNetwork();
+  EvmNFTID = async (network: string, address: string) => {
     const { data } = await this.sendRequest(
       'GET',
       `/api/v3/evm/nft/id?network=${network}&address=${address}`,
@@ -2253,7 +2262,7 @@ class OpenApiService {
     const response: FlowApiResponse = await this.sendRequest(
       'GET',
       `/api/v4/cadence/tokens/ft/${address}`,
-      {},
+      { network },
       {},
       WEB_NEXT_URL
     );
@@ -2308,7 +2317,7 @@ class OpenApiService {
     const userEvmTokenList: EvmApiResponse = await this.sendRequest(
       'GET',
       `/api/v4/evm/tokens/ft/${formattedEvmAddress}`,
-      {},
+      { network },
       {},
       WEB_NEXT_URL
     );

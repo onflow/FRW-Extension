@@ -16,7 +16,6 @@ const ShowKey = ({ handleSwitchTab, mnemonic }) => {
   const [showAction, setShowAction] = useState(false);
 
   const onResetSubmit = async () => {
-    // usewallet.resetPwd();
     setShowAction(true);
   };
 
@@ -24,17 +23,12 @@ const ShowKey = ({ handleSwitchTab, mnemonic }) => {
     usewallet.resetPwd().then(() => {
       window.close();
     });
-    // console.log('reset reset reset')
   };
 
   const copyAll = () => {
-    // Extract 'value' from each item and join them with a space
-    const allValues = mnemonic.map((item, index) => `${index + 1}: ${item.value}`).join('\n');
+    const allValues = mnemonic.map((item, index) => `${index + 1}: ${item}`).join('\n');
 
-    navigator.clipboard
-      .writeText(allValues)
-      .then(() => console.log('Copied to clipboard successfully!'))
-      .catch((err) => console.error('Failed to copy to clipboard: ', err));
+    navigator.clipboard.writeText(allValues);
   };
 
   return (
@@ -93,7 +87,7 @@ const ShowKey = ({ handleSwitchTab, mnemonic }) => {
                     fontSize: '12px',
                   }}
                 >
-                  {`account ${i + 1}: ${item.value}`}
+                  {`account ${i + 1}: ${item}`}
                 </Typography>
               </Box>
             ))}

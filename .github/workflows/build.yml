@@ -91,6 +91,7 @@ jobs:
           API_NEWS_PATH="${{ vars.API_NEWS_PATH }}"
           API_CONFIG_PATH="${{ vars.API_CONFIG_PATH }}"
           API_BASE_URL="${{ vars.API_BASE_URL }}"
+          API_GO_SERVER_URL="${{ vars.API_GO_SERVER_URL }}"
           # manifest
           MANIFEST_KEY="${{ secrets.MANIFEST_KEY }}"
           OAUTH2_CLIENT_ID="${{ secrets.OAUTH2_CLIENT_ID }}"
@@ -115,7 +116,7 @@ jobs:
           create_env_file ".env.pro"
 
           # Create .env.dev if environment is development
-          if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" ]]; then
+          if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" || "${{ needs.determine-env.outputs.env_name }}" == "staging" ]]; then
             create_env_file ".env.dev"
           fi
 
@@ -124,7 +125,7 @@ jobs:
 
       - name: Build
         run: |
-          if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" ]]; then
+          if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" || "${{ needs.determine-env.outputs.env_name }}" == "staging" ]]; then
             pnpm run build:dev-ci
           else
             pnpm run build:ci

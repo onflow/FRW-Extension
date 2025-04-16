@@ -209,11 +209,6 @@ const DeveloperMode = () => {
 
     setNetwork(network);
     usewallet.switchNetwork(network);
-
-    if (currentNetwork !== network) {
-      // TODO: replace it with better UX
-      window.location.reload();
-    }
   };
 
   const switchMonitor = async (domain: string) => {

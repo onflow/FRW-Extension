@@ -7,6 +7,14 @@
     "message": "Цифровой кошелек, созданный для всех.",
     "description": "Application Descrtipion"
   },
+  "appNameBeta": {
+    "message": "Flow Wallet BETA",
+    "description": "Application Name"
+  },
+  "appDescriptionBeta": {
+    "message": "ЭТО РАСШИРЕНИЕ ДЛЯ БЕТА-ТЕСТИРОВАНИЯ. ИСПОЛЬЗУЙТЕ НА СВОЙ СТРАХ.",
+    "description": "Application Descrtipion"
+  },
   "Send": {
     "message": "Отправить"
   },

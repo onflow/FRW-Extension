@@ -7,8 +7,12 @@ import {
 } from '@/shared/utils/cache-data-access';
 import storage, { type AreaName, type StorageChange } from '@/shared/utils/storage';
 
+type DataState = {
+  key: string;
+  data: unknown;
+};
 export const useCachedData = <T>(key: string | undefined | null): T | undefined => {
-  const [data, setData] = useState<T | undefined>(undefined);
+  const [dataState, setDataState] = useState<DataState | undefined>(undefined);
 
   useEffect(() => {
     let mounted = true;
@@ -17,13 +21,13 @@ export const useCachedData = <T>(key: string | undefined | null): T | undefined 
       if (!key) return;
       const data = await getCachedData(key);
       if (mounted) {
-        setData(data as T);
+        setDataState({ key, data });
       }
     };
     const handleDataChange = (k: string, data: unknown) => {
       if (k === key) {
         if (mounted) {
-          setData(data as T);
+          setDataState({ key, data });
         }
       }
     };
@@ -38,12 +42,15 @@ export const useCachedData = <T>(key: string | undefined | null): T | undefined 
       removeCachedDataListener(key, handleDataChange);
     };
   }, [key]);
-
-  return data;
+  if (key !== dataState?.key) {
+    // This is to protect against a race condition where the key changes before the data is set
+    return undefined;
+  }
+  return dataState?.data as T;
 };
 
 export const useUserData = <T>(key: string | undefined | null): T | undefined => {
-  const [data, setData] = useState<T | undefined>(undefined);
+  const [dataState, setDataState] = useState<DataState | undefined>(undefined);
 
   useEffect(() => {
     let mounted = true;
@@ -52,7 +59,7 @@ export const useUserData = <T>(key: string | undefined | null): T | undefined =>
       if (!key) return;
       const data = await storage.get(key);
       if (mounted) {
-        setData(data as T);
+        setDataState({ key, data });
       }
     };
 
@@ -65,7 +72,7 @@ export const useUserData = <T>(key: string | undefined | null): T | undefined =>
       if (namespace === 'local' || namespace === 'sync') {
         if (changes[key]) {
           if (mounted) {
-            setData(changes[key].newValue as T);
+            setDataState({ key, data: changes[key].newValue });
           }
         }
       }
@@ -81,5 +88,9 @@ export const useUserData = <T>(key: string | undefined | null): T | undefined =>
     };
   }, [key]);
 
-  return data;
+  if (key !== dataState?.key) {
+    // This is to protect against a race condition where the key changes before the data is set
+    return undefined;
+  }
+  return dataState?.data as T;
 };

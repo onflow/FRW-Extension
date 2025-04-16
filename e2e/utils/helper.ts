@@ -23,8 +23,8 @@ export const getCurrentAddress = async (page: Page) => {
   await page.waitForURL(/.*\/dashboard.*/);
 
   //await expect(page.getByLabel('Copy Address')).toBeVisible({ timeout: 120_000 });
-  const copyIcon = await page.getByLabel('Copy Address');
-  await copyIcon.isVisible({ timeout: 120_000 });
+  const copyIcon = page.getByTestId('copy-address-button');
+  await expect(copyIcon).toBeEnabled({ timeout: 120_000 });
 
   await copyIcon.click();
 
@@ -192,14 +192,8 @@ export const registerAccount = async ({ page, extensionId, username, password })
   await page.goto(`chrome-extension://${extensionId}/index.html#/dashboard`);
 
   // get address
-  const copyIcon = await page.getByLabel('Copy Address');
-  await expect(copyIcon).toBeEnabled({ timeout: 600_000 }); // 10 minutes...
 
-  await copyIcon.isEnabled();
-
-  await copyIcon.click();
-
-  const flowAddr = await page.evaluate(getClipboardText);
+  const flowAddr = await getCurrentAddress(page);
 
   // save keys and pwd to keys file
   return {

@@ -55,7 +55,16 @@ async function prepare() {
     scopes: OAUTH2_SCOPES.split(','),
   };
   // Update the version in the manifest
-  manifest.version = version;
+  if (version.includes('beta')) {
+    manifest.version = version.replace(/^(\d+\.\d+\.\d+).*/, '$1');
+
+    manifest.name = '__MSG_appNameBeta__';
+    manifest.description = '__MSG_appDescriptionBeta__';
+  } else {
+    manifest.version = version;
+    manifest.name = '__MSG_appName__';
+    manifest.description = '__MSG_appDescription__';
+  }
 
   if (mode === 'dev') {
     manifest.key = process.env.MANIFEST_KEY;

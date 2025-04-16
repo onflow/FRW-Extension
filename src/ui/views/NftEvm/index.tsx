@@ -10,21 +10,15 @@ import ListTab from './ListTab';
 const NftEvm = () => {
   const wallet = useWallet();
   const { mainAddress } = useProfiles();
-  const [address, setAddress] = useState<string | null>(null);
   const [nftCount, setCount] = useState<number>(0);
   const [accessible] = useState<any>([]);
   const [isActive, setIsActive] = useState(true);
   const listTabRef = useRef<{ reload: () => void }>(null);
 
-  const loadNFTs = useCallback(async () => {
-    const address = await wallet.queryEvmAddress(mainAddress!);
-    setIsActive(false);
-    setAddress(ensureEvmAddressPrefix(address));
-  }, [wallet, mainAddress]);
+  const { evmAddress } = useProfiles();
 
-  useEffect(() => {
-    loadNFTs();
-  }, [loadNFTs]);
+  // TODO: Think it could just be current address
+  const address = evmAddress;
 
   const refreshButtonClicked = () => {
     listTabRef.current?.reload();

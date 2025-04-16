@@ -7,12 +7,14 @@ import {
 import {
   type ChildAccountMap,
   type MainAccount,
+  type MainAccountBalance,
   type EvmAddress,
   type WalletAccount,
 } from '@/shared/types/wallet-types';
 import {
   childAccountsKey,
   evmAccountKey,
+  accountBalanceKey,
   mainAccountsKey,
   userInfoCachekey,
   type UserInfoStore,
@@ -33,6 +35,13 @@ export const useMainAccounts = (
   return useCachedData<MainAccount[]>(
     network && publicKey ? mainAccountsKey(network, publicKey) : null
   );
+};
+
+export const useAccountBalance = (
+  network: string | undefined | null,
+  address: string | undefined | null
+) => {
+  return useCachedData<string>(network && address ? accountBalanceKey(network, address) : null);
 };
 
 export const useChildAccounts = (
@@ -61,9 +70,10 @@ export const useActiveAccounts = (
   network: string | undefined | null,
   publicKey: string | undefined | null
 ) => {
-  return useUserData<ActiveAccountsStore>(
+  const activeAccounts = useUserData<ActiveAccountsStore>(
     network && publicKey ? activeAccountsKey(network, publicKey) : null
   );
+  return activeAccounts;
 };
 
 export const useUserWallets = () => {

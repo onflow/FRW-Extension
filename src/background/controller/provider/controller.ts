@@ -7,7 +7,9 @@ import RLP from 'rlp';
 import Web3 from 'web3';
 import { stringToHex } from 'web3-utils';
 
+import { getAccountsByPublicKeyTuple } from '@/background/utils/modules/findAddressWithPubKey';
 import { signWithKey } from '@/background/utils/modules/publicPrivateKey';
+import { tupleToPrivateKey } from '@/shared/types/key-types';
 import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@/shared/types/network-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import { getHashAlgo, getSignAlgo } from '@/shared/utils/algo';
@@ -18,6 +20,7 @@ import {
   signTextHistoryService,
   keyringService,
   notificationService,
+  userWalletService,
 } from 'background/service';
 import { EVM_ENDPOINT } from 'consts';
 
@@ -71,17 +74,51 @@ function createAndEncodeCOAOwnershipProof(
   return encodedData; // Convert the encoded data to a hexadecimal string for easy display or transmission
 }
 
-// Should not be in controller
-async function signMessage(msgParams, opts = {}) {
+/**
+ * Gets the matching account and signing information for the current wallet
+ * @returns Object containing account details and signing information
+ */
+async function getSigningDetailsForCurrentWallet() {
+  const network = await Wallet.getNetwork();
+  const privateKeyTuple = await keyringService.getCurrentPublicPrivateKeyTuple();
+
+  // Find any account with public key information
+  const accounts = await getAccountsByPublicKeyTuple(privateKeyTuple, network);
+
+  const addressHex = await Wallet.getParentAddress();
+  const matchingAccount = accounts.find((account) => account.address === addressHex);
+
+  if (!matchingAccount) {
+    throw new Error('Current wallet not found in accounts');
+  }
+
+  // Get the private key from the private key tuple
+  const privateKey = tupleToPrivateKey(privateKeyTuple, matchingAccount.signAlgo);
+  const hashAlgo = matchingAccount.hashAlgo;
+  const signAlgo = matchingAccount.signAlgo;
+  const keyIndex = matchingAccount.keyIndex;
+
+  return {
+    addressHex,
+    privateKey,
+    hashAlgo,
+    signAlgo,
+    keyIndex,
+  };
+}
+
+/**
+ * Common signing logic used by both message and typed data signing
+ * @param dataToSign The prepared data to sign
+ * @returns The encoded proof as a hex string
+ */
+async function createSignatureProof(dataToSign: string) {
   if (!(await Wallet.isUnlocked())) {
     throw new Error('Wallet is locked');
   }
-  const web3 = new Web3();
-  const textData = msgParams.data;
 
   const rightPaddedHexBuffer = (value: string, pad: number) =>
     Buffer.from(value.padEnd(pad * 2, '0'), 'hex');
-  const hashedData = web3.eth.accounts.hashMessage(textData);
 
   const USER_DOMAIN_TAG = rightPaddedHexBuffer(
     Buffer.from('FLOW-V0.0-user').toString('hex'),
@@ -89,73 +126,39 @@ async function signMessage(msgParams, opts = {}) {
   ).toString('hex');
 
   const prependUserDomainTag = (msg: string) => USER_DOMAIN_TAG + msg;
-  const signableData = prependUserDomainTag(removeHexPrefix(hashedData));
+  const signableData = prependUserDomainTag(removeHexPrefix(dataToSign));
 
   // Retrieve the private key from the wallet
-  const privateKeyTuple = await keyringService.getCurrentPrivateKeyTuple();
-  const currentWallet = await Wallet.getParentAddress();
-  if (!currentWallet) {
+  const { addressHex, privateKey, hashAlgo, signAlgo, keyIndex } =
+    await getSigningDetailsForCurrentWallet();
+  if (!addressHex) {
     throw new Error('Current wallet not found');
   }
-  const hashAlgo = getHashAlgo(await storage.get('hashAlgo'));
-  const signAlgo = getSignAlgo(await storage.get('signAlgo'));
-  const keyindex = await storage.get('keyIndex');
-  // const wallet = new ethers.Wallet(privateKey);
-  const privateKey =
-    signAlgo === SIGN_ALGO_NUM_ECDSA_P256 ? privateKeyTuple.P256.pk : privateKeyTuple.SECP256K1.pk;
+
   const signature = await signWithKey(signableData, signAlgo, hashAlgo, privateKey);
 
-  const addressHex = currentWallet;
   const addressBuffer = Buffer.from(addressHex.slice(2), 'hex');
   const addressArray = Uint8Array.from(addressBuffer);
 
-  const encodedProof = createAndEncodeCOAOwnershipProof([BigInt(keyindex)], addressArray, 'evm', [
+  const encodedProof = createAndEncodeCOAOwnershipProof([BigInt(keyIndex)], addressArray, 'evm', [
     Uint8Array.from(Buffer.from(signature, 'hex')),
   ]);
 
   return '0x' + toHexString(encodedProof);
 }
 
+async function signMessage(msgParams, opts = {}) {
+  const web3 = new Web3();
+  const textData = msgParams.data;
+  const hashedData = web3.eth.accounts.hashMessage(textData);
+
+  return createSignatureProof(hashedData);
+}
+
 async function signTypeData(msgParams, opts = {}) {
-  if (!(await Wallet.isUnlocked())) {
-    throw new Error('Wallet is locked');
-  }
-  const rightPaddedHexBuffer = (value: string, pad: number) =>
-    Buffer.from(value.padEnd(pad * 2, '0'), 'hex');
   const hashedData = Buffer.from(msgParams).toString('hex');
-  const USER_DOMAIN_TAG = rightPaddedHexBuffer(
-    Buffer.from('FLOW-V0.0-user').toString('hex'),
-    32
-  ).toString('hex');
 
-  const prependUserDomainTag = (msg: string) => USER_DOMAIN_TAG + msg;
-  const signableData = prependUserDomainTag(removeHexPrefix(hashedData));
-
-  // Retrieve the private key from the wallet (assuming Ethereum wallet)
-  const privateKeyTuple = await keyringService.getCurrentPrivateKeyTuple();
-  // TODO: Fix this reliance on passing the hash algo via storage
-  const hashAlgo = getHashAlgo(await storage.get('hashAlgoString'));
-  const signAlgo = getSignAlgo(await storage.get('signAlgoString'));
-  const keyindex = await storage.get('keyIndex');
-  console.log('keyindex ', keyindex);
-  // const wallet = new ethers.Wallet(privateKey);
-  const privateKey =
-    signAlgo === SIGN_ALGO_NUM_ECDSA_P256 ? privateKeyTuple.P256.pk : privateKeyTuple.SECP256K1.pk;
-  const signature = await signWithKey(signableData, signAlgo, hashAlgo, privateKey);
-  const currentWallet = await Wallet.getParentAddress();
-
-  const addressHex = currentWallet;
-  if (!addressHex) {
-    throw new Error('Current wallet not found');
-  }
-  const addressBuffer = Buffer.from(addressHex.slice(2), 'hex');
-  const addressArray = Uint8Array.from(addressBuffer);
-
-  const encodedProof = createAndEncodeCOAOwnershipProof([BigInt(keyindex)], addressArray, 'evm', [
-    Uint8Array.from(Buffer.from(signature, 'hex')),
-  ]);
-
-  return '0x' + toHexString(encodedProof);
+  return createSignatureProof(hashedData);
 }
 
 const SignTypedDataVersion = {
@@ -294,11 +297,10 @@ class ProviderController extends BaseController {
 
     // Extracting individual parameters
     const from = transactionParams.from || '';
-    const gas = transactionParams.gas || '0x76c0';
     const to = transactionParams.to || '';
     const value = transactionParams.value || '0x0';
     const dataValue = transactionParams.data || '0x';
-    // console.log('transactionParams ', transactionParams)
+    const gas = transactionParams.gas || '0x1C9C380';
     const cleanHex = gas.startsWith('0x') ? gas : `0x${gas}`;
     const gasBigInt = BigInt(cleanHex);
 

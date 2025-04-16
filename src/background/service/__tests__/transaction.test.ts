@@ -2,6 +2,10 @@ import type { TransactionStatus, TransactionExecutionStatus } from '@onflow/type
 import { describe, test, expect, beforeEach, vi, beforeAll } from 'vitest';
 
 import openapiService from '@/background/service/openapi';
+import { getValidData, setCachedData } from '@/background/utils/data-cache';
+import { type FlowNetwork } from '@/shared/types/network-types';
+import { TransferItem } from '@/shared/types/transaction-types';
+import { transferListKey, type TransferListStore } from '@/shared/utils/cache-data-keys';
 
 import transaction from '../transaction';
 
@@ -103,49 +107,13 @@ const chrome = {
 vi.stubGlobal('chrome', chrome);
 
 // Initialize storage with default values
-beforeAll(async () => {
-  const defaultStore = {
-    expiry: Date.now(),
-    total: 0,
-    transactionItem: {
-      mainnet: [],
-      crescendo: [],
-      testnet: [],
-    },
-    pendingItem: {
-      mainnet: [],
-      crescendo: [],
-      testnet: [],
-    },
-  };
-
-  await chrome.storage.local.set({ transaction: defaultStore });
-  await chrome.storage.session.set({ transaction: defaultStore });
-});
+beforeAll(async () => {});
 
 describe('Transaction Service', () => {
   beforeEach(async () => {
     // Clear mock storage state
     await chrome.storage.local.clear();
     await chrome.storage.session.clear();
-
-    // Reset default values
-    const defaultStore = {
-      expiry: Date.now(),
-      total: 0,
-      transactionItem: {
-        mainnet: [],
-        crescendo: [],
-        testnet: [],
-      },
-      pendingItem: {
-        mainnet: [],
-        crescendo: [],
-        testnet: [],
-      },
-    };
-    await chrome.storage.local.set({ transaction: defaultStore });
-    await chrome.storage.session.set({ transaction: defaultStore });
 
     // Reset the service before each test
     await transaction.init();
@@ -183,6 +151,7 @@ describe('Transaction Service', () => {
 
     return {
       default: {
+        getNetwork: vi.fn().mockResolvedValue('mainnet'),
         getFeatureFlag: vi.fn().mockResolvedValue(false),
         init: vi.fn().mockResolvedValue(undefined),
         getTransfers: vi.fn().mockResolvedValue(mockData),
@@ -193,10 +162,11 @@ describe('Transaction Service', () => {
   describe('Initialization', () => {
     test('should initialize with correct default values', async () => {
       // Test initialization through public methods
-      const networks = ['mainnet', 'testnet', 'crescendo'];
+      const networks = ['mainnet', 'testnet'];
       const testAddress = '0x1234567890abcdef';
 
       for (const network of networks) {
+        vi.mocked(openapiService.getNetwork).mockResolvedValue(network as FlowNetwork);
         const transactions = await transaction.listTransactions(network, testAddress, '', '');
         expect(transactions).toEqual([]);
 
@@ -493,10 +463,9 @@ describe('Transaction Service', () => {
     test('should set transactions correctly with indexed flag', async () => {
       const network = 'mainnet';
       const address = '0x1234567890abcdef';
+      vi.mocked(openapiService.getNetwork).mockImplementation(() => network as FlowNetwork);
 
-      await transaction.loadTransactions(network, address, '', '');
-
-      const transactions = await transaction.listTransactions(network, address, '', '');
+      const transactions = await transaction.listTransactions(network, address, '0', '15');
       expect(transactions).toHaveLength(1);
       expect(transactions[0]).toMatchObject({
         sender: '0x1234567890abcdef',
@@ -518,7 +487,7 @@ describe('Transaction Service', () => {
         transactions: [],
         total: 0,
       });
-
+      vi.mocked(openapiService.getNetwork).mockResolvedValueOnce('mainnet');
       await transaction.loadTransactions(network, address, '', '');
 
       const transactions = await transaction.listTransactions(network, address, '', '');

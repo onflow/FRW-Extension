@@ -4,11 +4,12 @@ import { Box, Typography, Drawer, Stack, Grid, CardMedia, IconButton, Button } f
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { type Contact } from '@/shared/types/network-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import StorageExceededAlert from '@/ui/FRWComponent/StorageExceededAlert';
 import { WarningStorageLowSnackbar } from '@/ui/FRWComponent/WarningStorageLowSnackbar';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useContacts } from '@/ui/hooks/useContactHook';
 import { useTransferList } from '@/ui/hooks/useTransferListHook';
 import { MatchMediaType } from '@/ui/utils/url';
 import { LLSpinner, FRWProfileCard, FRWDropdownProfileCard } from 'ui/FRWComponent';
@@ -27,15 +28,15 @@ interface SendNFTConfirmationProps {
 const MovefromParent = (props: SendNFTConfirmationProps) => {
   const usewallet = useWallet();
   const history = useHistory();
-  const { childAccounts } = useProfiles();
+  const { childAccountsContacts, evmAccounts } = useContacts();
   const { occupied } = useTransferList();
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
   const [, setErrorMessage] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<number | null>(null);
 
-  const [childWallets, setChildWallets] = useState({});
-  const [selectedAccount, setSelectedChildAccount] = useState(null);
+  const [childWallets, setChildWallets] = useState<Contact[]>([]);
+  const [selectedAccount, setSelectedChildAccount] = useState<Contact | null>(null);
   const { sufficient: isSufficient, sufficientAfterAction } = useStorageCheck({
     transferAmount: 0,
     coin: 'flow',
@@ -144,32 +145,13 @@ const MovefromParent = (props: SendNFTConfirmationProps) => {
   }, [props.data.contact, transactionDoneHandler]);
 
   const getChildResp = useCallback(async () => {
-    const eWallet: any = await usewallet.getEvmWallet();
-    let evmAddress;
-    if (eWallet.address) {
-      evmAddress = ensureEvmAddressPrefix(eWallet.address);
-    }
-    let evmWallet = {};
-    if (evmAddress) {
-      evmWallet = {
-        [evmAddress!]: {
-          name: eWallet.name,
-          description: eWallet.name,
-          thumbnail: {
-            url: eWallet.icon,
-          },
-        },
-      };
-    }
-
     // Merge usewallet lists
-    const walletList = { ...childAccounts, ...evmWallet };
+    const walletList = [...childAccountsContacts, ...evmAccounts];
     setChildWallets(walletList);
-    const firstWalletAddress = Object.keys(walletList)[0];
-    if (firstWalletAddress) {
-      setSelectedChildAccount(walletList[firstWalletAddress]);
+    if (walletList && walletList.length > 0) {
+      setSelectedChildAccount(walletList[0]);
     }
-  }, [usewallet, childAccounts]);
+  }, [evmAccounts, childAccountsContacts]);
 
   useEffect(() => {
     getChildResp();
@@ -259,7 +241,6 @@ const MovefromParent = (props: SendNFTConfirmationProps) => {
           <Box sx={{ height: '8px' }}></Box>
           {selectedAccount && (
             <FRWDropdownProfileCard
-              contact={selectedAccount}
               contacts={childWallets}
               setSelectedChildAccount={setSelectedChildAccount}
             />

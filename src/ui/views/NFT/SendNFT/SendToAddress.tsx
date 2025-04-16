@@ -15,8 +15,7 @@ import { StyledEngineProvider, useTheme } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import { isEmpty } from 'lodash';
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import SwipeableViews from 'react-swipeable-views';
+import { useLocation } from 'react-router-dom';
 
 import { type Contact, ContactType } from '@/shared/types/network-types';
 import { withPrefix, isValidEthereumAddress } from '@/shared/utils/address';
@@ -223,7 +222,6 @@ const SendToAddress = () => {
         contact_name: info.username,
       };
     }
-    console.log('userContact ', userContact);
     setUser(userContact);
   }, [usewallet, state.linked, currentWallet, childAccounts]);
 
@@ -235,10 +233,8 @@ const SendToAddress = () => {
     setMedia(media);
 
     const contractList = await usewallet.openapi.getAllNft();
-    console.log('contractList ', contractList);
-    console.log('NFT ', NFT);
+
     const filteredCollections = returnFilteredCollections(contractList, NFT);
-    console.log('filteredCollections ', filteredCollections);
     if (filteredCollections) {
       setContractInfo(filteredCollections);
     }
@@ -446,7 +442,6 @@ const SendToAddress = () => {
             className={classes.inputBox}
             placeholder={chrome.i18n.getMessage('Search__Address__or__Flow__domain')}
             autoFocus
-            disableUnderline
             endAdornment={
               <InputAdornment position="end">
                 <SearchIcon color="primary" sx={{ ml: '10px', my: '5px', fontSize: '24px' }} />
@@ -505,41 +500,34 @@ const SendToAddress = () => {
                 flexGrow: 1,
               }}
             >
-              <SwipeableViews
-                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                index={tabValue}
-                onChangeIndex={(index: number) => setTabValue(index)}
-                style={{ height: '100%', width: '100%' }}
-              >
-                <TabPanel value={tabValue} index={0} dir={theme.direction}>
-                  <RecentList
-                    filteredContacts={recentContacts}
-                    isLoading={isLoading}
-                    handleClick={(eachgroup) => {
-                      searchResult = eachgroup;
-                      setConfirmationOpen(true);
-                    }}
-                  />
-                </TabPanel>
-                <TabPanel value={tabValue} index={1} dir={theme.direction}>
-                  <AddressBookList
-                    filteredContacts={filteredContacts}
-                    isLoading={isLoading}
-                    handleClick={(eachgroup) => {
-                      searchResult = eachgroup;
-                      setConfirmationOpen(true);
-                    }}
-                  />
-                </TabPanel>
-                <TabPanel value={tabValue} index={2} dir={theme.direction}>
-                  <AccountsList
-                    handleClick={(eachgroup) => {
-                      searchResult = eachgroup;
-                      setConfirmationOpen(true);
-                    }}
-                  />
-                </TabPanel>
-              </SwipeableViews>
+              <TabPanel value={tabValue} index={0} dir={theme.direction}>
+                <RecentList
+                  filteredContacts={recentContacts}
+                  isLoading={isLoading}
+                  handleClick={(eachgroup) => {
+                    searchResult = eachgroup;
+                    setConfirmationOpen(true);
+                  }}
+                />
+              </TabPanel>
+              <TabPanel value={tabValue} index={1} dir={theme.direction}>
+                <AddressBookList
+                  filteredContacts={filteredContacts}
+                  isLoading={isLoading}
+                  handleClick={(eachgroup) => {
+                    searchResult = eachgroup;
+                    setConfirmationOpen(true);
+                  }}
+                />
+              </TabPanel>
+              <TabPanel value={tabValue} index={2} dir={theme.direction}>
+                <AccountsList
+                  handleClick={(eachgroup) => {
+                    searchResult = eachgroup;
+                    setConfirmationOpen(true);
+                  }}
+                />
+              </TabPanel>
             </Box>
           </div>
         ) : (

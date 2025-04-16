@@ -7,40 +7,46 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  type SelectChangeEvent,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 
+import { type Contact } from '@/shared/types/network-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
 import { useWallet, isEmoji, formatAddress } from 'ui/utils';
 
-export const FWMoveDropdown = ({
-  contact,
+interface FWMoveDropdownProps {
+  contacts: Contact[];
+  setSelectedChildAccount: (account: Contact) => void;
+  isLoading?: boolean;
+}
+
+export const FWMoveDropdown: React.FC<FWMoveDropdownProps> = ({
   contacts,
   setSelectedChildAccount,
   isLoading = false,
 }) => {
-  const usewallet = useWallet();
-
-  const contactKeys = Object.keys(contacts);
   const [selectedChild, setSelectedChild] = React.useState(
-    contactKeys.length > 0 ? contactKeys[0] : ''
+    contacts.length > 0 ? contacts[0].address : ''
   );
 
   useEffect(() => {
     if (selectedChild) {
-      const select = contacts[selectedChild];
-      select['address'] = selectedChild;
-      setSelectedChildAccount(select);
+      const select = contacts.find((contact) => contact.address === selectedChild);
+      if (select) {
+        setSelectedChildAccount(select);
+      }
     }
   }, [selectedChild, contacts, setSelectedChildAccount]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
     const selectedAddress = event.target.value;
     setSelectedChild(selectedAddress);
-    const select = contacts[selectedChild];
-    select['address'] = selectedChild;
-    setSelectedChildAccount(select);
+    const select = contacts.find((contact) => contact.address === selectedAddress);
+    if (select) {
+      setSelectedChildAccount(select);
+    }
   };
 
   return (
@@ -64,11 +70,11 @@ export const FWMoveDropdown = ({
             height: '100%',
           }}
         >
-          {Object.keys(contacts).map((address) => (
-            <MenuItem key={address} value={address}>
+          {contacts.map((contact) => (
+            <MenuItem key={contact.address} value={contact.address}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 <Box sx={{ display: 'flex' }}>
-                  {isEmoji(contacts[address].thumbnail.url) ? (
+                  {isEmoji(contact.avatar) ? (
                     <Typography
                       sx={{
                         mr: '4px',
@@ -83,11 +89,11 @@ export const FWMoveDropdown = ({
                         fontSize: '32px', // Adjust font size to fit within the box
                       }}
                     >
-                      {contacts[address].thumbnail.url}
+                      {contact.avatar}
                     </Typography>
                   ) : (
                     <Avatar
-                      src={contacts[address].thumbnail.url}
+                      src={contact.avatar}
                       sx={{
                         height: '32px',
                         width: '32px',
@@ -101,13 +107,13 @@ export const FWMoveDropdown = ({
                 <Typography
                   sx={{ textAlign: 'start', color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}
                 >
-                  {contacts[address].name}
+                  {contact.contact_name}
                 </Typography>
                 <Typography
                   sx={{ lineHeight: '1', textAlign: 'start', fontSize: '12px', fontWeight: '400' }}
                   color="#FFFFFFCC"
                 >
-                  {formatAddress(address)}
+                  {formatAddress(contact.address)}
                 </Typography>
               </Box>
             </MenuItem>

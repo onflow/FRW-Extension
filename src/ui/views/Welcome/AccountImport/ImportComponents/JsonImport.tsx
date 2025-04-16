@@ -11,6 +11,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
+import PasswordTextarea from '@/ui/FRWComponent/PasswordTextarea';
 import { useWallet } from '@/ui/utils/WalletContext';
 import { LLSpinner } from 'ui/FRWComponent';
 
@@ -126,11 +127,11 @@ const JsonImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
   return (
     <Box sx={{ padding: '0' }}>
       <form id="seed" onSubmit={handleImport} className={classes.form}>
-        <TextareaAutosize
+        <PasswordTextarea
           minRows={5}
           placeholder={chrome.i18n.getMessage('You_can_import_the')}
-          className={classes.textarea}
           required
+          sx={{ marginBottom: '16px' }}
         />
         <TextField
           required

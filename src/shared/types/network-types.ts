@@ -87,7 +87,9 @@ export interface FlowTokenStoragePath {
 }
 
 export type FlowNetwork = 'mainnet' | 'testnet' | 'crescendo';
-
+export const isValidNetwork = (network: string): network is FlowNetwork => {
+  return network === 'mainnet' || network === 'testnet' || network === 'crescendo';
+};
 export const MAINNET_NETWORK: FlowNetwork = 'mainnet';
 export const TESTNET_NETWORK: FlowNetwork = 'testnet';
 

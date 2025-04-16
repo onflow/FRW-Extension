@@ -7,6 +7,14 @@
     "message": "すべての人のために作られたデジタルウォレット。",
     "description": "Application Descrtipion"
   },
+  "appNameBeta": {
+    "message": "Flow Wallet BETA",
+    "description": "Application Name"
+  },
+  "appDescriptionBeta": {
+    "message": "この拡張機能はベータテスト用です。自己責任で使用してください。",
+    "description": "Application Descrtipion"
+  },
   "Send": {
     "message": "送信"
   },

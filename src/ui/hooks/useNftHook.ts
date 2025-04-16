@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { type NFTItem } from '@/shared/types/nft-types';
+import { type NFTCollections, type NFTItem } from '@/shared/types/nft-types';
+import {
+  evmNftIdsKey,
+  type EvmNftIdsStore,
+  nftCatalogCollectionsKey,
+  evmNftCollectionListKey,
+  type EvmNftCollectionListStore,
+} from '@/shared/utils/cache-data-keys';
+
+import { useCachedData } from './use-data';
 
 interface UseNftHookProps {
   getCollection: (
@@ -262,4 +271,33 @@ export const useNftHook = ({
     loadAllPages,
     refreshCollectionImpl,
   };
+};
+
+export const useNftCatalogCollections = (network: string, address: string) => {
+  const collections = useCachedData<NFTCollections[]>(
+    network && address ? nftCatalogCollectionsKey(network, address) : null
+  );
+
+  return collections;
+};
+
+export const useEvmNftIds = (network: string, address: string) => {
+  const evmNftIds = useCachedData<EvmNftIdsStore>(
+    network && address ? evmNftIdsKey(network, address) : null
+  );
+  return evmNftIds;
+};
+
+export const useEvmNftCollectionList = (
+  network: string,
+  address: string,
+  collectionIdentifier: string,
+  offset: number
+) => {
+  const evmNftCollectionList = useCachedData<EvmNftCollectionListStore>(
+    network && address
+      ? evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`)
+      : null
+  );
+  return evmNftCollectionList;
 };

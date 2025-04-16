@@ -93,7 +93,7 @@ const CoinList = ({
                 fontWeight: '550',
                 textAlign: 'start',
                 color: 'text.title',
-                maxWidth: '120px',
+                maxWidth: '160px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -203,7 +203,7 @@ const CoinList = ({
               }
               return (
                 <ListItem
-                  key={coin.unit}
+                  key={coin.id}
                   data-testid={`token-${coin.unit.toLowerCase()}`}
                   secondaryAction={
                     <EndListItemText
