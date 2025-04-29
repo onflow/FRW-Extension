@@ -188,7 +188,7 @@ const TokenInfoCard = ({
 
             <Box sx={{ flex: 1 }} />
             {canMoveChild && (
-              <ButtonBase onClick={() => toSend()}>
+              <ButtonBase data-testid="tokeninfo-move-button" onClick={() => toSend()}>
                 <Box sx={{ display: 'flex', alignItems: 'center', height: '46px' }}>
                   <Box
                     sx={{
@@ -272,6 +272,7 @@ const TokenInfoCard = ({
           >
             {(accountType === 'main' || accountType === 'evm') && (
               <IconButton
+                testId="tokeninfo-send-button"
                 messageKey="Send"
                 onClick={toSend}
                 icon={sendIcon}
@@ -279,18 +280,21 @@ const TokenInfoCard = ({
               />
             )}
             <IconButton
+              testId="tokeninfo-receive-button"
               messageKey="Receive"
               onClick={() => history.push('/dashboard/wallet/deposit')}
               icon={receiveIcon}
               customSx={{ width: '42px', height: '42px' }}
             />
             <IconButton
+              testId="tokeninfo-swap-button"
               messageKey="Swap"
               onClick={() => window.open('https://app.increment.fi/swap', '_blank')}
               icon={swapIcon}
               customSx={{ width: '42px', height: '42px' }}
             />
             <IconButton
+              testId="tokeninfo-buy-button"
               messageKey="Buy"
               onClick={() => setIsOnRamp(true)}
               icon={buyIcon}

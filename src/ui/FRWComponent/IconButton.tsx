@@ -7,6 +7,7 @@ interface IconButtonProps {
   showLabel?: boolean;
   icon: string;
   customSx?: object;
+  testId?: string;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -15,6 +16,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   showLabel = true,
   icon,
   customSx = {},
+  testId,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -30,6 +32,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       <Button
         color="info3"
         variant="contained"
+        data-testid={testId ? testId : ''}
         sx={{
           height: '38px',
           width: '38px',
