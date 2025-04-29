@@ -289,7 +289,9 @@ const TokenInfoCard = ({
             <IconButton
               testId="tokeninfo-swap-button"
               messageKey="Swap"
-              onClick={() => window.open('https://app.increment.fi/swap', '_blank')}
+              onClick={() =>
+                window.open('https://app.increment.fi/swap', '_blank', 'noopener,noreferrer')
+              }
               icon={swapIcon}
               customSx={{ width: '42px', height: '42px' }}
             />
