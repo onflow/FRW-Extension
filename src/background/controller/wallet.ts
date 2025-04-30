@@ -268,11 +268,11 @@ export class WalletController extends BaseController {
       }
 
       userWalletService.registerCurrentPubkey(account.keys[0].publicKey, account);
-      setUserData(registerStatusKey(), false);
       return account;
     } catch (error) {
-      setUserData(registerStatusKey(), false);
       throw new Error(`Account creation failed: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUserData(registerStatusKey(), false);
     }
   };
 
