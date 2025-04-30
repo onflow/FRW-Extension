@@ -74,6 +74,7 @@ import {
   type EvmNftIdsStore,
   type EvmNftCollectionListStore,
   evmNftCollectionListKey,
+  registerStatusKey,
 } from '@/shared/utils/cache-data-keys';
 import { getCurrentProfileId } from '@/shared/utils/current-id';
 import {
@@ -87,6 +88,7 @@ import {
   type CadenceScripts,
   type NetworkScripts,
 } from '@/shared/utils/script-types';
+import { setUserData } from '@/shared/utils/user-data-access';
 import {
   keyringService,
   preferenceService,
@@ -240,6 +242,8 @@ export class WalletController extends BaseController {
     // We're creating the Flow address for the account
     // Only after this, do we have a valid wallet with a Flow address
     const result = await openapiService.createFlowAddressV2();
+    setUserData(registerStatusKey(), true);
+
     this.checkForNewAddress(result.data.txid);
   };
 
@@ -264,6 +268,7 @@ export class WalletController extends BaseController {
       }
 
       userWalletService.registerCurrentPubkey(account.keys[0].publicKey, account);
+      setUserData(registerStatusKey(), false);
       return account;
     } catch (error) {
       throw new Error(`Account creation failed: ${error.message || 'Unknown error'}`);

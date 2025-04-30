@@ -74,6 +74,8 @@ const Header = ({ _loading = false }) => {
     mainAddressLoading,
     clearProfileData,
     profileIds,
+    noAddress,
+    registerStatus,
   } = useProfiles();
 
   const [drawer, setDrawer] = useState(false);
@@ -299,7 +301,7 @@ const Header = ({ _loading = false }) => {
     return (
       <Toolbar sx={{ height: '56px', width: '100%', display: 'flex', px: '0px' }}>
         <Box sx={{ flex: '0 0 68px', position: 'relative', display: 'flex', alignItems: 'center' }}>
-          {isPending && (
+          {(isPending || registerStatus) && (
             <CircularProgress
               size={'28px'}
               sx={{
@@ -440,6 +442,8 @@ const Header = ({ _loading = false }) => {
                     >
                       {haveAddress ? (
                         formatAddress(props.address)
+                      ) : noAddress && !registerStatus ? (
+                        chrome.i18n.getMessage('No_address_found')
                       ) : (
                         <Skeleton variant="text" width={120} />
                       )}

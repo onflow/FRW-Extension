@@ -96,6 +96,17 @@ export const accountBalanceKey = (network: string, address: string) =>
 
 export const accountBalanceRefreshRegex = refreshKey(accountBalanceKey);
 
+export const noAddressKey = (network: string, publicKey: string) =>
+  `no-address-${network}-${publicKey}`;
+
+export const noAddressRefreshRegex = refreshKey(noAddressKey);
+export type NoAddressStore = boolean;
+
+export const registerStatusKey = () => 'register-status';
+
+export const registerStatusRefreshRegex = refreshKey(registerStatusKey);
+export type RegisterStatusStore = boolean;
+
 // Transfer list
 export const transferListKey = (
   network: string,

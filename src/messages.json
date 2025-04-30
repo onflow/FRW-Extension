@@ -1341,5 +1341,8 @@
   },
   "Manage_Token": {
     "message": "Manage Token"
+  },
+  "No_address_found": {
+    "message": "No address found, please check your publickey"
   }
 }

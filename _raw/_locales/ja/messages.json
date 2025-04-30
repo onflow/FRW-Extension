@@ -1391,5 +1391,8 @@
   },
   "Manage_Token": {
     "message": "トークンを管理"
+  },
+  "No_address_found": {
+    "message": "アドレスが見つかりません、公開鍵を確認してください"
   }
 }

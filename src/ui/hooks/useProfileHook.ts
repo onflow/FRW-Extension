@@ -24,6 +24,8 @@ import {
   useMainAccounts,
   useUserInfo,
   useUserWallets,
+  useRegisterStatus,
+  useNoAddress,
 } from './use-account-hooks';
 
 const INITIAL_WALLET = {
@@ -72,6 +74,8 @@ export const useProfiles = () => {
 
   const currentBalance = useAccountBalance(network, activeAccounts?.currentAddress);
 
+  const noAddress = useNoAddress(network, userWallets?.currentPubkey);
+  const registerStatus = useRegisterStatus();
   const parentWallet =
     walletList.find((wallet) => wallet.address === activeAccounts?.parentAddress) ?? INITIAL_WALLET;
 
@@ -142,5 +146,7 @@ export const useProfiles = () => {
     profileIds,
     activeAccountType,
     canMoveToChild,
+    noAddress,
+    registerStatus,
   };
 };

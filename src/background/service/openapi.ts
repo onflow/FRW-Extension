@@ -364,6 +364,11 @@ const dataConfig: Record<string, OpenApiConfigValue> = {
     method: 'get',
     params: [],
   },
+  create_manual_address: {
+    path: '/v1/user/manualaddress',
+    method: 'post',
+    params: [],
+  },
   device_list: {
     path: '/v1/user/device',
     method: 'get',
@@ -1268,6 +1273,13 @@ class OpenApiService {
 
   getManualAddress = async () => {
     const config = this.store.config.manual_address;
+    const data = await this.sendRequest(config.method, config.path, {});
+
+    return data;
+  };
+
+  createManualAddress = async () => {
+    const config = this.store.config.create_manual_address;
     const data = await this.sendRequest(config.method, config.path, {});
 
     return data;
