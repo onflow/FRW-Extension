@@ -355,7 +355,7 @@ const dataConfig: Record<string, OpenApiConfigValue> = {
     params: ['nickname', 'avatar'],
   },
   get_transfers: {
-    path: '/api/v1/account/transfers',
+    path: '/v1/account/transfers',
     method: 'get',
     params: ['address', 'after', 'limit'],
   },
