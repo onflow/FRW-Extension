@@ -271,6 +271,7 @@ export class WalletController extends BaseController {
       setUserData(registerStatusKey(), false);
       return account;
     } catch (error) {
+      setUserData(registerStatusKey(), false);
       throw new Error(`Account creation failed: ${error.message || 'Unknown error'}`);
     }
   };
