@@ -74,7 +74,6 @@ interface MenuDrawerProps {
   evmLoading: boolean;
   modeOn: boolean;
   mainAddressLoading: boolean;
-  noAddress: boolean;
 }
 
 const MenuDrawer = (props: MenuDrawerProps) => {
@@ -82,7 +81,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   const history = useHistory();
   const classes = useStyles();
   const evmBalance = useAccountBalance(props.currentNetwork, props.evmWallet.address);
-  const { clearProfileData } = useProfiles();
+  const { clearProfileData, noAddress } = useProfiles();
 
   interface EvmADDComponentProps {
     myString: string | number;
@@ -165,7 +164,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
               <ListItemText
                 sx={{ fontSize: '14px', fontWeight: '700' }}
                 primary={
-                  ((!props.mainAddressLoading || props.noAddress) && props?.userInfo?.nickname) || (
+                  ((!props.mainAddressLoading || noAddress) && props?.userInfo?.nickname) || (
                     <Skeleton variant="text" width={100} />
                   )
                 }

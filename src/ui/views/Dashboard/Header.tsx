@@ -550,7 +550,6 @@ const Header = ({ _loading = false }) => {
               evmLoading={evmLoading}
               modeOn={developerMode}
               mainAddressLoading={mainAddressLoading}
-              noAddress={noAddress || false}
             />
           )}
           {appBarLabel(currentWallet)}
