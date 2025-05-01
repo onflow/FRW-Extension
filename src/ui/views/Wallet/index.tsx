@@ -51,7 +51,7 @@ const WalletTab = ({ network }) => {
   const history = useHistory();
   const location = useLocation();
   const { initializeStore } = useInitHook();
-  const { childAccounts, evmWallet, currentWallet } = useProfiles();
+  const { childAccounts, evmWallet, currentWallet, noAddress } = useProfiles();
   const { balance, coinsLoaded } = useCoins();
   const [value, setValue] = React.useState(0);
 
@@ -241,7 +241,11 @@ const WalletTab = ({ network }) => {
             fontWeight: 'semi-bold',
           }}
         >
-          {coinsLoaded ? (
+          {noAddress ? (
+            <Typography variant="h4" component="div">
+              -
+            </Typography>
+          ) : coinsLoaded ? (
             <CurrencyValue value={balance} showCurrencyCode={false} />
           ) : (
             <Skeleton variant="text" width={100} />

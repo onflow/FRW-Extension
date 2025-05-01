@@ -1393,6 +1393,9 @@
     "message": "Manage Token"
   },
   "No_address_found": {
-    "message": "No address found, please check your publickey"
+    "message": "No address found"
+  },
+  "Check_your_public_key": {
+    "message": "Check your public key"
   }
 }

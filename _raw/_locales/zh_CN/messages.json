@@ -1393,6 +1393,9 @@
     "message": "管理代币"
   },
   "No_address_found": {
-    "message": "未找到地址，请检查您的公钥"
+    "message": "未找到地址"
+  },
+  "Check_your_public_key": {
+    "message": "检查您的公钥"
   }
 }

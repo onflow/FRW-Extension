@@ -74,6 +74,7 @@ interface MenuDrawerProps {
   evmLoading: boolean;
   modeOn: boolean;
   mainAddressLoading: boolean;
+  noAddress: boolean;
 }
 
 const MenuDrawer = (props: MenuDrawerProps) => {
@@ -164,7 +165,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
               <ListItemText
                 sx={{ fontSize: '14px', fontWeight: '700' }}
                 primary={
-                  (!props.mainAddressLoading && props?.userInfo?.nickname) || (
+                  ((!props.mainAddressLoading || props.noAddress) && props?.userInfo?.nickname) || (
                     <Skeleton variant="text" width={100} />
                   )
                 }

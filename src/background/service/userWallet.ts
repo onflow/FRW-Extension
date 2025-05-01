@@ -1130,6 +1130,8 @@ const preloadAllAccountsWithPubKey = async (
     console.warn(
       `No main accounts loaded even after trying for ${Math.round(MAX_LOAD_TIME / 1000 / 60)} minutes`
     );
+  } else {
+    setUserData(noAddressKey(network, pubKey), false);
   }
 
   // Now for each main account load the evm address and child accounts

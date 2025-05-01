@@ -1393,6 +1393,9 @@
     "message": "トークンを管理"
   },
   "No_address_found": {
-    "message": "アドレスが見つかりません、公開鍵を確認してください"
+    "message": "アドレスが見つかりません"
+  },
+  "Check_your_public_key": {
+    "message": "公開鍵を確認してください"
   }
 }
