@@ -93,7 +93,8 @@ export const useProfiles = () => {
   const evmAddress = evmAccount?.address ?? '';
   const mainAddress = activeAccounts?.parentAddress ?? '';
 
-  const mainAddressLoading = !mainAccounts || !activeAccounts || !activeAccounts?.parentAddress;
+  const mainAddressLoading =
+    !mainAccounts || !activeAccounts || activeAccounts?.parentAddress === undefined;
 
   const activeAccountType = useMemo(
     () =>
