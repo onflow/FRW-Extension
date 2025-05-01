@@ -102,5 +102,5 @@ export const useNoAddress = (
 };
 
 export const useRegisterStatus = () => {
-  return useUserData<boolean>(registerStatusKey());
+  return useCachedData<boolean>(registerStatusKey());
 };

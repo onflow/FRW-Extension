@@ -242,7 +242,7 @@ export class WalletController extends BaseController {
     // We're creating the Flow address for the account
     // Only after this, do we have a valid wallet with a Flow address
     const result = await openapiService.createFlowAddressV2();
-    setUserData(registerStatusKey(), true);
+    setCachedData(registerStatusKey(), true);
 
     this.checkForNewAddress(result.data.txid);
   };
@@ -272,7 +272,7 @@ export class WalletController extends BaseController {
     } catch (error) {
       throw new Error(`Account creation failed: ${error.message || 'Unknown error'}`);
     } finally {
-      setUserData(registerStatusKey(), false);
+      setCachedData(registerStatusKey(), false);
     }
   };
 

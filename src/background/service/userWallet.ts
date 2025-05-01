@@ -1102,8 +1102,6 @@ const preloadAllAccountsWithPubKey = async (
     throw new Error('Network and pubkey are required');
   }
 
-  setUserData(noAddressKey(network, pubKey), false);
-
   let mainAccounts: MainAccount[] = [];
   try {
     mainAccounts = await retryOperation(
