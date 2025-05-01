@@ -1104,6 +1104,8 @@ const preloadAllAccountsWithPubKey = async (
 
   let mainAccounts: MainAccount[] = [];
   try {
+    // Set the no address flag to false when retrying to load the main accounts
+    setUserData(noAddressKey(network, pubKey), false);
     mainAccounts = await retryOperation(
       async () => {
         try {
