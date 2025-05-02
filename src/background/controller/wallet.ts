@@ -302,6 +302,9 @@ export class WalletController extends BaseController {
   };
 
   importAccountFromMobile = async (address: string, password: string, mnemonic: string) => {
+    // Make sure we're on mainnet
+    await this.switchNetwork('mainnet');
+
     // Query the account to get the account info befofe we add the key
     const accountInfo = await this.getAccountInfo(address);
 
@@ -2926,10 +2929,6 @@ export class WalletController extends BaseController {
     await userWalletService.switchFclNetwork(network as FlowNetwork);
     await userWalletService.setNetwork(network);
     eventBus.emit('switchNetwork', network);
-
-    // Reload everything
-    await this.refreshWallets();
-    await this.refreshAll();
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (!tabs || tabs.length === 0) {
