@@ -1,0 +1,32 @@
+# Use Ubuntu as base
+FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y curl unzip
+
+# Install Flow CLI
+RUN sh -ci "$(curl -fsSL https://raw.githubusercontent.com/onflow/flow-cli/master/install.sh)"
+
+# Add Flow CLI binary to PATH (since it's installed in /root/.local/bin)
+ENV PATH="/root/.local/bin:$PATH"
+
+# Set correct working directory where flow.json is located
+WORKDIR /root/flow_emulator
+
+# Copy necessary files
+COPY e2e-flow.json /root/flow_emulator/flow.json
+COPY e2e-emulator-account.pkey /root/flow_emulator/e2e-emulator-account.pkey
+COPY init_emulator.sh /usr/local/bin/init_emulator.sh
+RUN chmod +x /usr/local/bin/init_emulator.sh
+
+# Ensure /root/.flow-emulator exists for persistence
+RUN mkdir -p /root/.flow-emulator
+
+# Run emulator, sync from Testnet, and create snapshot
+RUN /usr/local/bin/init_emulator.sh
+
+# Expose necessary ports
+EXPOSE 3569 8080
+
+# Start emulator from the correct directory, using the correct flow.json path
+CMD ["flow", "emulator", "--config-path", "flow.json", "--persist", "--chain-id", "testnet", "--rpc-host", "access.devnet.nodes.onflow.org:9000"]
