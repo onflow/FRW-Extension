@@ -8,7 +8,7 @@ import {
   TermsCheckbox,
   ErrorSnackbar,
   SubmitButton,
-} from '@/ui/FRWComponent/LandingPages/PasswordComponents';
+} from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 
 import CheckCircleIcon from '../../../components/iconfont/IconCheckmark';
@@ -167,6 +167,7 @@ const SetPassword: React.FC<SetPasswordProps> = ({
               setVisible={setPasswordVisible}
               className={classes.inputBox}
               autoFocus={autoFocus}
+              showIndicator={!isLogin}
               placeholder={
                 isLogin
                   ? chrome.i18n.getMessage('Confirm__your__password')
@@ -186,6 +187,7 @@ const SetPassword: React.FC<SetPasswordProps> = ({
                   setVisible={setConfirmPasswordVisible}
                   placeholder={chrome.i18n.getMessage('Confirm__your__password')}
                   className={classes.inputBox}
+                  showIndicator={true}
                 />
                 <SlideRelative show={!!confirmPassword} direction="down">
                   {helperMatch}

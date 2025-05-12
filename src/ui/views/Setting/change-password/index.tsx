@@ -22,12 +22,12 @@ import CancelIcon from '@/components/iconfont/IconClose';
 import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
 import { LLHeader } from '@/ui/FRWComponent/LLHeader';
+import { PasswordIndicator, PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from '@/ui/utils';
 
 import { GoogleWarningDialog } from './google-warning';
-import { PasswordIndicator } from './password-indicator';
 import { ProfileBackupSelectionDialog } from './profile-backup-selection';
 
 const useStyles = makeStyles(() => ({
@@ -367,21 +367,16 @@ const ChangePassword = () => {
             >
               {chrome.i18n.getMessage('Current__Password')}
             </Typography>
-            <Input
-              sx={{ fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' }}
-              id="pass"
-              name="password"
-              type={isCurrentPasswordVisible ? 'text' : 'password'}
-              placeholder={chrome.i18n.getMessage('Enter__Current__Password')}
+            <PasswordInput
               value={confirmCurrentPassword}
+              onChange={(value) => setConfirmCurrentPassword(value)}
+              sx={{ fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' }}
               className={classes.inputBox}
-              fullWidth
               autoFocus
-              disableUnderline
-              autoComplete="new-password"
-              onChange={(event) => {
-                setConfirmCurrentPassword(event.target.value);
-              }}
+              placeholder={chrome.i18n.getMessage('Enter__Current__Password')}
+              isVisible={isCurrentPasswordVisible}
+              setVisible={setCurrentPasswordVisible}
+              visibilitySx={{ fontSize: 14, padding: 0 }}
               endAdornment={
                 <InputAdornment position="end">
                   {isVerifying ? (
@@ -416,7 +411,12 @@ const ChangePassword = () => {
             >
               {chrome.i18n.getMessage('New__Password')}
             </Typography>
-            <Input
+
+            <PasswordInput
+              value={password}
+              onChange={(value) => {
+                setPassword(value);
+              }}
               sx={{
                 pb: '15px',
                 marginTop: password ? '0px' : '0px',
@@ -424,30 +424,16 @@ const ChangePassword = () => {
                 fontFamily: 'Inter',
                 fontStyle: 'normal',
               }}
-              id="pass1"
-              type={isPasswordVisible ? 'text' : 'password'}
-              name="password1"
-              placeholder={chrome.i18n.getMessage('Enter__New__Password')}
-              value={password}
-              className={classes.inputBox2}
-              fullWidth
-              disableUnderline
-              autoComplete="new-password"
-              onChange={(event) => {
-                setPassword(event.target.value);
+              visibilitySx={{
+                fontSize: 14,
+                margin: 0,
               }}
-              endAdornment={
-                <InputAdornment position="end">
-                  {password && <PasswordIndicator value={password} />}
-                  <IconButton onClick={() => setPasswordVisible(!isPasswordVisible)}>
-                    {isPasswordVisible ? (
-                      <VisibilityOffIcon sx={{ fontSize: 14, padding: 0 }} />
-                    ) : (
-                      <VisibilityIcon sx={{ fontSize: 14, padding: 0 }} />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              }
+              isVisible={isPasswordVisible}
+              setVisible={setPasswordVisible}
+              className={classes.inputBox}
+              autoFocus={true}
+              placeholder={chrome.i18n.getMessage('Enter__New__Password')}
+              showIndicator={true}
             />
             <SlideRelative direction="down" show={!!password}>
               {helperText}
@@ -465,7 +451,12 @@ const ChangePassword = () => {
             >
               {chrome.i18n.getMessage('Confirm__Password')}
             </Typography>
-            <Input
+
+            <PasswordInput
+              value={confirmPassword}
+              onChange={(value) => {
+                setConfirmPassword(value);
+              }}
               sx={{
                 pb: '15px',
                 marginTop: password ? '0px' : '0px',
@@ -473,29 +464,16 @@ const ChangePassword = () => {
                 fontFamily: 'Inter',
                 fontStyle: 'normal',
               }}
-              id="pass2"
-              type={isConfirmPasswordVisible ? 'text' : 'password'}
-              name="password2"
-              placeholder={chrome.i18n.getMessage('Confirm__Password')}
-              value={confirmPassword}
-              className={classes.inputBox3}
-              autoComplete="new-password"
-              fullWidth
-              disableUnderline
-              onChange={(event) => {
-                setConfirmPassword(event.target.value);
+              visibilitySx={{
+                fontSize: 14,
+                margin: 0,
               }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setConfirmPasswordVisible(!isConfirmPasswordVisible)}>
-                    {isConfirmPasswordVisible ? (
-                      <VisibilityOffIcon sx={{ fontSize: 14, margin: 0 }} />
-                    ) : (
-                      <VisibilityIcon sx={{ fontSize: 14, margin: 0 }} />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              }
+              isVisible={isConfirmPasswordVisible}
+              setVisible={setConfirmPasswordVisible}
+              className={classes.inputBox}
+              autoFocus={true}
+              placeholder={chrome.i18n.getMessage('Confirm__Password')}
+              showIndicator={true}
             />
             <SlideRelative direction="down" show={!!confirmPassword}>
               {helperMatch}

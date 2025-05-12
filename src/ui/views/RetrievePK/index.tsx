@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { LLPrimaryButton, CredentialBox, LLSecondaryButton } from 'ui/FRWComponent';
 import { useWallet, useApproval, useWalletRequest } from 'ui/utils';
@@ -40,6 +41,7 @@ const RetrievePK = () => {
   const inputEl = useRef<any>(null);
   // const { t } = useTranslation();
   const [showError, setShowError] = useState(false);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [dataArray, setArray] = useState<any[]>([]);
@@ -140,19 +142,17 @@ const RetrievePK = () => {
           </Box>
 
           <FormControl sx={{ flexGrow: 1, width: '90%', display: 'flex', flexDirection: 'column' }}>
-            <Input
-              id="textfield"
-              type="password"
-              className={classes.inputBox}
-              placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-              autoFocus
-              fullWidth
-              disableUnderline
+            <PasswordInput
               value={password}
-              onChange={(event) => {
+              onChange={(value) => {
                 setShowError(false);
-                setPassword(event.target.value);
+                setPassword(value);
               }}
+              isVisible={isPasswordVisible}
+              setVisible={setPasswordVisible}
+              className={classes.inputBox}
+              autoFocus={true}
+              placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
               onKeyDown={handleKeyDown}
             />
 

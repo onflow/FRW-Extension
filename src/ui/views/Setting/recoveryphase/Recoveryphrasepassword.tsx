@@ -6,6 +6,7 @@ import { Link, useHistory } from 'react-router-dom';
 
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
 import { LLHeader } from '@/ui/FRWComponent';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { useWallet } from 'ui/utils';
 
@@ -38,6 +39,7 @@ const Recoveryphrasepassword = () => {
   const wallet = useWallet();
   const classes = useStyles();
   const [confirmPassword, setConfirmPassword] = useState(DEFAULT_PASSWORD);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isMatch, setMatch] = useState(false);
 
   const handleKeyDown = (event) => {
@@ -119,18 +121,16 @@ const Recoveryphrasepassword = () => {
             paddingTop: '12px',
           }}
         >
-          <Input
-            id="textfield"
-            type="password"
-            className={classes.inputBox}
-            placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-            autoFocus
-            fullWidth
-            disableUnderline
+          <PasswordInput
             value={confirmPassword}
-            onChange={(event) => {
-              setConfirmPassword(event.target.value);
+            onChange={(value) => {
+              setConfirmPassword(value);
             }}
+            isVisible={isPasswordVisible}
+            setVisible={setPasswordVisible}
+            className={classes.inputBox}
+            autoFocus={true}
+            placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
             onKeyDown={handleKeyDown}
           />
 

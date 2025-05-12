@@ -6,6 +6,7 @@ import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { useWallet } from 'ui/utils';
 
@@ -136,27 +137,14 @@ const DecryptWallet = ({ handleSwitchTab, setMnemonic, username }) => {
           }}
         >
           <FormGroup sx={{ width: '100%' }}>
-            <Input
-              id="pass"
-              type={isPasswordVisible ? 'text' : 'password'}
-              name="password"
-              placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
+            <PasswordInput
               value={password}
+              onChange={setPassword}
+              isVisible={isPasswordVisible}
+              setVisible={setPasswordVisible}
               className={classes.inputBox}
-              fullWidth
-              autoFocus
-              disableUnderline
-              autoComplete="new-password"
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setPasswordVisible(!isPasswordVisible)}>
-                    {isPasswordVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              }
+              autoFocus={true}
+              placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
             />
             <SlideRelative direction="down" show={!!password}>
               {helperText}

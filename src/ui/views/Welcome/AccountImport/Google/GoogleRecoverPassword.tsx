@@ -19,6 +19,7 @@ import React, { useEffect, useState } from 'react';
 import zxcvbn from 'zxcvbn';
 
 import { LLSpinner, LLNotFound } from '@/ui/FRWComponent';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import { useWallet } from 'ui/utils';
 
 import CheckCircleIcon from '../../../../../components/iconfont/IconCheckmark';
@@ -90,46 +91,6 @@ const BpCheckedIcon = styled(BpIcon)({
     backgroundColor: '#41CC5D',
   },
 });
-
-const PasswordIndicator = (props) => {
-  const score = zxcvbn(props.value).score;
-  const precentage = ((score + 1) / 5) * 100;
-
-  const level = (score) => {
-    switch (score) {
-      case 0:
-      case 1:
-        return { text: chrome.i18n.getMessage('Weak'), color: 'error' };
-      case 2:
-        return { text: chrome.i18n.getMessage('Good'), color: 'testnet' };
-      case 3:
-        return { text: chrome.i18n.getMessage('Great'), color: 'success' };
-      case 4:
-        return { text: chrome.i18n.getMessage('Strong'), color: 'success' };
-      default:
-        return { text: chrome.i18n.getMessage('Unknown'), color: 'error' };
-    }
-  };
-
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '72px', mr: 1 }}>
-        <LinearProgress
-          variant="determinate"
-          // @ts-expect-error level function returned expected value
-          color={level(score).color}
-          sx={{ height: '12px', width: '72px', borderRadius: '12px' }}
-          value={precentage}
-        />
-      </Box>
-      <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" color="text.secondary">
-          {level(score).text}
-        </Typography>
-      </Box>
-    </Box>
-  );
-};
 
 const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPassword }) => {
   const classes = useStyles();
@@ -253,26 +214,14 @@ const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPasswo
             }}
           >
             <FormGroup sx={{ width: '100%' }}>
-              <Input
-                id="pass"
-                type={isPasswordVisible ? 'text' : 'password'}
-                name="password"
-                placeholder={chrome.i18n.getMessage('Create__a__password')}
+              <PasswordInput
                 value={password}
+                onChange={setPassword}
+                isVisible={isPasswordVisible}
+                setVisible={setPasswordVisible}
                 className={classes.inputBox}
-                fullWidth
-                disableUnderline
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    {password && <PasswordIndicator value={password} />}
-                    <IconButton onClick={() => setPasswordVisible(!isPasswordVisible)}>
-                      {isPasswordVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                    </IconButton>
-                  </InputAdornment>
-                }
+                autoFocus={true}
+                placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
               />
             </FormGroup>
           </Box>
