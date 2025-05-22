@@ -6,6 +6,7 @@ import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { useWallet } from 'ui/utils';
 
@@ -22,19 +23,6 @@ const useStyles = makeStyles(() => ({
   customInputLabel: {
     '& legend': {
       visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
     },
   },
   inputBox2: {
@@ -136,27 +124,13 @@ const DecryptWallet = ({ handleSwitchTab, setMnemonic, username }) => {
           }}
         >
           <FormGroup sx={{ width: '100%' }}>
-            <Input
-              id="pass"
-              type={isPasswordVisible ? 'text' : 'password'}
-              name="password"
-              placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
+            <PasswordInput
               value={password}
-              className={classes.inputBox}
-              fullWidth
-              autoFocus
-              disableUnderline
-              autoComplete="new-password"
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setPasswordVisible(!isPasswordVisible)}>
-                    {isPasswordVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              }
+              onChange={setPassword}
+              isVisible={isPasswordVisible}
+              setVisible={setPasswordVisible}
+              autoFocus={true}
+              placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
             />
             <SlideRelative direction="down" show={!!password}>
               {helperText}

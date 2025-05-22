@@ -8,6 +8,7 @@ import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
 import lilo from '@/ui/FRWAssets/image/lilo.png';
 import { LLPrimaryButton } from '@/ui/FRWComponent';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet, useWalletLoaded } from '@/ui/utils';
@@ -20,20 +21,6 @@ const useStyles = makeStyles(() => ({
   customInputLabel: {
     '& legend': {
       visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    magrinBottom: '64px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
     },
   },
 }));
@@ -65,6 +52,8 @@ const Unlock = () => {
   // const { t } = useTranslation();
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showUnexpectedError, setShowUnexpectedError] = useState(false);
+
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [unlocking, setUnlocking] = useState<boolean>(false);
   const { clearProfileData } = useProfiles();
@@ -153,19 +142,16 @@ const Unlock = () => {
           position: 'relative',
         }}
       >
-        <Input
-          id="textfield"
-          type="password"
-          className={classes.inputBox}
-          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-          autoFocus
-          fullWidth
-          disableUnderline
+        <PasswordInput
           value={password}
-          onChange={(event) => {
+          onChange={(value) => {
             setShowPasswordError(false);
-            setPassword(event.target.value);
+            setPassword(value);
           }}
+          isVisible={isPasswordVisible}
+          setVisible={setPasswordVisible}
+          autoFocus={true}
+          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           onKeyDown={handleKeyDown}
         />
 

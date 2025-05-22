@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { PasswordInput } from '@/ui/FRWComponent/PasswordComponents';
 import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 import { LLPrimaryButton } from 'ui/FRWComponent';
 import { useWallet } from 'ui/utils';
@@ -16,20 +17,6 @@ const useStyles = makeStyles(() => ({
       visibility: 'visible',
     },
   },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    magrinBottom: '64px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
 }));
 
 const RecoverPage = ({ dataArray, setArray, goNext }) => {
@@ -39,6 +26,7 @@ const RecoverPage = ({ dataArray, setArray, goNext }) => {
   // const { t } = useTranslation();
   const [showError, setShowError] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [retrieved, setRetrieved] = useState(false);
   useEffect(() => {
@@ -158,19 +146,16 @@ const RecoverPage = ({ dataArray, setArray, goNext }) => {
       </Box>
 
       <FormControl sx={{ flexGrow: 1, width: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Input
-          id="textfield"
-          type="password"
-          className={classes.inputBox}
-          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-          autoFocus
-          fullWidth
-          disableUnderline
+        <PasswordInput
           value={password}
-          onChange={(event) => {
+          onChange={(value) => {
             setShowError(false);
-            setPassword(event.target.value);
+            setPassword(value);
           }}
+          isVisible={isPasswordVisible}
+          setVisible={setPasswordVisible}
+          autoFocus={true}
+          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           onKeyDown={handleKeyDown}
         />
 

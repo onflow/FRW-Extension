@@ -22,12 +22,11 @@ import CancelIcon from '@/components/iconfont/IconClose';
 import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
 import { LLHeader } from '@/ui/FRWComponent/LLHeader';
-import SlideRelative from '@/ui/FRWComponent/SlideRelative';
+import PasswordForm from '@/ui/FRWComponent/PasswordForm';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from '@/ui/utils';
 
 import { GoogleWarningDialog } from './google-warning';
-import { PasswordIndicator } from './password-indicator';
 import { ProfileBackupSelectionDialog } from './profile-backup-selection';
 
 const useStyles = makeStyles(() => ({
@@ -37,11 +36,9 @@ const useStyles = makeStyles(() => ({
     },
   },
   inputBox: {
-    width: '355px',
+    width: '100%',
     height: '48px',
     padding: '18px',
-    marginLeft: '18px',
-    marginRight: '18px',
     zIndex: '999',
     border: '1px solid #4C4C4C',
     borderRadius: '8px',
@@ -88,8 +85,6 @@ const ChangePassword = () => {
   const wallet = useWallet();
   const { clearProfileData } = useProfiles();
   const [isCurrentPasswordVisible, setCurrentPasswordVisible] = useState(false);
-  const [isPasswordVisible, setPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [confirmPassword, setConfirmPassword] = useState(DEFAULT_PASSWORD);
   const [isCharacters, setCharacters] = useState(false);
@@ -334,6 +329,36 @@ const ChangePassword = () => {
     }
   }, [confirmPassword, password]);
 
+  // Custom endAdornment for the current password field
+  const currentPasswordAdornment = (
+    <InputAdornment position="end">
+      {isVerifying ? (
+        <Box sx={{ width: 14, height: 14, margin: '8px' }}>
+          <LinearProgress sx={{ width: 14, height: 14 }} />
+        </Box>
+      ) : isSame ? (
+        <CheckCircleIcon size={14} color={'#41CC5D'} style={{ margin: '8px' }} />
+      ) : (
+        <CancelIcon size={14} color={'#E54040'} style={{ margin: '8px' }} />
+      )}
+      <IconButton onClick={() => setCurrentPasswordVisible(!isCurrentPasswordVisible)}>
+        {isCurrentPasswordVisible ? (
+          <VisibilityOffIcon sx={{ fontSize: 14, padding: 0 }} />
+        ) : (
+          <VisibilityIcon sx={{ fontSize: 14, padding: 0 }} />
+        )}
+      </IconButton>
+    </InputAdornment>
+  );
+
+  const handleValidationChange = useCallback(
+    (validationState: { characters: boolean; match: boolean }) => {
+      setCharacters(validationState.characters);
+      setMatch(validationState.match);
+    },
+    []
+  );
+
   return (
     <div className="page">
       <Box
@@ -349,158 +374,51 @@ const ChangePassword = () => {
         <Box
           sx={{
             flexGrow: 1,
-            width: '355px',
-            maxWidth: '100%',
+            width: '100%',
             my: '8px',
             display: 'flex',
+            boxSizing: 'border-box',
+            paddingX: '18px',
           }}
         >
-          <FormGroup sx={{ width: '100%' }}>
-            <Typography
-              sx={{
-                fontSize: '14px',
-                fontFamily: 'Inter',
-                fontWeight: '500',
-                paddingLeft: '18px',
-                marginBottom: '8px',
-              }}
-            >
-              {chrome.i18n.getMessage('Current__Password')}
-            </Typography>
-            <Input
-              sx={{ fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' }}
-              id="pass"
-              name="password"
-              type={isCurrentPasswordVisible ? 'text' : 'password'}
-              placeholder={chrome.i18n.getMessage('Enter__Current__Password')}
-              value={confirmCurrentPassword}
-              className={classes.inputBox}
-              fullWidth
-              autoFocus
-              disableUnderline
-              autoComplete="new-password"
-              onChange={(event) => {
-                setConfirmCurrentPassword(event.target.value);
-              }}
-              endAdornment={
-                <InputAdornment position="end">
-                  {isVerifying ? (
-                    <Box sx={{ width: 14, height: 14, margin: '8px' }}>
-                      <LinearProgress sx={{ width: 14, height: 14 }} />
-                    </Box>
-                  ) : isSame ? (
-                    <CheckCircleIcon size={14} color={'#41CC5D'} style={{ margin: '8px' }} />
-                  ) : (
-                    <CancelIcon size={14} color={'#E54040'} style={{ margin: '8px' }} />
-                  )}
-                  <IconButton onClick={() => setCurrentPasswordVisible(!isCurrentPasswordVisible)}>
-                    {isCurrentPasswordVisible ? (
-                      <VisibilityOffIcon sx={{ fontSize: 14, padding: 0 }} />
-                    ) : (
-                      <VisibilityIcon sx={{ fontSize: 14, padding: 0 }} />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-
-            <Typography
-              sx={{
-                fontSize: '14px',
-                fontFamily: 'Inter',
-                fontWeight: '500',
-                paddingLeft: '18px',
-                marginTop: '16px',
-                marginBottom: '8px',
-              }}
-            >
-              {chrome.i18n.getMessage('New__Password')}
-            </Typography>
-            <Input
-              sx={{
-                pb: '15px',
-                marginTop: password ? '0px' : '0px',
-                fontSize: '12px',
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-              }}
-              id="pass1"
-              type={isPasswordVisible ? 'text' : 'password'}
-              name="password1"
-              placeholder={chrome.i18n.getMessage('Enter__New__Password')}
-              value={password}
-              className={classes.inputBox2}
-              fullWidth
-              disableUnderline
-              autoComplete="new-password"
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-              endAdornment={
-                <InputAdornment position="end">
-                  {password && <PasswordIndicator value={password} />}
-                  <IconButton onClick={() => setPasswordVisible(!isPasswordVisible)}>
-                    {isPasswordVisible ? (
-                      <VisibilityOffIcon sx={{ fontSize: 14, padding: 0 }} />
-                    ) : (
-                      <VisibilityIcon sx={{ fontSize: 14, padding: 0 }} />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-            <SlideRelative direction="down" show={!!password}>
-              {helperText}
-            </SlideRelative>
-
-            <Typography
-              sx={{
-                fontSize: '14px',
-                fontFamily: 'Inter',
-                fontWeight: '500',
-                paddingLeft: '18px',
-                marginTop: '16px',
-                marginBottom: '8px',
-              }}
-            >
-              {chrome.i18n.getMessage('Confirm__Password')}
-            </Typography>
-            <Input
-              sx={{
-                pb: '15px',
-                marginTop: password ? '0px' : '0px',
-                fontSize: '12px',
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-              }}
-              id="pass2"
-              type={isConfirmPasswordVisible ? 'text' : 'password'}
-              name="password2"
-              placeholder={chrome.i18n.getMessage('Confirm__Password')}
-              value={confirmPassword}
-              className={classes.inputBox3}
-              autoComplete="new-password"
-              fullWidth
-              disableUnderline
-              onChange={(event) => {
-                setConfirmPassword(event.target.value);
-              }}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setConfirmPasswordVisible(!isConfirmPasswordVisible)}>
-                    {isConfirmPasswordVisible ? (
-                      <VisibilityOffIcon sx={{ fontSize: 14, margin: 0 }} />
-                    ) : (
-                      <VisibilityIcon sx={{ fontSize: 14, margin: 0 }} />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-            <SlideRelative direction="down" show={!!confirmPassword}>
-              {helperMatch}
-            </SlideRelative>
-          </FormGroup>
+          <PasswordForm
+            fields={[
+              {
+                value: confirmCurrentPassword,
+                onChange: (value) => setConfirmCurrentPassword(value),
+                label: chrome.i18n.getMessage('Current__Password'),
+                placeholder: chrome.i18n.getMessage('Enter__Current__Password'),
+                sx: { fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' },
+                visibilitySx: { fontSize: 14, padding: 0 },
+                endAdornment: currentPasswordAdornment,
+              },
+              {
+                value: password,
+                onChange: (value) => {
+                  setPassword(value);
+                  setConfirmPassword('');
+                },
+                label: chrome.i18n.getMessage('New__Password'),
+                placeholder: chrome.i18n.getMessage('Enter__New__Password'),
+                sx: { fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' },
+                visibilitySx: { fontSize: 14, margin: 0 },
+                showIndicator: true,
+              },
+              {
+                value: confirmPassword,
+                onChange: (value) => setConfirmPassword(value),
+                label: chrome.i18n.getMessage('Confirm__Password'),
+                placeholder: chrome.i18n.getMessage('Confirm__Password'),
+                sx: { fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' },
+                visibilitySx: { fontSize: 14, margin: 0 },
+                showIndicator: true,
+              },
+            ]}
+            className={classes.inputBox}
+            requireMatch={true}
+            matchFields={[1, 2]} // Match new password and confirm password
+            onValidationChange={handleValidationChange}
+          />
         </Box>
         <Box
           sx={{

@@ -1,34 +1,10 @@
-import { Box, Typography, FormGroup } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
-import {
-  PasswordInput,
-  TermsCheckbox,
-  ErrorSnackbar,
-  SubmitButton,
-} from '@/ui/FRWComponent/LandingPages/PasswordComponents';
-import SlideRelative from '@/ui/FRWComponent/SlideRelative';
-
-import CheckCircleIcon from '../../../components/iconfont/IconCheckmark';
-import CancelIcon from '../../../components/iconfont/IconClose';
-
-const useStyles = makeStyles(() => ({
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
+import { TermsCheckbox, ErrorSnackbar, SubmitButton } from '@/ui/FRWComponent/PasswordComponents';
+import PasswordForm from '@/ui/FRWComponent/PasswordForm';
 
 interface SetPasswordProps {
   handleSwitchTab: () => void;
@@ -51,10 +27,6 @@ const SetPassword: React.FC<SetPasswordProps> = ({
   isLogin = false,
   autoFocus = false,
 }) => {
-  const classes = useStyles();
-
-  const [isPasswordVisible, setPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [confirmPassword, setConfirmPassword] = useState(DEFAULT_PASSWORD);
   const [isCharacters, setCharacters] = useState(false);
@@ -63,46 +35,6 @@ const SetPassword: React.FC<SetPasswordProps> = ({
   const [isLoading, setLoading] = useState(false);
   const [errMessage, setErrorMessage] = useState('Something wrong, please try again');
   const [showError, setShowError] = useState(false);
-  const [helperText, setHelperText] = useState(<div />);
-  const [helperMatch, setHelperMatch] = useState(<div />);
-
-  const successInfo = (message: string) => (
-    <Box
-      sx={{
-        width: '95%',
-        backgroundColor: 'success.light',
-        mx: 'auto',
-        borderRadius: '0 0 12px 12px',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-    >
-      <CheckCircleIcon size={24} color={'#41CC5D'} style={{ margin: '8px' }} />
-      <Typography variant="body1" color="success.main">
-        {message}
-      </Typography>
-    </Box>
-  );
-
-  const errorInfo = (message: string) => (
-    <Box
-      sx={{
-        width: '95%',
-        backgroundColor: 'error.light',
-        mx: 'auto',
-        borderRadius: '0 0 12px 12px',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-    >
-      <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-      <Typography variant="body1" color="error.main">
-        {message}
-      </Typography>
-    </Box>
-  );
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -116,25 +48,10 @@ const SetPassword: React.FC<SetPasswordProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (password.length > 7) {
-      setHelperText(successInfo(chrome.i18n.getMessage('At__least__8__characters')));
-      setCharacters(true);
-    } else {
-      setHelperText(errorInfo(chrome.i18n.getMessage('At__least__8__characters')));
-      setCharacters(false);
-    }
-  }, [password]);
-
-  useEffect(() => {
-    if (confirmPassword === password) {
-      setHelperMatch(successInfo(chrome.i18n.getMessage('Passwords__match')));
-      setMatch(true);
-    } else {
-      setMatch(false);
-      setHelperMatch(errorInfo(chrome.i18n.getMessage('Your__passwords__do__not__match')));
-    }
-  }, [confirmPassword, password]);
+  const handleValidationChange = (validationState: { characters: boolean; match: boolean }) => {
+    setCharacters(validationState.characters);
+    setMatch(validationState.match);
+  };
 
   return (
     <>
@@ -159,40 +76,31 @@ const SetPassword: React.FC<SetPasswordProps> = ({
         </Typography>
 
         <Box sx={{ flexGrow: 1, width: 640, maxWidth: '100%', my: '32px', display: 'flex' }}>
-          <FormGroup sx={{ width: '100%' }}>
-            <PasswordInput
-              value={password}
-              onChange={setPassword}
-              isVisible={isPasswordVisible}
-              setVisible={setPasswordVisible}
-              className={classes.inputBox}
-              autoFocus={autoFocus}
-              placeholder={
-                isLogin
+          <PasswordForm
+            fields={[
+              {
+                value: password,
+                onChange: setPassword,
+                placeholder: isLogin
                   ? chrome.i18n.getMessage('Confirm__your__password')
-                  : chrome.i18n.getMessage('Create__a__password')
-              }
-            />
-            <SlideRelative show={!!password} direction="down">
-              <Box style={{ marginBottom: '24px' }}>{helperText}</Box>
-            </SlideRelative>
-
-            {!isLogin && (
-              <Box sx={{ pb: '30px', marginTop: password ? '0px' : '24px' }}>
-                <PasswordInput
-                  value={confirmPassword}
-                  onChange={setConfirmPassword}
-                  isVisible={isConfirmPasswordVisible}
-                  setVisible={setConfirmPasswordVisible}
-                  placeholder={chrome.i18n.getMessage('Confirm__your__password')}
-                  className={classes.inputBox}
-                />
-                <SlideRelative show={!!confirmPassword} direction="down">
-                  {helperMatch}
-                </SlideRelative>
-              </Box>
-            )}
-          </FormGroup>
+                  : chrome.i18n.getMessage('Create__a__password'),
+                showIndicator: !isLogin,
+              },
+              ...(!isLogin
+                ? [
+                    {
+                      value: confirmPassword,
+                      onChange: setConfirmPassword,
+                      placeholder: chrome.i18n.getMessage('Confirm__your__password'),
+                      showIndicator: true,
+                    },
+                  ]
+                : []),
+            ]}
+            requireMatch={!isLogin}
+            onValidationChange={handleValidationChange}
+            autoFocus={autoFocus}
+          />
         </Box>
 
         {showTerms && <TermsCheckbox onChange={setCheck} />}
