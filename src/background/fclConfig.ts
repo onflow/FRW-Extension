@@ -1,5 +1,4 @@
 import * as fcl from '@onflow/fcl';
-import { send as httpSend } from '@onflow/transport-http';
 
 import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 
@@ -112,12 +111,7 @@ export const fclMainnetConfig = async (emulatorMode?: boolean) => {
   const mainnetContracts = contracts.mainnet || fallbackContracts.mainnet;
 
   const host = !!emulatorMode ? EMULATOR_HOST_MAINNET : HOST_MAINNET;
-  const config = fcl
-    .config()
-    .put('accessNode.api', host)
-    // note this is the default transport. We don't really need to set this
-    .put('sdk.transport', httpSend)
-    .put('flow.network', 'mainnet');
+  const config = fcl.config().put('accessNode.api', host).put('flow.network', 'mainnet');
 
   // Loop through all keys in mainnetContracts and apply them to the configuration
   for (const key in mainnetContracts) {
@@ -133,12 +127,7 @@ export const fclTestnetConfig = async (emulatorMode?: boolean) => {
   const testnetContracts = contracts.testnet || fallbackContracts.testnet;
 
   const host = !!emulatorMode ? EMULATOR_HOST_TESTNET : HOST_TESTNET;
-  const config = fcl
-    .config()
-    .put('accessNode.api', host)
-    // note this is the default transport. We don't really need to set this
-    .put('sdk.transport', httpSend)
-    .put('flow.network', 'testnet');
+  const config = fcl.config().put('accessNode.api', host).put('flow.network', 'testnet');
 
   for (const key in testnetContracts) {
     if (Object.prototype.hasOwnProperty.call(testnetContracts, key)) {

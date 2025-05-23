@@ -1,6 +1,5 @@
 import * as fcl from '@onflow/fcl';
 import type { AccountKey, Account as FclAccount } from '@onflow/typedefs';
-import * as t from '@onflow/types';
 import BN from 'bignumber.js';
 import * as bip39 from 'bip39';
 import { ethErrors } from 'eth-rpc-errors';
@@ -1428,7 +1427,7 @@ export class WalletController extends BaseController {
     const script = await getScripts(userWalletService.getNetwork(), 'evm', 'createCoa');
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(formattedAmount, t.UFix64),
+      fcl.arg(formattedAmount.toString(), fcl.t.UFix64),
     ]);
 
     // try to seal it
@@ -1620,9 +1619,9 @@ export class WalletController extends BaseController {
     }
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(recipientEVMAddressHex, t.String),
-      fcl.arg(amount, t.UFix64),
-      fcl.arg(gasLimit, t.UInt64),
+      fcl.arg(recipientEVMAddressHex, fcl.t.String),
+      fcl.arg(amount, fcl.t.UFix64),
+      fcl.arg(gasLimit, fcl.t.UInt64),
     ]);
 
     mixpanelTrack.track('ft_transfer', {
@@ -1657,12 +1656,12 @@ export class WalletController extends BaseController {
     const gasLimit = 30000000;
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(tokenContractAddress, t.Address),
-      fcl.arg(tokenContractName, t.String),
-      fcl.arg(amount, t.UFix64),
-      fcl.arg(contractEVMAddress, t.String),
-      fcl.arg(regularArray, t.Array(t.UInt8)),
-      fcl.arg(gasLimit, t.UInt64),
+      fcl.arg(tokenContractAddress, fcl.t.Address),
+      fcl.arg(tokenContractName, fcl.t.String),
+      fcl.arg(amount, fcl.t.UFix64),
+      fcl.arg(contractEVMAddress, fcl.t.String),
+      fcl.arg(regularArray, fcl.t.Array(fcl.t.UInt8)),
+      fcl.arg(gasLimit, fcl.t.UInt64),
     ]);
     mixpanelTrack.track('ft_transfer', {
       from_address: (await this.getCurrentAddress()) || '',
@@ -1686,9 +1685,9 @@ export class WalletController extends BaseController {
     );
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(vaultIdentifier, t.String),
-      fcl.arg(amount, t.UFix64),
-      fcl.arg(recipient, t.String),
+      fcl.arg(vaultIdentifier, fcl.t.String),
+      fcl.arg(amount, fcl.t.UFix64),
+      fcl.arg(recipient, fcl.t.String),
     ]);
 
     mixpanelTrack.track('ft_transfer', {
@@ -1722,9 +1721,9 @@ export class WalletController extends BaseController {
       'bridgeTokensFromEvmToFlowV3'
     );
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(flowidentifier, t.String),
-      fcl.arg(integerAmountStr, t.UInt256),
-      fcl.arg(receiver, t.Address),
+      fcl.arg(flowidentifier, fcl.t.String),
+      fcl.arg(integerAmountStr, fcl.t.UInt256),
+      fcl.arg(receiver, fcl.t.Address),
     ]);
 
     mixpanelTrack.track('ft_transfer', {
@@ -1742,8 +1741,8 @@ export class WalletController extends BaseController {
     const script = await getScripts(userWalletService.getNetwork(), 'evm', 'withdrawCoa');
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(amount, t.UFix64),
-      fcl.arg(address, t.Address),
+      fcl.arg(amount, fcl.t.UFix64),
+      fcl.arg(address, fcl.t.Address),
     ]);
 
     return txID;
@@ -1752,7 +1751,7 @@ export class WalletController extends BaseController {
   fundFlowEvm = async (amount = '1.0'): Promise<string> => {
     const script = await getScripts(userWalletService.getNetwork(), 'evm', 'fundCoa');
 
-    return await userWalletService.sendTransaction(script, [fcl.arg(amount, t.UFix64)]);
+    return await userWalletService.sendTransaction(script, [fcl.arg(amount, fcl.t.UFix64)]);
   };
 
   coaLink = async (): Promise<string> => {
@@ -1795,8 +1794,8 @@ export class WalletController extends BaseController {
     );
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(flowIdentifier, t.String),
-      fcl.arg(amount, t.UFix64),
+      fcl.arg(flowIdentifier, fcl.t.String),
+      fcl.arg(amount, fcl.t.UFix64),
     ]);
 
     mixpanelTrack.track('ft_transfer', {
@@ -1824,8 +1823,8 @@ export class WalletController extends BaseController {
       'bridgeTokensFromEvmV2'
     );
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(flowIdentifier, t.String),
-      fcl.arg(integerAmountStr, t.UInt256),
+      fcl.arg(flowIdentifier, fcl.t.String),
+      fcl.arg(integerAmountStr, fcl.t.UInt256),
     ]);
 
     mixpanelTrack.track('ft_transfer', {
@@ -1890,10 +1889,10 @@ export class WalletController extends BaseController {
     const transactionValue = value === '0x' ? BigInt(0) : BigInt(value);
 
     const result = await userWalletService.sendTransaction(script, [
-      fcl.arg(to, t.String),
-      fcl.arg(transactionValue.toString(), t.UInt256),
-      fcl.arg(regularArray, t.Array(t.UInt8)),
-      fcl.arg(gasLimit, t.UInt64),
+      fcl.arg(to, fcl.t.String),
+      fcl.arg(transactionValue.toString(), fcl.t.UInt256),
+      fcl.arg(regularArray, fcl.t.Array(fcl.t.UInt8)),
+      fcl.arg(gasLimit, fcl.t.UInt64),
     ]);
 
     mixpanelTrack.track('ft_transfer', {
@@ -1949,10 +1948,10 @@ export class WalletController extends BaseController {
     const transactionValue = value === '0x' ? BigInt(0) : BigInt(value);
 
     await userWalletService.sendTransaction(script, [
-      fcl.arg(to, t.String),
-      fcl.arg(transactionValue.toString(), t.UInt256),
-      fcl.arg(regularArray, t.Array(t.UInt8)),
-      fcl.arg(gasLimit.toString(), t.UInt64),
+      fcl.arg(to, fcl.t.String),
+      fcl.arg(transactionValue.toString(), fcl.t.UInt256),
+      fcl.arg(regularArray, fcl.t.Array(fcl.t.UInt8)),
+      fcl.arg(gasLimit.toString(), fcl.t.UInt64),
     ]);
 
     let evmAddress = await this.getEvmAddress();
@@ -2082,7 +2081,7 @@ export class WalletController extends BaseController {
       'getChildAccountMeta'
     );
 
-    return await userWalletService.sendTransaction(script, [fcl.arg(address, t.Address)]);
+    return await userWalletService.sendTransaction(script, [fcl.arg(address, fcl.t.Address)]);
   };
 
   unlinkChildAccountV2 = async (address: string): Promise<string> => {
@@ -2093,7 +2092,7 @@ export class WalletController extends BaseController {
       'unlinkChildAccount'
     );
 
-    return await userWalletService.sendTransaction(script, [fcl.arg(address, t.Address)]);
+    return await userWalletService.sendTransaction(script, [fcl.arg(address, fcl.t.Address)]);
   };
 
   editChildAccount = async (
@@ -2110,10 +2109,10 @@ export class WalletController extends BaseController {
     );
 
     return await userWalletService.sendTransaction(script, [
-      fcl.arg(address, t.Address),
-      fcl.arg(name, t.String),
-      fcl.arg(description, t.String),
-      fcl.arg(thumbnail, t.String),
+      fcl.arg(address, fcl.t.Address),
+      fcl.arg(name, fcl.t.String),
+      fcl.arg(description, fcl.t.String),
+      fcl.arg(thumbnail, fcl.t.String),
     ]);
   };
 
@@ -2143,7 +2142,7 @@ export class WalletController extends BaseController {
         .replaceAll('<TokenReceiverPath>', token.path.receiver)
         .replaceAll('<TokenStoragePath>', token.path.vault)
         .replaceAll('<TokenAddress>', token.address),
-      [fcl.arg(amount, t.UFix64), fcl.arg(address, t.Address)]
+      [fcl.arg(amount, fcl.t.UFix64), fcl.arg(address, fcl.t.Address)]
     );
 
     mixpanelTrack.track('ft_transfer', {
@@ -2160,7 +2159,7 @@ export class WalletController extends BaseController {
   revokeKey = async (index: string): Promise<string> => {
     const script = await getScripts(userWalletService.getNetwork(), 'basic', 'revokeKey');
 
-    return await userWalletService.sendTransaction(script, [fcl.arg(index, t.Int)]);
+    return await userWalletService.sendTransaction(script, [fcl.arg(index, fcl.t.Int)]);
   };
 
   addKeyToAccount = async (
@@ -2187,10 +2186,10 @@ export class WalletController extends BaseController {
       }
       `,
       [
-        fcl.arg(publicKey, t.String),
-        fcl.arg(signatureAlgorithm, t.UInt8),
-        fcl.arg(hashAlgorithm, t.UInt8),
-        fcl.arg(weight.toFixed(1), t.UFix64),
+        fcl.arg(publicKey, fcl.t.String),
+        fcl.arg(signatureAlgorithm, fcl.t.UInt8),
+        fcl.arg(hashAlgorithm, fcl.t.UInt8),
+        fcl.arg(weight.toFixed(1), fcl.t.UFix64),
       ]
     );
   };
@@ -2220,10 +2219,10 @@ export class WalletController extends BaseController {
         .replaceAll('<TokenStoragePath>', token.storage_path.vault)
         .replaceAll('<TokenAddress>', token.address[network]),
       [
-        fcl.arg(domainName, t.String),
-        fcl.arg(root, t.String),
-        fcl.arg(key, t.String),
-        fcl.arg(amount, t.UFix64),
+        fcl.arg(domainName, fcl.t.String),
+        fcl.arg(root, fcl.t.String),
+        fcl.arg(key, fcl.t.String),
+        fcl.arg(amount, fcl.t.UFix64),
       ]
     );
   };
@@ -2287,9 +2286,9 @@ export class WalletController extends BaseController {
     const replacedScript = replaceNftKeywords(script, token);
 
     const result = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(childAddress, t.Address),
-      fcl.arg(path, t.String),
-      fcl.arg(amount, t.UFix64),
+      fcl.arg(childAddress, fcl.t.Address),
+      fcl.arg(path, fcl.t.String),
+      fcl.arg(amount, fcl.t.UFix64),
     ]);
     mixpanelTrack.track('ft_transfer', {
       from_address: (await this.getCurrentAddress()) || '',
@@ -2321,10 +2320,10 @@ export class WalletController extends BaseController {
     const replacedScript = replaceNftKeywords(script, token);
 
     const result = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(childAddress, t.Address),
-      fcl.arg(receiver, t.Address),
-      fcl.arg(path, t.String),
-      fcl.arg(amount, t.UFix64),
+      fcl.arg(childAddress, fcl.t.Address),
+      fcl.arg(receiver, fcl.t.Address),
+      fcl.arg(path, fcl.t.String),
+      fcl.arg(amount, fcl.t.UFix64),
     ]);
     mixpanelTrack.track('ft_transfer', {
       from_address: childAddress,
@@ -2349,9 +2348,9 @@ export class WalletController extends BaseController {
     );
     const replacedScript = replaceNftKeywords(script, token);
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(nftContractAddress, t.Address),
-      fcl.arg(nftContractName, t.String),
-      fcl.arg(ids, t.UInt64),
+      fcl.arg(nftContractAddress, fcl.t.Address),
+      fcl.arg(nftContractName, fcl.t.String),
+      fcl.arg(ids, fcl.t.UInt64),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2379,10 +2378,10 @@ export class WalletController extends BaseController {
     );
     const replacedScript = replaceNftKeywords(script, token);
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(linkedAddress, t.Address),
-      fcl.arg(receiverAddress, t.Address),
-      fcl.arg(nftContractName, t.String),
-      fcl.arg(ids, t.UInt64),
+      fcl.arg(linkedAddress, fcl.t.Address),
+      fcl.arg(receiverAddress, fcl.t.Address),
+      fcl.arg(nftContractName, fcl.t.String),
+      fcl.arg(ids, fcl.t.UInt64),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2410,10 +2409,10 @@ export class WalletController extends BaseController {
     );
     const replacedScript = replaceNftKeywords(script, token);
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(nftContractName, t.String),
-      fcl.arg(linkedAddress, t.Address),
-      fcl.arg(id, t.UInt64),
-      fcl.arg(receiverAddress, t.String),
+      fcl.arg(nftContractName, fcl.t.String),
+      fcl.arg(linkedAddress, fcl.t.Address),
+      fcl.arg(id, fcl.t.UInt64),
+      fcl.arg(receiverAddress, fcl.t.String),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2444,9 +2443,9 @@ export class WalletController extends BaseController {
     }
     const replacedScript = replaceNftKeywords(script, token);
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(walletAddress, t.Address),
-      fcl.arg(path, t.String),
-      fcl.arg(ids, t.UInt64),
+      fcl.arg(walletAddress, fcl.t.Address),
+      fcl.arg(path, fcl.t.String),
+      fcl.arg(ids, fcl.t.UInt64),
     ]);
 
     mixpanelTrack.track('nft_transfer', {
@@ -2499,7 +2498,7 @@ export class WalletController extends BaseController {
 
     const txID = await userWalletService.sendTransaction(
       script,
-      [fcl.arg(flowIdentifier, t.String), fcl.arg(ids, t.Array(t.UInt64))],
+      [fcl.arg(flowIdentifier, fcl.t.String), fcl.arg(ids, fcl.t.Array(fcl.t.UInt64))],
       shouldCoverBridgeFee
     );
     mixpanelTrack.track('nft_transfer', {
@@ -2523,7 +2522,7 @@ export class WalletController extends BaseController {
 
     const txID = await userWalletService.sendTransaction(
       script,
-      [fcl.arg(flowIdentifier, t.String), fcl.arg(ids, t.Array(t.UInt256))],
+      [fcl.arg(flowIdentifier, fcl.t.String), fcl.arg(ids, fcl.t.Array(fcl.t.UInt256))],
       shouldCoverBridgeFee
     );
     mixpanelTrack.track('nft_transfer', {
@@ -2552,9 +2551,9 @@ export class WalletController extends BaseController {
     const replacedScript = replaceNftKeywords(script, token);
 
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(childAddr, t.Address),
-      fcl.arg(identifier, t.String),
-      fcl.arg(ids, t.Array(t.UInt64)),
+      fcl.arg(childAddr, fcl.t.Address),
+      fcl.arg(identifier, fcl.t.String),
+      fcl.arg(ids, fcl.t.Array(fcl.t.UInt64)),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2582,9 +2581,9 @@ export class WalletController extends BaseController {
     const replacedScript = replaceNftKeywords(script, token);
 
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(childAddr, t.Address),
-      fcl.arg(identifier, t.String),
-      fcl.arg(ids, t.Array(t.UInt64)),
+      fcl.arg(childAddr, fcl.t.Address),
+      fcl.arg(identifier, fcl.t.String),
+      fcl.arg(ids, fcl.t.Array(fcl.t.UInt64)),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2613,10 +2612,10 @@ export class WalletController extends BaseController {
     const replacedScript = replaceNftKeywords(script, token);
 
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(childAddr, t.Address),
-      fcl.arg(receiver, t.Address),
-      fcl.arg(identifier, t.String),
-      fcl.arg(ids, t.Array(t.UInt64)),
+      fcl.arg(childAddr, fcl.t.Address),
+      fcl.arg(receiver, fcl.t.Address),
+      fcl.arg(identifier, fcl.t.String),
+      fcl.arg(ids, fcl.t.Array(fcl.t.UInt64)),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2643,9 +2642,9 @@ export class WalletController extends BaseController {
     );
     const replacedScript = replaceNftKeywords(script, token);
     const txID = await userWalletService.sendTransaction(replacedScript, [
-      fcl.arg(identifier, t.String),
-      fcl.arg(childAddr, t.Address),
-      fcl.arg(ids, t.Array(t.UInt64)),
+      fcl.arg(identifier, fcl.t.String),
+      fcl.arg(childAddr, fcl.t.Address),
+      fcl.arg(ids, fcl.t.Array(fcl.t.UInt64)),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2671,9 +2670,9 @@ export class WalletController extends BaseController {
     );
 
     const txID = await userWalletService.sendTransaction(script, [
-      fcl.arg(identifier, t.String),
-      fcl.arg(childAddr, t.Address),
-      fcl.arg(ids, t.Array(t.UInt256)),
+      fcl.arg(identifier, fcl.t.String),
+      fcl.arg(childAddr, fcl.t.Address),
+      fcl.arg(ids, fcl.t.Array(fcl.t.UInt256)),
     ]);
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2707,9 +2706,9 @@ export class WalletController extends BaseController {
     const txID = await userWalletService.sendTransaction(
       script,
       [
-        fcl.arg(flowIdentifier, t.String),
-        fcl.arg(ids, t.UInt64),
-        fcl.arg(recipientEvmAddress, t.String),
+        fcl.arg(flowIdentifier, fcl.t.String),
+        fcl.arg(ids, fcl.t.UInt64),
+        fcl.arg(recipientEvmAddress, fcl.t.String),
       ],
       shouldCoverBridgeFee
     );
@@ -2738,7 +2737,11 @@ export class WalletController extends BaseController {
 
     const txID = await userWalletService.sendTransaction(
       script,
-      [fcl.arg(flowIdentifier, t.String), fcl.arg(ids, t.UInt256), fcl.arg(receiver, t.Address)],
+      [
+        fcl.arg(flowIdentifier, fcl.t.String),
+        fcl.arg(ids, fcl.t.UInt256),
+        fcl.arg(receiver, fcl.t.Address),
+      ],
       shouldCoverBridgeFee
     );
     mixpanelTrack.track('nft_transfer', {
@@ -2776,7 +2779,7 @@ export class WalletController extends BaseController {
         .replaceAll('<NFTAddress>', token.address)
         .replaceAll('<CollectionStoragePath>', token.path.storage)
         .replaceAll('<CollectionPublicPath>', token.path.public),
-      [fcl.arg(recipient, t.Address), fcl.arg(parseInt(id), t.UInt64)]
+      [fcl.arg(recipient, fcl.t.Address), fcl.arg(parseInt(id), fcl.t.UInt64)]
     );
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
@@ -2800,7 +2803,7 @@ export class WalletController extends BaseController {
         .replaceAll('<NFTAddress>', token.address)
         .replaceAll('<CollectionStoragePath>', token.path.storage)
         .replaceAll('<CollectionPublicPath>', token.path.public),
-      [fcl.arg(recipient, t.Address), fcl.arg(parseInt(id), t.UInt64)]
+      [fcl.arg(recipient, fcl.t.Address), fcl.arg(parseInt(id), fcl.t.UInt64)]
     );
     mixpanelTrack.track('nft_transfer', {
       tx_id: txID,
