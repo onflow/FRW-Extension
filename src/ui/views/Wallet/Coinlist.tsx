@@ -264,9 +264,6 @@ const CoinList = ({
                   return false;
                 }
               }
-              if (tokenFilter.hideUnverified && !coin.isVerified) {
-                return false;
-              }
               if (tokenFilter.filteredIds.includes(coin.id)) {
                 return false;
               }
