@@ -11,6 +11,8 @@ import SlideRelative from '@/ui/FRWComponent/SlideRelative';
 
 import { useWallet } from '../utils';
 
+import { PasswordInput } from './PasswordComponents';
+
 const useStyles = makeStyles(() => ({
   customInputLabel: {
     '& legend': {
@@ -45,6 +47,7 @@ const SettingsPassword = ({
   const classes = useStyles();
   const history = useHistory();
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [passMatch, setPassMatch] = useState<PassMatch>('unverified');
 
   const verify = useCallback(() => {
@@ -112,18 +115,16 @@ const SettingsPassword = ({
             paddingTop: '12px',
           }}
         >
-          <Input
-            id="textfield"
-            type="password"
-            className={classes.inputBox}
-            placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-            autoFocus
-            fullWidth
-            disableUnderline
+          <PasswordInput
             value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
+            onChange={(value) => {
+              setPassword(value);
             }}
+            isVisible={isPasswordVisible}
+            setVisible={setPasswordVisible}
+            className={classes.inputBox}
+            autoFocus={true}
+            placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           />
 
           <SlideRelative direction="down" show={!!password && passMatch === 'no-match'}>

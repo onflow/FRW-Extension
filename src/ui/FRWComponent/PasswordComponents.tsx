@@ -87,24 +87,43 @@ interface PasswordInputProps {
   value: string;
   onChange: (value: string) => void;
   isVisible: boolean;
-  setVisible: (visible: boolean) => void;
+  setVisible?: (visible: boolean) => void;
   readOnly?: boolean;
   placeholder?: string;
   autoFocus?: boolean;
   className?: string;
+  showIndicator?: boolean;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  sx?: any;
+  visibilitySx?: any;
+  endAdornment?: React.ReactNode;
 }
 
 export const PasswordInput = ({
   value,
   onChange,
   isVisible,
-  setVisible,
+  setVisible = () => {},
   readOnly = false,
   placeholder = chrome.i18n.getMessage('Create__a__password'),
   autoFocus = false,
   className,
+  showIndicator = false,
+  onKeyDown,
+  sx,
+  visibilitySx,
+  endAdornment,
 }: PasswordInputProps) => {
   const classes = useStyles();
+
+  const defaultEndAdornment = (
+    <InputAdornment position="end">
+      {value && showIndicator && <PasswordIndicator value={value} />}
+      <IconButton onClick={() => setVisible(!isVisible)}>
+        {isVisible ? <VisibilityOffIcon sx={visibilitySx} /> : <VisibilityIcon sx={visibilitySx} />}
+      </IconButton>
+    </InputAdornment>
+  );
 
   return (
     <Input
@@ -117,14 +136,9 @@ export const PasswordInput = ({
       fullWidth
       disableUnderline
       onChange={(e) => onChange(e.target.value)}
-      endAdornment={
-        <InputAdornment position="end">
-          {value && <PasswordIndicator value={value} />}
-          <IconButton onClick={() => setVisible(!isVisible)}>
-            {isVisible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-          </IconButton>
-        </InputAdornment>
-      }
+      onKeyDown={onKeyDown}
+      sx={sx}
+      endAdornment={endAdornment || defaultEndAdornment}
     />
   );
 };
