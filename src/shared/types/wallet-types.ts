@@ -115,6 +115,7 @@ export type WalletAccount = {
   icon: string;
   color: string;
   balance?: string;
+  nfts?: number;
 };
 export type WalletAccountWithBalance = WalletAccount & {
   balance: string;

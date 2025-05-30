@@ -50,7 +50,10 @@ export const TokenBalance: React.FC<TokenBalanceProps> = ({
         <sub
           style={{
             fontSize: '0.7em',
-            verticalAlign: '-0.25em',
+            verticalAlign: 'baseline',
+            position: 'relative',
+            lineHeight: '1em',
+            top: '0.3em',
           }}
         >
           {zeroPart}

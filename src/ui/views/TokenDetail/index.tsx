@@ -20,10 +20,10 @@ import tips from 'ui/assets/svg/tips.svg';
 import WarningIcon from 'ui/assets/svg/warning.svg';
 import { useWallet } from 'ui/utils';
 
+import PriceCard from '../../components/TokenLists/PriceCard';
 import OnRampList from '../Wallet/OnRampList';
 
 import ClaimTokenCard from './ClaimTokenCard';
-import PriceCard from './PriceCard';
 import StackingCard from './StackingCard';
 import TokenInfoCard from './TokenInfoCard';
 

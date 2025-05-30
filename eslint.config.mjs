@@ -121,7 +121,7 @@ const config = [
     },
   }, // Build files specific config
   {
-    files: ['build/**/*.{js,jsx,ts,tsx}'],
+    files: ['build/**/*.{js,jsx,ts,tsx}', '.storybook/**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-console': ['off'],
     },

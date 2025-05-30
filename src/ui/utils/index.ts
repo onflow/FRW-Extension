@@ -139,7 +139,7 @@ export const ellipsisOverflowedText = (str: string, length = 5, removeLastComma 
 
 export const formatAddress = (address) => {
   if (address && address.length >= 30) {
-    return `${address.substring(0, 6)}...${address.substring(address.length - 8)}`;
+    return `${address.substring(0, 8)}...${address.substring(address.length - 8)}`;
   }
   return address;
 };

@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { useCurrency } from '@/ui/hooks/preference-hooks';
-
-import { TokenValue } from './TokenValue';
+import { TokenBalance } from './TokenBalance';
 
 interface CurrencyValueProps {
   value: string;
@@ -20,11 +18,12 @@ export const CurrencyValue: React.FC<CurrencyValueProps> = ({
   showCurrencyCode = true,
 }) => {
   return (
-    <TokenValue
+    <TokenBalance
       value={value}
       className={className}
       prefix={currencySymbol}
       postFix={showCurrencyCode ? currencyCode : undefined}
+      decimals={2}
     />
   );
 };

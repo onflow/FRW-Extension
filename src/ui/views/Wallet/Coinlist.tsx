@@ -24,7 +24,7 @@ import { useProfiles } from '@/ui/hooks/useProfileHook';
 import plus from '../../assets/svg/plus.svg';
 import slider from '../../assets/svg/slider.svg';
 import VerifiedIcon from '../../assets/svg/verfied-check.svg';
-import { CurrencyValue } from '../TokenDetail/CurrencyValue';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
 
 const ActionButtons = ({ managePath, createPath }) => {
   const history = useHistory();

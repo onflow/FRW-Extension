@@ -22,7 +22,7 @@ import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useTransferList } from '@/ui/hooks/useTransferListHook';
 import activity from 'ui/assets/svg/activity.svg';
 
-import { TokenBalance } from '../TokenDetail/TokenBalance';
+import { TokenBalance } from '../../components/TokenLists/TokenBalance';
 
 dayjs.extend(relativeTime);
 

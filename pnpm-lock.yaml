@@ -327,6 +327,9 @@ importers:
       '@storybook/addon-onboarding':
         specifier: ^9.0.0
         version: 9.0.0(storybook@9.0.0(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10))
+      '@storybook/addon-themes':
+        specifier: ^9.0.0
+        version: 9.0.1(storybook@9.0.0(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10))
       '@storybook/addon-webpack5-compiler-swc':
         specifier: ^3.0.0
         version: 3.0.0(webpack@5.99.9)
@@ -2849,6 +2852,11 @@ packages:
     resolution: {integrity: sha512-akYjo65k7p/t5qY8wYon3SCUpgmOoYp7swrVV/zn69TWueaX012THdXnTlSc6To8uO0aaYaE6qXztB9FL3KQXA==}
     peerDependencies:
       storybook: ^9.0.0
+
+  '@storybook/addon-themes@9.0.1':
+    resolution: {integrity: sha512-S9wp6es54OpPxTNwps+ujz2xcOYN+kN2MEWabHLTU1MPynei2RgM3OhW21n4OVjSOZnKm0EBu/H3SwTUz892wg==}
+    peerDependencies:
+      storybook: ^9.0.1
 
   '@storybook/addon-webpack5-compiler-swc@3.0.0':
     resolution: {integrity: sha512-qkQwQEvHlxwPCHz/xakGfXJusEa1gKMw7enELh6QGopblfN3rMiV084boqiIqBReqWTasSwHOqvuElAu0NQ+8w==}
@@ -14647,6 +14655,11 @@ snapshots:
   '@storybook/addon-onboarding@9.0.0(storybook@9.0.0(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10))':
     dependencies:
       storybook: 9.0.0(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10)
+
+  '@storybook/addon-themes@9.0.1(storybook@9.0.0(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10))':
+    dependencies:
+      storybook: 9.0.0(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10)
+      ts-dedent: 2.2.0
 
   '@storybook/addon-webpack5-compiler-swc@3.0.0(webpack@5.99.9)':
     dependencies:

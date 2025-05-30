@@ -151,6 +151,7 @@
     "@playwright/test": "^1.49.0",
     "@storybook/addon-docs": "^9.0.0",
     "@storybook/addon-onboarding": "^9.0.0",
+    "@storybook/addon-themes": "^9.0.0",
     "@storybook/addon-webpack5-compiler-swc": "^3.0.0",
     "@storybook/react-webpack5": "^9.0.0",
     "@svgr/webpack": "^5.5.0",

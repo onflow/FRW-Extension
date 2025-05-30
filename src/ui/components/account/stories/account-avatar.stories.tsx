@@ -12,7 +12,7 @@ const meta: Meta<typeof AccountAvatar> = {
   argTypes: {
     network: {
       control: 'select',
-      options: ['mainnet', 'testnet'],
+      options: ['mainnet', 'testnet', null],
     },
     emoji: {
       control: 'text',
@@ -112,4 +112,8 @@ export const CustomColor: Story = {
     active: false,
     spinning: false,
   },
+};
+
+export const Loading: Story = {
+  args: {},
 };

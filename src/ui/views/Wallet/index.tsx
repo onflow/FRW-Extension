@@ -21,11 +21,11 @@ import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from '@/ui/utils';
 
 import { withPrefix } from '../../../shared/utils/address';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
 import theme from '../../style/LLTheme';
 import MoveBoard from '../MoveBoard';
 import NFTTab from '../NFT';
 import NftEvm from '../NftEvm';
-import { CurrencyValue } from '../TokenDetail/CurrencyValue';
 
 import CoinList from './Coinlist';
 import OnRampList from './OnRampList';

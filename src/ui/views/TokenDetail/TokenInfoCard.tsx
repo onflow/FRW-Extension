@@ -15,8 +15,7 @@ import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useCoins } from 'ui/hooks/useCoinHook';
 
 import VerifiedIcon from '../../assets/svg/verfied-check.svg';
-
-import { CurrencyValue } from './CurrencyValue';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
 
 const TokenInfoCard = ({
   tokenInfo,
