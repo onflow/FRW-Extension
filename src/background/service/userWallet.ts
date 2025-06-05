@@ -8,6 +8,7 @@ import { getAuth, signInAnonymously } from 'firebase/auth/web-extension';
 import keyringService from '@/background/service/keyring';
 import { mixpanelTrack } from '@/background/service/mixpanel';
 import openapiService from '@/background/service/openapi';
+import { getAccountAddresses } from '@/background/utils/modules/eoa';
 import {
   signWithKey,
   seed2PublicPrivateKey,
@@ -1310,6 +1311,31 @@ const loadMainAccountsWithPubKey = async (
       };
     }
   );
+
+  // Get the EOA account
+  const privateKeyTuple = await keyringService.getCurrentPublicPrivateKeyTuple();
+  const privateKey = privateKeyTuple.SECP256K1.pk;
+  const { eoa } = getAccountAddresses(privateKey);
+
+  // Add the EOA account to the list
+  const eoaAccount: MainAccount = {
+    address: eoa,
+    publicKey: pubKey,
+    keyIndex: 0,
+    weight: 1000,
+    signAlgo: 2, // SECP256K1
+    hashAlgo: 3, // SHA3_256
+    signAlgoString: 'SECP256K1',
+    hashAlgoString: 'SHA3_256',
+    chain: networkToChainId(network),
+    id: mainAccounts.length,
+    name: 'EOA Account',
+    icon: '🔑',
+    color: '#4CAF50',
+    type: 'EOA',
+  };
+
+  mainAccounts.push(eoaAccount);
 
   // Save the main accounts to the cache
   setCachedData(

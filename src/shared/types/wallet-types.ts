@@ -116,6 +116,7 @@ export type WalletAccount = {
   color: string;
   balance?: string;
   nfts?: number;
+  type?: AccountType; // Add type property to distinguish between COA and EOA accounts
 };
 export type WalletAccountWithBalance = WalletAccount & {
   balance: string;
@@ -180,4 +181,17 @@ export interface ProfileBackupStatus {
   isBackedUp: boolean; // Is backed up on Google
   canDecrypt: boolean; // Can be decrypted with current password
   isSelected: boolean; // User selected it for password change
+}
+
+export type AccountType = 'COA' | 'EOA';
+
+export interface AccountMetadata {
+  address: string;
+  type: AccountType;
+  chainId: string;
+}
+
+export interface AccountInfo {
+  accounts: AccountMetadata[];
+  selectedAccount: string;
 }

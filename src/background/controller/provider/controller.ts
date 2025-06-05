@@ -11,6 +11,7 @@ import { getAccountsByPublicKeyTuple } from '@/background/utils/modules/findAddr
 import { signWithKey } from '@/background/utils/modules/publicPrivateKey';
 import { tupleToPrivateKey } from '@/shared/types/key-types';
 import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@/shared/types/network-types';
+import type { AccountMetadata } from '@/shared/types/wallet-types';
 import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@/shared/utils/address';
 import { consoleError } from '@/shared/utils/console-log';
 import {
@@ -235,38 +236,38 @@ class ProviderController extends BaseController {
     }
 
     const currentWallet = await Wallet.getParentAddress();
-    let evmAddress;
-
     if (!currentWallet) {
       throw new Error('Current wallet not found');
     }
+
     try {
-      // Attempt to query the EVM address
-      evmAddress = await Wallet.queryEvmAddress(currentWallet);
-      if (!isValidEthereumAddress(evmAddress)) {
-        throw new Error('Invalid EVM address');
-      }
-    } catch (error) {
-      // If an error occurs, request approval
-      consoleError('ethRequestAccounts - Error querying EVM address:', error);
+      // Get both COA and EOA addresses
+      const { coa, eoa } = await Wallet.getAccountAddresses();
+      const network = await Wallet.getNetwork();
+      const chainId = (network === 'testnet' ? TESTNET_CHAIN_ID : MAINNET_CHAIN_ID).toString();
 
-      await notificationService.requestApproval(
+      // Create account metadata
+      const accounts: AccountMetadata[] = [
         {
-          params: { origin, name, icon },
-          approvalComponent: 'EthConnect',
+          address: ensureEvmAddressPrefix(coa.toLowerCase()),
+          type: 'COA',
+          chainId,
         },
-        { height: 599 }
-      );
-      evmAddress = await Wallet.queryEvmAddress(currentWallet);
-      if (!isValidEthereumAddress(evmAddress)) {
-        throw new Error('Invalid EVM address');
-      }
+        {
+          address: ensureEvmAddressPrefix(eoa.toLowerCase()),
+          type: 'EOA',
+          chainId,
+        },
+      ];
+
+      // Return just the addresses for eth_requestAccounts
+      const addresses = accounts.map((acc) => acc.address);
+      sessionService.broadcastEvent('accountsChanged', addresses);
+      return addresses;
+    } catch (error) {
+      consoleError('ethRequestAccounts - Error getting addresses:', error);
+      throw error;
     }
-
-    const account = evmAddress ? [ensureEvmAddressPrefix(evmAddress)] : [];
-
-    sessionService.broadcastEvent('accountsChanged', account);
-    return account;
   };
 
   ethEstimateGas = async ({ data }) => {
@@ -318,39 +319,44 @@ class ProviderController extends BaseController {
       return [];
     }
 
-    let currentWallet;
     try {
-      // Attempt to query the currentNetwork address
-      currentWallet = await Wallet.getParentAddress();
+      // Get both COA and EOA addresses
+      const { coa, eoa } = await Wallet.getAccountAddresses();
+      const network = await Wallet.getNetwork();
+      const chainId = (network === 'testnet' ? TESTNET_CHAIN_ID : MAINNET_CHAIN_ID).toString();
+
+      // Create account metadata
+      const accounts: AccountMetadata[] = [
+        {
+          address: ensureEvmAddressPrefix(coa.toLowerCase()),
+          type: 'COA',
+          chainId,
+        },
+        {
+          address: ensureEvmAddressPrefix(eoa.toLowerCase()),
+          type: 'EOA',
+          chainId,
+        },
+      ];
+
+      // Return just the addresses for eth_accounts
+      const addresses = accounts.map((acc) => acc.address);
+
+      try {
+        await sessionService.broadcastEvent('accountsChanged', addresses);
+      } catch (error) {
+        consoleError('Error broadcasting accountsChanged event:', error);
+        // Continue despite the error
+      }
+
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(200);
+
+      return addresses;
     } catch (error) {
-      // If an error occurs, request approval
-      consoleError('Error querying EVM address:', error);
-
-      return;
+      consoleError('Error getting addresses:', error);
+      return [];
     }
-
-    let evmAccount: string | null = null;
-    try {
-      // Attempt to query the EVM address
-      evmAccount = await Wallet.queryEvmAddress(currentWallet);
-    } catch (error) {
-      // If an error occurs, request approval
-      consoleError('Error querying EVM address:', error);
-    }
-
-    const account = evmAccount ? [evmAccount.toLowerCase()] : [];
-    try {
-      await sessionService.broadcastEvent('accountsChanged', account);
-    } catch (error) {
-      consoleError('Error broadcasting accountsChanged event:', error);
-      // Continue despite the error
-    }
-
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    await delay(200);
-
-    return account;
   };
 
   walletRequestPermissions = ({ data: { params: permissions } }) => {
@@ -640,6 +646,40 @@ class ProviderController extends BaseController {
   ethSignTypedDataV4 = async (request) => {
     const result = await this.signTypeData(request);
     return result;
+  };
+
+  // Add a new method to get account metadata
+  getAccountMetadata = async ({ session: { origin } }) => {
+    if (!permissionService.hasPermission(origin) || !(await Wallet.isUnlocked())) {
+      return null;
+    }
+
+    try {
+      const { coa, eoa } = await Wallet.getAccountAddresses();
+      const network = await Wallet.getNetwork();
+      const chainId = (network === 'testnet' ? TESTNET_CHAIN_ID : MAINNET_CHAIN_ID).toString();
+
+      const accounts: AccountMetadata[] = [
+        {
+          address: ensureEvmAddressPrefix(coa.toLowerCase()),
+          type: 'COA',
+          chainId,
+        },
+        {
+          address: ensureEvmAddressPrefix(eoa.toLowerCase()),
+          type: 'EOA',
+          chainId,
+        },
+      ];
+
+      return {
+        accounts,
+        selectedAccount: accounts[0].address, // Default to COA
+      };
+    } catch (error) {
+      consoleError('Error getting account metadata:', error);
+      return null;
+    }
   };
 }
 

@@ -17,6 +17,7 @@ type AccountHierarchyProps = {
   onAccountClickSecondary?: (address: string, parentAddress?: string) => void;
   secondaryIcon?: React.ReactNode;
 };
+
 const AccountHierarchy = ({
   network,
   account,
@@ -79,6 +80,8 @@ const AccountHierarchy = ({
           showCard={false}
         />
       )}
+
+      {/* Display child accounts */}
       {childAccounts &&
         childAccounts.map((linkedAccount) => {
           return (
@@ -209,7 +212,11 @@ export const AccountListing = ({
       {accountList === undefined && (
         <AccountHierarchy network={network} account={undefined} activeAccount={activeAccount} />
       )}
+      {/* Render accounts in the list */}
       {accountList?.map((account) => {
+        // Check if this is an EOA account
+        const isEoaAccount = account.type === 'EOA';
+
         return (
           <AccountHierarchy
             network={network}

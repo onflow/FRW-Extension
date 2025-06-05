@@ -14,6 +14,7 @@ import { type WalletAccount } from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
 import { CopyIcon } from '@/ui/assets/icons/CopyIcon';
 import { LinkIcon } from '@/ui/assets/icons/LinkIcon';
+import evmLogo from '@/ui/assets/image/evmlogo.png';
 import { useAccountBalance } from '@/ui/hooks/use-account-hooks';
 import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
 import {
@@ -148,9 +149,11 @@ export const AccountCard = ({
             {isValidEthereumAddress(address) && (
               <span
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
                   padding: '0px 4px',
                   justifyContent: 'center',
-                  alignItems: 'center',
                   borderRadius: '16px',
                   background: COLOR_ACCENT_EVM_627EEA,
                   color: COLOR_DARKMODE_TEXT_PRIMARY_FFFFFF,
@@ -161,6 +164,11 @@ export const AccountCard = ({
                   lineHeight: '1.5em',
                 }}
               >
+                <img
+                  src={evmLogo}
+                  alt="EVM"
+                  style={{ width: 14, height: 14, marginRight: 2, borderRadius: '50%' }}
+                />
                 EVM
               </span>
             )}

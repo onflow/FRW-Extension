@@ -15,6 +15,7 @@ import {
   pubKeyAccountToAccountKey,
   pubKeyTupleToAccountKey,
 } from '@/background/utils/account-key';
+import { getAccountAddresses } from '@/background/utils/modules/eoa';
 import {
   findAddressWithSeed,
   findAddressWithPK,
@@ -3641,6 +3642,35 @@ export class WalletController extends BaseController {
       throw err;
     }
   };
+
+  /**
+   * Gets both COA and EOA addresses for the current wallet
+   * @returns Object containing both COA and EOA addresses
+   */
+  async getAccountAddresses(): Promise<{ coa: string; eoa: string }> {
+    const privateKeyTuple = await keyringService.getCurrentPublicPrivateKeyTuple();
+    // Use the SECP256K1 private key for EOA derivation
+    const privateKey = privateKeyTuple.SECP256K1.pk;
+    return getAccountAddresses(privateKey);
+  }
+
+  /**
+   * Gets the EOA address for the current wallet
+   * @returns The EOA address
+   */
+  async getEoaAddress(): Promise<string> {
+    const { eoa } = await this.getAccountAddresses();
+    return eoa;
+  }
+
+  /**
+   * Gets the COA address for the current wallet
+   * @returns The COA address
+   */
+  async getCoaAddress(): Promise<string> {
+    const { coa } = await this.getAccountAddresses();
+    return coa;
+  }
 }
 
 export default new WalletController();
