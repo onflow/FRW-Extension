@@ -25,7 +25,12 @@ import {
   type EvmNFTCollectionList,
 } from '../types/nft-types';
 import { type TransferItem } from '../types/transaction-types';
-import { type MainAccount, type WalletAccount, type Currency } from '../types/wallet-types';
+import {
+  type MainAccount,
+  type WalletAccount,
+  type Currency,
+  type PendingTransaction,
+} from '../types/wallet-types';
 
 import { getCachedData, triggerRefresh } from './cache-data-access';
 import { type NetworkScripts } from './script-types';
@@ -166,6 +171,12 @@ export type TransferListStore = {
   pendingCount: number;
   list: TransferItem[];
 };
+
+// Pending Transactions
+export const pendingTransactionsKey = (network: string, pubkey: string) =>
+  `pending-transactions-${network}-${pubkey}`;
+export const pendingTransactionsRefreshRegex = refreshKey(pendingTransactionsKey);
+export type PendingTransactionsStore = PendingTransaction[];
 
 // NFTs
 

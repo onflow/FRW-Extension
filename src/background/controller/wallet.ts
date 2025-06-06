@@ -29,7 +29,7 @@ import eventBus from '@/eventBus';
 import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
 import { type PublicPrivateKeyTuple, type PublicKeyTuple } from '@/shared/types/key-types';
 import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
-import { ContactType, MAINNET_CHAIN_ID } from '@/shared/types/network-types';
+import { ContactType, MAINNET_CHAIN_ID, networkToChainId } from '@/shared/types/network-types';
 import { type NFTCollections, type NFTCollectionData } from '@/shared/types/nft-types';
 import { type TrackingEvents } from '@/shared/types/tracking-types';
 import { type TransferItem, type TransactionState } from '@/shared/types/transaction-types';
@@ -71,6 +71,8 @@ import {
   coinListKey,
   type ChildAccountFtStore,
   accountBalanceKey,
+  getCachedMainAccounts,
+  mainAccountsKey,
 } from '@/shared/utils/cache-data-keys';
 import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 import { returnCurrentProfileId } from '@/shared/utils/current-id';
@@ -109,7 +111,12 @@ import type { CacheState } from 'background/service/pageStateCache';
 import { replaceNftKeywords } from 'background/utils';
 import { notification, storage } from 'background/webapi';
 import { openIndexPage } from 'background/webapi/tab';
-import { INTERNAL_REQUEST_ORIGIN, EVM_ENDPOINT, HTTP_STATUS_CONFLICT } from 'consts';
+import {
+  INTERNAL_REQUEST_ORIGIN,
+  EVM_ENDPOINT,
+  HTTP_STATUS_CONFLICT,
+  HTTP_STATUS_TOO_MANY_REQUESTS,
+} from 'consts';
 
 import type {
   AccountKeyRequest,
@@ -135,7 +142,7 @@ import {
   triggerRefresh,
 } from '../utils/data-cache';
 import defaultConfig from '../utils/defaultConfig.json';
-import { getEmojiList } from '../utils/emoji-util';
+import { getEmojiByIndex, getEmojiList } from '../utils/emoji-util';
 import erc20ABI from '../utils/erc20.abi.json';
 import { getOrCheckAccountsByPublicKeyTuple } from '../utils/modules/findAddressWithPubKey';
 
@@ -243,7 +250,12 @@ export class WalletController extends BaseController {
     this.checkForNewAddress(result.data.txid);
   };
 
-  checkForNewAddress = async (txid: string): Promise<FclAccount | null> => {
+  checkForNewAddress = async (
+    txid: string,
+    newAccountId?: number,
+    createPubKey?: string
+  ): Promise<FclAccount | null> => {
+    const network = await this.getNetwork();
     try {
       const txResult = await fcl.tx(txid).onceSealed();
 
@@ -263,10 +275,23 @@ export class WalletController extends BaseController {
         throw new Error('Fcl account not found');
       }
 
-      userWalletService.registerCurrentPubkey(account.keys[0].publicKey, account);
+      if (newAccountId && createPubKey) {
+        await userWalletService.updatePlaceholderAccount(network, newAccountId, account, txid);
+      } else {
+        userWalletService.registerCurrentPubkey(account.keys[0].publicKey, account);
+      }
 
       return account;
     } catch (error) {
+      // Remove from pending creation transactions on error
+      if (createPubKey) {
+        await userWalletService.removePendingTransaction(network, createPubKey, txid);
+      }
+
+      // Remove placeholder account if creation failed
+      if (newAccountId && createPubKey) {
+        await userWalletService.removePlaceholderAccount(network, createPubKey, newAccountId);
+      }
       throw new Error(`Account creation failed: ${error.message || 'Unknown error'}`);
     }
   };
@@ -338,13 +363,19 @@ export class WalletController extends BaseController {
         publickey,
         1000
       );
+      if (data.status === HTTP_STATUS_TOO_MANY_REQUESTS) {
+        throw new Error('Rate limit exceeded. Please wait at least 2 minutes between requests.');
+      }
 
       if (!data || !data.data || !data.data.txid) {
         throw new Error('Transaction ID not found in response');
       }
 
       const txid = data.data.txid;
-      this.checkForNewAddress(txid);
+
+      const newAccountId = await userWalletService.setPlaceholderAccount(accountKey, txid);
+
+      this.checkForNewAddress(txid, newAccountId, accountKey.public_key);
     } catch (error) {
       // Reset the registration status if the operation fails
       setCachedData(registerStatusKey(publickey), false);
@@ -353,7 +384,7 @@ export class WalletController extends BaseController {
       consoleError('Failed to create manual address:', error);
 
       // Re-throw a more specific error
-      throw new Error('Failed to create manual address. Please try again later.');
+      throw new Error(`Failed to create manual address. ${error.message}`);
     }
   };
 

@@ -3,7 +3,11 @@ import {
   KEYRING_STATE_CURRENT_KEY,
   type KeyringState,
 } from '@/shared/types/keyring-types';
-import { type MainAccount, type WalletAccount } from '@/shared/types/wallet-types';
+import {
+  type MainAccount,
+  type WalletAccount,
+  type PendingTransaction,
+} from '@/shared/types/wallet-types';
 import {
   childAccountsKey,
   evmAccountKey,
@@ -15,6 +19,7 @@ import {
   childAccountAllowTypesKey,
   type MainAccountStorageBalanceStore,
   mainAccountStorageBalanceKey,
+  pendingTransactionsKey,
 } from '@/shared/utils/cache-data-keys';
 import {
   activeAccountsKey,
@@ -128,4 +133,13 @@ export const useRegisterStatus = (pubKey: string | undefined | null) => {
 
 export const usePayer = () => {
   return useUserData<string>('lilicoPayer');
+};
+
+export const usePendingAccountCreationTransactions = (
+  network: string | undefined | null,
+  pubkey: string | undefined | null
+) => {
+  return useCachedData<PendingTransaction[]>(
+    network && pubkey ? pendingTransactionsKey(network, pubkey) : null
+  );
 };

@@ -1496,5 +1496,14 @@
   },
   "Other_accounts": {
     "message": "Other accounts"
+  },
+  "Create_a_new_account": {
+    "message": "Create a new account"
+  },
+  "Import_an_existing_account": {
+    "message": "Import an existing account"
+  },
+  "Add_Account_Sidebar": {
+    "message": "Add Account"
   }
 }

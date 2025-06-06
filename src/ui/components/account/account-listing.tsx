@@ -3,7 +3,13 @@ import React from 'react';
 
 import { type WalletAccount } from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
-import { useChildAccounts, useEvmAccount } from '@/ui/hooks/use-account-hooks';
+import { FlowIcon } from '@/ui/assets/icons/FlowIcon';
+import {
+  useChildAccounts,
+  useEvmAccount,
+  usePendingAccountCreationTransactions,
+} from '@/ui/hooks/use-account-hooks';
+import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80 } from '@/ui/style/color';
 
 import { AccountCard } from './account-card';
@@ -28,7 +34,6 @@ const AccountHierarchy = ({
   const childAccounts = useChildAccounts(network, account?.address);
   const evmAccount = useEvmAccount(network, account?.address);
   const loading = network === undefined || account === undefined;
-
   if (loading) {
     return (
       <Box sx={{ gap: '0px', display: 'flex', flexDirection: 'column' }}>
@@ -136,12 +141,11 @@ export const AccountListing = ({
       ? activeAccount?.address
       : undefined
   );
-
   // Check if the EVM account is not valid
   const noEvmAccount = evmAccount && !isValidEthereumAddress(evmAccount.address);
-
+  const { pendingAccountTransactions } = useProfiles();
   return (
-    <Box sx={{ gap: '0px', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ gap: '0px', padding: '0 16px', display: 'flex', flexDirection: 'column' }}>
       {/* Active account */}
       {showActiveAccount && (
         <>
@@ -155,9 +159,7 @@ export const AccountListing = ({
               fontStyle: 'normal',
               fontWeight: '400',
               lineHeight: '16px',
-              marginTop: '24px',
               marginBottom: '8px',
-              marginLeft: '16px',
             }}
           >
             {chrome.i18n.getMessage('Active_account')}
@@ -198,7 +200,6 @@ export const AccountListing = ({
               lineHeight: '16px',
               marginTop: '24px',
               marginBottom: '8px',
-              marginLeft: '16px',
             }}
           >
             {chrome.i18n.getMessage('Other_accounts')}
@@ -222,6 +223,20 @@ export const AccountListing = ({
           />
         );
       })}
+      {pendingAccountTransactions &&
+        pendingAccountTransactions.map((transaction) => {
+          return (
+            <AccountCard
+              key={transaction.txId}
+              account={transaction}
+              showCard={false}
+              isPending={true}
+              showLink={false}
+              network={network}
+              spinning={true}
+            />
+          );
+        })}
     </Box>
   );
 };

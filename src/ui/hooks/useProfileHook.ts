@@ -22,6 +22,7 @@ import {
   useRegisterStatus,
   usePayer,
   useMainAccountStorageBalance,
+  usePendingAccountCreationTransactions,
 } from './use-account-hooks';
 
 const INITIAL_WALLET: WalletAccount = {
@@ -103,6 +104,10 @@ export const useProfiles = () => {
       ),
     [activeAccounts?.currentAddress, activeAccounts?.parentAddress]
   );
+  const pendingAccountTransactions = usePendingAccountCreationTransactions(
+    network,
+    userWallets?.currentPubkey
+  );
 
   // The current wallet is the wallet that the user is currently using
   const currentWallet = useMemo(() => {
@@ -158,5 +163,6 @@ export const useProfiles = () => {
     currentWalletList,
     payer,
     network,
+    pendingAccountTransactions,
   };
 };

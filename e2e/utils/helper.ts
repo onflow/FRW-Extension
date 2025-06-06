@@ -259,7 +259,8 @@ export const importAccountBySeedPhrase = async ({
 
     // We're already logged in so we need to click import profile
     await page.getByTestId('account-menu-button').click();
-    await page.getByRole('button', { name: 'Import Profile' }).click();
+    await page.getByTestId('add-account-button').click();
+    await page.getByTestId('import-existing-account-button').click();
     // Close all pages except the current page (the extension opens them in the background)
     await closeOpenedPages(page);
   }

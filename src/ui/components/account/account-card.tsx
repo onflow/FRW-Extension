@@ -22,6 +22,7 @@ import {
   COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3,
   COLOR_ACCENT_EVM_627EEA,
   COLOR_GREY_ICONS_767676,
+  COLOR_GREEN_FLOW_THEME_16FF99,
 } from '@/ui/style/color';
 import { formatAddress } from '@/ui/utils';
 
@@ -38,6 +39,7 @@ type AccountCardWithCopyProps = {
   onClick?: () => void;
   showLink?: boolean;
   showCard?: boolean;
+  isPending?: boolean;
   'data-testid'?: string;
 };
 
@@ -57,6 +59,7 @@ export const AccountCard = ({
   secondaryIcon = <CopyIcon width={24} />,
   showLink = false,
   showCard = false,
+  isPending = false,
   'data-testid': dataTestId,
 }: AccountCardProps) => {
   const { name, icon, color, address, nfts } = account || {};
@@ -87,10 +90,10 @@ export const AccountCard = ({
   return (
     <Card
       sx={{
-        paddingLeft: '8px',
-        paddingRight: '16px',
-        paddingTop: showCard ? '10px' : '8px',
-        paddingBottom: showCard ? '10px' : '8px',
+        paddingLeft: showCard ? '8px' : '0',
+        paddingRight: showCard ? '16px' : '0',
+        paddingTop: showCard ? '10px' : '0',
+        paddingBottom: showCard ? '10px' : '0',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
@@ -110,6 +113,8 @@ export const AccountCard = ({
           padding: '0px',
           alignItems: 'center',
           overflow: 'hidden',
+          paddingTop: showCard ? '0' : '8px',
+          paddingBottom: showCard ? '0' : '8px',
         }}
         onClick={onClick}
       >
@@ -127,6 +132,7 @@ export const AccountCard = ({
             parentColor={parentColor}
             active={active}
             spinning={spinning}
+            isPending={isPending}
           />
         </CardMedia>
         <Box sx={{ width: '100%', overflow: 'hidden' }}>
@@ -198,7 +204,7 @@ export const AccountCard = ({
           </Typography>
         </Box>
       </CardActionArea>
-      {onClickSecondary && (
+      {onClickSecondary && !isPending && (
         <CardActions sx={{ padding: '0px', marginLeft: 'auto' }}>
           <IconButton onClick={onClickSecondary} aria-label="Copy address" disabled={!address}>
             {secondaryIcon}

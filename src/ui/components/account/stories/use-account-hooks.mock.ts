@@ -4,3 +4,6 @@ import { fn } from 'storybook/test';
 export const useChildAccounts = fn().mockName('useChildAccounts');
 export const useEvmAccount = fn().mockName('useEvmAccount');
 export const useAccountBalance = fn().mockName('useAccountBalance');
+export const usePendingAccountCreationTransactions = fn()
+  .mockName('usePendingAccountCreationTransactions')
+  .mockReturnValue([]);

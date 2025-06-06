@@ -3,7 +3,9 @@ import { useTheme, alpha } from '@mui/material/styles';
 import { margin } from '@mui/system';
 import React from 'react';
 
+import { FlowIcon } from '@/ui/assets/icons/FlowIcon';
 import { COLOR_DARK_GRAY_1A1A1A, networkColor } from '@/ui/style/color';
+import { isEmoji } from '@/ui/utils';
 
 const EmojiIcon = ({ emoji }: { emoji: string }) => {
   return (
@@ -35,11 +37,14 @@ const ImageIcon = ({ image, size = 24 }: { image: string; size?: number }) => {
   );
 };
 
-const Icon = ({ icon }: { icon: string }) => {
-  if (icon.startsWith('http')) {
-    return <ImageIcon image={icon} />;
+const Icon = ({ icon, isPending }: { icon: string; isPending?: boolean }) => {
+  if (isPending) {
+    return <FlowIcon width={36} height={36} />;
   }
-  return <EmojiIcon emoji={icon} />;
+  if (isEmoji(icon)) {
+    return <EmojiIcon emoji={icon} />;
+  }
+  return <ImageIcon image={icon} />;
 };
 
 /**
@@ -56,6 +61,7 @@ export const AccountAvatar = ({
   active = false,
   spinning = false,
   onClick,
+  isPending = false,
 }: {
   network?: string;
   emoji?: string;
@@ -65,6 +71,7 @@ export const AccountAvatar = ({
   active?: boolean;
   spinning?: boolean;
   onClick?: () => void;
+  isPending?: boolean;
 }) => {
   const loading = !network || !emoji || !color;
   if (loading) {
@@ -105,12 +112,12 @@ export const AccountAvatar = ({
       )}
       {onClick && (
         <IconButton onClick={onClick} sx={sxProps}>
-          <Icon icon={emoji} />
+          <Icon icon={emoji} isPending={isPending} />
         </IconButton>
       )}
       {!onClick && (
         <Box sx={sxProps}>
-          <Icon icon={emoji} />
+          <Icon icon={emoji} isPending={isPending} />
         </Box>
       )}
 
