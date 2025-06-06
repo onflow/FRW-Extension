@@ -137,7 +137,7 @@ const Wallet = () => {
             <ListItem
               key={item.address}
               component={Link}
-              to="/dashboard/setting/wallet/detail"
+              to={`/dashboard/setting/wallet/detail?address=${item.address}`}
               onClick={() => handleWalletClick(item, 0)}
               disablePadding
               sx={{
