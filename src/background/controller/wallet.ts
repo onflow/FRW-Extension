@@ -71,6 +71,7 @@ import {
   coinListKey,
   type ChildAccountFtStore,
   accountBalanceKey,
+  childAccountFtKey,
 } from '@/shared/utils/cache-data-keys';
 import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 import { returnCurrentProfileId } from '@/shared/utils/current-id';
@@ -1108,13 +1109,12 @@ export class WalletController extends BaseController {
   checkAccessibleFt = async (childAccount: string): Promise<ChildAccountFtStore | undefined> => {
     const network = await this.getNetwork();
 
-    const address = await userWalletService.getParentAddress();
-    if (!address) {
+    const parentAddress = await userWalletService.getParentAddress();
+    if (!parentAddress) {
       throw new Error('Parent address not found');
     }
-    const result = await openapiService.queryAccessibleFt(network, address, childAccount);
 
-    return result;
+    return await coinListService.getChildAccountFt(network, parentAddress, childAccount);
   };
 
   getParentAddress = async () => {
@@ -1807,6 +1807,11 @@ export class WalletController extends BaseController {
     return evmAccount?.address ?? null;
   };
 
+  /**
+   *
+   * @returns
+   * @deprecated use canMoveToOtherAccount from useProfiles
+   */
   checkCanMoveChild = async () => {
     const activeAccountType = await this.getActiveAccountType();
     if (activeAccountType !== 'child') {

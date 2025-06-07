@@ -8,11 +8,10 @@ import { type Emoji, type WalletAccount } from '@/shared/types/wallet-types';
 import {
   useChildAccounts as importedMockUseChildAccounts, // Aliased import from the mock file
   useEvmAccount as importedMockUseEvmAccount, // Aliased import from the mock file
-} from '@/ui/components/account/stories/use-account-hooks.mock';
+} from '@/stories/use-account-hooks.mock';
 import {
   useNftCatalogCollections as importedMockUseNftCatalogCollections, // Aliased import from the mock file
-} from '@/ui/components/account/stories/use-nft-hooks.mock';
-// eslint-disable-next-line import/order
+} from '@/stories/use-nft-hooks.mock';
 import { AccountListing } from '@/ui/components/account/account-listing';
 
 const mainWalletAccount: WalletAccount = {

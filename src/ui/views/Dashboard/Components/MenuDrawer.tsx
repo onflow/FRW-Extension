@@ -85,7 +85,7 @@ const MenuDrawer = ({
       onClose={toggleDrawer}
       className={classes.menuDrawer}
       classes={{ paper: classes.paper }}
-      PaperProps={{ sx: { width: '75%' } }}
+      PaperProps={{ sx: { width: '75%', maxWidth: '400px' } }}
     >
       <List
         sx={{

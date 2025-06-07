@@ -1147,7 +1147,7 @@
     "message": "Импортировать другие кошельки"
   },
   "Support_Flow_Wallet_Blocto": {
-    "message": "Поддержка Flow Wallet, keystore и raw ключа"
+    "message": "Поддержка Flow Wallet, Blocto, Recovery Phrase, Keystore и Private Key"
   },
   "A_crypto_wallet_on_Flow": {
     "message": "Криптокошелек на Flow для исследователей, коллекционеров и геймеров"
@@ -1158,11 +1158,14 @@
   "Keystore": {
     "message": "Ключевое хранилище"
   },
-  "Seed_Phrase": {
-    "message": "Секретная фраза"
+  "Recovery_Phrase": {
+    "message": "Фраза восстановления"
   },
   "Private_Key": {
     "message": "Приватный ключ"
+  },
+  "Mobile_app": {
+    "message": "Мобильное приложение"
   },
   "You_can_import_the": {
     "message": "Вставьте содержимое JSON из хранилища ключей другого кошелька (например: Blocto)"
@@ -1232,6 +1235,9 @@
   },
   "Step_3": {
     "message": "Шаг 3"
+  },
+  "Step_4": {
+    "message": "Шаг 4"
   },
   "Import_Recovery_Phrase_or_Private_Key": {
     "message": "Импортировать фразу для восстановления или приватный ключ"
@@ -1487,5 +1493,29 @@
   },
   "Other_accounts": {
     "message": "Другие аккаунты"
+  },
+  "Mobile_overview": {
+    "message": "Обзор мобильного приложения"
+  },
+  "Create_a_new_profile_with_an_account_from_Flow_Wallet_Mobile_App": {
+    "message": "Это шаги, которые включают в себя импорт вашего профиля из вашего мобильного приложения Flow Wallet."
+  },
+  "Import_from_Mobile_Step_1": {
+    "message": "Сгенерируйте новую фразу восстановления, чтобы защитить ваш профиль."
+  },
+  "Import_from_Mobile_Step_2_setup": {
+    "message": "Установите новый пароль, чтобы защитить ваш профиль."
+  },
+  "Import_from_Mobile_Step_2_verify": {
+    "message": "Проверьте ваш пароль, чтобы защитить профиль."
+  },
+  "Import_from_Mobile_Step_3": {
+    "message": "Сканируйте, чтобы подключиться к мобильному устройству."
+  },
+  "Import_from_Mobile_Step_4": {
+    "message": "Выберите профиль, который вы хотите импортировать."
+  },
+  "Import_from_Mobile_Submit": {
+    "message": "Начать"
   }
 }

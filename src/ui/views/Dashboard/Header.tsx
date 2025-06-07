@@ -60,7 +60,6 @@ const Header = ({ _loading = false }) => {
     walletList,
     userInfo,
     mainAddressLoading,
-    clearProfileData,
     profileIds,
     noAddress,
   } = useProfiles();
@@ -118,7 +117,6 @@ const Header = ({ _loading = false }) => {
         // await usewallet.clearWallet();
         await usewallet.switchProfile(profileId);
         // await usewallet.switchNetwork(switchingTo);
-        clearProfileData();
       } catch (error) {
         consoleError('Error during account switch:', error);
         //if cannot login directly with current password switch to unlock page
@@ -128,7 +126,7 @@ const Header = ({ _loading = false }) => {
         setSwitchLoading(false);
       }
     },
-    [usewallet, history, clearProfileData]
+    [usewallet, history]
   );
 
   const transactionHandler = (request) => {

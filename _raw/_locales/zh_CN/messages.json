@@ -1147,7 +1147,7 @@
     "message": "导入钱包"
   },
   "Support_Flow_Wallet_Blocto": {
-    "message": "支持 keystore、Google Drive 和原始密钥"
+    "message": "支持 Flow 钱包、Blocto、恢复短语、密钥库和私钥"
   },
   "A_crypto_wallet_on_Flow": {
     "message": "Flow 上的加密钱包适用于"
@@ -1158,11 +1158,14 @@
   "Keystore": {
     "message": "密钥库"
   },
-  "Seed_Phrase": {
-    "message": "助记词"
+  "Recovery_Phrase": {
+    "message": "恢复短语"
   },
   "Private_Key": {
     "message": "私钥"
+  },
+  "Mobile_app": {
+    "message": "移动应用"
   },
   "You_can_import_the": {
     "message": "从另一个钱包（例如：Blocto）粘贴Json内容"
@@ -1232,6 +1235,9 @@
   },
   "Step_3": {
     "message": "步骤 3"
+  },
+  "Step_4": {
+    "message": "步骤 4"
   },
   "Import_Recovery_Phrase_or_Private_Key": {
     "message": "导入恢复短语或私钥"
@@ -1487,5 +1493,29 @@
   },
   "Other_accounts": {
     "message": "其他账户"
+  },
+  "Mobile_overview": {
+    "message": "移动应用概览"
+  },
+  "Create_a_new_profile_with_an_account_from_Flow_Wallet_Mobile_App": {
+    "message": "这些是导入您的 Flow Wallet 移动应用程序中的个人资料所涉及的步骤。"
+  },
+  "Import_from_Mobile_Step_1": {
+    "message": "生成一个新的恢复短语来保护您的个人资料。"
+  },
+  "Import_from_Mobile_Step_2_setup": {
+    "message": "设置一个新的密码来保护您的个人资料。"
+  },
+  "Import_from_Mobile_Step_2_verify": {
+    "message": "验证您的密码来保护您的个人资料。"
+  },
+  "Import_from_Mobile_Step_3": {
+    "message": "扫描以连接到移动设备。"
+  },
+  "Import_from_Mobile_Step_4": {
+    "message": "选择您想要导入的个人资料。"
+  },
+  "Import_from_Mobile_Submit": {
+    "message": "开始"
   }
 }

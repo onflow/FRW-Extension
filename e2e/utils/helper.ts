@@ -65,7 +65,7 @@ export const loginToExtensionAccount = async ({ page, extensionId, addr, passwor
   // get address
   let flowAddr = await getCurrentAddress(page);
   if (flowAddr !== addr && isValidEthereumAddress(flowAddr)) {
-    await switchToFlow({ page, extensionId });
+    await switchToMainAccount({ page, address: addr });
     flowAddr = await getCurrentAddress(page);
   }
   if (flowAddr !== addr) {
@@ -79,7 +79,7 @@ export const loginToExtensionAccount = async ({ page, extensionId, addr, passwor
     // get address
     flowAddr = await getCurrentAddress(page);
     if (flowAddr !== addr && isValidEthereumAddress(flowAddr)) {
-      await switchToFlow({ page, extensionId });
+      await switchToMainAccount({ page, address: addr });
       flowAddr = await getCurrentAddress(page);
     }
   }
@@ -270,7 +270,7 @@ export const importAccountBySeedPhrase = async ({
   // Close all pages except the current page (the extension opens them in the background)
   await closeOpenedPages(page);
 
-  await page.getByRole('tab', { name: 'Seed Phrase' }).click();
+  await page.getByRole('tab', { name: 'Recovery Phrase' }).click();
   await page.getByPlaceholder('Import 12 or 24 words split').click();
 
   await page.getByPlaceholder('Import 12 or 24 words split').fill(seedPhrase);
@@ -308,11 +308,11 @@ export const importAccountBySeedPhrase = async ({
 
   // Wait for the account address to be visible
   let flowAddr = await getCurrentAddress(page);
+
   if (accountAddr && flowAddr !== accountAddr) {
-    await switchToFlow({ page, extensionId });
+    await switchToMainAccount({ page, address: accountAddr });
     flowAddr = await getCurrentAddress(page);
   }
-
   if (accountAddr && flowAddr !== accountAddr) {
     throw new Error('Account address does not match');
   }
@@ -376,6 +376,17 @@ export const importReceiverAccount = async ({ page, extensionId }) => {
   });
 };
 
+export const getSenderCadenceAccount = ({ parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    // We've logged into the sender account, and we need to send tokens to the receiver account
+    return process.env.TEST_SENDER_ADDR;
+  } else {
+    // We've logged into the receiver account, and we need to send tokens back to the sender account
+    return process.env.TEST_RECEIVER_ADDR;
+  }
+};
+
 export const getReceiverCadenceAccount = ({ parallelIndex }) => {
   // If parallel index is 0, login to sender account, otherwise login to receiver account
   if (parallelIndex === 0) {
@@ -386,7 +397,16 @@ export const getReceiverCadenceAccount = ({ parallelIndex }) => {
     return process.env.TEST_SENDER_ADDR;
   }
 };
-
+export const getSenderEvmAccount = ({ parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    // We've logged into the sender account, and we need to send tokens to the receiver account
+    return process.env.TEST_SENDER_EVM_ADDR;
+  } else {
+    // We've logged into the receiver account, and we need to send tokens back to the sender account
+    return process.env.TEST_RECEIVER_EVM_ADDR;
+  }
+};
 export const getReceiverEvmAccount = ({ parallelIndex }) => {
   // If parallel index is 0, login to sender account, otherwise login to receiver account
   if (parallelIndex === 0) {
@@ -397,6 +417,7 @@ export const getReceiverEvmAccount = ({ parallelIndex }) => {
     return process.env.TEST_SENDER_EVM_ADDR;
   }
 };
+
 export const loginToSenderOrReceiver = async ({ page, extensionId, parallelIndex }) => {
   // If parallel index is 0, login to sender account, otherwise login to receiver account
   if (parallelIndex === 0) {
@@ -405,18 +426,8 @@ export const loginToSenderOrReceiver = async ({ page, extensionId, parallelIndex
     await loginToReceiverAccount({ page, extensionId });
   }
 };
-export const switchToEvm = async ({ page, extensionId }) => {
-  // Assume the user is on the dashboard page
-  await page.getByTestId('account-menu-button').click();
-  // switch to COA account
-  await page
-    .getByTestId(/evm-account-0x.*/)
-    .first()
-    .click();
-  // get address
-  await getCurrentAddress(page);
-};
-export const switchToEvmAddress = async ({ page, extensionId, address }) => {
+
+export const switchToEvmAddress = async ({ page, address }) => {
   // Assume the user is on the dashboard page
   await page.getByTestId('account-menu-button').click();
   // switch to COA account
@@ -428,29 +439,13 @@ export const switchToEvmAddress = async ({ page, extensionId, address }) => {
   await getCurrentAddress(page);
 };
 
-export const switchToFlow = async ({ page, extensionId }) => {
-  // Assume the user is on the dashboard page
-  await page.getByTestId('account-menu-button').click();
-  // switch to COA account
-  await page
-    .getByTestId(/main-account-0x.*/)
-    .first()
-    .click();
-  // get address
-  await getCurrentAddress(page);
-};
-export const switchAccount = async ({ page, extensionId }) => {
+export const switchToMainAccount = async ({ page, address }) => {
   // Assume the user is on the dashboard page
   await page.getByTestId('account-menu-button').click();
   // switch to another flow account
   await page
-    .getByTestId(/main-account-0x.*/)
+    .getByTestId(new RegExp(`main-account-${address}`, 'i'))
     .first()
-    .click();
-  await page.getByTestId('account-menu-button').click();
-  await page
-    .getByTestId(/main-account-0x.*/)
-    .nth(1)
     .click();
   // get address
   await getCurrentAddress(page);

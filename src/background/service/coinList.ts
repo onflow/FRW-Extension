@@ -268,6 +268,9 @@ class CoinList {
     const childAccountFt = await getValidData<ChildAccountFtStore>(
       childAccountFtKey(network, parentAddress, childAccount)
     );
+    if (!childAccountFt) {
+      return this.loadChildAccountFt(network, parentAddress, childAccount);
+    }
     return childAccountFt;
   };
 }

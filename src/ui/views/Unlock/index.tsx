@@ -67,7 +67,6 @@ const Unlock = () => {
   const [showUnexpectedError, setShowUnexpectedError] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [unlocking, setUnlocking] = useState<boolean>(false);
-  const { clearProfileData } = useProfiles();
 
   useEffect(() => {
     if (!inputEl.current) return;
@@ -76,9 +75,8 @@ const Unlock = () => {
 
   const restPass = useCallback(async () => {
     await wallet.lockWallet();
-    clearProfileData();
     openInternalPageInTab('forgot');
-  }, [wallet, clearProfileData]);
+  }, [wallet]);
 
   const handleUnlock = useCallback(async () => {
     // Check the password is correct

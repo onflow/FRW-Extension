@@ -5,10 +5,9 @@ const { emojis } = emojisJson;
 import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
 import { type WalletAccount } from '@/shared/types/wallet-types';
 
+import { useAccountBalance } from '../../../../stories/use-account-hooks.mock';
+import { useNftCatalogCollections } from '../../../../stories/use-nft-hooks.mock';
 import { AccountCard } from '../account-card';
-
-import { useAccountBalance } from './use-account-hooks.mock';
-import { useNftCatalogCollections } from './use-nft-hooks.mock';
 
 const mainWalletAccount: WalletAccount = {
   name: emojis[2].name,

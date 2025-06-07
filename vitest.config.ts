@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { defineConfig } from 'vitest/config';
 
-dotenv.config({ path: ['.env.dev', '.env.pro', '.env.test'] });
+dotenv.config({ path: ['.env.dev', '.env.pro'] });
 
 export default defineConfig({
   test: {

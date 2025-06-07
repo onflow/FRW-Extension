@@ -73,11 +73,11 @@ const ActionButtons = ({ managePath, createPath }) => {
 const CoinList = ({
   ableFt,
   isActive,
-  childType,
+  activeAccountType,
 }: {
   ableFt: any[];
   isActive: boolean;
-  childType: ActiveAccountType;
+  activeAccountType: ActiveAccountType;
 }) => {
   // const wallet = useWallet();
   const { noAddress } = useProfiles();
@@ -247,10 +247,10 @@ const CoinList = ({
 
   return (
     <>
-      {childType === 'main' && (
+      {activeAccountType === 'main' && (
         <ActionButtons managePath="dashboard/managetoken" createPath="dashboard/tokenList" />
       )}
-      {childType === 'evm' && (
+      {activeAccountType === 'evm' && (
         <ActionButtons managePath="dashboard/managetoken" createPath="dashboard/addcustomevm" />
       )}
 
@@ -282,7 +282,7 @@ const CoinList = ({
             })
             .map((coin: CoinItem) => {
               if (
-                childType === 'evm' &&
+                activeAccountType === 'evm' &&
                 coin.id !== 'A.1654653399040a61.FlowToken' &&
                 parseFloat(coin.balance) === 0 &&
                 !coin.custom

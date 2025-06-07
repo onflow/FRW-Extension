@@ -83,6 +83,7 @@ const Popup = (props: TransferConfirmationProps) => {
         sx: {
           width: '100%',
           height: 'auto',
+          maxHeight: '80%',
           background: '#121212',
           borderRadius: '18px 18px 0px 0px',
         },
@@ -130,7 +131,7 @@ const Popup = (props: TransferConfirmationProps) => {
                 flexDirection: 'column',
                 display: 'flex',
                 height: 'auto',
-                maxHeight: '190px',
+                maxHeight: '60%',
                 overflow: 'scroll',
                 paddingBottom: '16px',
               }}

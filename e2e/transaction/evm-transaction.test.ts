@@ -1,12 +1,12 @@
 import {
-  loginToSenderAccount,
   getCurrentAddress,
-  switchToEvm,
   waitForTransaction,
   loginToSenderOrReceiver,
   getReceiverEvmAccount,
   getReceiverCadenceAccount,
   checkSentAmount,
+  switchToEvmAddress,
+  getSenderEvmAccount,
 } from '../utils/helper';
 import { test } from '../utils/loader';
 
@@ -70,7 +70,10 @@ test.beforeEach(async ({ page, extensionId }) => {
   // Login to our sender account
   await loginToSenderOrReceiver({ page, extensionId, parallelIndex: test.info().parallelIndex });
   // switch to EVM account
-  await switchToEvm({ page, extensionId });
+  await switchToEvmAddress({
+    page,
+    address: getSenderEvmAccount({ parallelIndex: test.info().parallelIndex }),
+  });
 });
 
 test('EVM transactions', async ({ page, extensionId }) => {

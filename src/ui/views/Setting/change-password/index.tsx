@@ -86,7 +86,6 @@ const useStyles = makeStyles(() => ({
 const ChangePassword = () => {
   const classes = useStyles();
   const wallet = useWallet();
-  const { clearProfileData } = useProfiles();
   const [isCurrentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -205,7 +204,6 @@ const ChangePassword = () => {
           await wallet
             .lockWallet()
             .then(() => {
-              clearProfileData();
               history.push('/unlock');
             })
             .catch((error) => {
@@ -229,7 +227,7 @@ const ChangePassword = () => {
         }
       }
     },
-    [confirmCurrentPassword, confirmPassword, wallet, clearProfileData, history, error]
+    [confirmCurrentPassword, confirmPassword, wallet, history, error]
   );
 
   const changePasswordWithBackups = useCallback(
@@ -258,7 +256,6 @@ const ChangePassword = () => {
           await wallet
             .lockWallet()
             .then(() => {
-              clearProfileData();
               history.push('/unlock');
             })
             .catch((error) => {
@@ -288,7 +285,7 @@ const ChangePassword = () => {
         setStatusMessage('');
       }
     },
-    [confirmCurrentPassword, confirmPassword, wallet, clearProfileData, history]
+    [confirmCurrentPassword, confirmPassword, wallet, history]
   );
 
   const handleChangePasswordClick = useCallback(async () => {

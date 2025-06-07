@@ -9,9 +9,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
-import React, { useEffect, useState } from 'react';
-
-import { storage } from 'background/webapi';
+import React, { useState } from 'react';
 
 import Expand from '../assets/svg/expand.svg';
 import Hide from '../assets/svg/hide.svg';
@@ -93,26 +91,6 @@ const KeyPathInput = ({
   const handleAccordionChange = () => (event, isExpanded) => {
     setExpanded(isExpanded ? true : false);
   };
-
-  const updateStorageWithPath = async (newPath) => {
-    const trimmedPath = newPath.trim();
-    await storage.set('temp_path', trimmedPath);
-  };
-
-  const updateStorageWithPhrase = async (newPhrase) => {
-    const trimmed = newPhrase.trim();
-    await storage.set('temp_key', trimmed);
-  };
-
-  // Update storage when path changes
-  useEffect(() => {
-    updateStorageWithPath(path);
-  }, [path]);
-
-  // Update storage when phrase changes
-  useEffect(() => {
-    updateStorageWithPhrase(phrase);
-  }, [phrase]);
 
   return (
     <Accordion

@@ -2,6 +2,15 @@
 
 If you'd like to contribute to the extension, you'll need to install Node.js, pnpm, and get access to the development environment.
 
+### TLDR
+
+1. `npm install --global corepack@latest`
+2. `corepack enable pnpm`
+3. `pnpm i`
+4. Get `.env.dev` from another developer
+5. `pnpm build:dev`
+6. Load Unpacked at `chrome://extensions/` in developer mode and pick the `dist` folder created by build:dev
+
 ### Install Node & Dependencies
 
 1. Install Node.js version v22.11 or later using a [package manager](https://nodejs.org/en/download/package-manager)
@@ -125,8 +134,6 @@ ATTENTION: When you create a new key, make sure the key doesen't include space a
 Setup the following environment variables in .env.dev file:
 
 - TEST_PASSWORD: The password for the test wallet
-- TEST_PK_P256: The P256 public key for the test wallet
-- TEST_PK_SECP256K1: The SECP256K1 public key for the test wallet
 
 ## Analyzing High Priority Issues
 
