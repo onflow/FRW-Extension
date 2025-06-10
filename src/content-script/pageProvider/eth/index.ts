@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 
 import { ethErrors, serializeError } from 'eth-rpc-errors';
 
+import { SAFE_RPC_METHODS } from '@/constant';
 import { consoleError, consoleLog } from '@/shared/utils/console-log';
 
 import DedupePromise from './pageProvider/dedupePromise';
@@ -334,7 +335,7 @@ declare global {
     web3: any;
     frw: EthereumProvider;
     flowWalletRouter: {
-      frwProvider: EthereumProvider;
+      flowProvider: EthereumProvider;
       lastInjectedProvider?: EthereumProvider;
       currentProvider: EthereumProvider;
       providers: EthereumProvider[];
@@ -346,7 +347,7 @@ declare global {
 
 const provider = new EthereumProvider();
 patchProvider(provider);
-const frwProvider = new Proxy(provider, {
+const flowProvider = new Proxy(provider, {
   deleteProperty: (target, prop) => {
     if (typeof prop === 'string' && ['on', 'isFrw', 'isMetaMask', '_isFrw'].includes(prop)) {
       delete target[prop];
@@ -369,24 +370,92 @@ const requestIsDefaultWallet = () => {
   }) as Promise<boolean>;
 };
 
+// Check if user is connected to Flow Wallet
+const isConnectedToFlowWallet = (flowProvider: EthereumProvider) => {
+  return flowProvider.selectedAddress !== null && flowProvider.selectedAddress !== undefined;
+};
+
+// Determine if a method should be routed to Flow Wallet
+const shouldRouteToFlowWallet = (method: string, connectedToFlowWallet: boolean) => {
+  // Read-only operations that should always be routed to Flow Wallet
+  const alwaysFlowWalletMethods = [
+    'eth_call',
+    'eth_getBalance',
+    'eth_getCode',
+    'eth_blockNumber',
+    'eth_gasPrice',
+    'eth_getTransactionByHash',
+    'eth_getTransactionReceipt',
+    'eth_chainId',
+    'net_version',
+  ];
+
+  // Methods that should only be routed to Flow Wallet when connected
+  const conditionalFlowWalletMethods = [
+    'eth_accounts',
+    'eth_requestAccounts',
+    'eth_sendTransaction',
+    'eth_estimateGas',
+    'eth_signTransaction',
+    'eth_signTypedData',
+    'eth_signTypedData_v3',
+    'eth_signTypedData_v4',
+    'personal_sign',
+    'wallet_requestPermissions',
+    'wallet_getPermissions',
+    'wallet_revokePermissions',
+    'wallet_switchEthereumChain',
+    'wallet_watchAsset',
+  ];
+
+  // Always route certain methods to Flow Wallet
+  if (alwaysFlowWalletMethods.includes(method)) {
+    log('[routing]', `${method} -> Flow Wallet (always)`);
+    return true;
+  }
+
+  // Route conditional methods only if connected to Flow Wallet
+  if (connectedToFlowWallet && conditionalFlowWalletMethods.includes(method)) {
+    log('[routing]', `${method} -> Flow Wallet (connected: ${connectedToFlowWallet})`);
+    return true;
+  }
+
+  // For any other safe RPC methods, route to Flow Wallet if connected, otherwise to default provider
+  if (SAFE_RPC_METHODS.includes(method)) {
+    if (connectedToFlowWallet) {
+      log(
+        '[routing]',
+        `${method} -> Flow Wallet (safe method, connected: ${connectedToFlowWallet})`
+      );
+      return true;
+    } else {
+      log('[routing]', `${method} -> Default provider (safe method, not connected)`);
+      return false;
+    }
+  }
+
+  log('[routing]', `${method} -> Default provider (not in safe methods)`);
+  return false;
+};
+
 const initOperaProvider = () => {
-  window.ethereum = frwProvider;
-  frwProvider._isReady = true;
-  window.frw = frwProvider;
-  patchProvider(frwProvider);
-  frwProvider.on('frw:chainChanged', switchChainNotice);
+  window.ethereum = flowProvider;
+  flowProvider._isReady = true;
+  window.frw = flowProvider;
+  patchProvider(flowProvider);
+  flowProvider.on('frw:chainChanged', switchChainNotice);
 };
 
 const initProvider = () => {
-  frwProvider._isReady = true;
-  frwProvider.on('defaultWalletChanged', switchWalletNotice);
-  patchProvider(frwProvider);
+  flowProvider._isReady = true;
+  flowProvider.on('defaultWalletChanged', switchWalletNotice);
+  patchProvider(flowProvider);
   if (window.ethereum) {
     requestHasOtherProvider();
   }
   if (!window.web3) {
     window.web3 = {
-      currentProvider: frwProvider,
+      currentProvider: flowProvider,
     };
   }
   const descriptor = Object.getOwnPropertyDescriptor(window, 'ethereum');
@@ -395,13 +464,71 @@ const initProvider = () => {
     try {
       Object.defineProperties(window, {
         frw: {
-          value: frwProvider,
+          value: flowProvider,
           configurable: false,
           writable: false,
         },
         ethereum: {
           get() {
-            return window.flowWalletRouter.currentProvider;
+            // Proxy that routes specific methods
+            const currentProvider = window.flowWalletRouter.currentProvider;
+            const flowProvider = window.flowWalletRouter.flowProvider;
+
+            // If current provider is Flow Wallet, return it directly
+            if (currentProvider === flowProvider) {
+              return currentProvider;
+            }
+
+            // Proxy that intercepts specific methods
+            return new Proxy(currentProvider, {
+              get(target, prop) {
+                // Handle request method specially
+                if (prop === 'request') {
+                  return async (data) => {
+                    // Check if user is connected to Flow Wallet
+                    const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
+
+                    if (data && shouldRouteToFlowWallet(data.method, connectedToFlowWallet)) {
+                      return flowProvider.request(data);
+                    }
+                    // Route other methods to the default provider
+                    return target.request(data);
+                  };
+                }
+                // Handle sendAsync method
+                if (prop === 'sendAsync') {
+                  return async (payload, callback) => {
+                    const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
+
+                    if (
+                      payload &&
+                      !Array.isArray(payload) &&
+                      shouldRouteToFlowWallet(payload.method, connectedToFlowWallet)
+                    ) {
+                      return flowProvider.sendAsync(payload, callback);
+                    }
+                    return target.sendAsync(payload, callback);
+                  };
+                }
+                // Handle send method
+                if (prop === 'send') {
+                  return async (payload, callback) => {
+                    const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
+
+                    if (
+                      typeof payload === 'object' &&
+                      payload.method &&
+                      shouldRouteToFlowWallet(payload.method, connectedToFlowWallet)
+                    ) {
+                      return flowProvider.send(payload, callback);
+                    }
+                    return target.send(payload, callback);
+                  };
+                }
+                // For other properties, return from the target
+                return target[prop];
+              },
+            });
           },
           set(newProvider) {
             window.flowWalletRouter.addProvider(newProvider);
@@ -410,10 +537,10 @@ const initProvider = () => {
         },
         flowWalletRouter: {
           value: {
-            frwProvider,
+            flowProvider,
             lastInjectedProvider: window.ethereum,
-            currentProvider: frwProvider,
-            providers: [frwProvider, ...(window.ethereum ? [window.ethereum] : [])],
+            currentProvider: flowProvider,
+            providers: [flowProvider, ...(window.ethereum ? [window.ethereum] : [])],
             setDefaultProvider(frwAsDefault: boolean) {
               if (frwAsDefault) {
                 window.flowWalletRouter.currentProvider = window.frw;
@@ -427,7 +554,7 @@ const initProvider = () => {
               if (!window.flowWalletRouter.providers.includes(provider)) {
                 window.flowWalletRouter.providers.push(provider);
               }
-              if (frwProvider !== provider) {
+              if (flowProvider !== provider) {
                 requestHasOtherProvider();
                 window.flowWalletRouter.lastInjectedProvider = provider;
               }
@@ -441,12 +568,12 @@ const initProvider = () => {
       // think that defineProperty failed means there is any other wallet
       requestHasOtherProvider();
       consoleError(e);
-      window.ethereum = frwProvider;
-      window.frw = frwProvider;
+      window.ethereum = flowProvider;
+      window.frw = flowProvider;
     }
   } else {
-    window.ethereum = frwProvider;
-    window.frw = frwProvider;
+    window.ethereum = flowProvider;
+    window.frw = flowProvider;
   }
 };
 
@@ -459,7 +586,7 @@ if (isOpera) {
 requestIsDefaultWallet().then((frwAsDefault) => {
   window.flowWalletRouter?.setDefaultProvider(frwAsDefault);
   if (frwAsDefault) {
-    window.ethereum = frwProvider;
+    window.ethereum = flowProvider;
   }
 });
 
@@ -482,9 +609,9 @@ const announceEip6963Provider = (provider: EthereumProvider) => {
 };
 
 window.addEventListener<any>('eip6963:requestProvider', (event: EIP6963RequestProviderEvent) => {
-  announceEip6963Provider(frwProvider);
+  announceEip6963Provider(flowProvider);
 });
 
-announceEip6963Provider(frwProvider);
+announceEip6963Provider(flowProvider);
 
 window.dispatchEvent(new Event('ethereum#initialized'));
