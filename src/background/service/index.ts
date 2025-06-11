@@ -15,6 +15,7 @@ export { default as evmNftService } from './nft-evm';
 export { default as googleDriveService } from './googleDrive';
 export { default as googleSafeHostService } from './googleSafeHost';
 export { default as signTextHistoryService } from './signTextHistory';
+export { default as contentScriptInjectionService } from './content-script-injection';
 export { default as i18n } from './i18n';
 export { default as newsService } from './news';
 export { default as tokenListService } from './token-list';

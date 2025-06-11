@@ -13,6 +13,7 @@ import PushEventHandlers from './pageProvider/pushEventHandlers';
 import ReadyPromise from './pageProvider/readyPromise';
 import { domReadyCall, $ } from './pageProvider/utils';
 import BroadcastChannelMessage from './utils/message/broadcastChannelMessage';
+import PostMessage from './utils/message/post-message';
 import { patchProvider } from './utils/metamask';
 
 declare const __frw__channelName;
@@ -35,6 +36,60 @@ let isDefaultWallet =
   typeof __frw__isDefaultWallet !== 'undefined' ? __frw__isDefaultWallet : false;
 let isOpera = typeof __frw__isOpera !== 'undefined' ? __frw__isOpera : false;
 let uuid = typeof __frw__uuid !== 'undefined' ? __frw__uuid : '';
+
+// Check if we're running in MAIN world by looking for the bridge UUID event
+let isMainWorld = false;
+let bridgeUUID = '';
+
+log('PageProvider starting - checking for bridge UUID');
+
+// First check if UUIDs are already available from global storage
+const existingUUIDs = (window as any).__frwUUIDs;
+if (existingUUIDs?.bridgeUUID && existingUUIDs?.walletUUID) {
+  isMainWorld = true;
+  bridgeUUID = existingUUIDs.bridgeUUID;
+  uuid = existingUUIDs.walletUUID;
+
+  // Store in window for easy access
+  (window as any).__frwBridgeUUID = bridgeUUID;
+  (window as any).__frwWalletUUID = uuid;
+
+  log('Found existing UUIDs - bridge UUID:', bridgeUUID, 'wallet UUID:', uuid);
+} else {
+  log('No existing UUIDs found, waiting for bridge UUID event');
+}
+
+// Function to wait for wallet UUID
+const waitForWalletUUID = (): Promise<string> => {
+  return new Promise((resolve) => {
+    if (uuid) {
+      log('UUID already available:', uuid);
+      resolve(uuid);
+      return;
+    }
+
+    let checkCount = 0;
+
+    const timeoutId = setTimeout(() => {
+      clearInterval(checkInterval);
+      const fallbackUUID = uuid || 'flow-wallet-default';
+      log(`UUID wait timed out after ${checkCount} checks, using fallback:`, fallbackUUID);
+      resolve(fallbackUUID);
+    }, 1000);
+
+    // Check periodically for the UUID
+    const checkInterval = setInterval(() => {
+      checkCount++;
+      if (typeof (window as any).__frwWalletUUID !== 'undefined') {
+        uuid = (window as any).__frwWalletUUID;
+        log(`Got UUID after ${checkCount} checks:`, uuid);
+        clearInterval(checkInterval);
+        clearTimeout(timeoutId);
+        resolve(uuid);
+      }
+    }, 10);
+  });
+};
 
 const getParams = () => {
   if (localStorage.getItem('frw:channelName')) {
@@ -123,17 +178,37 @@ export class EthereumProvider extends EventEmitter {
   private _pushEventHandlers: PushEventHandlers;
   private _requestPromise = new ReadyPromise(2);
   private _dedupePromise = new DedupePromise([]);
-  private _bcm = new BroadcastChannelMessage(channelName);
+  private _bcm: BroadcastChannelMessage | PostMessage;
 
   constructor({ maxListeners = 100 } = {}) {
     super();
     this.setMaxListeners(maxListeners);
+
+    // Initialize communication based on execution context
+    log(
+      'EthereumProvider constructor - isMainWorld:',
+      isMainWorld,
+      'bridgeUUID:',
+      bridgeUUID,
+      'channelName:',
+      channelName
+    );
+
+    if (isMainWorld && bridgeUUID) {
+      log('Creating PostMessage with bridgeUUID:', bridgeUUID);
+      this._bcm = new PostMessage(bridgeUUID);
+    } else {
+      log('Creating BroadcastChannelMessage with channelName:', channelName);
+      this._bcm = new BroadcastChannelMessage(channelName);
+    }
+
     this.initialize();
     this.shimLegacy();
     this._pushEventHandlers = new PushEventHandlers(this);
   }
 
   initialize = async () => {
+    log('EthereumProvider - initialize');
     document.addEventListener('visibilitychange', this._requestPromiseCheckVisibility);
 
     this._bcm.connect().on('message', this._handleBackgroundMessage);
@@ -182,6 +257,7 @@ export class EthereumProvider extends EventEmitter {
   };
 
   private _requestPromiseCheckVisibility = () => {
+    log('EthereumProvider - _requestPromiseCheckVisibility', document.visibilityState);
     if (document.visibilityState === 'visible') {
       this._requestPromise.check(1);
     } else {
@@ -199,11 +275,13 @@ export class EthereumProvider extends EventEmitter {
   };
 
   isConnected = () => {
+    log('EthereumProvider - isConnected', this._isConnected);
     return true;
   };
 
   // TODO: support multi request!
   request = async (data) => {
+    log('EthereumProvider - request', data);
     if (!this._isReady) {
       const promise = new Promise((resolve, reject) => {
         this._cacheRequestsBeforeReady.push({
@@ -218,6 +296,7 @@ export class EthereumProvider extends EventEmitter {
   };
 
   _request = async (data) => {
+    log('EthereumProvider - _request', data);
     if (!data) {
       throw ethErrors.rpc.invalidRequest();
     }
@@ -247,11 +326,13 @@ export class EthereumProvider extends EventEmitter {
   };
 
   requestInternalMethods = (data) => {
+    log('EthereumProvider - requestInternalMethods', data);
     return this._dedupePromise.call(data.method, () => this._request(data));
   };
 
   // shim to matamask legacy api
   sendAsync = (payload, callback) => {
+    log('EthereumProvider - sendAsync', payload);
     if (Array.isArray(payload)) {
       return Promise.all(
         payload.map(
@@ -272,6 +353,7 @@ export class EthereumProvider extends EventEmitter {
   };
 
   send = (payload, callback?) => {
+    log('EthereumProvider - send', payload);
     if (typeof payload === 'string' && (!callback || Array.isArray(callback))) {
       // send(method, params? = [])
       return this.request({
@@ -310,6 +392,7 @@ export class EthereumProvider extends EventEmitter {
   };
 
   shimLegacy = () => {
+    log('EthereumProvider - shimLegacy');
     const legacyMethods = [
       ['enable', 'eth_requestAccounts'],
       ['net_version', 'net_version'],
@@ -345,25 +428,69 @@ declare global {
   }
 }
 
-const provider = new EthereumProvider();
-patchProvider(provider);
-const flowProvider = new Proxy(provider, {
-  deleteProperty: (target, prop) => {
-    if (typeof prop === 'string' && ['on', 'isFrw', 'isMetaMask', '_isFrw'].includes(prop)) {
-      delete target[prop];
-    }
-    return true;
-  },
+// Will be initialized asynchronously
+let flowProvider: EthereumProvider | null = null;
+let resolveProvider: (provider: EthereumProvider) => void;
+const flowProviderPromise = new Promise<EthereumProvider>((resolve) => {
+  resolveProvider = resolve;
 });
 
-const requestHasOtherProvider = () => {
+// Listen for the bridge event to set config and initialize the provider
+document.addEventListener(
+  'frw:bridge-uuid',
+  ((event: CustomEvent) => {
+    log('Received bridge UUID event, setting config', event.detail);
+    if (event.detail?.bridgeUUID && event.detail?.walletUUID) {
+      isMainWorld = true;
+      bridgeUUID = event.detail.bridgeUUID;
+      uuid = event.detail.walletUUID;
+
+      // Store in window for easy access
+      (window as any).__frwBridgeUUID = bridgeUUID;
+      (window as any).__frwWalletUUID = uuid;
+
+      log('Updated from event - bridge UUID:', bridgeUUID, 'wallet UUID:', uuid);
+    }
+    // Initialize the provider now that we have the config
+    initializeFlowProvider();
+  }) as EventListener,
+  { once: true }
+); // Important: only handle this once
+
+const createProvider = () => {
+  const provider = new EthereumProvider();
+  patchProvider(provider);
+  return new Proxy(provider, {
+    deleteProperty: (target, prop) => {
+      if (typeof prop === 'string' && ['on', 'isFrw', 'isMetaMask', '_isFrw'].includes(prop)) {
+        delete target[prop];
+      }
+      return true;
+    },
+  });
+};
+
+const initializeFlowProvider = () => {
+  // Prevent double-initialization
+  if (flowProvider) {
+    return;
+  }
+  log('Initializing Flow provider...');
+  flowProvider = createProvider();
+  resolveProvider(flowProvider); // Resolve the promise for other parts of the script
+  return flowProvider;
+};
+
+const requestHasOtherProvider = async () => {
+  const provider = await flowProviderPromise;
   return provider.requestInternalMethods({
     method: 'hasOtherProvider',
     params: [],
   });
 };
 
-const requestIsDefaultWallet = () => {
+const requestIsDefaultWallet = async () => {
+  const provider = await flowProviderPromise;
   return provider.requestInternalMethods({
     method: 'isDefaultWallet',
     params: [],
@@ -438,24 +565,26 @@ const shouldRouteToFlowWallet = (method: string, connectedToFlowWallet: boolean)
   return false;
 };
 
-const initOperaProvider = () => {
-  window.ethereum = flowProvider;
-  flowProvider._isReady = true;
-  window.frw = flowProvider;
-  patchProvider(flowProvider);
-  flowProvider.on('frw:chainChanged', switchChainNotice);
+const initOperaProvider = async () => {
+  const provider = await flowProviderPromise;
+  window.ethereum = provider;
+  provider._isReady = true;
+  window.frw = provider;
+  patchProvider(provider);
+  provider.on('frw:chainChanged', switchChainNotice);
 };
 
-const initProvider = () => {
-  flowProvider._isReady = true;
-  flowProvider.on('defaultWalletChanged', switchWalletNotice);
-  patchProvider(flowProvider);
+const initProvider = async () => {
+  const provider = await flowProviderPromise;
+  provider._isReady = true;
+  provider.on('defaultWalletChanged', switchWalletNotice);
+  patchProvider(provider);
   if (window.ethereum) {
-    requestHasOtherProvider();
+    await requestHasOtherProvider();
   }
   if (!window.web3) {
     window.web3 = {
-      currentProvider: flowProvider,
+      currentProvider: provider,
     };
   }
   const descriptor = Object.getOwnPropertyDescriptor(window, 'ethereum');
@@ -464,12 +593,13 @@ const initProvider = () => {
     try {
       Object.defineProperties(window, {
         frw: {
-          value: flowProvider,
+          value: provider,
           configurable: false,
           writable: false,
         },
         ethereum: {
           get() {
+            log('ethereum get');
             // Proxy that routes specific methods
             const currentProvider = window.flowWalletRouter.currentProvider;
             const flowProvider = window.flowWalletRouter.flowProvider;
@@ -537,10 +667,10 @@ const initProvider = () => {
         },
         flowWalletRouter: {
           value: {
-            flowProvider,
+            flowProvider: provider,
             lastInjectedProvider: window.ethereum,
-            currentProvider: flowProvider,
-            providers: [flowProvider, ...(window.ethereum ? [window.ethereum] : [])],
+            currentProvider: provider,
+            providers: [provider, ...(window.ethereum ? [window.ethereum] : [])],
             setDefaultProvider(frwAsDefault: boolean) {
               if (frwAsDefault) {
                 window.flowWalletRouter.currentProvider = window.frw;
@@ -566,40 +696,74 @@ const initProvider = () => {
       });
     } catch (e) {
       // think that defineProperty failed means there is any other wallet
-      requestHasOtherProvider();
+      await requestHasOtherProvider();
       consoleError(e);
-      window.ethereum = flowProvider;
-      window.frw = flowProvider;
+      window.ethereum = provider;
+      window.frw = provider;
     }
   } else {
-    window.ethereum = flowProvider;
-    window.frw = flowProvider;
+    window.ethereum = provider;
+    window.frw = provider;
   }
 };
 
-if (isOpera) {
-  initOperaProvider();
-} else {
-  initProvider();
-}
-
-requestIsDefaultWallet().then((frwAsDefault) => {
-  window.flowWalletRouter?.setDefaultProvider(frwAsDefault);
-  if (frwAsDefault) {
-    window.ethereum = flowProvider;
-  }
+// Set up initialization promises
+const providerInitPromise = flowProviderPromise.then((provider) => {
+  return new Promise<void>((resolve) => {
+    const checkInit = () => {
+      if (provider._initialized) {
+        resolve();
+      } else {
+        provider.once('_initialized', resolve);
+      }
+    };
+    checkInit();
+  });
 });
+
+(async () => {
+  try {
+    if (isOpera) {
+      await initOperaProvider();
+    } else {
+      await initProvider();
+    }
+  } catch (e) {
+    consoleError('An error occurred while initializing the Flow wallet provider', e);
+  }
+})();
+
+(async () => {
+  try {
+    const provider = await flowProviderPromise;
+    const frwAsDefault = await requestIsDefaultWallet();
+    window.flowWalletRouter?.setDefaultProvider(frwAsDefault);
+    if (frwAsDefault) {
+      window.ethereum = provider;
+    }
+  } catch (e) {
+    consoleError('An error occurred while checking if the Flow wallet is the default wallet', e);
+  }
+})();
 
 const EIP6963Icon =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8xMzc2MV8zNTIxKSI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiByeD0iNDYuODc1IiBmaWxsPSJ3aGl0ZSIvPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDFfMTM3NjFfMzUyMSkiPgo8cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzEzNzYxXzM1MjEpIi8+CjxwYXRoIGQ9Ik0xMjUgMjE3LjUyOUMxNzYuMTAyIDIxNy41MjkgMjE3LjUyOSAxNzYuMTAyIDIxNy41MjkgMTI1QzIxNy41MjkgNzMuODk3NSAxNzYuMTAyIDMyLjQ3MDcgMTI1IDMyLjQ3MDdDNzMuODk3NSAzMi40NzA3IDMyLjQ3MDcgNzMuODk3NSAzMi40NzA3IDEyNUMzMi40NzA3IDE3Ni4xMDIgNzMuODk3NSAyMTcuNTI5IDEyNSAyMTcuNTI5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE2NS4zODIgMTEwLjQyMkgxMzkuNTg1VjEzNi43OEgxNjUuMzgyVjExMC40MjJaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMTEzLjIyNyAxMzYuNzhIMTM5LjU4NVYxMTAuNDIySDExMy4yMjdWMTM2Ljc4WiIgZmlsbD0iIzQxQ0M1RCIvPgo8L2c+CjwvZz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8xMzc2MV8zNTIxIiB4MT0iMCIgeTE9IjAiIHgyPSIyNTAiIHkyPSIyNTAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzFDRUI4QSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0MUNDNUQiLz4KPC9saW5lYXJHcmFkaWVudD4KPGNsaXBQYXRoIGlkPSJjbGlwMF8xMzc2MV8zNTIxIj4KPHJlY3Qgd2lkdGg9IjI1MCIgaGVpZ2h0PSIyNTAiIHJ4PSI0Ni44NzUiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjxjbGlwUGF0aCBpZD0iY2xpcDFfMTM3NjFfMzUyMSI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ3aGl0ZSIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+Cjwvc3ZnPgo=';
 
 const announceEip6963Provider = (provider: EthereumProvider) => {
+  // Ensure we have a valid UUID before announcing
+  if (!uuid) {
+    log('EIP-6963: No UUID available, skipping announcement');
+    return;
+  }
+
   const info: EIP6963ProviderInfo = {
     uuid: uuid,
     name: 'Flow Wallet',
     icon: EIP6963Icon,
     rdns: 'com.flowfoundation.wallet',
   };
+
+  log('EIP-6963: Announcing provider with UUID', uuid);
 
   window.dispatchEvent(
     new CustomEvent('eip6963:announceProvider', {
@@ -608,10 +772,51 @@ const announceEip6963Provider = (provider: EthereumProvider) => {
   );
 };
 
-window.addEventListener<any>('eip6963:requestProvider', (event: EIP6963RequestProviderEvent) => {
-  announceEip6963Provider(flowProvider);
-});
+// Set up EIP-6963 event listener
+window.addEventListener<any>(
+  'eip6963:requestProvider',
+  async (event: EIP6963RequestProviderEvent) => {
+    log('eip6963:requestProvider', event);
+    try {
+      const provider = await flowProviderPromise;
+      // Only announce if provider is ready
+      if (provider._isReady) {
+        announceEip6963Provider(provider);
+      } else {
+        // If not ready, wait for it
+        await providerInitPromise;
+        announceEip6963Provider(provider);
+      }
+    } catch (e) {
+      log('Error handling eip6963:requestProvider:', e);
+    }
+  }
+);
 
-announceEip6963Provider(flowProvider);
+// Wait for both UUIDs and provider initialization
+Promise.all([waitForWalletUUID(), flowProviderPromise])
+  .then(([walletUUID, provider]) => {
+    providerInitPromise.then(() => {
+      log('Provider initialized and got wallet UUID:', walletUUID);
+
+      // Announce immediately when both are ready
+      announceEip6963Provider(provider);
+
+      // Also announce when DOM is ready (for late-loading dApps)
+      domReadyCall(() => {
+        log('DOM ready, announcing EIP-6963 provider again');
+        announceEip6963Provider(provider);
+      });
+
+      // Announce after a short delay to catch very late-loading dApps
+      setTimeout(() => {
+        log('Delayed EIP-6963 announcement');
+        announceEip6963Provider(provider);
+      }, 100);
+    });
+  })
+  .catch((e) => {
+    log('Error in EIP-6963 setup:', e);
+  });
 
 window.dispatchEvent(new Event('ethereum#initialized'));
