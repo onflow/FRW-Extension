@@ -60,7 +60,6 @@ const flowContext = flow
       mapMethod !== 'walletWatchAsset' &&
       mapMethod !== 'walletConnect' &&
       mapMethod !== 'walletDisconnect' &&
-      mapMethod !== 'walletConnect' &&
       !Reflect.getMetadata('SAFE', providerController, mapMethod)
     ) {
       if (!permissionService.hasPermission(origin) || !(await Wallet.isUnlocked())) {

@@ -1,0 +1,289 @@
+<!doctype html>
+<html>
+  <head>
+    <title>EIP-6963 Test - Flow Wallet</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      .wallet {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .wallet img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+      }
+      .info {
+        flex: 1;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        background: #f0f0f0;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background: #007bff;
+        color: white;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .logs {
+        background: #f5f5f5;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .debug-info {
+        background: #e7f1ff;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border-left: 4px solid #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>EIP-6963 Wallet Discovery Test</h1>
+
+    <div class="status" id="status">Waiting for wallets...</div>
+
+    <div class="debug-info" id="debug-info">
+      <h3>Debug Info:</h3>
+      <div id="uuid-status">Checking UUIDs...</div>
+      <div id="provider-status">Checking providers...</div>
+    </div>
+
+    <button onclick="requestProviders()">Request Providers</button>
+    <button onclick="checkWindowEthereum()">Check window.ethereum</button>
+    <button onclick="checkUUIDs()">Check UUIDs</button>
+    <button onclick="clearWallets()">Clear</button>
+
+    <h2>Discovered Wallets:</h2>
+    <div id="wallets"></div>
+
+    <h2>Console Logs:</h2>
+    <div class="logs" id="logs"></div>
+
+    <script>
+      const wallets = new Map();
+      const logs = [];
+
+      function log(message, data = null) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] ${message}${data ? ' - ' + JSON.stringify(data) : ''}`;
+        logs.push(logEntry);
+        console.log(message, data);
+        updateLogs();
+      }
+
+      function updateLogs() {
+        const logsDiv = document.getElementById('logs');
+        logsDiv.innerHTML = logs.join('<br>');
+        logsDiv.scrollTop = logsDiv.scrollHeight;
+      }
+
+      function updateStatus(message, isError = false) {
+        const status = document.getElementById('status');
+        status.textContent = message;
+        status.className = 'status ' + (isError ? 'error' : 'success');
+      }
+
+      function updateDebugInfo() {
+        const uuidStatus = document.getElementById('uuid-status');
+        const providerStatus = document.getElementById('provider-status');
+
+        // Check UUIDs
+        const bridgeUUID = window.__frwBridgeUUID;
+        const walletUUID = window.__frwWalletUUID;
+        uuidStatus.innerHTML = `
+          Bridge UUID: ${bridgeUUID || 'NOT FOUND'}<br>
+          Wallet UUID: ${walletUUID || 'NOT FOUND'}
+        `;
+
+        // Check providers
+        const hasEthereum = !!window.ethereum;
+        const hasFrw = !!window.frw;
+        const hasFlowWalletRouter = !!window.flowWalletRouter;
+
+        providerStatus.innerHTML = `
+          window.ethereum: ${hasEthereum ? 'YES' : 'NO'}<br>
+          window.frw: ${hasFrw ? 'YES' : 'NO'}<br>
+          window.flowWalletRouter: ${hasFlowWalletRouter ? 'YES' : 'NO'}
+        `;
+      }
+
+      function displayWallets() {
+        const walletsDiv = document.getElementById('wallets');
+        walletsDiv.innerHTML = '';
+
+        if (wallets.size === 0) {
+          walletsDiv.innerHTML = '<p>No wallets discovered yet.</p>';
+          return;
+        }
+
+        wallets.forEach((detail, uuid) => {
+          const walletDiv = document.createElement('div');
+          walletDiv.className = 'wallet';
+          walletDiv.innerHTML = `
+                    <img src="${detail.info.icon}" alt="${detail.info.name}" />
+                    <div class="info">
+                        <h3>${detail.info.name}</h3>
+                        <p>UUID: ${detail.info.uuid}</p>
+                        <p>RDNS: ${detail.info.rdns}</p>
+                    </div>
+                `;
+          walletsDiv.appendChild(walletDiv);
+        });
+      }
+
+      function onAnnounceProvider(event) {
+        if (!event.detail) {
+          log('EIP-6963 announce event received but no detail', event);
+          return;
+        }
+
+        const { info, provider } = event.detail;
+        log(`Wallet announced: ${info.name}`, {
+          uuid: info.uuid,
+          rdns: info.rdns,
+          hasProvider: !!provider,
+        });
+
+        wallets.set(info.uuid, event.detail);
+        updateStatus(`Found ${wallets.size} wallet(s)`);
+        displayWallets();
+      }
+
+      function requestProviders() {
+        log('Requesting EIP-6963 providers...');
+        updateDebugInfo();
+        window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+        // Wait a bit to see if any providers respond
+        setTimeout(() => {
+          if (wallets.size === 0) {
+            updateStatus('No EIP-6963 wallets found', true);
+          }
+          updateDebugInfo();
+        }, 1000);
+      }
+
+      function checkWindowEthereum() {
+        updateDebugInfo();
+
+        if (window.ethereum) {
+          log('window.ethereum exists', {
+            isMetaMask: window.ethereum.isMetaMask,
+            isFrw: window.ethereum.isFrw,
+            _isFrw: window.ethereum._isFrw,
+            isRabby: window.ethereum.isRabby,
+            _isReady: window.ethereum._isReady,
+            _initialized: window.ethereum._initialized,
+          });
+        } else {
+          log('window.ethereum not found');
+        }
+
+        // Also check for Flow-specific objects
+        if (window.frw) {
+          log('window.frw exists', {
+            _isReady: window.frw._isReady,
+            _initialized: window.frw._initialized,
+          });
+        }
+
+        if (window.flowWalletRouter) {
+          log('window.flowWalletRouter exists', {
+            providers: window.flowWalletRouter.providers.length,
+          });
+        }
+      }
+
+      function checkUUIDs() {
+        log('Checking UUIDs');
+        updateDebugInfo();
+
+        log('Bridge UUID', window.__frwBridgeUUID);
+        log('Wallet UUID', window.__frwWalletUUID);
+
+        // Also log any other Flow-related global variables
+        const flowGlobals = Object.keys(window).filter(
+          (key) => key.includes('frw') || key.includes('flow') || key.includes('Flow')
+        );
+        log('Flow-related globals', flowGlobals);
+      }
+
+      function clearWallets() {
+        wallets.clear();
+        logs.length = 0;
+        displayWallets();
+        updateLogs();
+        updateStatus('Cleared all wallets');
+        updateDebugInfo();
+      }
+
+      // Set up listener before page load
+      window.addEventListener('eip6963:announceProvider', onAnnounceProvider);
+
+      // Log when DOM is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        log('DOM ready');
+        updateDebugInfo();
+        displayWallets();
+      });
+
+      // Log page lifecycle events
+      log('Script loaded');
+
+      // Update debug info immediately
+      updateDebugInfo();
+
+      // Auto-check UUIDs and providers periodically
+      let checkCount = 0;
+      const autoCheck = setInterval(() => {
+        checkCount++;
+        updateDebugInfo();
+
+        // Stop checking after 30 seconds
+        if (checkCount > 60) {
+          clearInterval(autoCheck);
+        }
+      }, 500);
+
+      // Automatically request providers after a delay
+      setTimeout(() => {
+        log('Auto-requesting providers...');
+        requestProviders();
+      }, 1000);
+    </script>
+  </body>
+</html>
