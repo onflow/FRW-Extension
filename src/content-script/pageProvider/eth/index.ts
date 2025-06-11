@@ -499,13 +499,27 @@ const requestIsDefaultWallet = async () => {
 
 // Check if user is connected to Flow Wallet
 const isConnectedToFlowWallet = (flowProvider: EthereumProvider) => {
-  return flowProvider.selectedAddress !== null && flowProvider.selectedAddress !== undefined;
+  const connected =
+    flowProvider.selectedAddress !== null && flowProvider.selectedAddress !== undefined;
+  log(
+    '[connection]',
+    'Flow Wallet connected:',
+    connected,
+    'selectedAddress:',
+    flowProvider.selectedAddress
+  );
+  return connected;
 };
 
 // Determine if a method should be routed to Flow Wallet
 const shouldRouteToFlowWallet = (method: string, connectedToFlowWallet: boolean) => {
-  // Read-only operations that should always be routed to Flow Wallet
-  const alwaysFlowWalletMethods = [
+  // Connection methods that should only be handled by Flow Wallet if user is already connected
+  // Otherwise let other wallets handle their own connection flow
+  const connectionMethods = ['eth_accounts', 'eth_requestAccounts'];
+
+  // Methods that should ONLY be routed to Flow Wallet when already connected
+  const connectedOnlyMethods = [
+    // Read-only methods (only when connected to avoid breaking other wallet connections)
     'eth_call',
     'eth_getBalance',
     'eth_getCode',
@@ -515,12 +529,7 @@ const shouldRouteToFlowWallet = (method: string, connectedToFlowWallet: boolean)
     'eth_getTransactionReceipt',
     'eth_chainId',
     'net_version',
-  ];
-
-  // Methods that should only be routed to Flow Wallet when connected
-  const conditionalFlowWalletMethods = [
-    'eth_accounts',
-    'eth_requestAccounts',
+    // Transaction methods
     'eth_sendTransaction',
     'eth_estimateGas',
     'eth_signTransaction',
@@ -535,25 +544,28 @@ const shouldRouteToFlowWallet = (method: string, connectedToFlowWallet: boolean)
     'wallet_watchAsset',
   ];
 
-  // Always route certain methods to Flow Wallet
-  if (alwaysFlowWalletMethods.includes(method)) {
-    log('[routing]', `${method} -> Flow Wallet (always)`);
+  // Only route connection methods if already connected to Flow Wallet
+  // This prevents intercepting MetaMask connection attempts
+  if (connectionMethods.includes(method)) {
+    if (connectedToFlowWallet) {
+      log('[routing]', `${method} -> Flow Wallet (already connected)`);
+      return true;
+    } else {
+      log('[routing]', `${method} -> Default provider (not connected, let other wallets handle)`);
+      return false;
+    }
+  }
+
+  // Route all other methods only if connected to Flow Wallet
+  if (connectedToFlowWallet && connectedOnlyMethods.includes(method)) {
+    log('[routing]', `${method} -> Flow Wallet (connected)`);
     return true;
   }
 
-  // Route conditional methods only if connected to Flow Wallet
-  if (connectedToFlowWallet && conditionalFlowWalletMethods.includes(method)) {
-    log('[routing]', `${method} -> Flow Wallet (connected: ${connectedToFlowWallet})`);
-    return true;
-  }
-
-  // For any other safe RPC methods, route to Flow Wallet if connected, otherwise to default provider
+  // For any other safe RPC methods, only route if connected
   if (SAFE_RPC_METHODS.includes(method)) {
     if (connectedToFlowWallet) {
-      log(
-        '[routing]',
-        `${method} -> Flow Wallet (safe method, connected: ${connectedToFlowWallet})`
-      );
+      log('[routing]', `${method} -> Flow Wallet (safe method, connected)`);
       return true;
     } else {
       log('[routing]', `${method} -> Default provider (safe method, not connected)`);
@@ -561,7 +573,7 @@ const shouldRouteToFlowWallet = (method: string, connectedToFlowWallet: boolean)
     }
   }
 
-  log('[routing]', `${method} -> Default provider (not in safe methods)`);
+  log('[routing]', `${method} -> Default provider (default case)`);
   return false;
 };
 
