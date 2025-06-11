@@ -612,16 +612,14 @@ const initProvider = async () => {
         ethereum: {
           get() {
             log('ethereum get');
-            // Proxy that routes specific methods
+            // This proxy is the key to multi-wallet interoperability.
+            // It intercepts requests and routes them to our wallet or the default
+            // wallet based on the connection state and method type.
             const currentProvider = window.flowWalletRouter.currentProvider;
             const flowProvider = window.flowWalletRouter.flowProvider;
 
-            // If current provider is Flow Wallet, return it directly
-            if (currentProvider === flowProvider) {
-              return currentProvider;
-            }
-
-            // Proxy that intercepts specific methods
+            // The proxy is always returned, wrapping the current default provider.
+            // This ensures we can intercept requests even if our wallet is not the active one.
             return new Proxy(currentProvider, {
               get(target, prop) {
                 // Handle request method specially
@@ -749,10 +747,9 @@ const providerInitPromise = flowProviderPromise.then((provider) => {
   try {
     const provider = await flowProviderPromise;
     const frwAsDefault = await requestIsDefaultWallet();
+    // Set our wallet as the default if configured, but do not overwrite
+    // the window.ethereum proxy, which is essential for routing.
     window.flowWalletRouter?.setDefaultProvider(frwAsDefault);
-    if (frwAsDefault) {
-      window.ethereum = provider;
-    }
   } catch (e) {
     consoleError('An error occurred while checking if the Flow wallet is the default wallet', e);
   }
