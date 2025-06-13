@@ -3,10 +3,6 @@ import { Box, Button, Typography, Drawer, IconButton, CardMedia } from '@mui/mat
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import {
-  type ActiveAccountType,
-  type ActiveChildType_depreciated,
-} from '@/shared/types/wallet-types';
 import LLComingSoon from '@/ui/components/LLComingSoonWarning';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import moveft from 'ui/assets/image/moveft.png';

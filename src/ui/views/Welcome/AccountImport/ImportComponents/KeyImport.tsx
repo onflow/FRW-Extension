@@ -81,7 +81,7 @@ const KeyImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
           type="submit"
           sx={{
             height: '56px',
-            width: '640px',
+            width: '100%',
             borderRadius: '12px',
             textTransform: 'capitalize',
             gap: '12px',

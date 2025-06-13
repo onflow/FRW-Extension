@@ -76,76 +76,67 @@ test.beforeEach(async ({ page, extensionId }) => {
 const txList: { txId: string; tokenname: string; amount: string; ingoreFlowCharge: boolean }[] = [];
 
 //Send FLOW token from Flow to Flow
-test('send FLOW flow to flow', async ({ page }) => {
+test('send Cadence transactions', async ({ page, extensionId }) => {
+  test.setTimeout(120_000);
   // This can take a while
-  const tx = await sendTokenFlow({
+  const tx1 = await sendTokenFlow({
     page,
     tokenname: 'flow',
     receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     amount: '0.00123456',
   });
-  txList.push(tx);
-});
+  txList.push(tx1);
 
-//Send StFlow from Flow to Flow
-test('send stFlow flow to flow', async ({ page }) => {
-  const tx = await sendTokenFlow({
+  //Send StFlow from Flow to Flow
+  const tx2 = await sendTokenFlow({
     page,
     tokenname: 'stFlow',
     receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     amount: '0.00123456',
   });
-  txList.push(tx);
-});
+  txList.push(tx2);
 
-//Send FLOW token from Flow to COA
-test('send FLOW flow to COA', async ({ page }) => {
+  //Send FLOW token from Flow to COA
   // This can take a while
-  const tx = await sendTokenFlow({
+  const tx3 = await sendTokenFlow({
     page,
     tokenname: 'flow',
     receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     amount: '0.00123456',
   });
-  txList.push(tx);
-});
-//Send USDC from Flow to Flow
-test('send USDC flow to COA', async ({ page }) => {
-  const tx = await sendTokenFlow({
+  txList.push(tx3);
+
+  //Send USDC from Flow to Flow
+  const tx4 = await sendTokenFlow({
     page,
     tokenname: 'usdc.e',
     receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     ingoreFlowCharge: true,
     amount: '0.00123456',
   });
-  txList.push(tx);
-});
+  txList.push(tx4);
 
-//Send FLOW token from Flow to EOA
-test('send FLOW flow to EOA', async ({ page }) => {
+  //Send FLOW token from Flow to EOA
   // This can take a while
-  const tx = await sendTokenFlow({
+  const tx5 = await sendTokenFlow({
     page,
     tokenname: 'flow',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
     amount: '0.00123456',
   });
-  txList.push(tx);
-});
+  txList.push(tx5);
 
-//Send BETA from Flow to EOA
-test('send BETA flow to EOA', async ({ page }) => {
-  const tx = await sendTokenFlow({
+  //Send BETA from Flow to EOA
+  const tx6 = await sendTokenFlow({
     page,
     tokenname: 'beta',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
     ingoreFlowCharge: true,
     amount: '0.00123456',
   });
-  txList.push(tx);
-});
+  txList.push(tx6);
 
-test('check all sealed transactions', async ({ page, extensionId }) => {
+  //Check all sealed transactions
   // Check the amounts that were sent for each transaction
   // Go to the activity page
   await page.goto(`chrome-extension://${extensionId}/index.html#/dashboard?activity=1`);

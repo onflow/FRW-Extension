@@ -1,9 +1,4 @@
-import { type AccountKeyRequest } from '@/shared/types/network-types';
-import {
-  type FlowAddress,
-  type EvmAddress,
-  type PublicKeyAccount,
-} from '@/shared/types/wallet-types';
+import { type FlowAddress, type EvmAddress } from '@/shared/types/wallet-types';
 
 export function sansPrefix(address: string): FlowAddress | EvmAddress | null {
   if (!address) return null;

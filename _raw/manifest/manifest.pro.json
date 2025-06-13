@@ -33,7 +33,8 @@
   "content_scripts": [
     {
       "js": ["content-script.js", "script.js"],
-      "matches": ["file://*/*", "http://*/*", "https://*/*"]
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "all_frames": true
     }
   ],
   "content_security_policy": {

@@ -10,7 +10,6 @@ import swapIcon from '@/ui/assets/svg/swapIcon.svg';
 import { IconButton } from './IconButton';
 
 interface ButtonRowProps {
-  isActive?: boolean;
   onSendClick: () => void;
   onReceiveClick: () => void;
   onSwapClick: () => void;

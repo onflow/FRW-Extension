@@ -3,10 +3,16 @@
 import { Box, Typography, Tooltip } from '@mui/material';
 import React from 'react';
 
-import type { CoinItem } from '@/shared/types/coin-types';
-import { isValidFlowAddress, isValidEthereumAddress } from '@/shared/utils/address';
+import type {
+  CoinItem,
+  CustomFungibleTokenInfo,
+  EvmCustomTokenInfo,
+} from '@/shared/types/coin-types';
+import { isValidFlowAddress } from '@/shared/utils/address';
 
-export const SecurityCard: React.FC<{ tokenInfo: CoinItem }> = ({ tokenInfo }) => {
+export const SecurityCard: React.FC<{
+  tokenInfo: CoinItem | CustomFungibleTokenInfo | EvmCustomTokenInfo;
+}> = ({ tokenInfo }) => {
   return (
     <Box
       sx={{
@@ -39,7 +45,7 @@ export const SecurityCard: React.FC<{ tokenInfo: CoinItem }> = ({ tokenInfo }) =
             Verified
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {tokenInfo.isVerified ? 'Yes' : 'No'}
+            {tokenInfo && 'isVerified' in tokenInfo && tokenInfo.isVerified ? 'Yes' : 'No'}
           </Typography>
         </Box>
         {tokenInfo.address && (
@@ -62,7 +68,7 @@ export const SecurityCard: React.FC<{ tokenInfo: CoinItem }> = ({ tokenInfo }) =
                   if (tokenInfo.address) {
                     const url = isValidFlowAddress(tokenInfo.address)
                       ? `https://flowscan.io/account/${tokenInfo.address}`
-                      : `https://evm.flowscan.io/address/${tokenInfo.address}?tab=contract`;
+                      : `https://flowscan.io/evm/address/${tokenInfo.address}?tab=contract`;
                     window.open(url, '_blank', 'noopener,noreferrer');
                   }
                 }}

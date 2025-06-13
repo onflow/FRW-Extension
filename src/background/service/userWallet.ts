@@ -26,10 +26,10 @@ import {
   type EvmAddress,
   type WalletAccount,
   type ChildAccountMap,
-  DEFAULT_CURRENCY,
   type ActiveAccountType,
   getActiveAccountTypeForAddress,
   type WalletAddress,
+  type PendingTransaction,
 } from '@/shared/types/wallet-types';
 import {
   ensureEvmAddressPrefix,
@@ -37,7 +37,7 @@ import {
   isValidFlowAddress,
   withPrefix,
 } from '@/shared/utils/address';
-import { FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
+import { DEFAULT_WEIGHT, FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
 import {
   mainAccountsKey,
   evmAccountKey,
@@ -51,6 +51,10 @@ import {
   mainAccountStorageBalanceKey,
   mainAccountStorageBalanceRefreshRegex,
   type MainAccountStorageBalanceStore,
+  pendingAccountCreationTransactionsKey,
+  placeholderAccountsKey,
+  placeholderAccountsRefreshRegex,
+  pendingAccountCreationTransactionsRefreshRegex,
 } from '@/shared/utils/cache-data-keys';
 import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 import { retryOperation } from '@/shared/utils/retryOperation';
@@ -73,7 +77,13 @@ import { type PublicKeyAccount, type MainAccount } from '../../shared/types/wall
 import { type WalletController } from '../controller/wallet';
 import { fclConfig, fclConfirmNetwork } from '../fclConfig';
 import { defaultAccountKey, pubKeyAccountToAccountKey } from '../utils/account-key';
-import { getValidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
+import {
+  clearCachedData,
+  getValidData,
+  registerRefreshListener,
+  registerBatchRefreshListener,
+  setCachedData,
+} from '../utils/data-cache';
 import { getEmojiByIndex } from '../utils/emoji-util';
 import {
   getAccountsByPublicKeyTuple,
@@ -297,7 +307,7 @@ class UserWallet {
       const allAccounts = await preloadAllAccountsWithPubKey(network, pubkey);
 
       // Get the active accounts
-      await this.getActiveAccountsWithPubKey(network, pubkey);
+      await this.loadActiveAccounts(network, pubkey);
 
       // Load the balances for the main accounts
       await loadAccountListBalance(
@@ -1179,7 +1189,7 @@ const loadAccountListBalance = async (network: string, addressList: string[]) =>
       await setCachedData(
         accountBalanceKey(network, address),
         accountsBalances[address] || '0.00000000',
-        Number(accountsBalances[address]) > 0 ? 60_000 : 1_000
+        5_000
       );
       return accountsBalances[address];
     })
@@ -1295,8 +1305,27 @@ const loadMainAccountsWithPubKey = async (
   // Get the accounts for the current public key
   const accounts: PublicKeyAccount[] = await getAccountsWithPublicKey(pubKey, network);
 
+  // Get the placeholder accounts for the current public key
+  const placeholderAccounts = await getPlaceholderAccounts(network, pubKey);
+
+  const filteredPlaceholderAccounts = placeholderAccounts.filter((placeholderAccount) => {
+    // Filter out placeholder accounts that are indexed
+    return !accounts.some((account) => account.address === placeholderAccount.address);
+  });
+
+  if (filteredPlaceholderAccounts.length < placeholderAccounts.length) {
+    // Remove the placeholder accounts that are indexed
+    await setCachedData(
+      placeholderAccountsKey(network, pubKey),
+      filteredPlaceholderAccounts,
+      360_000
+    );
+  }
+
+  const mainPublicKeyAccounts: PublicKeyAccount[] = [...accounts, ...filteredPlaceholderAccounts];
+
   // Transform the address array into MainAccount objects
-  const mainAccounts: MainAccount[] = (accounts || []).map(
+  const mainAccounts: MainAccount[] = mainPublicKeyAccounts.map(
     (publicKeyAccount, index): MainAccount => {
       const emoji = getEmojiByIndex(index);
 
@@ -1311,7 +1340,9 @@ const loadMainAccountsWithPubKey = async (
     }
   );
 
-  // Save the main accounts to the cache
+  // Merge with pending accounts
+
+  // Save the merged accounts to the cache
   setCachedData(
     mainAccountsKey(network, pubKey),
     mainAccounts,
@@ -1362,6 +1393,7 @@ export const loadChildAccountsOfParent = async (
   if (!(await fclConfirmNetwork(network))) {
     throw new Error('Network has been switched');
   }
+
   const childAccountMap: ChildAccountMap = await fcl.query({
     cadence: script,
     args: (arg, t) => [arg(mainAccountAddress, t.Address)],
@@ -1383,7 +1415,7 @@ export const loadChildAccountsOfParent = async (
   );
 
   // Save the child accounts to the cache
-  setCachedData(childAccountsKey(network, mainAccountAddress), childAccounts, 60_000);
+  setCachedData(childAccountsKey(network, mainAccountAddress), childAccounts, 10_000);
 
   return childAccounts;
 };
@@ -1452,7 +1484,7 @@ export const loadEvmAccountOfParent = async (
       id: index,
     };
     // Save the EVM account to the cache
-    setCachedData(evmAccountKey(network, mainAccountAddress), evmAccount, 60_000);
+    setCachedData(evmAccountKey(network, mainAccountAddress), evmAccount, 10_000);
 
     return evmAccount;
   } else {
@@ -1462,12 +1494,168 @@ export const loadEvmAccountOfParent = async (
   }
 };
 
+/**
+ * --------------------------------------------
+ * Account Creation Pending Transactions and Accounts
+ * --------------------------------------------
+ */
+
+/**
+ * Step 1 - Add a pending account creation transaction
+ * @param txId - The transaction ID
+ * @param network - The network
+ * @param pubkey - The public key
+ * @param accountId - The account ID
+ */
+export const addPendingAccountCreationTransaction = async (
+  network: string,
+  pubkey: string,
+  txId: string,
+  replaceRandomTxId?: string
+): Promise<void> => {
+  const existingPending =
+    (await getValidData<PendingTransaction[]>(
+      pendingAccountCreationTransactionsKey(network, pubkey)
+    )) || [];
+
+  // Remove any existing pending transaction with the same txId
+  const filtered = existingPending.filter(
+    (pendingTxId) =>
+      pendingTxId !== txId && (replaceRandomTxId ? pendingTxId !== replaceRandomTxId : true)
+  );
+  filtered.push(txId);
+
+  // Set it to 3 minutes. That should be enough time to get the address created and indexed
+  await setCachedData(pendingAccountCreationTransactionsKey(network, pubkey), filtered, 360_000);
+};
+
+/**
+ * Remove a pending account creation transaction
+ * @param network - The network
+ * @param pubkey - The public key
+ * @param txId - The transaction ID
+ */
+export const removePendingAccountCreationTransaction = async (
+  network: string,
+  pubkey: string,
+  txId: string
+): Promise<void> => {
+  const existingPending =
+    (await getValidData<PendingTransaction[]>(
+      pendingAccountCreationTransactionsKey(network, pubkey)
+    )) || [];
+
+  const filtered = existingPending.filter((pendingTxId) => pendingTxId !== txId);
+  await setCachedData(pendingAccountCreationTransactionsKey(network, pubkey), filtered, 360_000);
+};
+
+/**
+ * Get the placeholder accounts for a given public key
+ * @param network - The network to load the accounts for
+ * @param pubkey - The public key to load the accounts for
+ * @returns The placeholder accounts for the given public key or null if not found. Does not throw an error.
+ */
+const getPlaceholderAccounts = async (
+  network: string,
+  pubkey: string
+): Promise<PublicKeyAccount[]> => {
+  return (await getValidData<PublicKeyAccount[]>(placeholderAccountsKey(network, pubkey))) || [];
+};
+
+/**
+ * Step 2 - Add a placeholder account with real account data after address creation succeeds
+ * Updates existing placeholder or creates new account if placeholder not found
+ * @param network - The network the account is on ('mainnet' or 'testnet')
+ * @param pendingAccountId - The ID of the placeholder account to update
+ * @param account - The FCL account object containing the real account data
+ * @param txId - The transaction ID to remove from pending creation transactions
+ * @returns void
+ */
+export const addPlaceholderAccount = async (
+  network: string,
+  pubkey: string,
+  txId: string,
+  account: FclAccount
+) => {
+  const keyIndex = account.keys.findIndex(
+    (key) => key.publicKey === pubkey && key.weight >= DEFAULT_WEIGHT
+  );
+  if (keyIndex === -1) {
+    throw new Error('Key not found');
+  }
+
+  const newAccount: PublicKeyAccount = {
+    address: fcl.withPrefix(account.address),
+    publicKey: pubkey,
+    keyIndex: keyIndex,
+    weight: account.keys[keyIndex].weight,
+    signAlgo: account.keys[keyIndex].signAlgo,
+    signAlgoString: account.keys[keyIndex].signAlgoString,
+    hashAlgo: account.keys[keyIndex].hashAlgo,
+    hashAlgoString: account.keys[keyIndex].hashAlgoString,
+  };
+
+  return await addPlaceholderPublicKeyAccount(network, pubkey, txId, newAccount);
+};
+
+export const addPlaceholderPublicKeyAccount = async (
+  network: string,
+  pubkey: string,
+  txId: string,
+  account: PublicKeyAccount
+) => {
+  const placeholderAccounts = await getPlaceholderAccounts(network, pubkey);
+
+  // Update the pending accounts
+  placeholderAccounts.push(account);
+
+  // Set to 3 minutes. That should be enough time to get the account indexed
+  await setCachedData(placeholderAccountsKey(network, pubkey), placeholderAccounts, 360_000);
+
+  await loadMainAccountsWithPubKey(network, pubkey);
+
+  // Provided no errors, remove the pending transaction
+  // Remove from pending creation transactions once the account is created
+  await removePendingAccountCreationTransaction(network, pubkey, txId);
+};
+
+const clearPlaceholderAccounts = async (network: string, pubkey: string) => {
+  await clearCachedData(placeholderAccountsKey(network, pubkey));
+};
+
+const clearPendingAccountCreationTransactions = async (network: string, pubkey: string) => {
+  await clearCachedData(pendingAccountCreationTransactionsKey(network, pubkey));
+};
+
 const initAccountLoaders = () => {
   registerRefreshListener(mainAccountsRefreshRegex, loadMainAccountsWithPubKey);
   registerRefreshListener(childAccountsRefreshRegex, loadChildAccountsOfParent);
   registerRefreshListener(evmAccountRefreshRegex, loadEvmAccountOfParent);
-  registerRefreshListener(accountBalanceRefreshRegex, loadAccountBalance);
+
+  // Use batch refresh for account balances to avoid hitting the backend too hard
+  registerBatchRefreshListener(
+    accountBalanceRefreshRegex,
+    async (network: string, addresses: string[]) => {
+      // Load the balances for all addresses
+      const balances = await loadAccountListBalance(network, addresses);
+      // Convert to a record keyed by address
+      const result: Record<string, string> = {};
+      addresses.forEach((address, index) => {
+        result[address] = balances[index] || '0.00000000';
+      });
+      return result;
+    },
+    (matches) => matches[2], // Extract address from the regex match
+    (network: string, address: string) => accountBalanceKey(network, address),
+    100 // 100ms batch window
+  );
+
   registerRefreshListener(mainAccountStorageBalanceRefreshRegex, loadMainAccountStorageBalance);
+  registerRefreshListener(placeholderAccountsRefreshRegex, clearPlaceholderAccounts);
+  registerRefreshListener(
+    pendingAccountCreationTransactionsRefreshRegex,
+    clearPendingAccountCreationTransactions
+  );
 };
 
 export default new UserWallet();

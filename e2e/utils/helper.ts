@@ -37,7 +37,7 @@ export const getCurrentAddress = async (page: Page) => {
 export const lockExtension = async ({ page }) => {
   // Assume we're logged in before calling this
 
-  await page.getByLabel('menu').click();
+  await page.getByTestId('account-menu-button').click();
   await page.getByRole('button', { name: 'Lock Wallet' }).click();
   const unlockBtn = await page.getByRole('button', { name: 'Unlock Wallet' });
 
@@ -65,21 +65,21 @@ export const loginToExtensionAccount = async ({ page, extensionId, addr, passwor
   // get address
   let flowAddr = await getCurrentAddress(page);
   if (flowAddr !== addr && isValidEthereumAddress(flowAddr)) {
-    await switchToFlow({ page, extensionId });
+    await switchToMainAccount({ page, address: addr });
     flowAddr = await getCurrentAddress(page);
   }
   if (flowAddr !== addr) {
     // switch to the correct account
-    await page.getByLabel('menu').click();
+    await page.getByTestId('account-menu-button').click();
     await page.getByRole('button', { name: 'close' }).click();
-    await expect(page.getByText('Profile', { exact: true })).toBeVisible();
+    await expect(page.getByText('Profiles', { exact: true })).toBeVisible();
     // Switch to the correct account. Note doest not handle more than 3 accounts loaded
     await page.getByTestId(`profile-item-nickname-${nickname}`).click();
     await expect(page.getByRole('progressbar').getByRole('img')).not.toBeVisible();
     // get address
     flowAddr = await getCurrentAddress(page);
     if (flowAddr !== addr && isValidEthereumAddress(flowAddr)) {
-      await switchToFlow({ page, extensionId });
+      await switchToMainAccount({ page, address: addr });
       flowAddr = await getCurrentAddress(page);
     }
   }
@@ -258,8 +258,9 @@ export const importAccountBySeedPhrase = async ({
     await page.waitForURL(/.*\/dashboard.*/);
 
     // We're already logged in so we need to click import profile
-    await page.getByLabel('menu').click();
-    await page.getByRole('button', { name: 'Import Profile' }).click();
+    await page.getByTestId('account-menu-button').click();
+    await page.getByTestId('switch-profile-button').click();
+    await page.getByTestId('recover-profile-button').click();
     // Close all pages except the current page (the extension opens them in the background)
     await closeOpenedPages(page);
   }
@@ -270,7 +271,7 @@ export const importAccountBySeedPhrase = async ({
   // Close all pages except the current page (the extension opens them in the background)
   await closeOpenedPages(page);
 
-  await page.getByRole('tab', { name: 'Seed Phrase' }).click();
+  await page.getByRole('tab', { name: 'Recovery Phrase' }).click();
   await page.getByPlaceholder('Import 12 or 24 words split').click();
 
   await page.getByPlaceholder('Import 12 or 24 words split').fill(seedPhrase);
@@ -308,11 +309,11 @@ export const importAccountBySeedPhrase = async ({
 
   // Wait for the account address to be visible
   let flowAddr = await getCurrentAddress(page);
+
   if (accountAddr && flowAddr !== accountAddr) {
-    await switchToFlow({ page, extensionId });
+    await switchToMainAccount({ page, address: accountAddr });
     flowAddr = await getCurrentAddress(page);
   }
-
   if (accountAddr && flowAddr !== accountAddr) {
     throw new Error('Account address does not match');
   }
@@ -376,6 +377,17 @@ export const importReceiverAccount = async ({ page, extensionId }) => {
   });
 };
 
+export const getSenderCadenceAccount = ({ parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    // We've logged into the sender account, and we need to send tokens to the receiver account
+    return process.env.TEST_SENDER_ADDR;
+  } else {
+    // We've logged into the receiver account, and we need to send tokens back to the sender account
+    return process.env.TEST_RECEIVER_ADDR;
+  }
+};
+
 export const getReceiverCadenceAccount = ({ parallelIndex }) => {
   // If parallel index is 0, login to sender account, otherwise login to receiver account
   if (parallelIndex === 0) {
@@ -386,7 +398,16 @@ export const getReceiverCadenceAccount = ({ parallelIndex }) => {
     return process.env.TEST_SENDER_ADDR;
   }
 };
-
+export const getSenderEvmAccount = ({ parallelIndex }) => {
+  // If parallel index is 0, login to sender account, otherwise login to receiver account
+  if (parallelIndex === 0) {
+    // We've logged into the sender account, and we need to send tokens to the receiver account
+    return process.env.TEST_SENDER_EVM_ADDR;
+  } else {
+    // We've logged into the receiver account, and we need to send tokens back to the sender account
+    return process.env.TEST_RECEIVER_EVM_ADDR;
+  }
+};
 export const getReceiverEvmAccount = ({ parallelIndex }) => {
   // If parallel index is 0, login to sender account, otherwise login to receiver account
   if (parallelIndex === 0) {
@@ -397,6 +418,7 @@ export const getReceiverEvmAccount = ({ parallelIndex }) => {
     return process.env.TEST_SENDER_EVM_ADDR;
   }
 };
+
 export const loginToSenderOrReceiver = async ({ page, extensionId, parallelIndex }) => {
   // If parallel index is 0, login to sender account, otherwise login to receiver account
   if (parallelIndex === 0) {
@@ -405,45 +427,26 @@ export const loginToSenderOrReceiver = async ({ page, extensionId, parallelIndex
     await loginToReceiverAccount({ page, extensionId });
   }
 };
-export const switchToEvm = async ({ page, extensionId }) => {
+
+export const switchToEvmAddress = async ({ page, address }) => {
   // Assume the user is on the dashboard page
-  await page.getByLabel('menu').click();
+  await page.getByTestId('account-menu-button').click();
   // switch to COA account
   await page
-    .getByTestId(/evm-account-0x.*/)
+    .getByTestId(new RegExp(`evm-account-${address}`, 'i'))
     .first()
     .click();
   // get address
   await getCurrentAddress(page);
 };
 
-export const switchToFlow = async ({ page, extensionId }) => {
+export const switchToMainAccount = async ({ page, address }) => {
   // Assume the user is on the dashboard page
-  await page.getByLabel('menu').click();
-  // switch to COA account
-  await page
-    .getByTestId(/main-account-0x.*/)
-    .first()
-    .click();
-  // get address
-  await getCurrentAddress(page);
-};
-export const switchAccount = async ({ page, extensionId }) => {
-  // Assume the user is on the dashboard page
-  await page.getByLabel('menu').click();
+  await page.getByTestId('account-menu-button').click();
   // switch to another flow account
   await page
-    .getByTestId(/main-account-0x.*/)
+    .getByTestId(new RegExp(`main-account-${address}`, 'i'))
     .first()
-    .click();
-  await page.getByLabel('menu').click();
-  await page
-    .getByTestId(/main-account-0x.*/)
-    .first()
-    .click();
-  await page
-    .getByTestId(/main-account-0x.*/)
-    .nth(1)
     .click();
   // get address
   await getCurrentAddress(page);

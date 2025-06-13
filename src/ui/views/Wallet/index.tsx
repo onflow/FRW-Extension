@@ -1,39 +1,40 @@
-import { Typography, Button, Skeleton, Drawer, CardMedia, Tabs, Tab } from '@mui/material';
+import { Typography, Button, Skeleton, Drawer, Tabs, Tab } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import eventBus from '@/eventBus';
-import {
-  type ActiveAccountType,
-  type ActiveChildType_depreciated,
-} from '@/shared/types/wallet-types';
+import { type ActiveAccountType } from '@/shared/types/wallet-types';
 import { consoleError } from '@/shared/utils/console-log';
-import { formatLargeNumber } from '@/shared/utils/number';
 import { ButtonRow } from '@/ui/components/ButtonRow';
 import CoinsIcon from '@/ui/components/CoinsIcon';
 import { IconActivity, IconNfts } from '@/ui/components/iconfont';
 import LLComingSoon from '@/ui/components/LLComingSoonWarning';
-import { useInitHook } from '@/ui/hooks';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
+import { useChildAccountFt } from '@/ui/hooks/use-coin-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from '@/ui/utils';
 
 import { withPrefix } from '../../../shared/utils/address';
-import theme from '../../style/LLTheme';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
 import MoveBoard from '../MoveBoard';
 import NFTTab from '../NFT';
 import NftEvm from '../NftEvm';
-import { CurrencyValue } from '../TokenDetail/CurrencyValue';
 
 import CoinList from './Coinlist';
 import OnRampList from './OnRampList';
 import TransferList from './TransferList';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
+const TabPanel = ({
+  children,
+  value,
+  index,
+}: {
+  children: React.ReactNode;
+  value: number;
+  index: number;
+}) => {
   return (
     <div
       role="tabpanel"
@@ -41,168 +42,67 @@ function TabPanel(props) {
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
       style={{ height: '100%', display: value === index ? 'block' : 'none' }}
-      {...other}
     >
       {children}
     </div>
   );
-}
+};
 const WalletTab = ({ network }) => {
   const wallet = useWallet();
   const history = useHistory();
   const location = useLocation();
-  const { initializeStore } = useInitHook();
-  const { balance, coinsLoaded } = useCoins();
   const currency = useCurrency();
-  const { childAccounts, evmWallet, currentWallet, noAddress, registerStatus } = useProfiles();
-  const [value, setValue] = React.useState(0);
+  const { balance, coinsLoaded } = useCoins();
 
-  const [address, setAddress] = useState<string>('');
-  const [accessible, setAccessible] = useState<any>([]);
-  const [childType, setChildType] = useState<ActiveAccountType>('main');
+  const {
+    currentWallet,
+    parentWallet,
+    activeAccountType,
+    noAddress,
+    registerStatus,
+    canMoveToOtherAccount,
+  } = useProfiles();
+
+  // This should be set to 2 if the activity tab is selected and should only be set once
+  const [currentTab, setCurrentTab] = useState(location.search.includes('activity') ? 2 : 0);
+
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
-  const [, setChildAccount] = useState<any>({});
-  const [isOnRamp, setOnRamp] = useState(false);
-  const [isActive, setIsActive] = useState(true);
-  const [showMoveBoard, setMoveBoard] = useState(false);
-  const [canMoveChild, setCanMoveChild] = useState(true);
+  const [showOnRamp, setShowOnRamp] = useState(false);
+  const [showMoveBoard, setShowMoveBoard] = useState(false);
 
-  const incLink =
-    network === 'mainnet' ? 'https://app.increment.fi/swap' : 'https://demo.increment.fi/swap';
+  const isMainOrEvmActive = activeAccountType === 'main' || activeAccountType === 'evm';
+  const swapLink =
+    activeAccountType === 'evm'
+      ? network === 'mainnet'
+        ? 'https://swap.kittypunch.xyz/swap'
+        : 'https://swap.kittypunch.xyz/swap'
+      : network === 'mainnet'
+        ? 'https://app.increment.fi/swap'
+        : 'https://demo.increment.fi/swap';
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  // Note that if any of the arguments are undefined, the hook will return undefined
+  // So can safely pass undefined for the childAccount argument if the activeAccountType is not 'child'
+  const childAccountAccessible = useChildAccountFt(
+    network,
+    parentWallet?.address,
+    activeAccountType === 'child' ? currentWallet?.address : undefined
+  );
+
+  const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
   };
 
-  const setUserAddress = useCallback(async () => {
-    let data = '';
-    try {
-      if (childType === 'evm') {
-        data = evmWallet?.address ?? '';
-      } else {
-        data = currentWallet?.address ?? '';
-      }
-    } catch (error) {
-      consoleError('Error getting address:', error);
-      data = '';
-    }
-    if (data) {
-      setAddress(withPrefix(data) || '');
-    }
-    return data;
-  }, [childType, evmWallet, currentWallet]);
-
-  //todo: move to util
-  const pollingFunction = (func, time = 1000, endTime, immediate = false) => {
-    if (immediate) {
-      func();
-    }
-    const startTime = new Date().getTime();
-    const pollTimer = setInterval(async () => {
-      const nowTime = new Date().getTime();
-      const data = await func();
-      if ((data && data.length > 2) || nowTime - startTime >= endTime) {
-        if (pollTimer) {
-          clearInterval(pollTimer);
-        }
-        eventBus.emit('addressDone');
-      }
-    }, time);
-    return pollTimer;
+  const goMoveBoard = () => {
+    setShowMoveBoard(true);
   };
 
-  const fetchWallet = useCallback(async () => {
-    // If childType is 'evm', handle it first
-    const activeAccountType = await wallet.getActiveAccountType();
-    if (activeAccountType === 'evm') {
-      return;
-      // If not 'evm', check if it's not active
-    } else if (activeAccountType === 'child') {
-      // Child wallet
-      const ftResult = await wallet.checkAccessibleFt(address);
-      if (ftResult) {
-        setAccessible(ftResult);
-      }
-    }
-
-    // Handle all non-evm and non-active cases here
-  }, [address, wallet]);
-
-  const fetchChildState = useCallback(async () => {
-    const accountType = await wallet.getActiveAccountType();
-    setChildAccount(childAccounts);
-    setChildType(accountType);
-    if (accountType !== 'main' && accountType !== 'evm') {
-      setIsActive(false);
-    } else {
-      setIsActive(true);
-    }
-    return accountType;
-  }, [wallet, childAccounts]);
-
-  useEffect(() => {
-    fetchChildState();
-    const pollTimer = pollingFunction(setUserAddress, 5000, 300000, true);
-
-    if (location.search.includes('activity')) {
-      setValue(2);
-    }
-
-    return function cleanup() {
-      clearInterval(pollTimer);
-    };
-  }, [fetchChildState, location.search, setUserAddress, setValue]);
-
-  useEffect(() => {
-    // First call after 40 seconds
-    const initialTimer = setTimeout(() => {
-      const pollTimer = setInterval(() => {
-        if (!address) {
-          // Only call if address is empty
-          initializeStore();
-        }
-      }, 10000); // Then call every 10 seconds
-
-      // Cleanup interval when component unmounts
-      return () => clearInterval(pollTimer);
-    }, 40000);
-
-    // Cleanup timeout when component unmounts
-    return () => clearTimeout(initialTimer);
-  }, [initializeStore, address]);
-
-  const goMoveBoard = async () => {
-    setMoveBoard(true);
+  const handleAddAddress = () => {
+    wallet.createNewAccount(network);
   };
-
-  useEffect(() => {
-    if (address && coinsLoaded) {
-      fetchWallet();
-    }
-  }, [address, coinsLoaded, fetchWallet]);
-
-  useEffect(() => {
-    setUserAddress();
-  }, [childType, setUserAddress]);
-
-  useEffect(() => {
-    const checkPermission = async () => {
-      if (!(await wallet.isUnlocked())) {
-        return;
-      }
-      if (!(await wallet.getParentAddress())) {
-        return;
-      }
-      const result = await wallet.checkCanMoveChild();
-      setCanMoveChild(result);
-    };
-
-    checkPermission();
-  }, [wallet]);
 
   useEffect(() => {
     // Add event listener for opening onramp
-    const onRampHandler = () => setOnRamp(true);
+    const onRampHandler = () => setShowOnRamp(true);
     eventBus.addEventListener('openOnRamp', onRampHandler);
 
     // Clean up listener
@@ -210,10 +110,6 @@ const WalletTab = ({ network }) => {
       eventBus.removeEventListener('openOnRamp', onRampHandler);
     };
   }, []);
-
-  const handleAddAddress = () => {
-    wallet.createManualAddress();
-  };
 
   return (
     <Box
@@ -277,17 +173,16 @@ const WalletTab = ({ network }) => {
         </Typography>
 
         <ButtonRow
-          isActive={isActive}
           onSendClick={() => history.push('/dashboard/token/flow/send')}
           onReceiveClick={() => history.push('/dashboard/wallet/deposit')}
-          onSwapClick={() => window.open(incLink, '_blank', 'noopener,noreferrer')}
-          onBuyClick={() => setOnRamp(true)}
+          onSwapClick={() => window.open(swapLink, '_blank', 'noopener,noreferrer')}
+          onBuyClick={() => setShowOnRamp(true)}
           onMoveClick={() => goMoveBoard()}
-          canMoveChild={canMoveChild}
+          canMoveChild={canMoveToOtherAccount ?? false}
         />
       </Box>
       <Tabs
-        value={value}
+        value={currentTab}
         sx={{
           width: '100%',
           position: 'sticky',
@@ -314,7 +209,7 @@ const WalletTab = ({ network }) => {
             },
           },
         }}
-        onChange={handleChange}
+        onChange={handleChangeTab}
         TabIndicatorProps={{
           style: {
             display: 'none',
@@ -325,7 +220,11 @@ const WalletTab = ({ network }) => {
       >
         <Tab
           icon={
-            <CoinsIcon width="20px" height="20px" color={value === 0 ? '#FFFFFF' : '#777E90'} />
+            <CoinsIcon
+              width="20px"
+              height="20px"
+              color={currentTab === 0 ? '#FFFFFF' : '#777E90'}
+            />
           }
           iconPosition="start"
           label={
@@ -335,7 +234,7 @@ const WalletTab = ({ network }) => {
                 textTransform: 'capitalize',
                 fontSize: '14px',
                 fontWeight: 500,
-                color: value === 0 ? '#FFFFFF' : '#777E90',
+                color: currentTab === 0 ? '#FFFFFF' : '#777E90',
               }}
             >
               {chrome.i18n.getMessage('coins')}
@@ -349,7 +248,7 @@ const WalletTab = ({ network }) => {
                 width: '20px',
                 height: '20px',
               }}
-              color={value === 1 ? '#FFFFFF' : '#777E90'}
+              color={currentTab === 1 ? '#FFFFFF' : '#777E90'}
             />
           }
           iconPosition="start"
@@ -360,7 +259,7 @@ const WalletTab = ({ network }) => {
                 textTransform: 'capitalize',
                 fontSize: '14px',
                 fontWeight: 500,
-                color: value === 1 ? '#FFFFFF' : '#777E90',
+                color: currentTab === 1 ? '#FFFFFF' : '#777E90',
               }}
             >
               {chrome.i18n.getMessage('NFTs')}
@@ -374,7 +273,7 @@ const WalletTab = ({ network }) => {
                 width: '20px',
                 height: '20px',
               }}
-              color={value === 2 ? '#FFFFFF' : '#777E90'}
+              color={currentTab === 2 ? '#FFFFFF' : '#777E90'}
             />
           }
           iconPosition="start"
@@ -385,7 +284,7 @@ const WalletTab = ({ network }) => {
                 textTransform: 'capitalize',
                 fontSize: '14px',
                 fontWeight: 500,
-                color: value === 2 ? '#FFFFFF' : '#777E90',
+                color: currentTab === 2 ? '#FFFFFF' : '#777E90',
               }}
             >
               {chrome.i18n.getMessage('Activity')}
@@ -394,27 +293,33 @@ const WalletTab = ({ network }) => {
         />
       </Tabs>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <TabPanel value={value} index={0}>
+        <TabPanel value={currentTab} index={0}>
           <Box sx={{ height: '100%', overflow: 'auto' }}>
-            {value === 0 && (
-              <CoinList ableFt={accessible} isActive={isActive} childType={childType} />
+            {currentTab === 0 && (
+              <CoinList
+                ableFt={childAccountAccessible ?? []}
+                isActive={isMainOrEvmActive}
+                activeAccountType={activeAccountType}
+              />
             )}
           </Box>
         </TabPanel>
-        <TabPanel value={value} index={1}>
+        <TabPanel value={currentTab} index={1}>
           <Box sx={{ height: '100%', overflow: 'auto' }}>
-            {value === 1 && (childType === 'evm' ? <NftEvm /> : <NFTTab />)}
+            {currentTab === 1 && (activeAccountType === 'evm' ? <NftEvm /> : <NFTTab />)}
           </Box>
         </TabPanel>
-        <TabPanel value={value} index={2}>
-          <Box sx={{ height: '100%', overflow: 'auto' }}>{value === 2 && <TransferList />}</Box>
+        <TabPanel value={currentTab} index={2}>
+          <Box sx={{ height: '100%', overflow: 'auto' }}>
+            {currentTab === 2 && <TransferList />}
+          </Box>
         </TabPanel>
       </Box>
       <LLComingSoon alertOpen={alertOpen} handleCloseIconClicked={() => setAlertOpen(false)} />
 
       <Drawer
         anchor="bottom"
-        open={isOnRamp}
+        open={showOnRamp}
         transitionDuration={300}
         PaperProps={{
           sx: {
@@ -425,15 +330,15 @@ const WalletTab = ({ network }) => {
           },
         }}
       >
-        <OnRampList close={() => setOnRamp(false)} />
+        <OnRampList close={() => setShowOnRamp(false)} />
       </Drawer>
       {showMoveBoard && (
         <MoveBoard
           showMoveBoard={showMoveBoard}
-          handleCloseIconClicked={() => setMoveBoard(false)}
-          handleCancelBtnClicked={() => setMoveBoard(false)}
+          handleCloseIconClicked={() => setShowMoveBoard(false)}
+          handleCancelBtnClicked={() => setShowMoveBoard(false)}
           handleAddBtnClicked={() => {
-            setMoveBoard(false);
+            setShowMoveBoard(false);
           }}
         />
       )}

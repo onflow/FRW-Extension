@@ -33,7 +33,7 @@ const config: webpack.Configuration = {
   resolve: {
     fallback: {
       fs: false,
-      vm: require.resolve('vm-browserify'),
+      vm: 'vm-browserify',
     },
   },
 };

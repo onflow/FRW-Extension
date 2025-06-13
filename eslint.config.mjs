@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from 'eslint-plugin-storybook';
+
 import js from '@eslint/js';
 import globals from 'globals';
 import typescriptParser from '@typescript-eslint/parser';
@@ -6,7 +9,7 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import';
 
-export default [
+const config = [
   // Base config for all files
   {
     ignores: [
@@ -19,9 +22,7 @@ export default [
       '**/test-results/**',
       '**/_raw/**',
     ],
-  },
-
-  // JavaScript and TypeScript files
+  }, // JavaScript and TypeScript files
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
@@ -93,14 +94,12 @@ export default [
       'no-restricted-syntax': [
         'warn',
         {
-          selector: 'Identifier[name="consoleLog"]',
+          selector: 'CallExpression[callee.name="consoleLog"]',
           message: 'Remove consoleLog once debugging is done',
         },
       ],
     },
-  },
-
-  // Test files specific config
+  }, // Test files specific config
   {
     files: [
       'e2e/**/*',
@@ -120,17 +119,13 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
       'no-console': ['off'],
     },
-  },
-
-  // Build files specific config
+  }, // Build files specific config
   {
-    files: ['build/**/*.{js,jsx,ts,tsx}'],
+    files: ['build/**/*.{js,jsx,ts,tsx}', '.storybook/**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-console': ['off'],
     },
-  },
-
-  // Background-specific config for chrome extension
+  }, // Background-specific config for chrome extension
   {
     files: ['**/src/background/**/*.{js,jsx,ts,tsx}'],
     rules: {
@@ -158,4 +153,7 @@ export default [
       ],
     },
   },
+  ...storybook.configs['flat/recommended'],
 ];
+
+export default config;

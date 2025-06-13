@@ -1,7 +1,6 @@
-import { type TokenInfo } from 'flow-native-token-registry';
 import { describe, expect, it } from 'vitest';
 
-import { type CoinItem, type ExtendedTokenInfo } from '@/shared/types/coin-types';
+import { type ExtendedTokenInfo } from '@/shared/types/coin-types';
 import {
   type NetworkType,
   type TokenType,

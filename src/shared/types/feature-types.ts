@@ -4,7 +4,9 @@ export type FeatureFlagKey =
   | 'swap'
   | 'tx_warning_prediction'
   | 'emulator_mode'
-  | 'cover_bridge_fee';
+  | 'cover_bridge_fee'
+  | 'create_new_account'
+  | 'import_existing_account';
 
 // Feature flags
 export type FeatureFlags = {

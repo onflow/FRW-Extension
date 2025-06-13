@@ -1,5 +1,7 @@
 // TODO: remove this function. It's called from CoinList and Wallet
-
+/**
+ * @deprecated
+ */
 export const formatLargeNumber = (num) => {
   if (typeof num === 'string' && num.startsWith('$')) {
     num = num.slice(1);
@@ -41,7 +43,8 @@ export const addDotSeparators = (num) => {
 export const trimDecimalAmount = (
   value: string,
   decimals: number,
-  mode: 'entering' | 'clean' | 'exact'
+  mode: 'entering' | 'clean' | 'exact',
+  roundingMode: 'down' | 'up' | 'nearest' = 'down'
 ) => {
   // Remove minus signs and non-digit/non-decimal characters
   const cleanValue = value.replace(/[^\d.]/g, '');
@@ -68,10 +71,8 @@ export const trimDecimalAmount = (
   }
 
   if (mode === 'entering') {
-    // If it's an empty string, return an empty string
-    if (trimmedValue === '') {
-      return '';
-    }
+    // Return the value as is
+    return trimmedValue;
   }
 
   // Are we displaying or passing the value to a function. i.e. clean up trailing zeros

@@ -1,7 +1,7 @@
 import BN from 'bignumber.js';
 import { table } from 'table'; // We'll need to install this
 
-import { switchToEvm, loginToSenderAccount, loginToReceiverAccount } from '../utils/helper';
+import { switchToEvmAddress, loginToSenderAccount, loginToReceiverAccount } from '../utils/helper';
 import { test, expect } from '../utils/loader';
 
 // Define minimum required balances for each token
@@ -142,6 +142,7 @@ test('Verify sufficient token balances for sender account', async ({ page, exten
   test.slow();
   const nickname = process.env.TEST_SENDER_NICKNAME || 'Sender';
   const address = process.env.TEST_SENDER_ADDR || 'Unknown Address';
+  const evmAddress = process.env.TEST_SENDER_EVM_ADDR || 'Unknown EVM Address';
   console.log(`Starting balance check for Sender: ${nickname} (${address})`);
 
   // Login to sender account
@@ -156,7 +157,7 @@ test('Verify sufficient token balances for sender account', async ({ page, exten
 
   // Switch to EVM wallet and check balances
   console.log('Switching to EVM and checking balances...');
-  await switchToEvm({ page, extensionId });
+  await switchToEvmAddress({ page, address: evmAddress });
   const evmResults = await runBalanceChecks(page, REQUIRED_BALANCES_EVM, 'EVM');
   allResults = allResults.concat(evmResults);
 
@@ -180,6 +181,7 @@ test('Verify sufficient token balances for sender account', async ({ page, exten
 test('Verify sufficient token balances for receiver account', async ({ page, extensionId }) => {
   const nickname = process.env.TEST_RECEIVER_NICKNAME || 'Receiver';
   const address = process.env.TEST_RECEIVER_ADDR || 'Unknown Address';
+  const evmAddress = process.env.TEST_RECEIVER_EVM_ADDR || 'Unknown EVM Address';
   console.log(`Starting balance check for Receiver: ${nickname} (${address})`);
 
   // Login to receiver account
@@ -194,7 +196,7 @@ test('Verify sufficient token balances for receiver account', async ({ page, ext
 
   // Switch to EVM wallet and check balances
   console.log('Switching to EVM and checking balances...');
-  await switchToEvm({ page, extensionId });
+  await switchToEvmAddress({ page, address: evmAddress });
   const evmResults = await runBalanceChecks(page, REQUIRED_BALANCES_EVM, 'EVM');
   allResults = allResults.concat(evmResults);
 

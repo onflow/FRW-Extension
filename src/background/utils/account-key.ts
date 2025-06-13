@@ -61,3 +61,13 @@ export const pubKeyTupleToAccountKey = (
   }
   throw new Error('Invalid public key');
 };
+
+export const pubKeySignAlgoToAccountKey = (pubKey: string, signAlgo: number): AccountKeyRequest => {
+  return {
+    public_key: pubKey,
+    sign_algo: signAlgo,
+    hash_algo:
+      signAlgo === SIGN_ALGO_NUM_ECDSA_P256 ? HASH_ALGO_NUM_SHA3_256 : HASH_ALGO_NUM_SHA2_256,
+    weight: DEFAULT_WEIGHT,
+  };
+};

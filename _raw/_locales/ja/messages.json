@@ -1147,7 +1147,7 @@
     "message": "他のウォレットをインポートする"
   },
   "Support_Flow_Wallet_Blocto": {
-    "message": "Flowウォレット、Blocto、jsonおよびrawキーをサポート"
+    "message": "Flowウォレット、Blocto、リカバリーフレーズ、キーストア、プライベートキーをサポート"
   },
   "A_crypto_wallet_on_Flow": {
     "message": "探検家、コレクター、ゲーマー向けのFlow上の暗号ウォレット"
@@ -1158,11 +1158,14 @@
   "Keystore": {
     "message": "キーストア"
   },
-  "Seed_Phrase": {
-    "message": "シードフレーズ"
+  "Recovery_Phrase": {
+    "message": "リカバリーフレーズ"
   },
   "Private_Key": {
     "message": "プライベートキー"
+  },
+  "Mobile_app": {
+    "message": "モバイルアプリ"
   },
   "You_can_import_the": {
     "message": "他のウォレット（例：Blocto）からキーストアのJSON内容を貼り付けてください"
@@ -1232,6 +1235,9 @@
   },
   "Step_3": {
     "message": "ステップ 3"
+  },
+  "Step_4": {
+    "message": "ステップ 4"
   },
   "Import_Recovery_Phrase_or_Private_Key": {
     "message": "回復フレーズまたは秘密鍵をインポート"
@@ -1472,5 +1478,53 @@
   },
   "Legend": {
     "message": "凡例"
+  },
+  "Profiles": {
+    "message": "プロファイル"
+  },
+  "Recover_an_existing_profile": {
+    "message": "既存のプロファイルを復元"
+  },
+  "Create_a_new_profile": {
+    "message": "新しいプロファイルを作成"
+  },
+  "Active_account": {
+    "message": "アクティブアカウント"
+  },
+  "Other_accounts": {
+    "message": "その他のアカウント"
+  },
+  "Create_a_new_account": {
+    "message": "新しいアカウントを作成"
+  },
+  "Import_an_existing_account": {
+    "message": "既存のアカウントをインポート"
+  },
+  "Add_Account_Sidebar": {
+    "message": "アカウントを追加"
+  },
+  "Mobile_overview": {
+    "message": "モバイルアプリの概要"
+  },
+  "Create_a_new_profile_with_an_account_from_Flow_Wallet_Mobile_App": {
+    "message": "Flow Wallet モバイルアプリからプロファイルをインポートするための手順です。"
+  },
+  "Import_from_Mobile_Step_1": {
+    "message": "プロファイルを保護するために新しい回復フレーズを生成します。"
+  },
+  "Import_from_Mobile_Step_2_setup": {
+    "message": "プロファイルを保護するために新しいパスワードを設定します。"
+  },
+  "Import_from_Mobile_Step_2_verify": {
+    "message": "パスワードを確認してプロファイルを保護します。"
+  },
+  "Import_from_Mobile_Step_3": {
+    "message": "モバイルデバイスに接続するためにスキャンします。"
+  },
+  "Import_from_Mobile_Step_4": {
+    "message": "インポートするプロファイルを選択します。"
+  },
+  "Import_from_Mobile_Submit": {
+    "message": "はじめる"
   }
 }

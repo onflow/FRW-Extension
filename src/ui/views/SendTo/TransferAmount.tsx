@@ -23,8 +23,8 @@ import SlideRelative from '@/ui/components/SlideRelative';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
 
-import { CurrencyValue } from '../TokenDetail/CurrencyValue';
-import { TokenBalance } from '../TokenDetail/TokenBalance';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
+import { TokenBalance } from '../../components/TokenLists/TokenBalance';
 
 const useStyles = makeStyles(() => ({
   customInputLabel: {

@@ -252,11 +252,11 @@ describe('OpenApiService', () => {
           const headers = fetchDetails[0].requestInit?.headers as { Network?: string };
           const networkHeader = headers?.Network;
           if (networkHeader) {
-            vi.mocked(userWalletService.getNetwork).mockResolvedValueOnce(
+            vi.mocked(userWalletService.getNetwork).mockResolvedValue(
               networkHeader.toLowerCase() as FlowNetwork
             );
             // Also update the headers in the mock storage
-            mockStorage.local.get.mockImplementationOnce(() =>
+            mockStorage.local.get.mockImplementation(() =>
               Promise.resolve({
                 auth: { token: 'mock-token' },
                 network: networkHeader.toLowerCase(),

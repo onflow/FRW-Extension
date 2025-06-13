@@ -169,3 +169,4 @@ export const EVM_ENDPOINT = {
 };
 
 export const HTTP_STATUS_CONFLICT = 409;
+export const HTTP_STATUS_TOO_MANY_REQUESTS = 429;

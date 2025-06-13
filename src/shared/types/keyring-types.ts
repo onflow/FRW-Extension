@@ -1,4 +1,4 @@
-import { storage } from '@/background/webapi';
+import storage from '@/shared/utils/storage';
 
 export type VaultEntryV2 = {
   id: string;

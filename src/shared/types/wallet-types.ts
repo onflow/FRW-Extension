@@ -115,6 +115,7 @@ export type WalletAccount = {
   icon: string;
   color: string;
   balance?: string;
+  nfts?: number;
 };
 export type WalletAccountWithBalance = WalletAccount & {
   balance: string;
@@ -180,3 +181,6 @@ export interface ProfileBackupStatus {
   canDecrypt: boolean; // Can be decrypted with current password
   isSelected: boolean; // User selected it for password change
 }
+
+// Transactions that are creating accounts
+export type PendingTransaction = string;

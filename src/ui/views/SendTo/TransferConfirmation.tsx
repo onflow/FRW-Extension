@@ -18,8 +18,8 @@ import { LLSpinner } from 'ui/components';
 import { Profile } from 'ui/components/Send/Profile';
 import { useWallet } from 'ui/utils';
 
-import { CurrencyValue } from '../TokenDetail/CurrencyValue';
-import { TokenBalance } from '../TokenDetail/TokenBalance';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
+import { TokenBalance } from '../../components/TokenLists/TokenBalance';
 
 interface TransferConfirmationProps {
   transactionState: TransactionState;

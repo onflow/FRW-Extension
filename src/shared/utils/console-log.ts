@@ -45,7 +45,14 @@ const _consoleInfo = (...args: unknown[]) => {
 };
 
 const _consoleError = (...args: unknown[]) => {
-  const sanitizedMessage = stripSensitive(args.join(' '));
+  const stringArgs = args.map((arg) => {
+    if (typeof arg === 'object') {
+      return JSON.stringify(arg);
+    }
+    return arg?.toString() || 'undefined';
+  });
+
+  const sanitizedMessage = stripSensitive(stringArgs.join(' '));
   // eslint-disable-next-line no-console
   console.error(sanitizedMessage);
   trackConsole('console_error', sanitizedMessage);

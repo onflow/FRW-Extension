@@ -1,9 +1,17 @@
 'use client';
 
-import { Box, Typography, LinearProgress } from '@mui/material';
+import { Box, Typography, LinearProgress, Skeleton } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 
-import { useProfiles } from '../hooks/useProfileHook';
+import { useMainAccountStorageBalance } from '../hooks/use-account-hooks';
+import {
+  COLOR_CHARCOAL_GRAY_4C4C4C,
+  COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
+  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+} from '../style/color';
+
+import { TokenBalance } from './TokenLists/TokenBalance';
 
 const determineUnit = (used: number) => {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -18,26 +26,30 @@ const determineUnit = (used: number) => {
   return { value, unit: units[unitIndex] };
 };
 
-export const StorageUsageCard: React.FC = () => {
-  const { parentAccountStorageBalance } = useProfiles();
+export const StorageUsageCard: React.FC<{
+  network: string;
+  address: string;
+  backgroundColor?: string;
+}> = ({ network, address, backgroundColor = COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A }) => {
+  const storageBalance = useMainAccountStorageBalance(network, address);
+  const usagePercentage = storageBalance
+    ? (parseFloat(storageBalance.storageUsed) / parseFloat(storageBalance.storageCapacity)) * 100
+    : 0;
+  const { value: used, unit: usedUnit } = storageBalance
+    ? determineUnit(parseFloat(storageBalance.storageUsed))
+    : { value: 0, unit: 'B' };
+  const { value: capacity, unit: capacityUnit } = storageBalance
+    ? determineUnit(parseFloat(storageBalance.storageCapacity))
+    : { value: 0, unit: 'B' };
 
-  if (!parentAccountStorageBalance) return null;
-
-  const usagePercentage =
-    (parseFloat(parentAccountStorageBalance.storageUsed) /
-      parseFloat(parentAccountStorageBalance.storageCapacity)) *
-    100;
-  const { value: used, unit: usedUnit } = determineUnit(
-    parseFloat(parentAccountStorageBalance.storageUsed)
-  );
-  const { value: capacity, unit: capacityUnit } = determineUnit(
-    parseFloat(parentAccountStorageBalance.storageCapacity)
-  );
+  const flowUsedForStorage = storageBalance
+    ? BigNumber(storageBalance.balance).minus(storageBalance.availableBalance).toString()
+    : 0;
 
   return (
     <Box
       sx={{
-        backgroundColor: '#121212',
+        backgroundColor: backgroundColor,
         borderRadius: '12px',
         p: 2,
       }}
@@ -50,11 +62,29 @@ export const StorageUsageCard: React.FC = () => {
           mb: 1,
         }}
       >
-        <Typography>Storage Fee</Typography>
-        <Typography>0.01 FLOW</Typography>
+        <Typography>Storage Usage</Typography>
+        <Typography>
+          {storageBalance ? (
+            <TokenBalance value={flowUsedForStorage.toString()} postFix="FLOW" />
+          ) : (
+            <Skeleton variant="text" width={200} />
+          )}
+        </Typography>
       </Box>
 
       <Box sx={{ mb: 1 }}>
+        <LinearProgress
+          variant="determinate"
+          value={storageBalance ? usagePercentage : 0}
+          sx={{
+            marginBottom: '1rem',
+            backgroundColor: COLOR_CHARCOAL_GRAY_4C4C4C,
+            '& .MuiLinearProgress-bar': {
+              backgroundColor: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+            },
+          }}
+        />
+
         <Box
           sx={{
             display: 'flex',
@@ -63,26 +93,41 @@ export const StorageUsageCard: React.FC = () => {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            {usagePercentage.toFixed(2)}%
+            {storageBalance ? (
+              `${usagePercentage.toFixed(2)}%`
+            ) : (
+              <Skeleton variant="text" width={200} />
+            )}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {(() => {
-              const formattedUsed = used ? Number(used).toFixed(1) : '0';
-              const formattedCapacity = capacity ? Number(capacity).toFixed(1) : '0';
-              return `${formattedUsed} ${usedUnit} / ${formattedCapacity} ${capacityUnit}`;
-            })()}
+            {storageBalance ? (
+              (() => {
+                const formattedUsed = used ? Number(used).toFixed(1) : '0';
+                const formattedCapacity = capacity ? Number(capacity).toFixed(1) : '0';
+                return `${formattedUsed} ${usedUnit} / ${formattedCapacity} ${capacityUnit}`;
+              })()
+            ) : (
+              <Skeleton variant="text" width={200} />
+            )}
           </Typography>
         </Box>
-        <LinearProgress
-          variant="determinate"
-          value={usagePercentage}
-          sx={{
-            backgroundColor: 'background.paper',
-            '& .MuiLinearProgress-bar': {
-              backgroundColor: '#4CAF50',
-            },
-          }}
-        />
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 1,
+        }}
+      >
+        <Typography>Total Balance</Typography>
+        <Typography>
+          {storageBalance ? (
+            <TokenBalance value={storageBalance.balance} postFix="FLOW" />
+          ) : (
+            <Skeleton variant="text" width={200} />
+          )}
+        </Typography>
       </Box>
     </Box>
   );

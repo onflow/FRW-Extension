@@ -1,29 +1,30 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, MenuItem, Typography, IconButton, Drawer } from '@mui/material';
-import { StyledEngineProvider } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { storage } from '@/background/webapi';
-import type { CoinItem } from '@/shared/types/coin-types';
-import type { PriceProvider } from '@/shared/types/network-types';
-import { type ActiveAccountType } from '@/shared/types/wallet-types';
-import { consoleWarn } from '@/shared/utils/console-log';
+import type {
+  CoinItem,
+  CustomFungibleTokenInfo,
+  EvmCustomTokenInfo,
+} from '@/shared/types/coin-types';
+import { getPriceProvider } from '@/shared/types/network-types';
+import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 import SecurityCard from '@/ui/components/SecurityCard';
 import StorageUsageCard from '@/ui/components/StorageUsageCard';
-import { refreshEvmToken } from '@/ui/hooks/use-coin-hooks';
+import { useAllTokenInfo, useEvmCustomTokens } from '@/ui/hooks/use-coin-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import tips from 'ui/assets/svg/tips.svg';
 import WarningIcon from 'ui/assets/svg/warning.svg';
 import { useWallet } from 'ui/utils';
 
+import PriceCard from '../../components/TokenLists/PriceCard';
 import OnRampList from '../Wallet/OnRampList';
 
 import ClaimTokenCard from './ClaimTokenCard';
-import PriceCard from './PriceCard';
 import StackingCard from './StackingCard';
 import TokenInfoCard from './TokenInfoCard';
 
@@ -49,39 +50,98 @@ const TokenDetail = () => {
   const classes = useStyles();
   const usewallet = useWallet();
   const history = useHistory();
-  const { currentWallet } = useProfiles();
-  const { coins, coinsLoaded } = useCoins();
-  const [price, setPrice] = useState('');
-  const [accessible, setAccessible] = useState(true);
+  // Get the token name and id from the url
   const token = useParams<{ name: string }>().name.toLowerCase();
   const tokenId = useParams<{ id: string }>().id;
-  const [network, setNetwork] = useState('mainnet');
-  const [walletName, setCurrentWallet] = useState({ name: '' });
-  const [tokenInfo, setTokenInfo] = useState<CoinItem | undefined>(undefined);
-  const [providers, setProviders] = useState<PriceProvider[]>([]);
-  const [accountType, setAccountType] = useState<ActiveAccountType>('main');
+
+  // Get the network, current wallet, and active account type
+  const { network, currentWallet, activeAccountType } = useProfiles();
+  // Get the coins and whether the coins are loaded
+  const { coins, coinsLoaded } = useCoins();
+
+  // Get all token info
+  const allTokenInfo = useAllTokenInfo(network, activeAccountType === 'evm' ? 'evm' : 'flow');
+
+  // Get EVM Custom Token Info
+  const evmCustomTokens = useEvmCustomTokens(network);
+
+  // Child account FT access
+  const [canAccessFt, setCanAccessFt] = useState(true);
+  // Get the token info from the coin list
+  const tokenInfo: CoinItem | CustomFungibleTokenInfo | EvmCustomTokenInfo | undefined =
+    useMemo(() => {
+      // check if the coins are loaded
+      if (!coins || !coinsLoaded || !token || !tokenId || !activeAccountType) {
+        return undefined;
+      }
+      // find the token by id
+      const coinItem = coins.find((coin) => coin.id === tokenId);
+      if (coinItem) {
+        return coinItem;
+      }
+
+      consoleWarn(`Token not found by ID ${tokenId}, trying to find by name ${token}`);
+
+      const lowerCaseToken = token.toLowerCase();
+      // find the token by name
+      const coinFoundByName = coins.find(
+        (coin) =>
+          coin.symbol?.toLowerCase() === lowerCaseToken ||
+          coin.name?.toLowerCase() === lowerCaseToken
+      );
+      if (coinFoundByName) {
+        return coinFoundByName;
+      }
+      consoleWarn(`Token not found by in coin list, trying to find in token list by name ${token}`);
+
+      // find the token by
+      const coinFoundByAddress: CustomFungibleTokenInfo | undefined = allTokenInfo?.find(
+        (customToken) =>
+          customToken.symbol?.toLowerCase() === lowerCaseToken ||
+          customToken.name?.toLowerCase() === lowerCaseToken
+      );
+      if (coinFoundByAddress) {
+        return coinFoundByAddress;
+      }
+      if (activeAccountType !== 'evm') {
+        consoleError(`Token not found ${token} for account type ${activeAccountType}`);
+        return undefined;
+      }
+
+      consoleWarn(
+        `Token not found in token list, trying to find in custom token list by name ${token}`
+      );
+
+      // Find custom token by address
+      const customTokenInfo: EvmCustomTokenInfo | undefined = evmCustomTokens?.find(
+        (customToken) => customToken.unit?.toLowerCase() === lowerCaseToken
+      );
+      if (customTokenInfo) {
+        return customTokenInfo;
+      }
+      consoleError(`Token not found ${token}`);
+      return undefined;
+    }, [coins, tokenId, coinsLoaded, token, allTokenInfo, evmCustomTokens, activeAccountType]);
+
+  // Get the price providers
+  const priceProviders = useMemo(() => {
+    return getPriceProvider(token);
+  }, [token]);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [isOnRamp, setIsOnRamp] = useState(false);
+
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
   };
 
+  // Handle the delete EFT button to remove an EVM Custom Token
   const handleDeleteEFT = async () => {
-    const network = await usewallet.getNetwork();
+    if (!tokenInfo?.address) {
+      throw new Error('Token address is required');
+    }
+    await usewallet.removeCustomEvmToken(network, tokenInfo.address);
 
-    let evmCustomToken = (await storage.get(`${network}evmCustomToken`)) || [];
-
-    // Filter out any empty objects from evmCustomToken
-    evmCustomToken = evmCustomToken.filter((token) => Object.keys(token).length > 0);
-
-    // Filter out the token with the matching address
-    evmCustomToken = evmCustomToken.filter(
-      (token) => token.address.toLowerCase() !== tokenInfo?.address?.toLowerCase()
-    );
-
-    await storage.set(`${network}evmCustomToken`, evmCustomToken);
-    await usewallet.clearCoinList();
-    refreshEvmToken(network);
     history.replace({ pathname: history.location.pathname, state: { refreshed: true } });
     history.goBack();
   };
@@ -93,12 +153,11 @@ const TokenDetail = () => {
           <ArrowBackIcon sx={{ color: 'icon.navi' }} />
         </IconButton>
         <Box sx={{ flexGrow: 1 }} />
-        {tokenInfo &&
-          (tokenInfo as any).custom && ( // potential type error here. custom is not a property of TokenInfo
-            <IconButton onClick={handleMenuToggle}>
-              <MoreHorizIcon sx={{ color: 'icon.navi' }} />
-            </IconButton>
-          )}
+        {tokenInfo?.custom && (
+          <IconButton onClick={handleMenuToggle}>
+            <MoreHorizIcon sx={{ color: 'icon.navi' }} />
+          </IconButton>
+        )}
         {menuOpen && (
           <Box
             sx={{
@@ -121,160 +180,115 @@ const TokenDetail = () => {
     );
   };
 
-  const getProvider = useCallback(async () => {
-    if (!coinsLoaded) {
-      return;
-    }
-
-    // First try to find by ID
-    let tokenResult = coins?.find((coin) => coin.id === tokenId);
-
-    // If not found by ID, try to find by token name (case insensitive)
-    if (!tokenResult) {
-      consoleWarn(`Token not found by ID ${tokenId}, trying to find by name ${token}`);
-      tokenResult = coins?.find(
-        (coin) =>
-          coin.symbol?.toLowerCase() === token.toLowerCase() ||
-          coin.name?.toLowerCase() === token.toLowerCase()
-      );
-    }
-
-    const result = await usewallet.openapi.getPriceProvider(token);
-    if (tokenResult) {
-      setTokenInfo(tokenResult);
-    } else {
-      consoleWarn(`Could not find token with ID ${tokenId} or name ${token}`);
-    }
-
-    setProviders(result);
-    if (result.length === 0) {
-      setPrice(tokenResult?.price || '');
-    }
-  }, [usewallet, token, tokenId, coins, coinsLoaded]);
-
-  const loadNetwork = useCallback(async () => {
-    const network = await usewallet.getNetwork();
-    setCurrentWallet(currentWallet ?? { name: '' });
-    setNetwork(network);
-  }, [usewallet, currentWallet]);
-
-  const requestChildType = useCallback(async () => {
-    const result = await usewallet.getActiveAccountType();
-    setAccountType(result);
-  }, [usewallet]);
-
-  const handleMoveOpen = () => {
-    history.push(`/dashboard/token/${token}/send`);
-  };
-
+  // Check if the token is accessible
   useEffect(() => {
-    if (coinsLoaded) {
-      loadNetwork();
-      getProvider();
-      requestChildType();
+    if (activeAccountType === 'child' && tokenInfo && 'flowIdentifier' in tokenInfo) {
+      usewallet.checkAccessibleFt(currentWallet.address).then((accessibleFt) => {
+        if (accessibleFt) {
+          setCanAccessFt(accessibleFt.some((ft) => ft.id === tokenInfo.flowIdentifier));
+        }
+      });
     }
-  }, [loadNetwork, getProvider, requestChildType, coinsLoaded]);
+  }, [activeAccountType, currentWallet.address, tokenInfo, usewallet]);
 
   return (
-    <StyledEngineProvider injectFirst>
-      <div className={`${classes.page} page`}>
-        <div className={classes.container}>
-          <Header />
-          {!accessible && (
-            <Box
+    <Box className={classes.page}>
+      <Box className={classes.container}>
+        <Header />
+        {!canAccessFt && (
+          <Box
+            sx={{
+              display: 'flex',
+              marginBottom: '12px',
+              borderRadius: '8px',
+              padding: '8px 11px',
+              backgroundColor: 'error.light',
+            }}
+          >
+            <img style={{ height: '16px', width: '16px', borderRadius: '16px' }} src={tips}></img>
+            <Typography
               sx={{
-                display: 'flex',
-                marginBottom: '12px',
-                borderRadius: '8px',
-                padding: '8px 11px',
-                backgroundColor: 'error.light',
+                fontSize: '12px',
+                marginLeft: '5px',
+                color: 'error.main',
               }}
             >
-              <img style={{ height: '16px', width: '16px', borderRadius: '16px' }} src={tips}></img>
+              Flow Wallet doesn't have access to {`${token}`} in
+              {`${currentWallet.name}`} Account, please check your linked account settings.
+            </Typography>
+          </Box>
+        )}
+        <TokenInfoCard
+          tokenInfo={tokenInfo}
+          accountType={activeAccountType}
+          tokenId={tokenId}
+          setIsOnRamp={setIsOnRamp}
+        />
+
+        {tokenInfo && 'isVerified' in tokenInfo && !tokenInfo.isVerified && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '6px',
+              padding: '16px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+            }}
+          >
+            <Box sx={{ position: 'relative', display: 'inline-block' }}>
+              <img src={WarningIcon} alt="Verified" style={{ width: '32px', height: '32px' }} />
+            </Box>
+            <Typography
+              sx={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.80)' }}
+            >
+              This is an unverified token, only interact with tokens you trust.{' '}
               <Typography
+                component="a"
+                href="https://wallet.flow.com/post/verified-tokens-on-flow-wallet"
+                target="_blank"
+                rel="noopener noreferrer"
                 sx={{
-                  fontSize: '12px',
-                  marginLeft: '5px',
-                  color: 'error.main',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 400,
+                  color: 'rgba(255, 255, 255, 0.80)',
                 }}
               >
-                Flow Wallet doesn't have access to {`${token}`} in
-                {`${walletName.name}`} Account, please check your linked account settings.
+                View more.
               </Typography>
-            </Box>
-          )}
-          <TokenInfoCard
-            tokenInfo={tokenInfo}
-            accountType={accountType}
-            tokenId={tokenId}
-            setIsOnRamp={setIsOnRamp}
-          />
+            </Typography>
+          </Box>
+        )}
+        {token === 'flow' && <StackingCard />}
+        {network === 'testnet' && token === 'flow' && <ClaimTokenCard token={token} />}
+        {priceProviders?.length > 0 && <PriceCard token={token} />}
 
-          {tokenInfo && !tokenInfo.isVerified && (
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '6px',
-                padding: '16px',
-                background: 'rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px',
-              }}
-            >
-              <Box sx={{ position: 'relative', display: 'inline-block' }}>
-                <img src={WarningIcon} alt="Verified" style={{ width: '32px', height: '32px' }} />
-              </Box>
-              <Typography
-                sx={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.80)' }}
-              >
-                This is an unverified token, only interact with tokens you trust.{' '}
-                <Typography
-                  component="a"
-                  href="https://wallet.flow.com/post/verified-tokens-on-flow-wallet"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 400,
-                    color: 'rgba(255, 255, 255, 0.80)',
-                  }}
-                >
-                  View more.
-                </Typography>
-              </Typography>
-            </Box>
-          )}
-          {token === 'flow' && <StackingCard />}
-          {network === 'testnet' && token === 'flow' && <ClaimTokenCard token={token} />}
-          {providers?.length > 0 && (
-            <PriceCard token={token} price={price} setPrice={setPrice} providers={providers} />
-          )}
-
-          {token === 'flow' && <StorageUsageCard />}
-          {tokenInfo && <SecurityCard tokenInfo={tokenInfo} />}
-          {isOnRamp && (
-            <Drawer
-              anchor="bottom"
-              open={isOnRamp}
-              transitionDuration={300}
-              PaperProps={{
-                sx: {
-                  width: '100%',
-                  height: '65%',
-                  bgcolor: 'background.default',
-                  borderRadius: '18px 18px 0px 0px',
-                },
-              }}
-            >
-              <OnRampList close={() => setIsOnRamp(false)} />
-            </Drawer>
-          )}
-        </div>
-      </div>
-    </StyledEngineProvider>
+        {token === 'flow' && activeAccountType === 'main' && (
+          <StorageUsageCard network={network} address={currentWallet.address} />
+        )}
+        {tokenInfo && <SecurityCard tokenInfo={tokenInfo} />}
+        {isOnRamp && (
+          <Drawer
+            anchor="bottom"
+            open={isOnRamp}
+            transitionDuration={300}
+            PaperProps={{
+              sx: {
+                width: '100%',
+                height: '65%',
+                bgcolor: 'background.default',
+                borderRadius: '18px 18px 0px 0px',
+              },
+            }}
+          >
+            <OnRampList close={() => setIsOnRamp(false)} />
+          </Drawer>
+        )}
+      </Box>
+    </Box>
   );
 };
 

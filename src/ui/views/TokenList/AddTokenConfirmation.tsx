@@ -1,9 +1,9 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Typography, Drawer, Grid, Button, IconButton, CircularProgress } from '@mui/material';
-import { type TokenInfo } from 'flow-native-token-registry';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { type TokenInfo } from '@/shared/types/token-info';
 import IconPlus from '@/ui/components/iconfont/IconPlus';
 import { useWallet } from 'ui/utils';
 

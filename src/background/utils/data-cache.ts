@@ -47,7 +47,7 @@ export const registerRefreshListener = (
 ) => {
   chrome.storage.onChanged.addListener(async (changes, namespace) => {
     // Filter out timestamp changes
-    const changedKeys = Object.keys(changes).filter((key) => !key.includes('timestamp'));
+    const changedKeys = Object.keys(changes).filter((key) => key.includes('-refresh'));
     if (changedKeys.length === 0) {
       return;
     }
@@ -99,3 +99,6 @@ export const setCachedData = async (
 export const clearCachedData = async (key: string): Promise<void> => {
   return storage.removeSession(key);
 };
+
+// Export batch refresh functionality
+export { registerBatchRefreshListener } from './batch-refresh';

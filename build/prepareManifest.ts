@@ -5,11 +5,14 @@ import { fileURLToPath } from 'url';
 
 import dotenv from 'dotenv';
 
-import packageJson from '../package.json';
-const { version } = packageJson;
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Read package.json dynamically to avoid ESM import issues
+const packageJson = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf-8')
+);
+const { version } = packageJson;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);

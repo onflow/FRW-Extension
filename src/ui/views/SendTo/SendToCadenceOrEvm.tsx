@@ -15,8 +15,8 @@ import { useContact } from '@/ui/hooks/useContactHook';
 import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { useWallet } from 'ui/utils';
 
-import { CurrencyValue } from '../TokenDetail/CurrencyValue';
-import { TokenBalance } from '../TokenDetail/TokenBalance';
+import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
+import { TokenBalance } from '../../components/TokenLists/TokenBalance';
 
 import TransferAmount from './TransferAmount';
 import TransferConfirmation from './TransferConfirmation';

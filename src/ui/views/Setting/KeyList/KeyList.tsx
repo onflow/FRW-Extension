@@ -1,5 +1,6 @@
 import { Box, IconButton, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { type KeyResponseItem, type AccountKey } from '@/shared/types/network-types';
 import { LLHeader } from '@/ui/components';
@@ -17,14 +18,17 @@ import RevokePage from './RevokePage';
 
 const KeyList = () => {
   const wallet = useWallet();
+  const location = useLocation();
+  const address = new URLSearchParams(location.search).get('address') || '';
   const [showKey, setShowkey] = useState(null);
   const [showRevoke, setShowRevoke] = useState(false);
   const [publickeys, setPublicKeys] = useState<any[]>([]);
   const [keyIndex, setKeyIndex] = useState<string>('');
 
   const getAccount = useCallback(async () => {
-    const account = await wallet.getMainAccountInfo();
     const keys = await wallet.openapi.keyList();
+
+    const account = await wallet.getAccountInfo(address);
     const installationId = await wallet.openapi.getInstallationId();
     const mergedArray = await mergeData(
       {
@@ -34,7 +38,7 @@ const KeyList = () => {
       installationId
     );
     setPublicKeys(mergedArray);
-  }, [wallet]);
+  }, [wallet, address]);
 
   const setTab = useCallback(async () => {
     await wallet.setDashIndex(3);

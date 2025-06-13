@@ -98,23 +98,6 @@ jobs:
           OAUTH2_SCOPES="${{ vars.OAUTH2_SCOPES }}"
           WC_PROJECTID="${{ secrets.WC_PROJECTID }}"
           MIXPANEL_TOKEN="${{ secrets.MIXPANEL_TOKEN }}"
-          TEST_PASSWORD="${{ secrets.TEST_PASSWORD }}"
-          TEST_PK_P256="${{ secrets.TEST_PK_P256 }}"
-          TEST_PK_SECP256K1="${{ secrets.TEST_PK_SECP256K1 }}"
-          TEST_SEED_PHRASE_RECEIVER="${{ secrets.TEST_SEED_PHRASE_RECEIVER }}"
-          TEST_SEED_PHRASE_SENDER="${{ secrets.TEST_SEED_PHRASE_SENDER }}"
-          TEST_SENDER_ADDR="${{ secrets.TEST_SENDER_ADDR }}"
-          TEST_SENDER_NICKNAME="${{ vars.TEST_SENDER_NICKNAME }}"
-          TEST_RECEIVER_ADDR="${{ secrets.TEST_RECEIVER_ADDR }}"
-          TEST_RECEIVER_NICKNAME="${{ vars.TEST_RECEIVER_NICKNAME }}"
-          TEST_RECEIVER_EVM_ADDR="${{ secrets.TEST_RECEIVER_EVM_ADDR }}"
-          TEST_RECEIVER_METAMASK_EVM_ADDR="${{ secrets.TEST_RECEIVER_METAMASK_EVM_ADDR }}"
-          TEST_SEED_PHRASE_MULTI_ACCOUNT_TESTER="${{ secrets.TEST_SEED_PHRASE_MULTI_ACCOUNT_TESTER }}"
-          TEST_MULTI_ACCOUNT_TESTER_ADDR1="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_ADDR1 }}"
-          TEST_MULTI_ACCOUNT_TESTER_ADDR2="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_ADDR2 }}"
-          TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR1="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR1 }}"
-          TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR2="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR2 }}"
-          TEST_MULTI_ACCOUNT_TESTER_NICKNAME="${{ vars.TEST_MULTI_ACCOUNT_TESTER_NICKNAME }}"
           SCRIPTS_PUBLIC_KEY="${{ vars.SCRIPTS_PUBLIC_KEY }}"
           BETA_MANIFEST_KEY="${{ secrets.BETA_MANIFEST_KEY }}"
           EOF
@@ -164,11 +147,21 @@ jobs:
       group: tests-${{ github.workflow }}
       cancel-in-progress: false
     environment: ${{ needs.determine-env.outputs.env_name }}
+    strategy:
+      matrix:
+        node-version: [22.x]
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -181,8 +174,6 @@ jobs:
           cat << EOF > .env.test
           # Test secrets
           TEST_PASSWORD="${{ secrets.TEST_PASSWORD }}"
-          TEST_PK_P256="${{ secrets.TEST_PK_P256 }}"
-          TEST_PK_SECP256K1="${{ secrets.TEST_PK_SECP256K1 }}"
           TEST_SEED_PHRASE_RECEIVER="${{ secrets.TEST_SEED_PHRASE_RECEIVER }}"
           TEST_SEED_PHRASE_SENDER="${{ secrets.TEST_SEED_PHRASE_SENDER }}"
           TEST_SENDER_ADDR="${{ secrets.TEST_SENDER_ADDR }}"
@@ -192,12 +183,8 @@ jobs:
           TEST_SENDER_EVM_ADDR="${{ secrets.TEST_SENDER_EVM_ADDR }}"
           TEST_RECEIVER_EVM_ADDR="${{ secrets.TEST_RECEIVER_EVM_ADDR }}"
           TEST_RECEIVER_METAMASK_EVM_ADDR="${{ secrets.TEST_RECEIVER_METAMASK_EVM_ADDR }}"
-          TEST_SEED_PHRASE_MULTI_ACCOUNT_TESTER="${{ secrets.TEST_SEED_PHRASE_MULTI_ACCOUNT_TESTER }}"
-          TEST_MULTI_ACCOUNT_TESTER_ADDR1="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_ADDR1 }}"
           TEST_MULTI_ACCOUNT_TESTER_ADDR2="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_ADDR2 }}"
-          TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR1="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR1 }}"
           TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR2="${{ secrets.TEST_MULTI_ACCOUNT_TESTER_EVM_ADDR2 }}"
-          TEST_MULTI_ACCOUNT_TESTER_NICKNAME="${{ vars.TEST_MULTI_ACCOUNT_TESTER_NICKNAME }}"
           EOF
 
       - name: Install pnpm
@@ -211,6 +198,9 @@ jobs:
         env:
           CI: true
           HEADLESS: true
+      - name: Sanitize Playwright Report
+        if: always()
+        run: pnpm tsx build/sanitize-playwright.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -218,35 +208,71 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-  deploy-report:
-    needs: [test]
+  deploy-storybook-and-reports:
+    needs: [test] # Depends on the Playwright test job
     runs-on: ubuntu-latest
-    if: always()
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
+    if: always() # Run even if tests fail to publish what's available
+    strategy:
+      matrix:
+        node-version: [22.x]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for tags
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Download Playwright Report
         uses: actions/download-artifact@v4
         with:
           name: playwright-report
-          path: temp-playwright-report
-      - name: Move report to run-specific directory
-        run: |
-          mkdir -p playwright-report/runs/${{ github.run_id }}
-          cp -r temp-playwright-report/* playwright-report/runs/${{ github.run_id }}/
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+          path: playwright-report/ # Download to this path
+
+      - name: Create .nojekyll file
+        run: touch playwright-report/.nojekyll
+
+      - name: Deploy Playwright Report
+        uses: peaceiris/actions-gh-pages@v4
+        if: always() # Deploy even if tests fail
         with:
-          path: playwright-report
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-      - name: Add Playwright Report Annotation
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          destination_dir: reports/run-${{ github.run_id }}
+          keep_files: true
+
+      - name: Build Storybook
+        run: pnpm build-storybook # Assumes output is storybook-static
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: storybook-static # Directory with Storybook and reports
+          exitZeroOnChanges: true # Optional: useful for PR checks
+          # workingDir: . # Not needed if storybookBuildDir is set correctly
+
+      - name: Add Job Summary
         if: always()
         run: |
-          echo "::notice title=Playwright Report::View the Playwright report for this run at https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/runs/${GITHUB_RUN_ID}/"
+          echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Report Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+          echo "- 📋 **[View Full Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/run-${{ github.run_id }}/)**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💡 **Tip**: Click the report link above to view detailed test results, traces, and screenshots!" >> $GITHUB_STEP_SUMMARY

@@ -31,12 +31,11 @@ const LandingComponents = ({
     {showRegisterHeader && <RegisterHeader />}
     <LLPinAlert open={showConfetti} />
 
-    <Box sx={{ flexGrow: 0.7 }} />
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        width: 720,
+        width: 744,
         marginTop: '80px',
         height: 'auto',
         transition: 'all .3s ease-in-out',

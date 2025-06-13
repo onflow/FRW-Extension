@@ -892,12 +892,12 @@ export const createTestResults = (): ApiTestResults => ({
             body: JSON.stringify({
               public_key: {
                 P256: {
-                  pubK: 'bfc8733c55f940b9fa1dcdbcc6788e9f18401d11a9f43714231d0c2af14d9319dc9b4d04d08872fafcc0b2f5f60c129a3f4fc8ea1b76397043a46a8f2889ba00',
-                  pk: process.env.TEST_PK_P256,
+                  pubK: 'somepubkey',
+                  pk: 'someprivatekey',
                 },
                 SECP256K1: {
-                  pubK: '23f371c3c8bf334edff60bb211978a9150deddd525cf67e1a2e8a9e2cf48652cf29e23e88d676b84a2c00473da3d804eecc1d18792e57958161cefb8aa58d148',
-                  pk: process.env.TEST_PK_SECP256K1,
+                  pubK: 'somepubkey',
+                  pk: 'someprivatekey',
                 },
               },
               signature: '',
@@ -2283,7 +2283,7 @@ export const createTestResults = (): ApiTestResults => ({
       timestamp: 1736463323017,
     },
     {
-      functionName: 'getTokenPriceHistory',
+      functionName: 'getTokenPriceHistoryArray',
       functionGroup: 'prices',
       functionParams: {
         token: 'flow',
@@ -5766,7 +5766,7 @@ export const createTestResults = (): ApiTestResults => ({
           requestInit: {
             method: 'get',
             headers: {
-              Network: 'testnet',
+              Network: 'mainnet',
               Accept: 'application/json',
               Authorization: 'Bearer mock-token',
               'Content-Type': 'application/json',
@@ -7187,7 +7187,7 @@ export const createTestResults = (): ApiTestResults => ({
           requestInit: {
             method: 'GET',
             headers: {
-              Network: 'mainnet',
+              Network: 'testnet',
               Accept: 'application/json',
               Authorization: 'Bearer mock-token',
               'Content-Type': 'application/json',

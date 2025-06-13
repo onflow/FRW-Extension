@@ -1,12 +1,12 @@
 import {
-  loginToSenderAccount,
   getCurrentAddress,
-  switchToEvm,
   waitForTransaction,
   loginToSenderOrReceiver,
   getReceiverEvmAccount,
   getReceiverCadenceAccount,
   checkSentAmount,
+  switchToEvmAddress,
+  getSenderEvmAccount,
 } from '../utils/helper';
 import { test } from '../utils/loader';
 
@@ -70,89 +70,80 @@ test.beforeEach(async ({ page, extensionId }) => {
   // Login to our sender account
   await loginToSenderOrReceiver({ page, extensionId, parallelIndex: test.info().parallelIndex });
   // switch to EVM account
-  await switchToEvm({ page, extensionId });
+  await switchToEvmAddress({
+    page,
+    address: getSenderEvmAccount({ parallelIndex: test.info().parallelIndex }),
+  });
 });
 
-const txList: { txId: string; tokenname: string; amount: string }[] = [];
+test('EVM transactions', async ({ page, extensionId }) => {
+  test.setTimeout(120_000);
+  const txList: { txId: string; tokenname: string; amount: string }[] = [];
 
-//Send Fts from COA to COA
-test('send Flow COA to COA', async ({ page }) => {
+  //Send Fts from COA to COA
   // Send FLOW token from COA to COA
-  const tx = await sendTokenCOA({
+  const tx1 = await sendTokenCOA({
     page,
     tokenname: 'flow',
     receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: /success|Executed/,
     amount: '0.12345678', // 8 decimal places
   });
-  txList.push(tx);
-});
+  txList.push(tx1);
 
-test('send Staked Flow COA to COA', async ({ page }) => {
   // Send stFLOW token from COA to COA
-  const tx = await sendTokenCOA({
+  const tx2 = await sendTokenCOA({
     page,
     tokenname: 'stFlow',
     receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: /success|Executed/,
     amount: '0.00000112134354678',
   });
-  txList.push(tx);
-});
+  txList.push(tx2);
 
-//Send FTS from COA to FLOW
-test('send Flow COA to FLOW', async ({ page }) => {
+  //Send FTS from COA to FLOW
   // This can take a while
   // Send FLOW token from COA to FLOW
-  const tx = await sendTokenCOA({
+  const tx3 = await sendTokenCOA({
     page,
     tokenname: 'flow',
     receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: /success|Executed/,
     amount: '0.00123456', // 8 decimal places
   });
-  txList.push(tx);
-});
+  txList.push(tx3);
 
-test('send USDC token COA to FLOW', async ({ page }) => {
   // Send USDC token from COA to FLOW
-  const tx = await sendTokenCOA({
+  const tx4 = await sendTokenCOA({
     page,
     tokenname: 'usdc.e',
     receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
     successtext: /success|Executed/,
     amount: '0.002468', // 6 decimal places
   });
-  txList.push(tx);
-});
+  txList.push(tx4);
 
-//Send FTs from COA to EOA (metamask)
-test('send Flow COA to EOA', async ({ page }) => {
-  // This can take a while
+  //Send FTs from COA to EOA (metamask)
   // Send FLOW token from COA to EOA
-  const tx = await sendTokenCOA({
+  const tx5 = await sendTokenCOA({
     page,
     tokenname: 'flow',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
     successtext: /success|Executed/,
     amount: '0.00123456', // 8 decimal places
   });
-  txList.push(tx);
-});
+  txList.push(tx5);
 
-test('send BETA token COA to EOA', async ({ page }) => {
   // Send BETA token from COA to EOA
-  const tx = await sendTokenCOA({
+  const tx6 = await sendTokenCOA({
     page,
     tokenname: 'beta',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
     successtext: /success|Executed/,
     amount: '0.001234567890123456', // 8 decimal places
   });
-  txList.push(tx);
-});
+  txList.push(tx6);
 
-test('check all sealed transactions', async ({ page, extensionId }) => {
   // Go to the activity page
   await page.goto(`chrome-extension://${extensionId}/index.html#/dashboard?activity=1`);
   await page.waitForURL(/.*\/dashboard.*/);
@@ -167,9 +158,8 @@ test('check all sealed transactions', async ({ page, extensionId }) => {
       });
     })
   );
-});
 
-/* //Move FTs from COA to FLOW
+  /* //Move FTs from COA to FLOW
 test('move Flow COA to FLOW', async ({ page }) => {
   // Move FLOW token from COA to FLOW
   await moveTokenCOA({
@@ -205,7 +195,8 @@ test('move USDC token COA to FLOW homepage', async ({ page }) => {
     amount: '0.000123',
   });
 }); */
-//Send NFT from COA to COA
-//Send NFT from COA to FLOW
-//Send NFT from COA to EOA
-//Move NFT from COA to FLOW
+  //Send NFT from COA to COA
+  //Send NFT from COA to FLOW
+  //Send NFT from COA to EOA
+  //Move NFT from COA to FLOW
+});

@@ -144,6 +144,87 @@ export const getNewUserData = async () => {
 const userData = useUserData<NewUserDataStore>(newUserDataKey);
 ```
 
+## Batch Refresh Mechanism
+
+For data that might be requested multiple times in quick succession (like account balances when displaying a list of accounts), we provide a batch refresh mechanism that collects multiple refresh requests and processes them together.
+
+### When to Use Batch Refresh
+
+Use batch refresh when:
+
+- Multiple UI components might request the same type of data simultaneously
+- The backend API supports batch operations (e.g., fetching multiple account balances at once)
+- You want to reduce the number of API calls to avoid rate limiting or improve performance
+
+### How to Implement Batch Refresh
+
+1. **Use `registerBatchRefreshListener` instead of `registerRefreshListener`**:
+
+```typescript
+import { registerBatchRefreshListener } from '@/background/utils/data-cache';
+
+registerBatchRefreshListener(
+  accountBalanceRefreshRegex,
+  async (network: string, addresses: string[]) => {
+    // Load data for all addresses in one API call
+    const balances = await loadAccountListBalance(network, addresses);
+
+    // Return a record keyed by the batch key (address)
+    const result: Record<string, string> = {};
+    addresses.forEach((address, index) => {
+      result[address] = balances[index] || '0.00000000';
+    });
+    return result;
+  },
+  (matches) => matches[2], // Extract batch key (address) from regex matches
+  (network: string, address: string) => accountBalanceKey(network, address),
+  100 // Batch window in milliseconds
+);
+```
+
+2. **Parameters Explained**:
+
+   - `keyRegex`: The refresh key regex pattern (must include `-refresh` suffix)
+   - `batchLoader`: Function that loads data for multiple items at once
+   - `getBatchKey`: Function to extract the batch key from regex matches
+   - `getFullKey`: Function to reconstruct the full cache key
+   - `batchWindowMs`: Time to wait before processing the batch (default: 100ms)
+   - `ttl`: Optional time-to-live for cached data
+
+3. **How It Works**:
+   - When multiple refresh requests come in within the batch window, they are collected
+   - After the batch window expires, all collected requests are processed together
+   - Requests are grouped by their first argument (usually network)
+   - The batch loader is called once per group with all batch keys
+   - Results are distributed to individual cache keys
+
+### Example: Account Balance Batching
+
+Here's how account balance batching is implemented:
+
+```typescript
+// In userWallet.ts
+registerBatchRefreshListener(
+  accountBalanceRefreshRegex,
+  async (network: string, addresses: string[]) => {
+    // This existing function already supports multiple addresses
+    const balances = await loadAccountListBalance(network, addresses);
+
+    // Convert array result to record for batch refresh
+    const result: Record<string, string> = {};
+    addresses.forEach((address, index) => {
+      result[address] = balances[index] || '0.00000000';
+    });
+    return result;
+  },
+  (matches) => matches[2], // Extract address from regex
+  (network: string, address: string) => accountBalanceKey(network, address),
+  100 // 100ms batch window
+);
+```
+
+This ensures that when the UI displays a list of accounts, all balance requests are batched into a single API call, significantly reducing backend load.
+
 ## Efficiency Considerations
 
 1. **Minimal Data Transfer**

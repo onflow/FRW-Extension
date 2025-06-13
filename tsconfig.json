@@ -3,8 +3,8 @@
     "baseUrl": "./",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "module": "ES2022",
-    "target": "ES2022",
+    "module": "ESNext",
+    "target": "ESNext",
     "moduleResolution": "bundler",
     "noImplicitAny": false,
     "checkJs": true,
@@ -38,6 +38,7 @@
     "build",
     "webpack.config.ts",
     "postcss.config.mjs",
-    "svgTransform.js"
+    "svgTransform.js",
+    ".storybook/**/*"
   ]
 }

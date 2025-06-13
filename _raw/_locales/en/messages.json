@@ -1135,7 +1135,7 @@
     "message": "Import Wallets"
   },
   "Support_Flow_Wallet_Blocto": {
-    "message": "From Seed Phrase, Keystore or Raw Key"
+    "message": "From Recovery Phrase, Keystore or Private Key"
   },
   "A_crypto_wallet_on_Flow": {
     "message": "A crypto wallet on Flow built for"
@@ -1146,11 +1146,14 @@
   "Keystore": {
     "message": "Keystore"
   },
-  "Seed_Phrase": {
-    "message": "Seed Phrase"
+  "Recovery_Phrase": {
+    "message": "Recovery phrase"
   },
   "Private_Key": {
-    "message": "Private Key"
+    "message": "Private key"
+  },
+  "Mobile_app": {
+    "message": "Mobile app"
   },
   "You_can_import_the": {
     "message": "Paste the JSON contents of the keystore from another wallet (eg: Blocto)"
@@ -1220,6 +1223,9 @@
   },
   "Step_3": {
     "message": "Step 3 "
+  },
+  "Step_4": {
+    "message": "Step 4 "
   },
   "Import_Recovery_Phrase_or_Private_Key": {
     "message": "Import Recovery Phrase or Private Key "
@@ -1481,5 +1487,53 @@
   },
   "Profile_Password_Change_Description": {
     "message": "The following profiles are either loaded in your wallet or backed up to Google Drive. Select which profiles you want to update the password for:"
+  },
+  "Profiles": {
+    "message": "Profiles"
+  },
+  "Recover_an_existing_profile": {
+    "message": "Recover an existing profile"
+  },
+  "Create_a_new_profile": {
+    "message": "Create a new profile"
+  },
+  "Active_account": {
+    "message": "Active account"
+  },
+  "Other_accounts": {
+    "message": "Other accounts"
+  },
+  "Create_a_new_account": {
+    "message": "Create a new account"
+  },
+  "Import_an_existing_account": {
+    "message": "Import an existing account"
+  },
+  "Add_Account_Sidebar": {
+    "message": "Add Account"
+  },
+  "Mobile_overview": {
+    "message": "Mobile overview"
+  },
+  "Create_a_new_profile_with_an_account_from_Flow_Wallet_Mobile_App": {
+    "message": "These are the steps involved in importing your profile from your Flow Wallet mobile app."
+  },
+  "Import_from_Mobile_Step_1": {
+    "message": "Generate a new recovery phrase to secure your profile."
+  },
+  "Import_from_Mobile_Step_2_setup": {
+    "message": "Set up a new password to secure your profile."
+  },
+  "Import_from_Mobile_Step_2_verify": {
+    "message": "Verify your password to secure the profile."
+  },
+  "Import_from_Mobile_Step_3": {
+    "message": "Scan to connect to mobile."
+  },
+  "Import_from_Mobile_Step_4": {
+    "message": "Choose the profile you'd like to import."
+  },
+  "Import_from_Mobile_Submit": {
+    "message": "Get Started"
   }
 }

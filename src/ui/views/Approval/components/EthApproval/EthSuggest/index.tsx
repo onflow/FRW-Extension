@@ -3,9 +3,12 @@ import { Contract, ethers } from 'ethers';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { storage } from '@/background/webapi';
+import { type CustomFungibleTokenInfo, type CoinItem } from '@/shared/types/coin-types';
+import { networkToChainId } from '@/shared/types/network-types';
 import { withPrefix } from '@/shared/utils/address';
 import { consoleError } from '@/shared/utils/console-log';
 import { refreshEvmToken } from '@/ui/hooks/use-coin-hooks';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { EVM_ENDPOINT } from 'consts';
 import { LLPrimaryButton, LLSecondaryButton, LLConnectLoading } from 'ui/components';
 import { useApproval, useWallet } from 'ui/utils';
@@ -20,8 +23,9 @@ const EthSuggest = (data) => {
   const [evmAddress, setEvmAddress] = useState('');
   const [isValidatingAddress, setIsValidatingAddress] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<boolean>(false);
-  const [coinInfo, setCoinInfo] = useState<any>({});
+  const [coinInfo, setCoinInfo] = useState<CustomFungibleTokenInfo | null>(null);
 
+  const { network } = useNetwork();
   const addCustom = useCallback(
     async (address) => {
       setLoading(true);
@@ -62,19 +66,18 @@ const EthSuggest = (data) => {
       const balance = await ftContract.balanceOf(evmAddress);
 
       if (decimals !== null && name !== null && symbol !== null) {
-        const info = {
-          coin: name,
-          unit: symbol,
-          icon: '',
-          price: 0,
-          change24h: 0,
-          total: Number(balance) / Math.pow(10, Number(decimals)),
+        const info: CustomFungibleTokenInfo = {
+          chainId: networkToChainId(network),
+          symbol,
+          name,
+          logoURI: '',
+          tags: [],
           address: contractAddress?.toLowerCase(),
           decimals: Number(decimals),
+          flowIdentifier: await usewallet.getAssociatedFlowIdentifier(contractAddress),
+          custom: true,
         };
 
-        const flowId = await usewallet.getAssociatedFlowIdentifier(contractAddress);
-        info['flowIdentifier'] = flowId;
         setCoinInfo(info);
         setLoading(false);
       } else {
@@ -92,25 +95,19 @@ const EthSuggest = (data) => {
   }, [addCustom, data]);
 
   const importCustom = async () => {
-    setLoading(true);
-    const contractAddress = withPrefix(data.params.data.params.options.address)?.toLowerCase;
-    const network = await usewallet.getNetwork();
-    let evmCustomToken = (await storage.get(`${network}evmCustomToken`)) || [];
-    // Filter out any empty objects from evmCustomToken
-    evmCustomToken = evmCustomToken.filter((token) => Object.keys(token).length > 0);
-
-    // Find the index of the existing token
-    const existingIndex = evmCustomToken.findIndex((token) => token.address === contractAddress);
-
-    if (existingIndex !== -1) {
-      evmCustomToken[existingIndex] = coinInfo;
-    } else {
-      evmCustomToken.push(coinInfo);
+    if (!coinInfo) {
+      throw new Error('Coin info is not set');
     }
-
-    await storage.set(`${network}evmCustomToken`, evmCustomToken);
-    refreshEvmToken(network);
-    setLoading(false);
+    try {
+      setLoading(true);
+      await usewallet.addCustomEvmToken(network, coinInfo);
+      refreshEvmToken(network);
+      setLoading(false);
+    } catch (error) {
+      consoleError('Failed to import custom token:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -141,7 +138,7 @@ const EthSuggest = (data) => {
             background: 'linear-gradient(0deg, #121212, #11271D)',
           }}
         >
-          {coinInfo.address && (
+          {coinInfo?.address && (
             <Box sx={{ display: 'flex', flexDirection: 'column', margin: '18px', gap: '18px' }}>
               <Box
                 sx={{
@@ -206,11 +203,11 @@ const EthSuggest = (data) => {
                       letterSpacing: '-0.16px',
                     }}
                   >
-                    {coinInfo.coin}
+                    {coinInfo.name}
                   </Typography>
                 </Box>
                 <Typography sx={{ fontSize: '16px', fontWeight: '400', color: '#FFFFFF' }}>
-                  {coinInfo.total} {coinInfo.unit}
+                  {coinInfo.symbol}
                 </Typography>
               </Box>
             </Box>

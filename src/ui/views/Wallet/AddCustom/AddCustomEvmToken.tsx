@@ -14,9 +14,11 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 
-import { storage } from '@/background/webapi';
+import { type CustomFungibleTokenInfo } from '@/shared/types/coin-types';
+import { networkToChainId } from '@/shared/types/network-types';
 import { consoleError } from '@/shared/utils/console-log';
 import { refreshEvmToken } from '@/ui/hooks/use-coin-hooks';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { EVM_ENDPOINT } from 'consts';
 import { useWallet } from 'ui/utils';
 
@@ -27,8 +29,8 @@ import AddCustomEvmForm from './CustomEvmForm';
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   zIndex: 1,
-  color: (theme.palette as any).text,
-  backgroundColor: (theme.palette as any).background.default,
+  color: theme.palette.text,
+  backgroundColor: theme.palette.background.default,
   borderRadius: theme.spacing(2),
   marginTop: '8px',
   width: '100%',
@@ -43,28 +45,29 @@ const AddCustomEvmToken = () => {
   const history = useHistory();
   const {
     register,
-    handleSubmit,
-    reset,
     watch,
-    formState: { errors, dirtyFields, isValid, isDirty, isSubmitting },
+    formState: { errors, dirtyFields, isValid },
   } = useForm({
     mode: 'all',
   });
-  const address = watch('address');
+  const enteredAddress = watch('address');
   const [isValidatingAddress, setIsValidatingAddress] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [coinInfo, setCoinInfo] = useState<any>({});
+  const [fungibleTokenInfo, setFungibleTokenInfo] = useState<CustomFungibleTokenInfo | undefined>(
+    undefined
+  );
   const [validationError, setValidationError] = useState<boolean>(false);
+  const { network } = useNetwork();
 
   const checkAddress = async (address: string) => {
     //usewallet controller api
     setIsValidatingAddress(true);
-    const validatedResult = await isValidEthereumAddress(address);
+    const validatedResult = isValidEthereumAddress(address);
     setIsValidatingAddress(false);
     return validatedResult;
   };
 
-  const addCustom = async (address) => {
+  const addCustom = async (address: string) => {
     setLoading(true);
     const contractAddress = withPrefix(address)!.toLowerCase();
     const network = await usewallet.getNetwork();
@@ -102,20 +105,19 @@ const AddCustomEvmToken = () => {
     const symbol = await getContractData(ftContract, 'symbol');
 
     if (decimals !== null && name !== null && symbol !== null) {
-      const info = {
-        coin: name,
-        unit: symbol,
-        icon: '',
-        price: 0,
-        change24h: 0,
-        total: 0,
+      const info: CustomFungibleTokenInfo = {
+        chainId: networkToChainId(network),
+        symbol,
+        name,
+        logoURI: '',
+        tags: [],
         address: contractAddress?.toLowerCase(),
         decimals: Number(decimals),
+        flowIdentifier: await usewallet.getAssociatedFlowIdentifier(contractAddress),
+        custom: true,
       };
 
-      const flowId = await usewallet.getAssociatedFlowIdentifier(contractAddress);
-      info['flowIdentifier'] = flowId;
-      setCoinInfo(info);
+      setFungibleTokenInfo(info);
       setLoading(false);
     } else {
       consoleError('Failed to retrieve all required data for the token.');
@@ -125,31 +127,21 @@ const AddCustomEvmToken = () => {
     }
   };
 
-  const importCustom = async (address) => {
-    setLoading(true);
-    const contractAddress = withPrefix(address)!.toLowerCase();
-    const network = await usewallet.getNetwork();
-
-    let evmCustomToken = (await storage.get(`${network}evmCustomToken`)) || [];
-    // Filter out any empty objects from evmCustomToken
-    evmCustomToken = evmCustomToken.filter((token) => Object.keys(token).length > 0);
-
-    // Find the index of the existing token
-    const existingIndex = evmCustomToken.findIndex((token) => token.address === contractAddress);
-
-    if (existingIndex !== -1) {
-      // Token already exists in evmCustomToken, replacing with new info
-      evmCustomToken[existingIndex] = coinInfo;
-    } else {
-      // New token added to evmCustomToken
-      evmCustomToken.push(coinInfo);
+  const importCustom = async () => {
+    if (!fungibleTokenInfo) {
+      throw new Error('Coin info is not set');
     }
-
-    await storage.set(`${network}evmCustomToken`, evmCustomToken);
-    refreshEvmToken(network);
-    setLoading(false);
-    history.replace({ pathname: history.location.pathname, state: { refreshed: true } });
-    history.goBack();
+    try {
+      setLoading(true);
+      await usewallet.addCustomEvmToken(network, fungibleTokenInfo);
+      refreshEvmToken(network);
+    } catch (error) {
+      consoleError('Failed to import custom token:', error);
+    } finally {
+      setLoading(false);
+      history.replace({ pathname: history.location.pathname, state: { refreshed: true } });
+      history.goBack();
+    }
   };
 
   const Header = () => {
@@ -173,7 +165,7 @@ const AddCustomEvmToken = () => {
     );
   };
 
-  const renderContent = () => (
+  return (
     <Box
       px="18px"
       sx={{
@@ -237,11 +229,13 @@ const AddCustomEvmToken = () => {
               />
             </FormControl>
           </Stack>
-          {coinInfo.address && !isLoading && <AddCustomEvmForm coinInfo={coinInfo} />}
+          {fungibleTokenInfo?.address && !isLoading && (
+            <AddCustomEvmForm coinInfo={fungibleTokenInfo} />
+          )}
         </Box>
 
         {/* Button Container */}
-        {coinInfo.address ? (
+        {fungibleTokenInfo?.address ? (
           <Box
             sx={{
               position: 'sticky',
@@ -263,7 +257,7 @@ const AddCustomEvmToken = () => {
                 )
               }
               fullWidth
-              onClick={() => importCustom(address)}
+              onClick={() => importCustom()}
               disabled={isLoading || !isValid}
             />
           </Box>
@@ -289,7 +283,7 @@ const AddCustomEvmToken = () => {
                 )
               }
               fullWidth
-              onClick={() => addCustom(address)}
+              onClick={() => addCustom(enteredAddress)}
               disabled={isLoading || !isValid}
             />
           </Box>
@@ -297,8 +291,6 @@ const AddCustomEvmToken = () => {
       </Box>
     </Box>
   );
-
-  return <Box>{renderContent()}</Box>;
 };
 
 export default AddCustomEvmToken;

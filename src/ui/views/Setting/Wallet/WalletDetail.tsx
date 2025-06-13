@@ -17,7 +17,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { makeStyles } from '@mui/styles';
 import { styled } from '@mui/system';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { storage } from '@/background/webapi';
 import type { StorageInfo } from '@/shared/types/network-types';
@@ -236,7 +236,8 @@ function formatStorageInfo(used: number | undefined, capacity: number | undefine
 const WalletDetail = () => {
   const classes = useStyles();
   const wallet = useWallet();
-
+  const location = useLocation();
+  const address = new URLSearchParams(location.search).get('address') || '';
   const [userWallet, setWallet] = useState<
     WalletAccountWithBalance | MainAccountWithBalance | null
   >(null);
@@ -429,7 +430,7 @@ const WalletDetail = () => {
                   <ListItem
                     button
                     component={Link}
-                    to="/dashboard/nested/keylist"
+                    to={`/dashboard/nested/keylist?address=${address}`}
                     disablePadding
                     className={classes.listItem}
                   >

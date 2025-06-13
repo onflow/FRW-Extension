@@ -22,6 +22,7 @@ import {
   useRegisterStatus,
   usePayer,
   useMainAccountStorageBalance,
+  usePendingAccountCreationTransactions,
 } from './use-account-hooks';
 
 const INITIAL_WALLET: WalletAccount = {
@@ -103,6 +104,10 @@ export const useProfiles = () => {
       ),
     [activeAccounts?.currentAddress, activeAccounts?.parentAddress]
   );
+  const pendingAccountTransactions = usePendingAccountCreationTransactions(
+    network,
+    userWallets?.currentPubkey
+  );
 
   // The current wallet is the wallet that the user is currently using
   const currentWallet = useMemo(() => {
@@ -126,16 +131,13 @@ export const useProfiles = () => {
     ...(evmAccount ? [evmAccount] : []),
     ...(childAccounts ?? []),
   ];
-
-  const canMoveToChild =
-    activeAccountType === 'main' && (evmAccount || (childAccounts && childAccounts?.length > 0));
-
-  const clearProfileData = () => {};
-  const fetchProfileData = () => {};
+  // Check if we have another account to move to
+  const canMoveToOtherAccount =
+    activeAccountType === 'evm' ||
+    activeAccountType === 'child' ||
+    (activeAccountType === 'main' && (!!evmAccount || !!childAccounts?.length));
 
   return {
-    fetchProfileData,
-    clearProfileData,
     currentWallet,
     mainAddress,
     evmAddress,
@@ -154,9 +156,10 @@ export const useProfiles = () => {
     activeAccountType,
     noAddress,
     registerStatus,
-    canMoveToChild,
+    canMoveToOtherAccount,
     currentWalletList,
     payer,
     network,
+    pendingAccountTransactions,
   };
 };

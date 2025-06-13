@@ -2,13 +2,12 @@ import { Box, Button, Typography, TextareaAutosize } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
-import { seedWithPathAndPhrase2PublicPrivateKey } from '@/background/utils/modules/publicPrivateKey';
 import { useWallet } from '@/ui/utils/WalletContext';
 import { LLSpinner } from 'ui/components';
 
 import KeyPathInput from '../../../../components/KeyPathInputs';
 import PasswordTextarea from '../../../../components/PasswordTextarea';
-import { FLOW_BIP44_PATH, KEY_TYPE } from '../../../../utils/modules/constants';
+import { KEY_TYPE } from '../../../../utils/modules/constants';
 
 const useStyles = makeStyles(() => ({
   form: {
@@ -109,7 +108,7 @@ const SeedPhraseImport = ({
           type="submit"
           sx={{
             height: '56px',
-            width: '640px',
+            width: '100%',
             borderRadius: '12px',
             textTransform: 'capitalize',
             gap: '12px',

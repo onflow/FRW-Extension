@@ -1,6 +1,4 @@
-import type { TokenInfo } from 'flow-native-token-registry';
-
-import { Currency } from './wallet-types';
+import type { TokenInfo } from '@/shared/types/token-info';
 
 export type CoinItem = {
   id: string;
@@ -96,6 +94,7 @@ export type CadenceTokenInfo = {
   balanceInCurrency: string;
   currency: string;
   logoURI: string;
+  displayBalance: string;
 };
 
 // New type definitions for API response for /v4/evm/tokens/ft/{address}
@@ -117,4 +116,72 @@ export type EvmTokenInfo = {
   priceInCurrency: string;
   balanceInCurrency: string;
   isVerified: boolean;
+};
+
+export type FungibleTokenInfo = {
+  chainId: number;
+  address: string;
+  contractName?: string;
+  path?: {
+    vault: string;
+    receiver: string;
+    balance: string;
+  };
+  evmAddress?: string;
+  flowAddress?: string;
+  symbol: string;
+  name: string;
+  description?: string;
+  decimals: number;
+  logoURI: string;
+  tags: string[];
+  extensions?: {
+    property1: string;
+    property2: string;
+  };
+  flowIdentifier: string;
+  website?: string;
+};
+
+export type CustomFungibleTokenInfo = FungibleTokenInfo & {
+  custom?: boolean;
+};
+
+/*
+ * This is the important part of the token info for EVM custom tokens
+ * These are the fields I have to use to display the token info
+ */
+export type EvmCustomTokenInfo = {
+  address: string;
+  coin: string;
+  flowIdentifier: string;
+  unit: string;
+  custom: true;
+};
+
+export type FungibleTokenListResponse = {
+  name: string;
+  network: string;
+  chainId: number;
+  tokens: FungibleTokenInfo[];
+  totalAmount: number; // The total number of tokens in the list.
+  filterType?: string; // The type used for filtering the list.
+  timestamp: string;
+  logoURI: string;
+  keywords: string[];
+  tags: {
+    property1: {
+      name: string;
+      description: string;
+    };
+    property2: {
+      name: string;
+      description: string;
+    };
+  };
+  version: {
+    major: number;
+    minor: number;
+    patch: number;
+  };
 };

@@ -20,7 +20,6 @@ src/background/utils/firebase.config.json
 dist.rar
 dist.7z
 .cursorrules
-.cursor
 /test-results/
 /playwright-report/
 /blob-report/
@@ -34,3 +33,8 @@ coverage
 playwright/.auth
 
 **/.claude/settings.local.json
+
+*storybook.log
+storybook-static
+
+/docs-archive/

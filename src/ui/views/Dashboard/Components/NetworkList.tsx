@@ -10,28 +10,22 @@ import {
 import React, { useState } from 'react';
 
 import { consoleError } from '@/shared/utils/console-log';
+import { networkColor } from '@/ui/style/color';
 import { useWallet } from 'ui/utils';
 
 import networkLink from '../../../assets/svg/networkLink.svg';
 
 const bgColor = (network: string) => {
-  switch (network) {
-    case 'mainnet':
-      return '#41CC5D14';
-    case 'testnet':
-      return '#FF8A0014';
-    case 'crescendo':
-      return '#CCAF2114';
-  }
+  return `${networkColor(network)}14`;
 };
 
-interface NetworkListProps {
-  networkColor: (network: string) => string;
+const NetworkList = ({
+  currentNetwork,
+  onClose,
+}: {
   currentNetwork: string;
   onClose: () => void;
-}
-
-const NetworkList = ({ networkColor, currentNetwork, onClose }: NetworkListProps) => {
+}) => {
   const usewallet = useWallet();
 
   const [isSwitchingNetwork, setIsSwitchingNetwork] = useState(false);

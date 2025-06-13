@@ -5,6 +5,7 @@ import Link from 'ui/assets/svg/link.svg';
 import mainnetsvg from 'ui/assets/svg/mainnet.svg';
 import testnetsvg from 'ui/assets/svg/testnet.svg';
 import { LLPrimaryButton, LLSecondaryButton } from 'ui/components';
+import { networkColor } from 'ui/style/color';
 import { useWallet } from 'ui/utils';
 
 interface ShowSwitchProps {
@@ -12,17 +13,6 @@ interface ShowSwitchProps {
   msgNetwork: string;
   onCancel: () => void;
 }
-
-const networkColor = (network: string) => {
-  switch (network) {
-    case 'mainnet':
-      return '#41CC5D';
-    case 'testnet':
-      return '#FF8A00';
-    case 'crescendo':
-      return '#CCAF21';
-  }
-};
 
 const ShowSwitch: React.FC<ShowSwitchProps> = ({ currentNetwork, msgNetwork, onCancel }) => {
   const wallet = useWallet();

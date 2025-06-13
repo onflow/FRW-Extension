@@ -97,7 +97,7 @@ const Root = styled('span')(
 const AccountSettings = () => {
   const history = useHistory();
   const wallet = useWallet();
-  const { clearProfileData, profileIds, userInfo, walletList } = useProfiles();
+  const { profileIds, userInfo, walletList } = useProfiles();
 
   const [username, setUsername] = useState(userInfo?.username || '');
   const [nickname, setNickname] = useState(userInfo?.nickname || '');
@@ -188,12 +188,10 @@ const AccountSettings = () => {
       handleCloseRemoveModal();
       if (profileIds && profileIds.length > 1) {
         wallet.lockWallet().then(() => {
-          clearProfileData();
           history.push('/unlock');
         });
       } else {
         wallet.signOutWallet().then(() => {
-          clearProfileData();
           openIndexPage('welcome?add=true');
         });
       }

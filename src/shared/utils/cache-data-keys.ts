@@ -2,13 +2,14 @@
  * Keys and types to access data in the UI from the background storage cache
  * This is the primary way to get cached data from network calls to the frontend
  */
-import { type TokenInfo } from 'flow-native-token-registry';
+import { type TokenInfo } from '@/shared/types/token-info';
 
 import {
   type TokenFilter,
   type ExtendedTokenInfo,
   type EvmTokenInfo,
   type CadenceTokenInfo,
+  type CustomFungibleTokenInfo,
 } from '../types/coin-types';
 import { type FeatureFlags } from '../types/feature-types';
 import {
@@ -25,7 +26,13 @@ import {
   type EvmNFTCollectionList,
 } from '../types/nft-types';
 import { type TransferItem } from '../types/transaction-types';
-import { type MainAccount, type WalletAccount, type Currency } from '../types/wallet-types';
+import {
+  type MainAccount,
+  type WalletAccount,
+  type Currency,
+  type PendingTransaction,
+  type PublicKeyAccount,
+} from '../types/wallet-types';
 
 import { getCachedData, triggerRefresh } from './cache-data-access';
 import { type NetworkScripts } from './script-types';
@@ -112,6 +119,21 @@ export type MainAccountStore = MainAccount[];
 export const getCachedMainAccounts = async (network: string, publicKey: string) => {
   return getCachedData<MainAccountStore>(mainAccountsKey(network, publicKey));
 };
+
+// Pending Accounts
+export const placeholderAccountsKey = (network: string, pubkey: string): string => {
+  return `placeholder-accounts-${network}-${pubkey}`;
+};
+export const placeholderAccountsRefreshRegex = refreshKey(placeholderAccountsKey);
+export type PlaceholderAccountsStore = PublicKeyAccount[];
+
+// Pending Account Creation Transactions
+export const pendingAccountCreationTransactionsKey = (network: string, pubkey: string) =>
+  `pending-account-creation-transactions-${network}-${pubkey}`;
+export const pendingAccountCreationTransactionsRefreshRegex = refreshKey(
+  pendingAccountCreationTransactionsKey
+);
+export type PendingAccountCreationTransactionsStore = string[];
 
 /*
  * --------------------------------------------------------------------
@@ -282,7 +304,7 @@ export const getCachedEvmNftCollectionList = async (
 export const tokenListKey = (network: string, chainType: string) =>
   `token-list-${network}-${chainType}`;
 export const tokenListRefreshRegex = refreshKey(tokenListKey);
-export type TokenListStore = TokenInfo[];
+export type TokenListStore = CustomFungibleTokenInfo[];
 
 // Coinlist can be used for both EVM and Cadence tokens - this is the primary way to get token information
 export const coinListKey = (network: string, address: string, currency: string = 'usd') =>

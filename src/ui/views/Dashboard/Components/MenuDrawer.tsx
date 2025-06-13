@@ -1,46 +1,46 @@
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import {
   Box,
-  List,
-  ListItemButton,
-  Typography,
+  CircularProgress,
   Drawer,
   IconButton,
+  List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  CardMedia,
   Skeleton,
+  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import type { UserInfoResponse } from '@/shared/types/network-types';
+import { type WalletAccount } from '@/shared/types/wallet-types';
+import { consoleError } from '@/shared/utils/console-log';
+import { AccountListing } from '@/ui/components/account/account-listing';
+import { MenuItem } from '@/ui/components/sidebar/menu-item';
+import { useFeatureFlag } from '@/ui/hooks/use-feature-flags';
 import {
-  type ActiveChildType_depreciated,
-  type WalletAccount,
-  type MainAccount,
-} from '@/shared/types/wallet-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
-import { useAccountBalance } from '@/ui/hooks/use-account-hooks';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
-import importIcon from 'ui/assets/svg/importIcon.svg';
-import popLock from 'ui/assets/svg/popLock.svg';
+  COLOR_GREEN_FLOW_THEME_16FF99,
+  COLOR_WHITE_ALPHA_10_FFFFFF1A,
+  COLOR_WHITE_ALPHA_40_FFFFFF66,
+} from '@/ui/style/color';
 import { useWallet } from 'ui/utils';
 
-import rightarrow from '../../../assets/svg/rightarrow.svg';
-import sideMore from '../../../assets/svg/sideMore.svg';
+import lock from '../../../assets/svg/sidebar-lock.svg';
+import plus from '../../../assets/svg/sidebar-plus.svg';
+import userCircleGear from '../../../assets/svg/user-circle-gear.svg';
+import ErrorModel from '../../../components/PopupModal/errorModel';
 
-import NetworkList from './NetworkList';
+import AddAccountPopup from './AddAccountPopup';
 
 const useStyles = makeStyles(() => ({
   menuDrawer: {
     zIndex: '1400 !important',
   },
   paper: {
-    background: '#282828',
+    background: '#0A0A0B',
   },
   active: {
     background: '#BABABA14',
@@ -49,394 +49,174 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface MenuDrawerProps {
-  userInfo: UserInfoResponse | null;
   drawer: boolean;
   toggleDrawer: () => void;
-  otherAccounts: MainAccount[];
-  switchAccount: (profileId: string) => Promise<void>;
+  userInfo: UserInfoResponse | null;
   togglePop: () => void;
   walletList: WalletAccount[];
-  childAccounts: WalletAccount[] | null;
-  profileIds: string[];
-  current: WalletAccount;
-  createWalletList: (props: WalletAccount) => React.ReactNode;
-  setWallets: (
-    walletInfo: WalletAccount,
-    key: ActiveChildType_depreciated | null,
-    index?: number | null
-  ) => Promise<void>;
-  currentNetwork: string;
-  evmWallet: WalletAccount;
-  networkColor: (network: string) => string;
-  evmLoading: boolean;
+  activeAccount: WalletAccount;
+  activeParentAccount: WalletAccount;
+  network: string;
   modeOn: boolean;
   mainAddressLoading: boolean;
+  noAddress?: boolean;
 }
 
-const MenuDrawer = (props: MenuDrawerProps) => {
-  const usewallet = useWallet();
+const MenuDrawer = ({
+  userInfo,
+  drawer,
+  toggleDrawer,
+  togglePop,
+  activeAccount,
+  activeParentAccount,
+  walletList,
+  network,
+  mainAddressLoading,
+  noAddress,
+}: MenuDrawerProps) => {
+  const wallet = useWallet();
   const history = useHistory();
   const classes = useStyles();
-  const evmBalance = useAccountBalance(props.currentNetwork, props.evmWallet.address);
-  const { clearProfileData, noAddress } = useProfiles();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // Add Account Drawer
+  const [showAddAccount, setShowAddAccount] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const canCreateNewAccount = useFeatureFlag('create_new_account');
+  // TODO: Uncomment this when we have the import existing account feature flag
+  const canImportExistingAccount = false; // useFeatureFlag('import_existing_account');
 
-  interface EvmADDComponentProps {
-    myString: string | number;
-  }
+  // Error state
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const EvmADDComponent: React.FC<EvmADDComponentProps> = ({ myString }) => {
-    // const formattedString = formatString(myString);
+  const setActiveAccount = useCallback(
+    (address: string, parentAddress?: string) => {
+      wallet.setActiveAccount(address, parentAddress || address).then(() => {
+        toggleDrawer();
+      });
+    },
+    [wallet, toggleDrawer]
+  );
 
-    return (
-      <Typography
-        sx={{
-          color: '#808080',
-          fontWeight: '400',
-          fontSize: '12px',
-          marginTop: '4px',
-        }}
-      >
-        {myString} FLOW
-      </Typography>
-    );
+  const addAccount = async () => {
+    try {
+      toggleAddAccount();
+
+      // Scroll to bottom to show the spinner
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({
+            top: scrollRef.current.scrollHeight + 60,
+            behavior: 'smooth',
+          });
+        }
+      }, 100);
+
+      await wallet.createNewAccount(network);
+    } catch (error) {
+      consoleError('Failed to create account:', error);
+      setErrorMessage(error.message || 'Failed to create account. Please try again.');
+      setShowError(true);
+    }
   };
 
-  const gradientStyle: React.CSSProperties = {
-    background: 'linear-gradient(92deg, #00EF8B 63.42%, #627EEA 91.99%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    display: 'inline',
-    fontSize: '12px',
-    fontStyle: 'normal',
-    fontWeight: 600,
-    letterSpacing: '0.1px',
+  const toggleAddAccount = () => {
+    setShowAddAccount((prevShowAddAccount) => !prevShowAddAccount);
   };
-
-  const goEnable = async () => {
-    props.toggleDrawer();
-    history.push('/dashboard/enable');
-  };
-
-  const hasChildAccounts = props.childAccounts && Object.keys(props.childAccounts).length > 0;
-
+  const handleEnableEvmClick = useCallback(
+    (parentAddress: string) => {
+      history.replace(`/dashboard/enable?parentAddress=${parentAddress}`);
+      toggleDrawer();
+    },
+    [history, toggleDrawer]
+  );
   return (
     <Drawer
-      open={props.drawer}
-      onClose={props.toggleDrawer}
+      open={drawer}
+      onClose={toggleDrawer}
       className={classes.menuDrawer}
       classes={{ paper: classes.paper }}
-      PaperProps={{ sx: { width: '75%' } }}
+      PaperProps={{ sx: { width: '75%', maxWidth: '400px' } }}
     >
       <List
         sx={{
-          backgroundColor: '#282828',
+          backgroundColor: '#0A0A0B',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
         }}
       >
-        <ListItem
-          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <ListItemIcon sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              {props?.userInfo ? (
+        <Box sx={{ padding: '24px 16px' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              padding: '0 0 12px',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.25)',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              {userInfo ? (
                 <img
-                  src={props.userInfo.avatar}
+                  src={userInfo.avatar}
                   width={48}
                   height={48}
-                  style={{ backgroundColor: '#797979', borderRadius: 48 / 2 }}
+                  style={{ backgroundColor: COLOR_GREEN_FLOW_THEME_16FF99, borderRadius: '8px' }}
                 />
               ) : (
                 <Skeleton variant="circular" width={48} height={48} />
               )}
-
-              <Box sx={{ paddingTop: '4px', px: '2px' }}>
-                <IconButton edge="end" aria-label="close" onClick={props.togglePop}>
-                  <img style={{ display: 'inline-block', width: '24px' }} src={sideMore} />
-                </IconButton>
-              </Box>
-            </ListItemIcon>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <ListItemText
-                sx={{ fontSize: '14px', fontWeight: '700' }}
-                primary={
-                  ((!props.mainAddressLoading || noAddress) && props?.userInfo?.nickname) || (
-                    <Skeleton variant="text" width={100} />
-                  )
-                }
-              />
-            </Box>
-          </Box>
-        </ListItem>
-        {!props.evmLoading && !isValidEthereumAddress(props.evmWallet.address) && (
-          <ListItem sx={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
-            <ListItemButton
-              sx={{
-                borderRadius: '12px',
-                display: 'flex',
-                width: '100%',
-                justifyContent: 'space-between',
-                backgroundColor: 'rgba(0, 0, 0, 0.30)',
-                padding: '16px',
-                cursor: 'pointer',
-                ':hover': {
-                  opacity: 0.8,
-                },
-              }}
-              onClick={goEnable}
-            >
-              <Box>
-                <Typography
-                  sx={{
-                    color: ' #FFF',
-                    fontSize: '12px',
-                    fontStyle: 'normal',
-                    fontWeight: 600,
-                    letterSpacing: '0.1px',
-                  }}
-                >
-                  {chrome.i18n.getMessage('path_to_enable')}{' '}
-                  <span style={gradientStyle}>{chrome.i18n.getMessage('EVM_on_flow')}</span> !
-                </Typography>
-                <Typography
-                  sx={{
-                    color: ' rgba(255, 255, 255, 0.80)',
-                    fontSize: '10px',
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    letterSpacing: '0.1px',
-                  }}
-                >
-                  {chrome.i18n.getMessage('manage_multi_assets_seamlessly')}
-                </Typography>
-              </Box>
-              <CardMedia
-                sx={{ width: '20px', height: '20px', display: 'block', marginLeft: '6px' }}
-                image={rightarrow}
-              />
-            </ListItemButton>
-          </ListItem>
-        )}
-        <Box sx={{ px: '16px' }}>
-          <Divider sx={{ my: '10px', mx: '0px' }} variant="middle" color="#4C4C4C" />
-        </Box>
-        <Box sx={{ overflowY: 'scroll' }}>
-          {props.walletList.length > 0 &&
-            props.walletList
-              .slice()
-              .sort((a, b) =>
-                a.address === props.current.address
-                  ? -1
-                  : b.address === props.current.address
-                    ? 1
-                    : 0
-              )
-              .map(props.createWalletList)}
-          {(isValidEthereumAddress(props.evmWallet.address) || hasChildAccounts) && (
-            <Typography
-              sx={{ color: '#FFFFFF66', fontSize: '12px', marginTop: '10px', marginLeft: '16px' }}
-            >
-              {chrome.i18n.getMessage('Linked_Account')}
-            </Typography>
-          )}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              paddingBottom: '16px',
-            }}
-          >
-            {isValidEthereumAddress(props.evmWallet.address) && (
-              <ListItem
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  padding: '16px 0 0',
-                  cursor: 'pointer',
-                }}
-                onClick={() =>
-                  props.setWallets(
-                    {
-                      name: 'evm',
-                      address: props.evmWallet.address,
-                      chain: props.evmWallet.chain,
-                      id: 1,
-                      icon: props.evmWallet.icon || '',
-                      color: props.evmWallet.color || '',
-                    },
-                    'evm'
-                  )
-                }
-              >
-                <ListItemButton
-                  data-testid={`evm-account-${props.evmWallet.address}`}
-                  sx={{
-                    mb: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexDirection: 'space-between',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      height: '32px',
-                      width: '32px',
-                      borderRadius: '32px',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: props.evmWallet.color,
-                      marginRight: '12px',
-                    }}
-                  >
-                    <Typography sx={{ fontSize: '20px', fontWeight: '600' }}>
-                      {props.evmWallet.icon}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      fontWeight={'semi-bold'}
-                      display="flex"
-                      color={
-                        props.evmWallet.address === props.current.address
-                          ? 'text.title'
-                          : 'text.nonselect'
-                      }
-                    >
-                      <Typography variant="body1" component="span" color="#FFF" fontSize={'12px'}>
-                        {props.evmWallet.name}
-                      </Typography>
-
-                      <Typography
-                        variant="body1"
-                        component="span"
-                        color="#FFF"
-                        fontSize={'9px'}
-                        sx={{
-                          backgroundColor: '#627EEA',
-                          padding: '0 8px',
-                          borderRadius: '18px',
-                          textAlign: 'center',
-                          marginLeft: '8px',
-                          lineHeight: '19px',
-                        }}
-                      >
-                        EVM
-                      </Typography>
-                      {props.evmWallet.address === props.current.address && (
-                        <ListItemIcon style={{ display: 'flex', alignItems: 'center' }}>
-                          <FiberManualRecordIcon
-                            style={{
-                              fontSize: '10px',
-                              color: '#40C900',
-                              marginLeft: '8px',
-                            }}
-                          />
-                        </ListItemIcon>
-                      )}
-                    </Typography>
-                    <EvmADDComponent myString={evmBalance || '0.00000000'} />
-                  </Box>
-                </ListItemButton>
-              </ListItem>
-            )}
-
-            {props.childAccounts &&
-              props.childAccounts.map((childAccount, index) => (
-                <ListItem
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    padding: '8px 16px 8px',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.08) !important',
-                    },
-                  }}
-                  key={index}
-                  onClick={() =>
-                    props.childAccounts &&
-                    props.setWallets(
-                      childAccount,
-                      childAccount.address as ActiveChildType_depreciated | null
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <ListItemText
+                  sx={{ fontSize: '14px', fontWeight: '700', marginLeft: '16px' }}
+                  primary={
+                    ((!mainAddressLoading || noAddress) && userInfo?.nickname) || (
+                      <Skeleton variant="text" width={100} />
                     )
                   }
-                >
-                  <ListItemButton
-                    data-testid={`child-account-${childAccount.address}`}
-                    sx={{
-                      mb: 0,
-                      padding: '0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      background: 'none !important',
-                    }}
-                    className={
-                      props.current['address'] === childAccount.address ? classes.active : ''
-                    }
-                  >
-                    <CardMedia
-                      component="img"
-                      image={childAccount.icon}
-                      sx={{
-                        height: '32px',
-                        width: '32px',
-                        marginRight: '12px',
-                        backgroundColor: '#282828',
-                        borderRadius: '24px',
-                        objectFit: 'cover',
-                      }}
-                    />
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      <Typography
-                        variant="body1"
-                        component="span"
-                        fontWeight={'semi-bold'}
-                        display="flex"
-                        color={
-                          props.current['address'] === childAccount.address
-                            ? 'text.title'
-                            : 'text.nonselect'
-                        }
-                      >
-                        <Typography
-                          variant="body1"
-                          component="span"
-                          color="#E6E6E6"
-                          fontSize={'12px'}
-                        >
-                          {childAccount.name}
-                        </Typography>
-                        {props.current['address'] === childAccount.address && (
-                          <ListItemIcon sx={{ display: 'flex', alignItems: 'center' }}>
-                            <FiberManualRecordIcon
-                              sx={{
-                                fontSize: '10px',
-                                color: '#40C900',
-                                marginLeft: '8px',
-                              }}
-                            />
-                          </ListItemIcon>
-                        )}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        component="span"
-                        // display="inline"
-                        color={'text.nonselect'}
-                        sx={{ fontSize: '12px', textTransform: 'lowercase' }}
-                      >
-                        {childAccount.address}
-                      </Typography>
-                    </Box>
-                  </ListItemButton>
-                </ListItem>
-              ))}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ paddingTop: '4px', px: '2px' }}>
+              <IconButton
+                edge="end"
+                aria-label="close"
+                onClick={togglePop}
+                data-testid="switch-profile-button"
+              >
+                <img style={{ display: 'inline-block', width: '24px' }} src={userCircleGear} />
+              </IconButton>
+            </Box>
           </Box>
         </Box>
+        <Box
+          ref={scrollRef}
+          sx={{
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 200px)',
+            '&::-webkit-scrollbar': {
+              width: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '4px',
+            },
+          }}
+        >
+          <AccountListing
+            network={network}
+            accountList={walletList}
+            activeAccount={activeAccount}
+            activeParentAccount={activeParentAccount}
+            onAccountClick={setActiveAccount}
+            onEnableEvmClick={handleEnableEvmClick}
+            showActiveAccount={true}
+          />
+        </Box>
+        <Box sx={{ padding: '0 16px', flex: 1 }}></Box>
         <Box
           sx={{
             justifyContent: 'space-between',
@@ -444,88 +224,80 @@ const MenuDrawer = (props: MenuDrawerProps) => {
             flexDirection: 'column',
             display: 'flex',
             px: '0',
-            marginTop: 'auto',
-            marginBottom: '20px',
+            marginTop: '24px',
+            marginBottom: '8px',
+            borderTop: `1px solid ${COLOR_WHITE_ALPHA_40_FFFFFF66}`,
+            paddingTop: '8px',
           }}
         >
-          {props.modeOn && (
-            <NetworkList
-              networkColor={props.networkColor}
-              currentNetwork={props.currentNetwork}
-              onClose={props.toggleDrawer}
-            />
-          )}
-          <ListItem
-            disablePadding
-            onClick={async () => {
-              await usewallet.lockAdd();
-              // history.push('/add');
-            }}
-          >
-            <ListItemButton sx={{ padding: '8px 16px', margin: '0', borderRadius: '0' }}>
-              <ListItemIcon
-                sx={{
-                  width: '24px',
-                  minWidth: '16px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: '12px',
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  sx={{ width: '16px', height: '16px' }}
-                  image={importIcon}
-                />
-              </ListItemIcon>
-              <Typography
-                variant="body1"
-                component="div"
-                display="inline"
-                color="text"
-                sx={{ fontSize: '12px' }}
-              >
-                {chrome.i18n.getMessage('Import__Profile')}
-              </Typography>
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            disablePadding
+          {canCreateNewAccount &&
+            (isCreating ? (
+              <ListItem disablePadding>
+                <ListItemButton sx={{ padding: '8px 16px', margin: '0', borderRadius: '0' }}>
+                  <ListItemIcon
+                    sx={{
+                      width: '40px',
+                      minWidth: '40px',
+                      height: '40px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: '16px',
+                      borderRadius: '40px',
+                      backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                    }}
+                  >
+                    <CircularProgress size={24} />
+                  </ListItemIcon>
+                  <Typography
+                    variant="body1"
+                    component="div"
+                    display="inline"
+                    sx={{ fontSize: '16px', color: '#FFFFFFCC', opacity: 0.7 }}
+                  >
+                    Creating...
+                  </Typography>
+                </ListItemButton>
+              </ListItem>
+            ) : (
+              <MenuItem
+                icon={plus}
+                text={chrome.i18n.getMessage('Add_Account_Sidebar')}
+                dataTestId="add-account-button"
+                onClick={toggleAddAccount}
+              />
+            ))}
+          <MenuItem
+            icon={lock}
+            text={chrome.i18n.getMessage('Lock__Wallet')}
             onClick={() => {
-              usewallet.lockWallet().then(() => {
-                clearProfileData();
+              wallet.lockWallet().then(() => {
                 history.push('/unlock');
               });
             }}
-          >
-            <ListItemButton sx={{ padding: '8px 16px', margin: '0', borderRadius: '0' }}>
-              <ListItemIcon
-                sx={{
-                  width: '24px',
-                  minWidth: '24px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: '12px',
-                }}
-              >
-                <CardMedia component="img" sx={{ width: '24px', height: '24px' }} image={popLock} />
-              </ListItemIcon>
-              <Typography
-                variant="body1"
-                component="div"
-                display="inline"
-                color="text"
-                sx={{ fontSize: '12px' }}
-              >
-                {chrome.i18n.getMessage('Lock__Wallet')}
-              </Typography>
-            </ListItemButton>
-          </ListItem>
+          />
+          {showAddAccount && (
+            <AddAccountPopup
+              isConfirmationOpen={showAddAccount}
+              handleCloseIconClicked={() => setShowAddAccount(false)}
+              handleCancelBtnClicked={() => setShowAddAccount(false)}
+              handleAddBtnClicked={() => {
+                setShowAddAccount(false);
+              }}
+              addAccount={addAccount}
+              importExistingAccount={canImportExistingAccount}
+            />
+          )}
         </Box>
+
+        {showError && (
+          <ErrorModel
+            isOpen={showError}
+            onOpenChange={() => setShowError(false)}
+            errorName={chrome.i18n.getMessage('Error')}
+            errorMessage={errorMessage}
+          />
+        )}
       </List>
     </Drawer>
   );
