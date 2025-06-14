@@ -99,6 +99,7 @@ jobs:
           WC_PROJECTID="${{ secrets.WC_PROJECTID }}"
           MIXPANEL_TOKEN="${{ secrets.MIXPANEL_TOKEN }}"
           SCRIPTS_PUBLIC_KEY="${{ vars.SCRIPTS_PUBLIC_KEY }}"
+          BETA_MANIFEST_KEY="${{ secrets.BETA_MANIFEST_KEY }}"
           EOF
           }
 
