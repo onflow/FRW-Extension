@@ -9,6 +9,7 @@ import discord from 'ui/assets/image/discord.png';
 import lilo from 'ui/assets/image/lilo.png';
 import X from 'ui/assets/svg/xLogo.svg';
 const { version } = packageJson;
+const BETA_VERSION = process.env.BETA_VERSION;
 // import '../../Unlock/style.css';
 
 const useStyles = makeStyles(() => ({
@@ -109,6 +110,7 @@ const About = () => {
           sx={{ textAlign: 'center', fontWeight: 300 }}
         >
           {chrome.i18n.getMessage('Version')} {`${version}`}
+          {BETA_VERSION && ` (${BETA_VERSION})`}
         </Typography>
 
         {process.env.DEPLOYMENT_ENV !== 'production' && (

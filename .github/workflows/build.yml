@@ -8,12 +8,24 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       env_name: ${{ steps.set_env.outputs.env_name }}
+      is_beta: ${{ steps.set_env.outputs.is_beta }}
+      beta_version: ${{ steps.set_env.outputs.beta_version }}
     steps:
       - id: set_env
         run: |
           ENV_NAME="${{ github.ref_type == 'tag' && 'production' || github.ref_name == 'master' && 'production' || github.ref_name == 'dev' && 'staging' || 'development' }}"
+          IS_BETA="false"
+          BETA_VERSION=""
+          if [[ "${{ github.ref_type }}" == "tag" && "${{ github.ref_name }}" == *"beta"* ]]; then
+            IS_BETA="true"
+            BETA_VERSION="${{ github.ref_name }}"
+          fi
           echo "env_name=$ENV_NAME" >> $GITHUB_OUTPUT
+          echo "is_beta=$IS_BETA" >> $GITHUB_OUTPUT
+          echo "beta_version=$BETA_VERSION" >> $GITHUB_OUTPUT
           echo "Environment name: $ENV_NAME"
+          echo "Is beta: $IS_BETA"
+          echo "Beta version: $BETA_VERSION"
 
   build:
     needs: determine-env
@@ -57,6 +69,9 @@ jobs:
         run: pnpm install
 
       - name: Create environment files
+        env:
+          IS_BETA: ${{ needs.determine-env.outputs.is_beta }}
+          BETA_VERSION: ${{ needs.determine-env.outputs.beta_version }}
         run: |
           # Function to create environment file with given name
           create_env_file() {
@@ -70,6 +85,8 @@ jobs:
           DEPLOYMENT_ENV="${{ needs.determine-env.outputs.env_name }}"
           LATEST_TAG="${{ env.LATEST_TAG }}"
           REPO_URL="${{ env.REPO_URL }}"
+          IS_BETA="${{ env.IS_BETA }}"
+          BETA_VERSION="${{ env.BETA_VERSION }}"
 
           # Google drive
           GD_BACKUP_NAME="${{ vars.GD_BACKUP_NAME }}"

@@ -20,6 +20,7 @@ const mode = args[0];
 
 dotenv.config({ path: `.env.${mode}` });
 
+const IS_BETA = process.env.IS_BETA === 'true';
 const OAUTH2_SCOPES = process.env.OAUTH2_SCOPES || '';
 
 const DEVTOOLS_URL = 'http://localhost:8097';
@@ -58,7 +59,7 @@ async function prepare() {
     scopes: OAUTH2_SCOPES.split(','),
   };
   // Update the version in the manifest
-  if (version.includes('beta')) {
+  if (IS_BETA) {
     manifest.version = version.replace(/^(\d+\.\d+\.\d+).*/, '$1');
 
     manifest.name = '__MSG_appNameBeta__';

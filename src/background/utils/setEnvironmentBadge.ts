@@ -5,7 +5,11 @@ export const setEnvironmentBadge = () => {
 
   if (deploymentEnv === 'production') {
     // No badge for production
-    chrome.action.setBadgeText({ text: '' });
+    if (process.env.BETA_MANIFEST_KEY) {
+      chrome.action.setBadgeText({ text: 'β' });
+    } else {
+      chrome.action.setBadgeText({ text: '' });
+    }
   } else if (deploymentEnv === 'staging') {
     chrome.action.setBadgeText({ text: 'stg' });
   } else if (deploymentEnv === 'development') {
