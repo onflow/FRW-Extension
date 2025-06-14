@@ -110,7 +110,7 @@ const InnerRoute = (props: RouteComponentProps) => {
       <div className={classes.innerWrapper}>
         <Header />
 
-        <div id="scrollableTab">
+        <div id="scrollableTab" style={{ height: '100%', overflowY: 'scroll' }}>
           <Switch>
             <PrivateRoute exact path={`${props.match.url}/`}>
               <Dashboard />
