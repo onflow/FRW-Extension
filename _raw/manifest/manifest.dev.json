@@ -35,18 +35,45 @@
       "js": ["content-script.js", "script.js"],
       "matches": ["file://*/*", "http://*/*", "https://*/*"],
       "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["message-bridge.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["pageProvider.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["script.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
     }
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self' 'wasm-unsafe-eval';"
   },
-  "permissions": ["storage", "activeTab", "tabs", "notifications", "identity", "camera"],
-  "host_permissions": ["https://api.mixpanel.com/*"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "notifications",
+    "identity",
+    "camera",
+    "scripting"
+  ],
+  "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
       "resources": [
         "node_modules/@trustwallet/wallet-core/dist/lib/wallet-core.wasm",
         "pageProvider.js",
+        "message-bridge.js",
         "user-media-permission.html"
       ],
       "matches": ["<all_urls>"]

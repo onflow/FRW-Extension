@@ -41,6 +41,7 @@ import {
   remoteConfigService,
   newsService,
 } from './service';
+import { ContentScriptInjectionService } from './service/content-script-injection';
 import { getFirbaseConfig } from './utils/firebaseConfig';
 import { setEnvironmentBadge } from './utils/setEnvironmentBadge';
 import { storage } from './webapi';
@@ -49,6 +50,8 @@ const { PortMessage } = Message;
 const chromeWindow = await chrome.windows.getCurrent();
 
 let appStoreLoaded = false;
+
+const contentScriptInjection = new ContentScriptInjectionService();
 
 async function initAppMeta() {
   // Initialize Firebase
@@ -343,13 +346,14 @@ const handlePreAuthz = async (id) => {
 
 // Function called when a new message is received
 const extMessageHandler = (msg, sender, sendResponse) => {
+  consoleLog('[Background] Received message:', msg);
+
   // Messages from FCL, posted to window and proxied from content.js
   const { service } = msg;
 
   if (msg.type === 'FLOW::TX') {
     // DO NOT LISTEN
     walletController.listenTransaction(msg.txId, false);
-    // fcl.tx(msg.txId).subscribe(txStatus => {})
   }
 
   if (msg.type === 'FCW:CS:LOADED') {
@@ -368,69 +372,19 @@ const extMessageHandler = (msg, sender, sendResponse) => {
         }
       });
   }
-  // Launches extension popup window
-  if (
-    service?.endpoint &&
-    (service?.endpoint === 'chrome-extension://hpclkefagolihohboafpheddmmgdffjm/popup.html' ||
-      service?.endpoint ===
-        'chrome-extension://hpclkefagolihohboafpheddmmgdffjm/popup.html?network=testnet')
-  ) {
-    chrome.tabs
-      .query({
-        active: true,
-        lastFocusedWindow: true,
-      })
-      .then(async (tabs) => {
-        const tabId = tabs[0].id;
 
-        // Check if current address is flow address
-        try {
-          const currentAddress = await userWalletService.getCurrentAddress();
-          if (!isValidFlowAddress(currentAddress)) {
-            const parentAddress = await userWalletService.getParentAddress();
-            if (!parentAddress) {
-              throw new Error('Parent address not found');
-            }
-            await userWalletService.setCurrentAccount(
-              parentAddress,
-              parentAddress as WalletAddress
-            );
-          }
-        } catch (error) {
-          consoleError('Error validating or setting current address:', error);
-        }
-        if (service.type === 'pre-authz') {
-          handlePreAuthz(tabId);
-        } else {
-          notificationService
-            .requestApproval(
-              {
-                params: { tabId, type: service.type },
-                approvalComponent: findPath(service),
-              },
-              { height: service.type === 'authz' ? 700 : 620 }
-            )
-            .then((res) => {
-              if (res === 'unlocked') {
-                notificationService.requestApproval(
-                  {
-                    params: { tabId, type: service.type },
-                    approvalComponent: findPath(service),
-                  },
-                  { height: service.type === 'authz' ? 700 : 620 }
-                );
-              }
-            });
-        }
-      });
+  // Handle Ethereum RPC requests
+  if (msg.payload && msg.payload.method) {
+    consoleLog('[Background] Handling Ethereum RPC request:', msg.payload);
+    const contentScriptInjection = new ContentScriptInjectionService();
+    contentScriptInjection.handleEthereumRequest(msg.payload, sendResponse);
+    return true; // Keep the message channel open for async response
   }
+
   sendResponse({ status: 'ok' });
-  // return true
 };
 
-/**
- * Fired when a message is sent from either an extension process or a content script.
- */
+// Set up message listener
 chrome.runtime.onMessage.addListener(extMessageHandler);
 
 chrome.runtime.onConnect.addListener((port) => {
@@ -457,3 +411,16 @@ const SAVE_TIMESTAMP_INTERVAL_MS = 2 * 1000;
 
 saveTimestamp();
 setInterval(saveTimestamp, SAVE_TIMESTAMP_INTERVAL_MS);
+
+// Initialize the extension
+const init = async () => {
+  consoleLog('Initializing extension...');
+
+  // Initialize content script injection
+  await contentScriptInjection.init();
+
+  consoleLog('Extension initialized');
+};
+
+// Start the extension
+init();

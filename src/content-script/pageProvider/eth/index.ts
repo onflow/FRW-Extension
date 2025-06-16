@@ -19,6 +19,8 @@ declare const __frw__channelName;
 declare const __frw__isDefaultWallet;
 declare const __frw__uuid;
 declare const __frw__isOpera;
+declare const __frwBridgeUUID;
+declare const __frwWalletUUID;
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -90,251 +92,117 @@ interface EIP6963RequestProviderEvent extends Event {
 }
 
 export class EthereumProvider extends EventEmitter {
-  chainId: string | null = null;
-  selectedAddress: string | null = null;
-  /**
-   * The network ID of the currently connected Ethereum chain.
-   * @deprecated
-   */
-  networkVersion: string | null = null;
-  isFrw = true;
-  isMetaMask = true;
-  _isFrw = true;
-
-  _isReady = false;
-  _isConnected = false;
-  _initialized = false;
-  _isUnlocked = false;
-
-  _cacheRequestsBeforeReady: any[] = [];
-  _cacheEventListenersBeforeReady: [string | symbol, () => any][] = [];
-
-  _state: StateProvider = {
+  private bridgeId: string;
+  private walletId: string;
+  public _initialized: boolean = false;
+  public _isReady: boolean = false;
+  public _isConnected: boolean = false;
+  public _isUnlocked: boolean = false;
+  public chainId: string | null = null;
+  public networkVersion: string | null = null;
+  public selectedAddress: string | null = null;
+  public _state = {
     accounts: null,
     isConnected: false,
     isUnlocked: false,
-    initialized: false,
-    isPermanentlyDisconnected: false,
   };
 
-  _metamask = {
-    isUnlocked: () => {
-      return new Promise((resolve) => {
-        resolve(this._isUnlocked);
-      });
-    },
-  };
-
-  private _pushEventHandlers: PushEventHandlers;
-  private _requestPromise = new ReadyPromise(2);
-  private _dedupePromise = new DedupePromise([]);
-  private _bcm = new BroadcastChannelMessage(channelName);
-
-  constructor({ maxListeners = 100 } = {}) {
+  constructor(bridgeId: string, walletId: string) {
     super();
-    this.setMaxListeners(maxListeners);
-    this.initialize();
-    this.shimLegacy();
-    this._pushEventHandlers = new PushEventHandlers(this);
+
+    this.bridgeId = bridgeId;
+    this.walletId = walletId;
+    this._initialized = true;
+    this._isReady = true;
+    consoleLog('Ethereum provider initialized with IDs:', {
+      bridgeId: this.bridgeId,
+      walletId: this.walletId,
+    });
   }
 
-  initialize = async () => {
-    document.addEventListener('visibilitychange', this._requestPromiseCheckVisibility);
+  // Handle Ethereum requests
+  async request(payload: any): Promise<any> {
+    consoleLog('Ethereum provider received request:', payload);
 
-    this._bcm.connect().on('message', this._handleBackgroundMessage);
-    domReadyCall(() => {
-      const origin = location.origin;
-      const icon =
-        ($('head > link[rel~="icon"]') as HTMLLinkElement)?.href ||
-        ($('head > meta[itemprop="image"]') as HTMLMetaElement)?.content;
+    return new Promise((resolve, reject) => {
+      // Create a unique ID for this request
+      const requestId = crypto.randomUUID();
 
-      const name =
-        document.title || ($('head > meta[name="title"]') as HTMLMetaElement)?.content || origin;
+      // Set up response listener
+      const responseListener = (event: MessageEvent) => {
+        const message = event.data;
+        if (message.target === this.walletId && message.payload?.id === requestId) {
+          consoleLog('Ethereum provider received response:', message);
+          window.removeEventListener('message', responseListener);
 
-      this._bcm.request({
-        method: 'tabCheckin',
-        params: { icon, name, origin },
-      });
+          if (message.error) {
+            reject(new Error(message.error.message));
+          } else {
+            resolve(message.payload.result);
+          }
+        }
+      };
 
-      this._requestPromise.check(2);
+      // Add response listener
+      window.addEventListener('message', responseListener);
+
+      // Send request through the bridge
+      const request = {
+        target: this.bridgeId,
+        source: this.walletId,
+        payload: {
+          id: requestId,
+          ...payload,
+        },
+      };
+      consoleLog('Sending request through bridge:', request);
+      window.postMessage(request, '*');
     });
+  }
 
+  // Implement required Ethereum provider methods
+  async isDefaultWallet(): Promise<boolean> {
+    return this.request({ method: 'isDefaultWallet' });
+  }
+
+  async getChainId(): Promise<string> {
+    return this.request({ method: 'eth_chainId' });
+  }
+
+  async getAccounts(): Promise<string[]> {
+    return this.request({ method: 'eth_accounts' });
+  }
+
+  async requestAccounts(): Promise<string[]> {
+    return this.request({ method: 'eth_requestAccounts' });
+  }
+
+  // Add legacy send method
+  async send(payload: any, callback?: (error: any, response: any) => void): Promise<any> {
     try {
-      const { chainId, accounts, networkVersion, isUnlocked }: any =
-        await this.requestInternalMethods({
-          method: 'getProviderState',
-        });
-      if (isUnlocked) {
-        this._isUnlocked = true;
-        this._state.isUnlocked = true;
-      }
-      this.chainId = chainId;
-      this.networkVersion = networkVersion;
-      this.emit('connect', { chainId });
-      this._pushEventHandlers.chainChanged({
-        chain: chainId,
-        networkVersion,
-      });
-
-      this._pushEventHandlers.accountsChanged(accounts);
-    } catch {
-      //
-    } finally {
-      this._initialized = true;
-      this._state.initialized = true;
-      this.emit('_initialized');
+      const result = await this.request(payload);
+      if (callback) callback(null, { result });
+      return result;
+    } catch (error) {
+      if (callback) callback(error, null);
+      throw error;
     }
-  };
+  }
 
-  private _requestPromiseCheckVisibility = () => {
-    if (document.visibilityState === 'visible') {
-      this._requestPromise.check(1);
-    } else {
-      this._requestPromise.uncheck(1);
+  // Add legacy sendAsync method
+  async sendAsync(payload: any, callback: (error: any, response: any) => void): Promise<void> {
+    try {
+      const result = await this.request(payload);
+      callback(null, { result });
+    } catch (error) {
+      callback(error, null);
     }
-  };
+  }
 
-  private _handleBackgroundMessage = ({ event, data }) => {
-    log('[push event]', event, data);
-    if (this._pushEventHandlers[event]) {
-      return this._pushEventHandlers[event](data);
-    }
-
-    this.emit(event, data);
-  };
-
-  isConnected = () => {
-    return true;
-  };
-
-  // TODO: support multi request!
-  request = async (data) => {
-    if (!this._isReady) {
-      const promise = new Promise((resolve, reject) => {
-        this._cacheRequestsBeforeReady.push({
-          data,
-          resolve,
-          reject,
-        });
-      });
-      return promise;
-    }
-    return this._dedupePromise.call(data.method, () => this._request(data));
-  };
-
-  _request = async (data) => {
-    if (!data) {
-      throw ethErrors.rpc.invalidRequest();
-    }
-
-    this._requestPromiseCheckVisibility();
-
-    return this._requestPromise.call(() => {
-      if (data.method !== 'eth_call') {
-        log('[request]', JSON.stringify(data, null, 2));
-      }
-
-      return this._bcm
-        .request({
-          ...data,
-          extensionId,
-        })
-        .then((res) => {
-          if (data.method !== 'eth_call') {
-            log('[request: success]', data.method, res);
-          }
-          return res;
-        })
-        .catch((err) => {
-          if (data.method !== 'eth_call') {
-            log('[request: error]', data.method, serializeError(err));
-          }
-          throw serializeError(err);
-        });
-    });
-  };
-
-  requestInternalMethods = (data) => {
-    return this._dedupePromise.call(data.method, () => this._request(data));
-  };
-
-  // shim to matamask legacy api
-  sendAsync = (payload, callback) => {
-    if (Array.isArray(payload)) {
-      return Promise.all(
-        payload.map(
-          (item) =>
-            new Promise((resolve) => {
-              this.sendAsync(item, (err, res) => {
-                // ignore error
-                resolve(res);
-              });
-            })
-        )
-      ).then((result) => callback(null, result));
-    }
-    const { method, params, ...rest } = payload;
-    this.request({ method, params })
-      .then((result) => callback(null, { ...rest, method, result }))
-      .catch((error) => callback(error, { ...rest, method, error }));
-  };
-
-  send = (payload, callback?) => {
-    if (typeof payload === 'string' && (!callback || Array.isArray(callback))) {
-      // send(method, params? = [])
-      return this.request({
-        method: payload,
-        params: callback,
-      }).then((result) => ({
-        id: undefined,
-        jsonrpc: '2.0',
-        result,
-      }));
-    }
-
-    if (typeof payload === 'object' && typeof callback === 'function') {
-      return this.sendAsync(payload, callback);
-    }
-
-    let result;
-    switch (payload.method) {
-      case 'eth_accounts':
-        result = this.selectedAddress ? [this.selectedAddress] : [];
-        break;
-
-      case 'eth_coinbase':
-        result = this.selectedAddress || null;
-        break;
-
-      default:
-        throw new Error('sync method doesnt support');
-    }
-
-    return {
-      id: payload.id,
-      jsonrpc: payload.jsonrpc,
-      result,
-    };
-  };
-
-  shimLegacy = () => {
-    const legacyMethods = [
-      ['enable', 'eth_requestAccounts'],
-      ['net_version', 'net_version'],
-    ];
-
-    for (const [_method, method] of legacyMethods) {
-      this[_method] = () => this.request({ method });
-    }
-  };
-
-  on = (event: string | symbol, handler: (...args: any[]) => void) => {
-    if (!this._isReady) {
-      this._cacheEventListenersBeforeReady.push([event, handler]);
-      return this;
-    }
-    return super.on(event, handler);
-  };
+  // Add internal methods request
+  async requestInternalMethods(payload: any): Promise<any> {
+    return this.request(payload);
+  }
 }
 
 declare global {
@@ -353,7 +221,7 @@ declare global {
   }
 }
 
-const provider = new EthereumProvider();
+const provider = new EthereumProvider(window.__FRW_BRIDGE_ID__, window.__FRW_WALLET_ID__);
 patchProvider(provider);
 const flowProvider = new Proxy(provider, {
   deleteProperty: (target, prop) => {
@@ -680,3 +548,46 @@ window.addEventListener<any>('eip6963:requestProvider', (event: EIP6963RequestPr
 announceEip6963Provider(flowProvider);
 
 window.dispatchEvent(new Event('ethereum#initialized'));
+
+// Wait for bridge to be ready
+function waitForBridge(): Promise<{ bridgeId: string; walletId: string }> {
+  return new Promise((resolve) => {
+    const checkBridge = () => {
+      if (window.__FRW_BRIDGE_ID__ && window.__FRW_WALLET_ID__) {
+        resolve({
+          bridgeId: window.__FRW_BRIDGE_ID__,
+          walletId: window.__FRW_WALLET_ID__,
+        });
+      } else {
+        setTimeout(checkBridge, 100);
+      }
+    };
+    checkBridge();
+  });
+}
+
+// Initialize provider
+async function init() {
+  try {
+    consoleLog('Waiting for bridge to be ready...');
+    const { bridgeId, walletId } = await waitForBridge();
+    consoleLog('Bridge is ready:', { bridgeId, walletId });
+
+    // Create and inject the provider
+    const provider = new EthereumProvider(bridgeId, walletId);
+    Object.defineProperty(window, 'ethereum', {
+      value: provider,
+      writable: false,
+      configurable: false,
+    });
+
+    // Notify that the provider is ready
+    window.dispatchEvent(new Event('ethereum#initialized'));
+    consoleLog('Ethereum provider injected into page');
+  } catch (error) {
+    consoleLog('Error initializing Ethereum provider:', error);
+  }
+}
+
+// Start initialization
+init();

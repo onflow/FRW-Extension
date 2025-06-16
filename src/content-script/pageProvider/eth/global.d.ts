@@ -5,3 +5,12 @@ declare module '*.svg' {
 declare module '*.png' {
   const value: any;
 }
+
+declare global {
+  interface Window {
+    __frwBridgeUUID: string;
+    __frwWalletUUID: string;
+  }
+}
+
+export {};
