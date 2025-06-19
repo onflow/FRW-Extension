@@ -35,12 +35,10 @@ const KeyImport = ({
   onOpen,
   onImport,
   setPk,
-  isSignLoading,
 }: {
   onOpen: () => void;
   onImport: (accounts: PublicKeyAccount[]) => void;
   setPk: (pk: string) => void;
-  isSignLoading: boolean;
 }) => {
   const classes = useStyles();
   const usewallet = useWallet();
@@ -55,15 +53,11 @@ const KeyImport = ({
       const inputValue = e.target[2].value;
       setPk(pk);
       const address = flowAddressRegex.test(inputValue) ? inputValue : null;
-      const result = await usewallet.findAddressWithPrivateKey(pk, address);
-      if (!result) {
+      const accounts = await usewallet.findAddressWithPrivateKey(pk, address);
+      if (!accounts || accounts.length === 0) {
         onOpen();
         return;
       }
-      const accounts: (PublicKeyAccount & { type: string })[] = result.map((a) => ({
-        ...a,
-        type: KEY_TYPE.PRIVATE_KEY,
-      }));
       onImport(accounts);
     } finally {
       setLoading(false);
@@ -75,7 +69,6 @@ const KeyImport = ({
       <form id="seed" onSubmit={handleImport} className={classes.form}>
         <PasswordTextarea
           minRows={2}
-          maxRows={2}
           placeholder={chrome.i18n.getMessage('Enter_your_Private_key')}
           aria-label="Private Key"
           required
@@ -101,9 +94,9 @@ const KeyImport = ({
             gap: '12px',
             display: 'flex',
           }}
-          disabled={isLoading || isSignLoading}
+          disabled={isLoading}
         >
-          {(isLoading || isSignLoading) && <LLSpinner size={28} />}
+          {isLoading && <LLSpinner size={28} />}
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="background.paper">
             {chrome.i18n.getMessage('Import')}
           </Typography>

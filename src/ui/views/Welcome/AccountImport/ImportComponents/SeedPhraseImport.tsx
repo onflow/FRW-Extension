@@ -37,20 +37,20 @@ const SeedPhraseImport = ({
   onOpen,
   onImport,
   setMnemonic,
-  isSignLoading,
   path,
   setPath,
   phrase,
   setPhrase,
+  setErrorMessage,
 }: {
   onOpen: () => void;
   onImport: (accounts: PublicKeyAccount[]) => void;
   setMnemonic: (mnemonic: string) => void;
-  isSignLoading: boolean;
   path: string;
   setPath: (path: string) => void;
   phrase: string;
   setPhrase: (phrase: string) => void;
+  setErrorMessage: (message: string) => void;
 }) => {
   const classes = useStyles();
   const usewallet = useWallet();
@@ -71,20 +71,15 @@ const SeedPhraseImport = ({
       // The address method uses fcl, to query the flow address then checks the public key matches
       // Otherwise we use the key indexer to find the address.
       // The address method is help the user double check they are importing the correct seed phrase for the address they want to access
-      const result = await usewallet.findAddressWithSeedPhrase(seed, address, path, phrase);
-      if (!result || result.length === 0) {
+      const accounts = await usewallet.findAddressWithSeedPhrase(seed, address, path, phrase);
+      if (!accounts || accounts.length === 0) {
         // Couldn't import the seed phrase... there's no account found on the network
         onOpen();
         return;
       }
-      const accounts: (PublicKeyAccount & { type: string; mnemonic: string })[] = result.map(
-        (a) => ({
-          ...a,
-          type: KEY_TYPE.SEED_PHRASE,
-          mnemonic: seed,
-        })
-      );
+
       onImport(accounts);
+    } catch {
       // TODO: We need to catch errors and show them to the user
     } finally {
       setLoading(false);
@@ -122,9 +117,9 @@ const SeedPhraseImport = ({
             display: 'flex',
             marginTop: '40px',
           }}
-          disabled={isLoading || isSignLoading}
+          disabled={isLoading}
         >
-          {(isLoading || isSignLoading) && <LLSpinner size={28} />}
+          {isLoading && <LLSpinner size={28} />}
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="background.paper">
             {chrome.i18n.getMessage('Import')}
           </Typography>

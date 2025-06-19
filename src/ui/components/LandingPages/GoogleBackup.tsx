@@ -1,7 +1,7 @@
 import InfoIcon from '@mui/icons-material/Info';
 import { Button, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { consoleError } from '@/shared/utils/console-log';
 import IconGoogleDrive from '@/ui/components/iconfont/IconGoogleDrive';
@@ -13,7 +13,7 @@ interface GoogleBackupProps {
   handleSwitchTab: () => void;
   mnemonic: string;
   username: string;
-  password: string;
+  password?: string;
 }
 
 const GoogleBackup: React.FC<GoogleBackupProps> = ({
@@ -25,8 +25,11 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
   const wallets = useWallet();
   const [loading, setLoading] = useState(false);
   const [backupErr, setBackupErr] = useState(false);
+  if (!password) {
+    throw new Error('No password provided');
+  }
 
-  const handleBackup = () => {
+  const handleBackup = useCallback(() => {
     try {
       setLoading(true);
       setBackupErr(false);
@@ -44,7 +47,7 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
       consoleError(e);
       setLoading(false);
     }
-  };
+  }, [mnemonic, username, password, handleSwitchTab, wallets]);
 
   return (
     <Box className="registerBox">

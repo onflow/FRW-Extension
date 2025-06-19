@@ -20,6 +20,7 @@ export interface ImportState {
   username: string;
   password?: string;
   accounts: PublicKeyAccount[];
+  accountAlreadyImported: boolean;
   errMessage: string;
   showError: boolean;
   showGoogleImport: boolean;
@@ -35,6 +36,7 @@ export const INITIAL_IMPORT_STATE: ImportState = {
   username: '',
   password: DEFAULT_PASSWORD,
   accounts: [],
+  accountAlreadyImported: false,
   errMessage: '',
   showError: false,
   showGoogleImport: false,
@@ -50,11 +52,13 @@ export type ImportAction =
   | { type: 'SET_USERNAME'; payload: string }
   | { type: 'SET_PASSWORD'; payload: string }
   | { type: 'SET_ACCOUNTS'; payload: PublicKeyAccount[] }
-  | { type: 'SET_ERROR'; payload: { message: string; show: boolean } }
+  | { type: 'SET_ACCOUNT_ALREADY_IMPORTED'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: { message: string } }
   | { type: 'SET_GOOGLE_IMPORT'; payload: { show: boolean; accounts: string[] } }
   | { type: 'SET_DERIVATION_PATH'; payload: string }
   | { type: 'SET_PASSPHRASE'; payload: string }
-  | { type: 'GO_BACK' };
+  | { type: 'GO_BACK' }
+  | { type: 'GO_NEXT' };
 
 export const importProfileReducer = (state: ImportState, action: ImportAction): ImportState => {
   switch (action.type) {
@@ -70,8 +74,14 @@ export const importProfileReducer = (state: ImportState, action: ImportAction): 
       return { ...state, password: action.payload };
     case 'SET_ACCOUNTS':
       return { ...state, accounts: action.payload };
+    case 'SET_ACCOUNT_ALREADY_IMPORTED':
+      return { ...state, accountAlreadyImported: action.payload };
     case 'SET_ERROR':
-      return { ...state, errMessage: action.payload.message, showError: action.payload.show };
+      return {
+        ...state,
+        errMessage: action.payload.message,
+        showError: action.payload.message !== '',
+      };
     case 'SET_GOOGLE_IMPORT':
       return {
         ...state,
@@ -90,6 +100,31 @@ export const importProfileReducer = (state: ImportState, action: ImportAction): 
           return { ...state, activeTab: IMPORT_STEPS.PICK_USERNAME };
         case IMPORT_STEPS.RECOVER_PASSWORD:
           return { ...state, activeTab: IMPORT_STEPS.IMPORT };
+        default:
+          return state;
+      }
+    }
+    case 'GO_NEXT': {
+      switch (state.activeTab) {
+        case IMPORT_STEPS.IMPORT:
+          return { ...state, activeTab: IMPORT_STEPS.PICK_USERNAME };
+        case IMPORT_STEPS.PICK_USERNAME:
+          return { ...state, activeTab: IMPORT_STEPS.SET_PASSWORD };
+        case IMPORT_STEPS.SET_PASSWORD:
+          // We can't backup if we don't have a mnemonic
+          if (state.pk) {
+            return { ...state, activeTab: IMPORT_STEPS.ALL_SET };
+          } else {
+            return { ...state, activeTab: IMPORT_STEPS.GOOGLE_BACKUP };
+          }
+        case IMPORT_STEPS.RECOVER_PASSWORD:
+          return { ...state, activeTab: IMPORT_STEPS.GOOGLE_BACKUP };
+        case IMPORT_STEPS.GOOGLE_BACKUP:
+          if (!state.password) {
+            throw new Error('No password provided');
+          }
+
+          return { ...state, activeTab: IMPORT_STEPS.ALL_SET };
         default:
           return state;
       }

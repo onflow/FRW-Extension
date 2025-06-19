@@ -58,7 +58,7 @@ const AccountImport = () => {
     if (reason === 'clickaway') {
       return;
     }
-    dispatch({ type: 'SET_ERROR', payload: { message: '', show: false } });
+    dispatch({ type: 'SET_ERROR', payload: { message: '' } });
   };
 
   const submitPassword = async (newPassword: string) => {
@@ -66,27 +66,18 @@ const AccountImport = () => {
     try {
       if (pk) {
         await usewallet.importProfileUsingPrivateKey(username, newPassword, pk);
-        dispatch({ type: 'SET_ACTIVE_TAB', payload: IMPORT_STEPS.ALL_SET });
       } else if (mnemonic) {
         await usewallet.importProfileUsingMnemonic(username, newPassword, mnemonic, path, phrase);
-        dispatch({ type: 'SET_ACTIVE_TAB', payload: IMPORT_STEPS.GOOGLE_BACKUP });
       } else {
         throw new Error('No mnemonic or private key provided');
       }
+      dispatch({ type: 'GO_NEXT' });
     } catch (error) {
       dispatch({
         type: 'SET_ERROR',
-        payload: { message: error.message, show: true },
+        payload: { message: error.message },
       });
     }
-  };
-
-  const goBack = () => {
-    if (activeTab === IMPORT_STEPS.GOOGLE_BACKUP || activeTab === IMPORT_STEPS.ALL_SET) {
-      history.goBack();
-      return;
-    }
-    dispatch({ type: 'GO_BACK' });
   };
 
   const handleGoogleAccountsFound = (accounts: string[]) => {
@@ -100,42 +91,12 @@ const AccountImport = () => {
           activeIndex={Object.values(IMPORT_STEPS).indexOf(activeTab)}
           direction="right"
           showBackButton={activeTab !== IMPORT_STEPS.ALL_SET}
-          onBack={goBack}
+          onBack={() => dispatch({ type: 'GO_BACK' })}
           showConfetti={activeTab === IMPORT_STEPS.ALL_SET}
           showRegisterHeader={true}
         >
           <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.IMPORT}>
-            <ImportTabs
-              setMnemonic={(m) => dispatch({ type: 'SET_MNEMONIC', payload: m })}
-              setPk={(k) => dispatch({ type: 'SET_PK', payload: k })}
-              setAccounts={(a) => dispatch({ type: 'SET_ACCOUNTS', payload: a })}
-              goPassword={() =>
-                dispatch({
-                  type: 'SET_ACTIVE_TAB',
-                  payload: IMPORT_STEPS.RECOVER_PASSWORD,
-                })
-              }
-              handleSwitchTab={() =>
-                dispatch({
-                  type: 'SET_ACTIVE_TAB',
-                  payload: IMPORT_STEPS.PICK_USERNAME,
-                })
-              }
-              setErrorMessage={(msg) =>
-                dispatch({
-                  type: 'SET_ERROR',
-                  payload: { message: msg, show: true },
-                })
-              }
-              setShowError={(show) =>
-                dispatch({ type: 'SET_ERROR', payload: { message: '', show } })
-              }
-              handleGoogleAccountsFound={handleGoogleAccountsFound}
-              path={path}
-              setPath={(p) => dispatch({ type: 'SET_DERIVATION_PATH', payload: p })}
-              phrase={phrase}
-              setPhrase={(p) => dispatch({ type: 'SET_PASSPHRASE', payload: p })}
-            />
+            <ImportTabs state={state} dispatch={dispatch} />
           </LandingTab>
           <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.PICK_USERNAME}>
             <PickUsername
@@ -157,15 +118,10 @@ const AccountImport = () => {
           </LandingTab>
           <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.GOOGLE_BACKUP}>
             <GoogleBackup
-              handleSwitchTab={() =>
-                dispatch({
-                  type: 'SET_ACTIVE_TAB',
-                  payload: IMPORT_STEPS.ALL_SET,
-                })
-              }
+              handleSwitchTab={() => dispatch({ type: 'GO_NEXT' })}
               mnemonic={mnemonic}
               username={username}
-              password={password || ''}
+              password={password}
             />
           </LandingTab>
           <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.ALL_SET}>

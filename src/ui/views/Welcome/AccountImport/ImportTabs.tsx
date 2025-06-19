@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { type PublicKeyAccount } from '@/shared/types/wallet-types';
 import { QrCodeIcon } from '@/ui/assets/icons/QrCodeIcon';
 import ErrorModel from '@/ui/components/PopupModal/errorModel';
+import { type ImportAction, type ImportState } from '@/ui/reducers/import-profile-reducer';
 import {
   COLOR_GREEN_FLOW_DARKMODE_00EF8B,
   COLOR_GREEN_FLOW_DARKMODE_00EF8B_10pc,
@@ -30,39 +31,14 @@ function TabPanel(props) {
     </div>
   );
 }
-
-const ImportTabs = ({
-  setMnemonic,
-  setPk,
-  setAccounts,
-
-  goPassword,
-  handleSwitchTab,
-  setErrorMessage,
-  setShowError,
-  handleGoogleAccountsFound,
-  path,
-  setPath,
-  phrase,
-  setPhrase,
-}: {
-  setMnemonic: (mnemonic: string) => void;
-  setPk: (pk: string) => void;
-  setAccounts: (accounts: PublicKeyAccount[]) => void;
-  goPassword: () => void;
-  handleSwitchTab: () => void;
-  setErrorMessage: (errorMessage: string) => void;
-  setShowError: (showError: boolean) => void;
-  handleGoogleAccountsFound: (accounts: string[]) => void;
-  path: string;
-  setPath: (path: string) => void;
-  phrase: string;
-  setPhrase: (phrase: string) => void;
-}) => {
+interface ImportTabsProps {
+  state: ImportState;
+  dispatch: (action: ImportAction) => void;
+}
+const ImportTabs: React.FC<ImportTabsProps> = ({ state, dispatch }) => {
+  const { path, phrase } = state;
   const [selectedTab, setSelectedTab] = useState(0);
-  const [isSignLoading, setSignLoading] = useState(false);
   const [addressFound, setAddressFound] = useState(true);
-  const [newKey, setKeyNew] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
   const usewallet = useWallet();
   useEffect(() => {
@@ -78,19 +54,21 @@ const ImportTabs = ({
   };
 
   const handleImport = async (accounts: PublicKeyAccount[]) => {
-    setAccounts(accounts);
+    dispatch({ type: 'SET_ACCOUNTS', payload: accounts });
+    if (!accounts[0].address) {
+      // The public key does not exist on the network
+      handleNotFoundPopup();
+      return;
+    }
+    // Check if the account has been previously imported
     const result = await usewallet.openapi.checkImport(accounts[0].publicKey);
     if (result.status === 409) {
       // The account has been previously imported, so just retrieve the current user name
-      goPassword();
+      dispatch({ type: 'SET_ACCOUNT_ALREADY_IMPORTED', payload: true });
     } else {
-      // The key has never been imported before, we need to set a username and confirm / create a password
-      if (!accounts[0].address) {
-        handleNotFoundPopup();
-        return;
-      }
-      handleSwitchTab();
+      dispatch({ type: 'SET_ACCOUNT_ALREADY_IMPORTED', payload: false });
     }
+    dispatch({ type: 'GO_NEXT' });
   };
 
   const handleNotFoundPopup = async () => {
@@ -158,37 +136,40 @@ const ImportTabs = ({
       </Tabs>
       <TabPanel value={selectedTab} index={0}>
         <Googledrive
-          setErrorMessage={setErrorMessage}
-          setShowError={setShowError}
-          handleGoogleAccountsFound={handleGoogleAccountsFound}
+          setErrorMessage={(message: string) =>
+            dispatch({ type: 'SET_ERROR', payload: { message } })
+          }
+          handleGoogleAccountsFound={(accounts: string[]) =>
+            dispatch({ type: 'SET_GOOGLE_IMPORT', payload: { show: false, accounts } })
+          }
         />
       </TabPanel>
       <TabPanel value={selectedTab} index={1}>
         <JsonImport
           onOpen={handleNotFoundPopup}
           onImport={handleImport}
-          setPk={setPk}
-          isSignLoading={isSignLoading}
+          setPk={(pk) => dispatch({ type: 'SET_PK', payload: pk })}
         />
       </TabPanel>
       <TabPanel value={selectedTab} index={2}>
         <SeedPhraseImport
           onOpen={handleNotFoundPopup}
           onImport={handleImport}
-          setMnemonic={setMnemonic}
-          isSignLoading={isSignLoading}
+          setMnemonic={(mnemonic) => dispatch({ type: 'SET_MNEMONIC', payload: mnemonic })}
           path={path}
-          setPath={setPath}
+          setPath={(path) => dispatch({ type: 'SET_DERIVATION_PATH', payload: path })}
           phrase={phrase}
-          setPhrase={setPhrase}
+          setPhrase={(phrase) => dispatch({ type: 'SET_PASSPHRASE', payload: phrase })}
+          setErrorMessage={(message: string) =>
+            dispatch({ type: 'SET_ERROR', payload: { message } })
+          }
         />
       </TabPanel>
       <TabPanel value={selectedTab} index={3}>
         <KeyImport
           onOpen={handleNotFoundPopup}
           onImport={handleImport}
-          setPk={setPk}
-          isSignLoading={isSignLoading}
+          setPk={(pk) => dispatch({ type: 'SET_PK', payload: pk })}
         />
       </TabPanel>
       <TabPanel value={selectedTab} index={4}>
@@ -200,15 +181,6 @@ const ImportTabs = ({
           onOpenChange={setAddressFound}
           errorName={chrome.i18n.getMessage('No_Account_found')}
           errorMessage={chrome.i18n.getMessage('We_cant_find')}
-        />
-      )}
-      {!newKey && (
-        <ErrorModel
-          isOpen={setKeyNew}
-          onOpenChange={setKeyNew}
-          errorName={chrome.i18n.getMessage('Publickey_already_exist')}
-          errorMessage={chrome.i18n.getMessage('Please_import_or_register_a_new_key')}
-          isGoback={true}
         />
       )}
     </Box>

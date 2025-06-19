@@ -7,7 +7,13 @@ import BrowserWarning from '@/ui/components/BrowserWarning';
 import IconGoogleDrive from '@/ui/components/iconfont/IconGoogleDrive';
 import { useWallet } from '@/ui/utils/WalletContext';
 
-const Googledrive = ({ setErrorMessage, setShowError, handleGoogleAccountsFound }) => {
+const Googledrive = ({
+  setErrorMessage,
+  handleGoogleAccountsFound,
+}: {
+  setErrorMessage: (message: string) => void;
+  handleGoogleAccountsFound: (accounts: string[]) => void;
+}) => {
   const wallets = useWallet();
 
   const [loading, setLoading] = useState(false);
@@ -23,12 +29,10 @@ const Googledrive = ({ setErrorMessage, setShowError, handleGoogleAccountsFound 
       if (accounts.length > 0) {
         handleGoogleAccountsFound(accounts);
       } else {
-        setShowError(true);
         setErrorMessage(chrome.i18n.getMessage('No__backup__found'));
       }
     } catch (e) {
       consoleError(e);
-      setShowError(true);
       setErrorMessage(chrome.i18n.getMessage('Something__is__wrong'));
     } finally {
       setLoading(false);

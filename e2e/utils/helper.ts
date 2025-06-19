@@ -116,19 +116,19 @@ export const fillInPassword = async ({ page, password }) => {
     filledAtLeastOneField = true;
   }
 
-  if (await page.getByPlaceholder('Enter your password').isVisible()) {
-    await page.getByPlaceholder('Enter your password').clear();
-    await page.getByPlaceholder('Enter your password').fill(password);
+  if (await page.getByRole('textbox', { name: 'Enter your password' }).isVisible()) {
+    await page.getByRole('textbox', { name: 'Enter your password' }).clear();
+    await page.getByRole('textbox', { name: 'Enter your password' }).fill(password);
     filledAtLeastOneField = true;
   }
-  if (await page.getByPlaceholder('Create a password').isVisible()) {
-    await page.getByPlaceholder('Create a password').clear();
-    await page.getByPlaceholder('Create a password').fill(password);
+  if (await page.getByRole('textbox', { name: 'Create a password' }).isVisible()) {
+    await page.getByRole('textbox', { name: 'Create a password' }).clear();
+    await page.getByRole('textbox', { name: 'Create a password' }).fill(password);
     filledAtLeastOneField = true;
   }
-  if (await page.getByPlaceholder('Confirm your password').isVisible()) {
-    await page.getByPlaceholder('Confirm your password').clear();
-    await page.getByPlaceholder('Confirm your password').fill(password);
+  if (await page.getByRole('textbox', { name: 'Confirm your password' }).isVisible()) {
+    await page.getByRole('textbox', { name: 'Confirm your password' }).clear();
+    await page.getByRole('textbox', { name: 'Confirm your password' }).fill(password);
     filledAtLeastOneField = true;
   }
   // Make sure we filled at least one field
@@ -296,7 +296,7 @@ export const importAccountBySeedPhrase = async ({
 
     await fillInPassword({ page, password });
 
-    await page.getByRole('button', { name: 'Login' }).click();
+    await page.getByRole('button', { name: /Login|Register/i }).click();
   }
 
   // Wait for the Google Drive backup text to be visible

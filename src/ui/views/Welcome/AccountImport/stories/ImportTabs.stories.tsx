@@ -7,6 +7,7 @@ import { fn } from 'storybook/test';
 import { FLOW_BIP44_PATH } from '@/shared/utils/algo-constants';
 import { Link as LinkMock } from '@/stories/react-router-dom.mock';
 import { useWallet as useWalletMock } from '@/stories/wallet-context.mock';
+import { IMPORT_STEPS } from '@/ui/reducers/import-profile-reducer';
 
 import ImportTabs from '../ImportTabs';
 
@@ -37,16 +38,21 @@ const meta = {
     layout: 'centered',
   },
   args: {
-    setMnemonic: fn(),
-    setPk: fn(),
-    setAccounts: fn(),
-    goPassword: fn(),
-    handleSwitchTab: fn(),
-    setErrorMessage: fn(),
-    setShowError: fn(),
-    handleGoogleAccountsFound: fn(),
-    setPath: fn(),
-    setPhrase: fn(),
+    state: {
+      activeTab: IMPORT_STEPS.PICK_USERNAME,
+      mnemonic: '',
+      pk: '',
+      username: '',
+      accounts: [],
+      errMessage: '',
+      showError: false,
+      showGoogleImport: false,
+      accountAlreadyImported: false,
+      googleAccounts: [],
+      path: FLOW_BIP44_PATH,
+      phrase: '',
+    },
+    dispatch: action('dispatch'),
   },
 } satisfies Meta<typeof ImportTabs>;
 
@@ -56,18 +62,20 @@ type Story = StoryObj<typeof ImportTabs>;
 
 export const Default: Story = {
   args: {
-    setMnemonic: action('setMnemonic'),
-    setPk: action('setPk'),
-    setAccounts: action('setAccounts'),
-
-    goPassword: action('goPassword'),
-    handleSwitchTab: action('handleSwitchTab'),
-    setErrorMessage: action('setErrorMessage'),
-    setShowError: action('setShowError'),
-    handleGoogleAccountsFound: action('handleGoogleAccountsFound'),
-    path: FLOW_BIP44_PATH,
-    setPath: action('setPath'),
-    phrase: '',
-    setPhrase: action('setPhrase'),
+    state: {
+      activeTab: IMPORT_STEPS.PICK_USERNAME,
+      mnemonic: '',
+      pk: '',
+      username: '',
+      accounts: [],
+      errMessage: '',
+      showError: false,
+      showGoogleImport: false,
+      accountAlreadyImported: false,
+      googleAccounts: [],
+      path: FLOW_BIP44_PATH,
+      phrase: '',
+    },
+    dispatch: action('dispatch'),
   },
 };

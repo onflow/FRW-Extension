@@ -357,7 +357,6 @@ const Sync = () => {
 
         {activeTab === STEPS.PASSWORD && (
           <SetPassword
-            handleSwitchTab={() => setActiveTab(STEPS.ALL_SET)}
             onSubmit={submitPassword}
             title={<>{chrome.i18n.getMessage('Welcome__Back')}</>}
             isLogin={isAddWallet}
