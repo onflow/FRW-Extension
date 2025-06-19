@@ -21,11 +21,10 @@ const LandingComponents = ({
       display: 'flex',
       flexDirection: 'column',
       backgroundColor: 'background.default',
-      width: '100%',
-      height: '100vh',
       justifyContent: 'center',
       alignItems: 'center',
     }}
+    data-testid="landing-components"
   >
     {showConfetti && <Confetti />}
     {showRegisterHeader && <RegisterHeader />}
@@ -35,14 +34,11 @@ const LandingComponents = ({
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        width: 744,
         marginTop: '80px',
-        height: 'auto',
         transition: 'all .3s ease-in-out',
         borderRadius: '24px',
         boxShadow: '0px 24px 24px rgba(0,0,0,0.36)',
-        overflowY: 'auto',
-        overflowX: 'hidden',
+        width: '744px',
         backgroundColor: 'background.paper',
       }}
     >

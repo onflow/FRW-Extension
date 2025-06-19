@@ -25,17 +25,7 @@ const meta = {
         importProfileUsingMnemonic: fn(),
         isBooted: fn().mockResolvedValue(false),
       }));
-      return (
-        <Box
-          sx={{
-            width: '100vw',
-            height: '100vh',
-            overflow: 'hidden',
-          }}
-        >
-          <Story />
-        </Box>
-      );
+      return <Story />;
     },
   ],
   parameters: {

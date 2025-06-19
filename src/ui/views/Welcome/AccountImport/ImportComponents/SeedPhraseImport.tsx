@@ -3,12 +3,13 @@ import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
 import { type PublicKeyAccount } from '@/shared/types/wallet-types';
+import { consoleError } from '@/shared/utils/console-log';
+import { LLSpinner } from '@/ui/components/LLSpinner';
+import PasswordTextarea from '@/ui/components/PasswordTextarea';
+import { type ImportState, type ImportAction } from '@/ui/reducers/import-profile-reducer';
 import { useWallet } from '@/ui/utils/WalletContext';
-import { LLSpinner } from 'ui/components';
 
-import KeyPathInput from '../../../../components/KeyPathInputs';
-import PasswordTextarea from '../../../../components/PasswordTextarea';
-import { KEY_TYPE } from '../../../../utils/modules/constants';
+import KeyPathInput from './KeyPathInputs';
 
 const useStyles = makeStyles(() => ({
   form: {
@@ -33,54 +34,35 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const SeedPhraseImport = ({
-  onOpen,
-  onImport,
-  setMnemonic,
-  path,
-  setPath,
-  phrase,
-  setPhrase,
-  setErrorMessage,
-}: {
-  onOpen: () => void;
+interface SeedPhraseImportProps {
+  state: ImportState;
+  dispatch: (action: ImportAction) => void;
   onImport: (accounts: PublicKeyAccount[]) => void;
-  setMnemonic: (mnemonic: string) => void;
-  path: string;
-  setPath: (path: string) => void;
-  phrase: string;
-  setPhrase: (phrase: string) => void;
-  setErrorMessage: (message: string) => void;
-}) => {
+}
+const SeedPhraseImport: React.FC<SeedPhraseImportProps> = ({ state, dispatch, onImport }) => {
   const classes = useStyles();
   const usewallet = useWallet();
   const [isLoading, setLoading] = useState(false);
-
-  const handleImport = async (e) => {
+  const { path, phrase, mnemonic, address } = state;
+  const handleImport = async () => {
     try {
       setLoading(true);
-      e.preventDefault();
-      const seed = e.target[0].value.trim().split(/\s+/g).join(' ');
-      setMnemonic(seed);
-      const flowAddressRegex = /^(0x)?[0-9a-fA-F]{16}$/;
-      const inputValue = e.target[2].value;
-      const address = flowAddressRegex.test(inputValue) ? inputValue : null;
 
       // Check if the seed phrase is valid
       // If address is provided, check if the address is associated with the seed phrase
       // The address method uses fcl, to query the flow address then checks the public key matches
       // Otherwise we use the key indexer to find the address.
       // The address method is help the user double check they are importing the correct seed phrase for the address they want to access
-      const accounts = await usewallet.findAddressWithSeedPhrase(seed, address, path, phrase);
-      if (!accounts || accounts.length === 0) {
-        // Couldn't import the seed phrase... there's no account found on the network
-        onOpen();
-        return;
-      }
+      const accounts = await usewallet.findAddressWithSeedPhrase(mnemonic, address, path, phrase);
 
       onImport(accounts);
-    } catch {
+    } catch (error) {
+      consoleError(error);
       // TODO: We need to catch errors and show them to the user
+      dispatch({
+        type: 'SET_ERROR',
+        payload: { message: chrome.i18n.getMessage('Something__went__wrong__please__try__again') },
+      });
     } finally {
       setLoading(false);
     }
@@ -94,13 +76,21 @@ const SeedPhraseImport = ({
           placeholder={chrome.i18n.getMessage('Import_12_or_24_words')}
           required
           sx={{ marginBottom: '16px' }}
+          value={mnemonic}
+          onChange={(e) => dispatch({ type: 'SET_MNEMONIC', payload: e.target.value })}
         />
         <TextareaAutosize
           placeholder={chrome.i18n.getMessage('Enter_your_flow_address')}
           className={classes.textarea}
-          defaultValue={''}
+          value={address}
+          onChange={(e) => dispatch({ type: 'SET_ADDRESS', payload: e.target.value })}
         />
-        <KeyPathInput path={path} setPath={setPath} phrase={phrase} setPhrase={setPhrase} />
+        <KeyPathInput
+          path={path}
+          setPath={(path) => dispatch({ type: 'SET_DERIVATION_PATH', payload: path })}
+          phrase={phrase}
+          setPhrase={(phrase) => dispatch({ type: 'SET_PASSPHRASE', payload: phrase })}
+        />
         <Button
           className="registerButton"
           variant="contained"

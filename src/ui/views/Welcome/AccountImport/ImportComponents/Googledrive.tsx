@@ -33,7 +33,7 @@ const Googledrive = ({
       }
     } catch (e) {
       consoleError(e);
-      setErrorMessage(chrome.i18n.getMessage('Something__is__wrong'));
+      setErrorMessage(chrome.i18n.getMessage('Something__went__wrong__please__try__again'));
     } finally {
       setLoading(false);
     }

@@ -6,15 +6,15 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  type AccordionSummaryProps,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
-import Expand from '../assets/svg/expand.svg';
-import Hide from '../assets/svg/hide.svg';
+import Expand from '@/ui/assets/svg/expand.svg';
+import Hide from '@/ui/assets/svg/hide.svg';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_theme) => ({
   form: {
     width: '100%', // Fix full width
     display: 'flex',
@@ -61,18 +61,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
-  flexDirection: 'row-reverse',
-  alignItems: 'center',
-  padding: '0',
-  margin: '0',
-  '& .MuiAccordionSummary-expandIconWrapper': {
-    margin: 0,
-  },
-  '& .MuiAccordionSummary-content': {
-    margin: 0,
-  },
-}));
+const StyledAccordionSummary: React.FC<AccordionSummaryProps> = ({ children, ...props }) => {
+  return (
+    <AccordionSummary
+      sx={{
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        padding: '0',
+        margin: '0',
+        '& .MuiAccordionSummary-expandIconWrapper': {
+          margin: 0,
+        },
+        '& .MuiAccordionSummary-content': {
+          margin: 0,
+        },
+      }}
+      {...props}
+    >
+      {children}
+    </AccordionSummary>
+  );
+};
 
 const KeyPathInput = ({
   path,
@@ -109,7 +118,7 @@ const KeyPathInput = ({
         aria-controls="additional-options-content"
         id="additional-options-header"
       >
-        <Typography sx={{ marginLeft: '8px', fontSize: '14px' }}>Advance</Typography>
+        <Typography sx={{ marginLeft: '8px', fontSize: '14px' }}>Advanced options</Typography>
       </StyledAccordionSummary>
       <AccordionDetails
         sx={{

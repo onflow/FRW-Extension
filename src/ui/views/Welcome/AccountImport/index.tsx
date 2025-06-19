@@ -80,10 +80,6 @@ const AccountImport = () => {
     }
   };
 
-  const handleGoogleAccountsFound = (accounts: string[]) => {
-    dispatch({ type: 'SET_GOOGLE_IMPORT', payload: { show: true, accounts } });
-  };
-
   return (
     <Box>
       {!showGoogleImport ? (

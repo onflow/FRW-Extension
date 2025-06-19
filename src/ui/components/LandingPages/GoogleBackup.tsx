@@ -25,12 +25,13 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
   const wallets = useWallet();
   const [loading, setLoading] = useState(false);
   const [backupErr, setBackupErr] = useState(false);
-  if (!password) {
-    throw new Error('No password provided');
-  }
 
   const handleBackup = useCallback(() => {
     try {
+      if (!password) {
+        throw new Error('No password provided');
+      }
+
       setLoading(true);
       setBackupErr(false);
       wallets

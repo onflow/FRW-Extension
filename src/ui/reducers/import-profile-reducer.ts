@@ -16,7 +16,8 @@ export type ImportStepType = (typeof IMPORT_STEPS)[keyof typeof IMPORT_STEPS];
 export interface ImportState {
   activeTab: ImportStepType;
   mnemonic: string;
-  pk: string | null;
+  pk: string;
+  address: string; // The address the user wants to import
   username: string;
   password?: string;
   accounts: PublicKeyAccount[];
@@ -32,7 +33,8 @@ export interface ImportState {
 export const INITIAL_IMPORT_STATE: ImportState = {
   activeTab: IMPORT_STEPS.IMPORT,
   mnemonic: '',
-  pk: null,
+  pk: '',
+  address: '',
   username: '',
   password: DEFAULT_PASSWORD,
   accounts: [],
@@ -48,7 +50,8 @@ export const INITIAL_IMPORT_STATE: ImportState = {
 export type ImportAction =
   | { type: 'SET_ACTIVE_TAB'; payload: ImportStepType }
   | { type: 'SET_MNEMONIC'; payload: string }
-  | { type: 'SET_PK'; payload: string | null }
+  | { type: 'SET_PK'; payload: string }
+  | { type: 'SET_ADDRESS'; payload: string }
   | { type: 'SET_USERNAME'; payload: string }
   | { type: 'SET_PASSWORD'; payload: string }
   | { type: 'SET_ACCOUNTS'; payload: PublicKeyAccount[] }
@@ -68,6 +71,8 @@ export const importProfileReducer = (state: ImportState, action: ImportAction): 
       return { ...state, mnemonic: action.payload };
     case 'SET_PK':
       return { ...state, pk: action.payload };
+    case 'SET_ADDRESS':
+      return { ...state, address: action.payload };
     case 'SET_USERNAME':
       return { ...state, username: action.payload };
     case 'SET_PASSWORD':

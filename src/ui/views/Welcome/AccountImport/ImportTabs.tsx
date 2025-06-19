@@ -36,7 +36,6 @@ interface ImportTabsProps {
   dispatch: (action: ImportAction) => void;
 }
 const ImportTabs: React.FC<ImportTabsProps> = ({ state, dispatch }) => {
-  const { path, phrase } = state;
   const [selectedTab, setSelectedTab] = useState(0);
   const [addressFound, setAddressFound] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
@@ -87,7 +86,7 @@ const ImportTabs: React.FC<ImportTabsProps> = ({ state, dispatch }) => {
   };
 
   return (
-    <Box sx={{ padding: '0 16px 16px' }}>
+    <Box sx={{ padding: '0 16px 16px', flexGrow: 1 }}>
       <Box sx={{ padding: '20px 24px' }}>
         <Typography variant="h4">{chrome.i18n.getMessage('Import__Profile')}</Typography>
         <Typography variant="body1" color="text.secondary">
@@ -152,25 +151,10 @@ const ImportTabs: React.FC<ImportTabsProps> = ({ state, dispatch }) => {
         />
       </TabPanel>
       <TabPanel value={selectedTab} index={2}>
-        <SeedPhraseImport
-          onOpen={handleNotFoundPopup}
-          onImport={handleImport}
-          setMnemonic={(mnemonic) => dispatch({ type: 'SET_MNEMONIC', payload: mnemonic })}
-          path={path}
-          setPath={(path) => dispatch({ type: 'SET_DERIVATION_PATH', payload: path })}
-          phrase={phrase}
-          setPhrase={(phrase) => dispatch({ type: 'SET_PASSPHRASE', payload: phrase })}
-          setErrorMessage={(message: string) =>
-            dispatch({ type: 'SET_ERROR', payload: { message } })
-          }
-        />
+        <SeedPhraseImport state={state} dispatch={dispatch} onImport={handleImport} />
       </TabPanel>
       <TabPanel value={selectedTab} index={3}>
-        <KeyImport
-          onOpen={handleNotFoundPopup}
-          onImport={handleImport}
-          setPk={(pk) => dispatch({ type: 'SET_PK', payload: pk })}
-        />
+        <KeyImport state={state} dispatch={dispatch} onImport={handleImport} />
       </TabPanel>
       <TabPanel value={selectedTab} index={4}>
         <MobileAppImportSteps isLogin={isLogin} />

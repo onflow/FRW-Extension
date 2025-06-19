@@ -74,8 +74,6 @@ const JsonImport = ({
   const classes = useStyles();
   const usewallet = useWallet();
   const [isLoading, setLoading] = useState(false);
-  const [isInvalid, setIsInvalid] = useState(false);
-  const [json, setJson] = useState('');
   const [errorMesssage, setErrorMessage] = useState('');
 
   const [keystoreInput, setKeystoreInput] = useState('');
@@ -141,14 +139,11 @@ const JsonImport = ({
   };
 
   const checkJSONImport = (event) => {
-    setJson(event);
     if (event.length === 0) {
-      setIsInvalid(false);
       setErrorMessage('');
       return false;
     }
     const result = hasJsonStructure(event);
-    setIsInvalid(!result);
     setErrorMessage(!result ? 'Not a valid json input' : '');
     return result;
   };

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import { type PublicKeyAccount } from '@/shared/types/wallet-types';
 import PasswordTextarea from '@/ui/components/PasswordTextarea';
+import { type ImportAction, type ImportState } from '@/ui/reducers/import-profile-reducer';
 import { useWallet } from '@/ui/utils/WalletContext';
 import { LLSpinner } from 'ui/components';
 
@@ -32,32 +33,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const KeyImport = ({
-  onOpen,
+  state,
+  dispatch,
   onImport,
-  setPk,
 }: {
-  onOpen: () => void;
+  state: ImportState;
+  dispatch: (action: ImportAction) => void;
   onImport: (accounts: PublicKeyAccount[]) => void;
-  setPk: (pk: string) => void;
 }) => {
   const classes = useStyles();
   const usewallet = useWallet();
   const [isLoading, setLoading] = useState(false);
-
-  const handleImport = async (e) => {
+  const { pk, address } = state;
+  const handleImport = async () => {
     try {
       setLoading(true);
-      e.preventDefault();
-      const pk = e.target[0].value.replace(/^0x/, '');
-      const flowAddressRegex = /^(0x)?[0-9a-fA-F]{16}$/;
-      const inputValue = e.target[2].value;
-      setPk(pk);
-      const address = flowAddressRegex.test(inputValue) ? inputValue : null;
+
       const accounts = await usewallet.findAddressWithPrivateKey(pk, address);
-      if (!accounts || accounts.length === 0) {
-        onOpen();
-        return;
-      }
+
       onImport(accounts);
     } finally {
       setLoading(false);
@@ -73,11 +66,14 @@ const KeyImport = ({
           aria-label="Private Key"
           required
           sx={{ marginBottom: '16px' }}
+          value={pk}
+          onChange={(e) => dispatch({ type: 'SET_PK', payload: e.target.value })}
         />
         <TextareaAutosize
           placeholder={chrome.i18n.getMessage('Enter_your_flow_address')}
           className={classes.textarea}
-          defaultValue={''}
+          value={address}
+          onChange={(e) => dispatch({ type: 'SET_ADDRESS', payload: e.target.value })}
         />
         <Button
           className="registerButton"

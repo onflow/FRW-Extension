@@ -61,6 +61,7 @@ const GoogleAccounts = ({ handleSwitchTab, accounts, setUsername }) => {
             height: '270px',
             display: 'flex',
             flexDirection: 'column',
+            flexGrow: 1,
           }}
         >
           <List component="nav" aria-label="secondary mailbox folder">

@@ -104,7 +104,7 @@ const PasswordTextarea = ({
       multiline
       rows={minRows}
       minRows={minRows}
-      maxRows={maxRows}
+      maxRows={minRows ? maxRows : undefined}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
