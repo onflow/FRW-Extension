@@ -8,7 +8,12 @@ import React, { useState } from 'react';
 import IconCopy from '@/ui/components/iconfont/IconCopy';
 import SlideRelative from '@/ui/components/SlideRelative';
 
-const RecoveryPhrase = ({ handleSwitchTab, mnemonic }) => {
+interface RecoveryPhraseProps {
+  handleSwitchTab: () => void;
+  mnemonic: string;
+}
+
+const RecoveryPhrase: React.FC<RecoveryPhraseProps> = ({ handleSwitchTab, mnemonic }) => {
   const [canGoNext, setCanGoNext] = useState(false);
   const [isCoverBlur, coverBlur] = useState(true);
 
@@ -54,7 +59,7 @@ const RecoveryPhrase = ({ handleSwitchTab, mnemonic }) => {
             filter: isCoverBlur ? 'blur(5px)' : 'none',
           }}
         >
-          {mnemonic.split(' ').map((word, i) => {
+          {mnemonic.split(' ').map((word: string, i: number) => {
             return (
               <Box
                 sx={{

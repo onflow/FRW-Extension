@@ -30,9 +30,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface SetPasswordProps {
-  handleSwitchTab: () => void;
   onSubmit: (password: string) => Promise<void>;
-  username?: string;
   showTerms?: boolean;
   title?: string | React.ReactNode;
   subtitle?: string;
@@ -41,11 +39,8 @@ interface SetPasswordProps {
 }
 
 const SetPassword: React.FC<SetPasswordProps> = ({
-  handleSwitchTab = () => {},
   onSubmit,
-  username = '',
   showTerms = false,
-  title = '',
   subtitle = '',
   isLogin = false,
   autoFocus = false,

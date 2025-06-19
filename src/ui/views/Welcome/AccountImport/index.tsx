@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import AllSet from '@/ui/components/LandingPages/AllSet';
 import GoogleBackup from '@/ui/components/LandingPages/GoogleBackup';
 import LandingComponents from '@/ui/components/LandingPages/LandingComponents';
+import LandingTab from '@/ui/components/LandingPages/LandingTab';
 import PickUsername from '@/ui/components/LandingPages/PickUsername';
 import SetPassword from '@/ui/components/LandingPages/SetPassword';
 import {
@@ -103,82 +104,73 @@ const AccountImport = () => {
           showConfetti={activeTab === IMPORT_STEPS.ALL_SET}
           showRegisterHeader={true}
         >
-          <Box>
-            <>
-              {activeTab === IMPORT_STEPS.IMPORT && (
-                <ImportTabs
-                  setMnemonic={(m) => dispatch({ type: 'SET_MNEMONIC', payload: m })}
-                  setPk={(k) => dispatch({ type: 'SET_PK', payload: k })}
-                  setAccounts={(a) => dispatch({ type: 'SET_ACCOUNTS', payload: a })}
-                  goPassword={() =>
-                    dispatch({
-                      type: 'SET_ACTIVE_TAB',
-                      payload: IMPORT_STEPS.RECOVER_PASSWORD,
-                    })
-                  }
-                  handleSwitchTab={() =>
-                    dispatch({
-                      type: 'SET_ACTIVE_TAB',
-                      payload: IMPORT_STEPS.PICK_USERNAME,
-                    })
-                  }
-                  setErrorMessage={(msg) =>
-                    dispatch({
-                      type: 'SET_ERROR',
-                      payload: { message: msg, show: true },
-                    })
-                  }
-                  setShowError={(show) =>
-                    dispatch({ type: 'SET_ERROR', payload: { message: '', show } })
-                  }
-                  handleGoogleAccountsFound={handleGoogleAccountsFound}
-                  path={path}
-                  setPath={(p) => dispatch({ type: 'SET_DERIVATION_PATH', payload: p })}
-                  phrase={phrase}
-                  setPhrase={(p) => dispatch({ type: 'SET_PASSPHRASE', payload: p })}
-                />
-              )}
-
-              {activeTab === IMPORT_STEPS.PICK_USERNAME && (
-                <PickUsername
-                  handleSwitchTab={() =>
-                    dispatch({
-                      type: 'SET_ACTIVE_TAB',
-                      payload: IMPORT_STEPS.SET_PASSWORD,
-                    })
-                  }
-                  username={username}
-                  setUsername={(u) => dispatch({ type: 'SET_USERNAME', payload: u })}
-                />
-              )}
-
-              {(activeTab === IMPORT_STEPS.SET_PASSWORD ||
-                activeTab === IMPORT_STEPS.RECOVER_PASSWORD) && (
-                <SetPassword
-                  handleSwitchTab={() => {}}
-                  onSubmit={submitPassword}
-                  isLogin={activeTab === IMPORT_STEPS.RECOVER_PASSWORD}
-                />
-              )}
-              {activeTab === IMPORT_STEPS.GOOGLE_BACKUP && (
-                <GoogleBackup
-                  handleSwitchTab={() =>
-                    dispatch({
-                      type: 'SET_ACTIVE_TAB',
-                      payload: IMPORT_STEPS.ALL_SET,
-                    })
-                  }
-                  mnemonic={mnemonic}
-                  username={username}
-                  password={password || ''}
-                />
-              )}
-
-              {activeTab === IMPORT_STEPS.ALL_SET && (
-                <AllSet handleSwitchTab={() => window.close()} />
-              )}
-            </>
-          </Box>
+          <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.IMPORT}>
+            <ImportTabs
+              setMnemonic={(m) => dispatch({ type: 'SET_MNEMONIC', payload: m })}
+              setPk={(k) => dispatch({ type: 'SET_PK', payload: k })}
+              setAccounts={(a) => dispatch({ type: 'SET_ACCOUNTS', payload: a })}
+              goPassword={() =>
+                dispatch({
+                  type: 'SET_ACTIVE_TAB',
+                  payload: IMPORT_STEPS.RECOVER_PASSWORD,
+                })
+              }
+              handleSwitchTab={() =>
+                dispatch({
+                  type: 'SET_ACTIVE_TAB',
+                  payload: IMPORT_STEPS.PICK_USERNAME,
+                })
+              }
+              setErrorMessage={(msg) =>
+                dispatch({
+                  type: 'SET_ERROR',
+                  payload: { message: msg, show: true },
+                })
+              }
+              setShowError={(show) =>
+                dispatch({ type: 'SET_ERROR', payload: { message: '', show } })
+              }
+              handleGoogleAccountsFound={handleGoogleAccountsFound}
+              path={path}
+              setPath={(p) => dispatch({ type: 'SET_DERIVATION_PATH', payload: p })}
+              phrase={phrase}
+              setPhrase={(p) => dispatch({ type: 'SET_PASSPHRASE', payload: p })}
+            />
+          </LandingTab>
+          <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.PICK_USERNAME}>
+            <PickUsername
+              handleSwitchTab={() =>
+                dispatch({
+                  type: 'SET_ACTIVE_TAB',
+                  payload: IMPORT_STEPS.SET_PASSWORD,
+                })
+              }
+              username={username}
+              setUsername={(u) => dispatch({ type: 'SET_USERNAME', payload: u })}
+            />
+          </LandingTab>
+          <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.SET_PASSWORD}>
+            <SetPassword onSubmit={submitPassword} isLogin={false} />
+          </LandingTab>
+          <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.RECOVER_PASSWORD}>
+            <SetPassword onSubmit={submitPassword} isLogin={true} />
+          </LandingTab>
+          <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.GOOGLE_BACKUP}>
+            <GoogleBackup
+              handleSwitchTab={() =>
+                dispatch({
+                  type: 'SET_ACTIVE_TAB',
+                  payload: IMPORT_STEPS.ALL_SET,
+                })
+              }
+              mnemonic={mnemonic}
+              username={username}
+              password={password || ''}
+            />
+          </LandingTab>
+          <LandingTab activeTab={activeTab} tab={IMPORT_STEPS.ALL_SET}>
+            <AllSet handleSwitchTab={() => window.close()} />
+          </LandingTab>
 
           <Snackbar open={showError} autoHideDuration={3000} onClose={handleErrorClose}>
             <Alert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>

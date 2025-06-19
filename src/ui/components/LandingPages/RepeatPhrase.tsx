@@ -17,7 +17,12 @@ const chunkArray = (myArray: any[], chunk_size: number) => {
   return results;
 };
 
-const RepeatPhrase = ({ handleSwitchTab, mnemonic }) => {
+interface RepeatPhraseProps {
+  handleSwitchTab: () => void;
+  mnemonic: string;
+}
+
+const RepeatPhrase: React.FC<RepeatPhraseProps> = ({ handleSwitchTab, mnemonic }) => {
   const [incorrect, setIncorrect] = useState(false);
   const [chosenIndex, setChosen] = useState<number[]>([]);
   const [selectedPhrase, setSelect] = useState<any[]>([]);

@@ -16,7 +16,7 @@ export type StepType = (typeof STEPS)[keyof typeof STEPS];
 export interface RegisterState {
   activeTab: StepType;
   username: string;
-  password?: string;
+  password: string;
   mnemonic: string;
   isAddWallet: boolean;
 }
@@ -41,7 +41,8 @@ export type RegisterAction =
   | { type: 'SET_USERNAME'; payload: string }
   | { type: 'SET_PASSWORD'; payload: string }
   | { type: 'SET_IS_ADD_WALLET'; payload: boolean }
-  | { type: 'GO_BACK' };
+  | { type: 'GO_BACK' }
+  | { type: 'GO_NEXT' };
 
 export const registerReducer = (state: RegisterState, action: RegisterAction): RegisterState => {
   switch (action.type) {
@@ -63,6 +64,22 @@ export const registerReducer = (state: RegisterState, action: RegisterAction): R
           return { ...state, activeTab: STEPS.REPEAT };
         case STEPS.BACKUP:
           return { ...state, activeTab: STEPS.PASSWORD };
+        default:
+          return state;
+      }
+    }
+    case 'GO_NEXT': {
+      switch (state.activeTab) {
+        case STEPS.USERNAME:
+          return { ...state, activeTab: STEPS.RECOVERY };
+        case STEPS.RECOVERY:
+          return { ...state, activeTab: STEPS.REPEAT };
+        case STEPS.REPEAT:
+          return { ...state, activeTab: STEPS.PASSWORD };
+        case STEPS.PASSWORD:
+          return { ...state, activeTab: STEPS.BACKUP };
+        case STEPS.BACKUP:
+          return { ...state, activeTab: STEPS.ALL_SET };
         default:
           return state;
       }

@@ -1,10 +1,10 @@
 import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useReducer } from 'react';
-import { useHistory } from 'react-router-dom';
 
 import AllSet from '@/ui/components/LandingPages/AllSet';
 import GoogleBackup from '@/ui/components/LandingPages/GoogleBackup';
 import LandingComponents from '@/ui/components/LandingPages/LandingComponents';
+import LandingTab from '@/ui/components/LandingPages/LandingTab';
 import PickUsername from '@/ui/components/LandingPages/PickUsername';
 import RecoveryPhrase from '@/ui/components/LandingPages/RecoveryPhrase';
 import RepeatPhrase from '@/ui/components/LandingPages/RepeatPhrase';
@@ -18,7 +18,6 @@ import {
 import { useWallet } from 'ui/utils';
 
 const Register = () => {
-  const history = useHistory();
   const usewallet = useWallet();
 
   const [state, dispatch] = useReducer(registerReducer, INITIAL_REGISTER_STATE, initRegisterState);
@@ -33,98 +32,67 @@ const Register = () => {
     checkWalletStatus();
   }, [usewallet]);
 
-  const loadView = useCallback(async () => {
-    usewallet
-      .getCurrentAccount()
-      .then((res) => {
-        if (res) {
-          history.push('/');
-        }
-      })
-      .catch(() => {
-        return;
-      });
-  }, [usewallet, history]);
-
   const submitPassword = useCallback(
     async (newPassword: string) => {
       dispatch({ type: 'SET_PASSWORD', payload: newPassword });
       // We're registering the new profile with the password, username, and mnemonic
       await usewallet.registerNewProfile(username, newPassword, mnemonic);
 
-      // But after all this, we haven't updated loggedInAccounts so if we close the window before the account refreshes, we won't be able to login
-      dispatch({ type: 'SET_ACTIVE_TAB', payload: STEPS.BACKUP });
+      dispatch({ type: 'GO_NEXT' });
     },
     [username, mnemonic, usewallet]
   );
-
-  const goBack = () => {
-    if (activeTab === STEPS.USERNAME || activeTab === STEPS.ALL_SET) {
-      history.goBack();
-    } else {
-      dispatch({ type: 'GO_BACK' });
-    }
-  };
-
-  useEffect(() => {
-    loadView();
-  }, [loadView]);
 
   return (
     <LandingComponents
       activeIndex={Object.values(STEPS).indexOf(activeTab)}
       direction="right"
       showBackButton={activeTab !== STEPS.ALL_SET}
-      onBack={goBack}
+      onBack={() => dispatch({ type: 'GO_BACK' })}
       showConfetti={activeTab === STEPS.ALL_SET}
       showRegisterHeader={true}
     >
       <Box>
-        {activeTab === STEPS.USERNAME && (
+        <LandingTab activeTab={activeTab} tab={STEPS.USERNAME}>
           <PickUsername
-            handleSwitchTab={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: STEPS.RECOVERY })}
+            handleSwitchTab={() => dispatch({ type: 'GO_NEXT' })}
             username={username}
-            setUsername={(name) => dispatch({ type: 'SET_USERNAME', payload: name })}
+            setUsername={(name: string) => dispatch({ type: 'SET_USERNAME', payload: name })}
           />
-        )}
+        </LandingTab>
 
-        {activeTab === STEPS.RECOVERY && (
+        <LandingTab activeTab={activeTab} tab={STEPS.RECOVERY}>
           <RecoveryPhrase
-            handleSwitchTab={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: STEPS.REPEAT })}
+            handleSwitchTab={() => dispatch({ type: 'GO_NEXT' })}
             mnemonic={mnemonic}
           />
-        )}
+        </LandingTab>
 
-        {activeTab === STEPS.REPEAT && (
-          <RepeatPhrase
-            handleSwitchTab={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: STEPS.PASSWORD })}
-            mnemonic={mnemonic}
-          />
-        )}
+        <LandingTab activeTab={activeTab} tab={STEPS.REPEAT}>
+          <RepeatPhrase handleSwitchTab={() => dispatch({ type: 'GO_NEXT' })} mnemonic={mnemonic} />
+        </LandingTab>
 
-        {activeTab === STEPS.PASSWORD && (
+        <LandingTab activeTab={activeTab} tab={STEPS.PASSWORD}>
           <SetPassword
-            handleSwitchTab={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: STEPS.BACKUP })}
             onSubmit={submitPassword}
-            username={username}
             showTerms={true}
             autoFocus={true}
             isLogin={isAddWallet}
           />
-        )}
+        </LandingTab>
 
-        {activeTab === STEPS.BACKUP && (
+        <LandingTab activeTab={activeTab} tab={STEPS.BACKUP}>
           <GoogleBackup
-            handleSwitchTab={() => dispatch({ type: 'SET_ACTIVE_TAB', payload: STEPS.ALL_SET })}
+            handleSwitchTab={() => dispatch({ type: 'GO_NEXT' })}
             mnemonic={mnemonic}
             username={username}
-            password={password || ''}
+            password={password}
           />
-        )}
+        </LandingTab>
 
-        {activeTab === STEPS.ALL_SET && (
+        <LandingTab activeTab={activeTab} tab={STEPS.ALL_SET}>
           <AllSet handleSwitchTab={() => window.close()} variant="add" />
-        )}
+        </LandingTab>
       </Box>
     </LandingComponents>
   );
