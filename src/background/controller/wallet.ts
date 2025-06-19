@@ -860,7 +860,17 @@ export class WalletController extends BaseController {
     derivationPath: string = FLOW_BIP44_PATH,
     passphrase: string = ''
   ): Promise<PublicKeyAccount[]> => {
-    return await findAddressWithSeed(seed, address, derivationPath, passphrase);
+    try {
+      // Validate the seed phrase
+      if (!seed || typeof seed !== 'string' || seed.trim() === '') {
+        throw new Error('Invalid seed phrase');
+      }
+      // Find the address with the seed phrase
+      return await findAddressWithSeed(seed, address, derivationPath, passphrase);
+    } catch (error) {
+      consoleError('Error finding address with seed phrase:', error);
+      throw new Error(`Failed to find address with seed phrase: ${error.message}`);
+    }
   };
 
   private createKeyringWithMnemonics = async (

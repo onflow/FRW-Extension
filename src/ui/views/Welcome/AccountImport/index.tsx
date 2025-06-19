@@ -1,5 +1,5 @@
 import { Snackbar, Alert, Box } from '@mui/material';
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import AllSet from '@/ui/components/LandingPages/AllSet';
@@ -80,11 +80,12 @@ const AccountImport = () => {
     }
   };
 
+  const activeTabIndex = useMemo(() => Object.values(IMPORT_STEPS).indexOf(activeTab), [activeTab]);
   return (
     <Box>
       {!showGoogleImport ? (
         <LandingComponents
-          activeIndex={Object.values(IMPORT_STEPS).indexOf(activeTab)}
+          activeIndex={activeTabIndex}
           direction="right"
           showBackButton={activeTab !== IMPORT_STEPS.ALL_SET}
           onBack={() => dispatch({ type: 'GO_BACK' })}

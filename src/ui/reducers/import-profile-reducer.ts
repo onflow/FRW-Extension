@@ -112,6 +112,9 @@ export const importProfileReducer = (state: ImportState, action: ImportAction): 
     case 'GO_NEXT': {
       switch (state.activeTab) {
         case IMPORT_STEPS.IMPORT:
+          if (state.accountAlreadyImported) {
+            return { ...state, activeTab: IMPORT_STEPS.RECOVER_PASSWORD };
+          }
           return { ...state, activeTab: IMPORT_STEPS.PICK_USERNAME };
         case IMPORT_STEPS.PICK_USERNAME:
           return { ...state, activeTab: IMPORT_STEPS.SET_PASSWORD };

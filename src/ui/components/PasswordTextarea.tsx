@@ -91,6 +91,9 @@ const PasswordTextarea = ({
     },
   };
 
+  const rows = minRows && maxRows && minRows === maxRows ? minRows : undefined;
+  const minRowsIfNotRows = minRows && maxRows && minRows === maxRows ? undefined : minRows;
+  const maxRowsIfNotRows = minRows && maxRows && minRows === maxRows ? undefined : maxRows;
   return (
     <TextField
       label={label}
@@ -102,9 +105,9 @@ const PasswordTextarea = ({
       sx={{ ...defaultSx, ...sx }}
       fullWidth
       multiline
-      rows={minRows}
-      minRows={minRows}
-      maxRows={minRows ? maxRows : undefined}
+      rows={rows}
+      minRows={minRowsIfNotRows}
+      maxRows={maxRowsIfNotRows}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">

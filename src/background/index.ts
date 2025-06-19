@@ -139,6 +139,15 @@ async function restoreAppState() {
 
   // Set the loaded flag to true so that the UI knows the app is ready
   walletController.setLoaded(true);
+  chrome.runtime.sendMessage({ type: 'walletInitialized' }, (response) => {
+    if (chrome.runtime.lastError) {
+      consoleLog(
+        'chrome.runtime.sendMessage - walletInitialized failed:',
+        chrome.runtime.lastError.message
+      );
+    }
+  });
+
   chrome.tabs
     .query({
       active: true,
@@ -151,7 +160,7 @@ async function restoreAppState() {
           chrome.tabs.sendMessage(tabId, { type: 'walletInitialized' }, (response) => {
             if (chrome.runtime.lastError) {
               consoleLog(
-                'chrome.tabs.sendMessage - Message delivery failed:',
+                'chrome.tabs.sendMessage - walletInitialized failed on tabs:',
                 chrome.runtime.lastError.message
               );
               // You can implement retry logic or alternative actions here
@@ -193,36 +202,56 @@ chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
 
   // @ts-ignore
   port._timer = setTimeout(forceReconnect, 250e3, port);
-  port.onDisconnect.addListener(deleteTimer);
+  port.onDisconnect.addListener((p) => {
+    deleteTimer(p);
+    // Gracefully handle disconnects, including bfcache
+    if (chrome.runtime.lastError) {
+      consoleLog('Port disconnected due to:', chrome.runtime.lastError.message);
+    } else {
+      consoleLog('Port disconnected. This may be due to bfcache or tab navigation.');
+    }
+  });
 
   if (port.name === 'popup' || port.name === 'notification' || port.name === 'tab') {
     const pm = new PortMessage(port);
     pm.listen((data) => {
-      if (data?.type) {
-        switch (data.type) {
-          case 'broadcast':
-            eventBus.emit(data.method, data.params);
-            break;
-          case 'openapi':
-            if (walletController.openapi[data.method]) {
-              return walletController.openapi[data.method].apply(null, data.params);
-            }
-            break;
-          case 'controller':
-          default:
-            if (data.method) {
-              return walletController[data.method].apply(null, data.params);
-            }
+      if (!port.sender) return; // Prevent messaging if port is disconnected
+      try {
+        if (data?.type) {
+          switch (data.type) {
+            case 'broadcast':
+              eventBus.emit(data.method, data.params);
+              break;
+            case 'openapi':
+              if (walletController.openapi[data.method]) {
+                return walletController.openapi[data.method].apply(null, data.params);
+              }
+              break;
+            case 'controller':
+            default:
+              if (data.method) {
+                return walletController[data.method].apply(null, data.params);
+              }
+          }
         }
+      } catch (err) {
+        consoleError('Error handling port message:', err);
       }
     });
 
     const boardcastCallback = (data: any) => {
-      pm.request({
-        type: 'broadcast',
-        method: data.method,
-        params: data.params,
-      });
+      try {
+        pm.request({
+          type: 'broadcast',
+          method: data.method,
+          params: data.params,
+        });
+        if (chrome.runtime.lastError) {
+          consoleError('Broadcast failed:', chrome.runtime.lastError.message);
+        }
+      } catch (err) {
+        consoleError('Broadcast error:', err);
+      }
     };
 
     if (port.name === 'popup') {
@@ -331,11 +360,9 @@ const extMessageHandler = (msg, sender, sendResponse) => {
   const { service } = msg;
 
   if (msg.type === 'FLOW::TX') {
-    // DO NOT LISTEN
     walletController.listenTransaction(msg.txId, false);
-    // fcl.tx(msg.txId).subscribe(txStatus => {})
     sendResponse({ status: 'ok' });
-    return true;
+    return;
   }
 
   if (msg.type === 'FCW:CS:LOADED') {
@@ -352,11 +379,15 @@ const extMessageHandler = (msg, sender, sendResponse) => {
             network: userWalletService.getNetwork(),
           });
         }
+        sendResponse({ status: 'ok' });
+      })
+      .catch((err) => {
+        consoleError('Error in FCW:CS:LOADED:', err);
+        sendResponse({ status: 'error', error: err?.message || String(err) });
       });
-    sendResponse({ status: 'ok' });
-    return true;
+    return true; // async response
   }
-  // Launches extension popup window
+
   if (
     service?.endpoint &&
     (service?.endpoint === 'chrome-extension://hpclkefagolihohboafpheddmmgdffjm/popup.html' ||
@@ -370,8 +401,6 @@ const extMessageHandler = (msg, sender, sendResponse) => {
       })
       .then(async (tabs) => {
         const tabId = tabs[0].id;
-
-        // Check if current address is flow address
         try {
           const currentAddress = await userWalletService.getCurrentAddress();
           if (!isValidFlowAddress(currentAddress)) {
@@ -408,14 +437,26 @@ const extMessageHandler = (msg, sender, sendResponse) => {
                   { height: service.type === 'authz' ? 700 : 620 }
                 );
               }
+              sendResponse({ status: 'ok' });
+            })
+            .catch((err) => {
+              consoleError('Error in requestApproval:', err);
+              sendResponse({ status: 'error', error: err?.message || String(err) });
             });
         }
+        if (service.type === 'pre-authz') {
+          sendResponse({ status: 'ok' });
+        }
+      })
+      .catch((err) => {
+        consoleError('Error in endpoint handler:', err);
+        sendResponse({ status: 'error', error: err?.message || String(err) });
       });
-    sendResponse({ status: 'ok' });
-    return true;
+    return true; // async response
   }
 
-  return true;
+  // Default: respond synchronously
+  sendResponse({ status: 'ok' });
 };
 
 /**
