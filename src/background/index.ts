@@ -139,14 +139,6 @@ async function restoreAppState() {
 
   // Set the loaded flag to true so that the UI knows the app is ready
   walletController.setLoaded(true);
-  chrome.runtime.sendMessage({ type: 'walletInitialized' }, (response) => {
-    if (chrome.runtime.lastError) {
-      consoleError(
-        'chrome.runtime.sendMessage - Message delivery failed:',
-        chrome.runtime.lastError.message
-      );
-    }
-  });
   chrome.tabs
     .query({
       active: true,
@@ -194,14 +186,6 @@ function deleteTimer(port) {
     delete port._timer;
   }
 }
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request === 'ping') {
-    sendResponse('pong');
-    return;
-  }
-  sendResponse();
-});
 
 // for page provider
 chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
@@ -350,6 +334,8 @@ const extMessageHandler = (msg, sender, sendResponse) => {
     // DO NOT LISTEN
     walletController.listenTransaction(msg.txId, false);
     // fcl.tx(msg.txId).subscribe(txStatus => {})
+    sendResponse({ status: 'ok' });
+    return true;
   }
 
   if (msg.type === 'FCW:CS:LOADED') {
@@ -367,6 +353,8 @@ const extMessageHandler = (msg, sender, sendResponse) => {
           });
         }
       });
+    sendResponse({ status: 'ok' });
+    return true;
   }
   // Launches extension popup window
   if (
@@ -423,26 +411,17 @@ const extMessageHandler = (msg, sender, sendResponse) => {
             });
         }
       });
+    sendResponse({ status: 'ok' });
+    return true;
   }
-  sendResponse({ status: 'ok' });
-  // return true
+
+  return true;
 };
 
 /**
  * Fired when a message is sent from either an extension process or a content script.
  */
 chrome.runtime.onMessage.addListener(extMessageHandler);
-
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name !== 'foo') return;
-  port.onMessage.addListener(onMessage);
-  port.onDisconnect.addListener(deleteTimer);
-  port['_timer'] = setTimeout(forceReconnect, 250e3, port);
-});
-
-function onMessage(msg, port) {
-  consoleLog('received', msg, 'from', port.sender);
-}
 
 // Call it when extension starts
 setEnvironmentBadge();
