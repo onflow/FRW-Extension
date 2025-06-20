@@ -1,7 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Drawer, Grid, Typography, Stack, InputBase } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect } from 'react';
 import { useForm, type FieldValues } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
@@ -12,43 +11,6 @@ import UnlinkSVG from 'ui/assets/svg/unlink.svg';
 import { useWallet } from 'ui/utils';
 
 import { LLPrimaryButton, LLSecondaryButton, LLSpinner } from '../../../components';
-
-const useStyles = makeStyles(() => ({
-  IconCheck: {
-    display: 'inline',
-    backgroundColor: '#00E075',
-    borderRadius: '20px',
-    width: '14px',
-    height: '14px',
-    padding: '3px',
-  },
-  normalLine: {
-    width: '104px',
-    height: '4px',
-    marginTop: '24px',
-    backgroundImage: 'linear-gradient(to left, #5F5F5F, #5A5A5A, #5F5F5F)',
-    backgroundSize: '100% 100%',
-  },
-  pulseLine: {
-    width: '104px',
-    height: '4px',
-    marginTop: '24px',
-    backgroundImage: 'linear-gradient(to left, #2ae245, #000, #2ae245)',
-    backgroundSize: '200% 100%',
-    animation: '$gradient 5s ease infinite',
-  },
-  '@keyframes gradient': {
-    '0%': {
-      backgroundPosition: '100% 0%',
-    },
-    '50%': {
-      backgroundPosition: '0% 0%',
-    },
-    '100%': {
-      backgroundPosition: '100% 0%',
-    },
-  },
-}));
 
 interface UnlinkAccountProps {
   isAddAddressOpen: boolean;
@@ -67,7 +29,6 @@ export interface AddressBookValues {
 
 const UnlinkAccount = (props: UnlinkAccountProps) => {
   const history = useHistory();
-  const classes = useStyles();
 
   const wallet = useWallet();
   const {
@@ -180,11 +141,6 @@ const UnlinkAccount = (props: UnlinkAccountProps) => {
                 </Typography>
               )}
             </Box>
-            {/* {isLoading ? (
-              <Box className={classes.pulseLine}></Box>
-            ) : (
-              <Box className={classes.normalLine}></Box>
-            )} */}
 
             <img src={UnlinkSVG} />
 

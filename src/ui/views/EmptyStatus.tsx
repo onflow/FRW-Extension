@@ -1,42 +1,19 @@
 import { Typography, Box } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 
 import empty_status from '@/ui/assets/image/empty_status.svg';
 
-const useStyles = makeStyles(() => ({
-  emptyBox: {
-    height: '249px',
-    justifyContent: 'center',
-    alignContent: 'center',
-    textAlign: 'center',
-  },
-  emptyImg: {
-    margin: '0 auto auto auto',
-  },
-  title: {
-    fontSize: '16px',
-    lineHeight: '24px',
-    fontWeight: 600,
-    marginTop: '16px',
-    marginBottom: '4px',
-    width: '100%',
-    color: '#8C8C8C',
-  },
-  subtitle: {
-    fontSize: '14px',
-    lineHeight: '20px',
-    width: '100%',
-    color: '#8C8C8C',
-  },
-}));
-
 function EmptyStatus() {
-  const classes = useStyles();
-
   return (
-    <Box className={classes.emptyBox}>
-      <img className={classes.emptyImg} src={empty_status} height="167px" />
+    <Box
+      sx={{
+        height: '249px',
+        justifyContent: 'center',
+        alignContent: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <img src={empty_status} height="167px" style={{ margin: '0 auto auto auto' }} />
       <Typography
         sx={{
           fontSize: '16px',

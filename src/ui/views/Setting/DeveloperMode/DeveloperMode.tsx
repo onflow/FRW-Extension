@@ -10,83 +10,12 @@ import {
   FormControlLabel,
   Fade,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { styled } from '@mui/system';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { storage } from '@/background/webapi';
 import { LLHeader } from '@/ui/components';
 import { useWallet } from 'ui/utils';
-
-const useStyles = makeStyles(() => ({
-  arrowback: {
-    borderRadius: '100%',
-    margin: '8px',
-  },
-  iconbox: {
-    position: 'sticky',
-    top: 0,
-    // width: '100%',
-    backgroundColor: '#121212',
-    margin: 0,
-    padding: 0,
-  },
-  developerTitle: {
-    zIndex: 20,
-    textAlign: 'center',
-    top: 0,
-    position: 'sticky',
-  },
-  developerBox: {
-    width: 'auto',
-    height: 'auto',
-    margin: '10px 20px',
-    backgroundColor: '#282828',
-    padding: '24px 20px',
-    display: 'flex',
-    flexDirection: 'row',
-    borderRadius: '16px',
-    alignContent: 'space-between',
-  },
-
-  gasBox: {
-    width: '90%',
-    margin: '10px auto',
-    backgroundColor: '#282828',
-    padding: '20px 24px',
-    display: 'flex',
-    flexDirection: 'row',
-    borderRadius: '16px',
-    alignContent: 'space-between',
-    gap: '8px',
-  },
-
-  radioBox: {
-    width: '90%',
-    borderRadius: '16px',
-    backgroundColor: '#282828',
-    margin: '20px auto',
-    // padding: '10px 24px',
-  },
-  checkboxRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignContent: 'space-between',
-    justifyContent: 'space-between',
-    padding: '20px 24px',
-    alignItems: 'center',
-  },
-  modeSelection: {
-    width: '100%',
-    height: '100%',
-    padding: 0,
-    margin: 0,
-    borderRadius: '16px',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-}));
 
 const orange = {
   500: '#41CC5D',
@@ -168,7 +97,6 @@ const Root = styled('span')(
 
 const DeveloperMode = () => {
   const usewallet = useWallet();
-  const classes = useStyles();
   const [developerModeOn, setDeveloperModeOn] = useState(false);
   const [emulatorFeatureEnabled, setEmulatorFeatureEnabled] = useState(false);
   const [emulatorModeOn, setEmulatorModeOn] = useState(false);
@@ -243,7 +171,19 @@ const DeveloperMode = () => {
     <div className="page">
       <LLHeader title={chrome.i18n.getMessage('Developer__Settings')} help={false} />
 
-      <Box className={classes.developerBox}>
+      <Box
+        sx={{
+          width: 'auto',
+          height: 'auto',
+          margin: '10px 20px',
+          backgroundColor: '#282828',
+          padding: '24px 20px',
+          display: 'flex',
+          flexDirection: 'row',
+          borderRadius: '16px',
+          alignContent: 'space-between',
+        }}
+      >
         <Typography variant="body1" color="neutral.contrastText" style={{ weight: 600 }}>
           {chrome.i18n.getMessage('Developer__Mode')}
         </Typography>
@@ -260,7 +200,19 @@ const DeveloperMode = () => {
       <Fade in={developerModeOn}>
         <Box sx={{ pb: '20px' }}>
           {emulatorFeatureEnabled && (
-            <Box className={classes.developerBox}>
+            <Box
+              sx={{
+                width: 'auto',
+                height: 'auto',
+                margin: '10px 20px',
+                backgroundColor: '#282828',
+                padding: '24px 20px',
+                display: 'flex',
+                flexDirection: 'row',
+                borderRadius: '16px',
+                alignContent: 'space-between',
+              }}
+            >
               <Typography variant="body1" color="neutral.contrastText" style={{ weight: 600 }}>
                 {chrome.i18n.getMessage('Emulator_Mode')}
               </Typography>
@@ -285,12 +237,37 @@ const DeveloperMode = () => {
           >
             {chrome.i18n.getMessage('Switch__Network')}
           </Typography>
-          <Box className={classes.radioBox}>
+          <Box
+            sx={{
+              width: '90%',
+              borderRadius: '16px',
+              backgroundColor: '#282828',
+              margin: '20px auto',
+            }}
+          >
             <CardActionArea
-              className={classes.modeSelection}
+              sx={{
+                width: '100%',
+                height: '100%',
+                padding: 0,
+                margin: 0,
+                borderRadius: '16px',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
               onClick={() => switchNetwork('mainnet')}
             >
-              <Box className={classes.checkboxRow}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignContent: 'space-between',
+                  justifyContent: 'space-between',
+                  padding: '20px 24px',
+                  alignItems: 'center',
+                }}
+              >
                 <FormControlLabel
                   label={chrome.i18n.getMessage('Mainnet')}
                   control={
@@ -321,10 +298,28 @@ const DeveloperMode = () => {
             <Divider sx={{ width: '90%', margin: '0 auto' }} />
 
             <CardActionArea
-              className={classes.modeSelection}
+              sx={{
+                width: '100%',
+                height: '100%',
+                padding: 0,
+                margin: 0,
+                borderRadius: '16px',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
               onClick={() => switchNetwork('testnet')}
             >
-              <Box className={classes.checkboxRow}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignContent: 'space-between',
+                  justifyContent: 'space-between',
+                  padding: '20px 24px',
+                  alignItems: 'center',
+                }}
+              >
                 <FormControlLabel
                   label={chrome.i18n.getMessage('Testnet')}
                   control={
@@ -363,12 +358,37 @@ const DeveloperMode = () => {
           >
             {chrome.i18n.getMessage('Transaction__Monitor')}
           </Typography>
-          <Box className={classes.radioBox}>
+          <Box
+            sx={{
+              width: '90%',
+              borderRadius: '16px',
+              backgroundColor: '#282828',
+              margin: '20px auto',
+            }}
+          >
             <CardActionArea
-              className={classes.modeSelection}
+              sx={{
+                width: '100%',
+                height: '100%',
+                padding: 0,
+                margin: 0,
+                borderRadius: '16px',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
               onClick={() => switchMonitor('flowscan')}
             >
-              <Box className={classes.checkboxRow}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignContent: 'space-between',
+                  justifyContent: 'space-between',
+                  padding: '20px 24px',
+                  alignItems: 'center',
+                }}
+              >
                 <FormControlLabel
                   label="Flowscan"
                   control={
@@ -399,10 +419,28 @@ const DeveloperMode = () => {
             <Divider sx={{ width: '90%', margin: '0 auto' }} />
 
             <CardActionArea
-              className={classes.modeSelection}
+              sx={{
+                width: '100%',
+                height: '100%',
+                padding: 0,
+                margin: 0,
+                borderRadius: '16px',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
               onClick={() => switchMonitor('source')}
             >
-              <Box className={classes.checkboxRow}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignContent: 'space-between',
+                  justifyContent: 'space-between',
+                  padding: '20px 24px',
+                  alignItems: 'center',
+                }}
+              >
                 <FormControlLabel
                   label={chrome.i18n.getMessage('Flow__view__source')}
                   control={
