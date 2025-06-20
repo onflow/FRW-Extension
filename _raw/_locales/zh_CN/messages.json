@@ -1523,5 +1523,8 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "开始"
+  },
+  "Add_Profile": {
+    "message": "添加新用户"
   }
 }

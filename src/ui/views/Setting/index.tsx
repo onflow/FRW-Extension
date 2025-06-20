@@ -1,7 +1,5 @@
 import AndroidIcon from '@mui/icons-material/Android';
 import AppleIcon from '@mui/icons-material/Apple';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import {
   List,
   ListItemText,
@@ -17,18 +15,27 @@ import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
+import { AboutIcon } from '@/ui/assets/icons/settings/About';
+import { AccountListIcon } from '@/ui/assets/icons/settings/AccountList';
+import { AddProfileIcon } from '@/ui/assets/icons/settings/AddProfile';
+import { AddressIcon } from '@/ui/assets/icons/settings/Address';
+import { BackupIcon } from '@/ui/assets/icons/settings/Backup';
+import { CurrencyIcon } from '@/ui/assets/icons/settings/Currency';
+import { DevicesIcon } from '@/ui/assets/icons/settings/Devices';
+import { DevmodeIcon } from '@/ui/assets/icons/settings/Devmode';
+import { EditIcon } from '@/ui/assets/icons/settings/Edit';
+import { MobileIcon } from '@/ui/assets/icons/settings/Mobile';
+import { SecurityIcon } from '@/ui/assets/icons/settings/Security';
 import { LLHeader } from '@/ui/components';
-import CoinsIcon from '@/ui/components/CoinsIcon';
-import IconAbout from '@/ui/components/iconfont/IconAbout';
-import IconAccount from '@/ui/components/iconfont/IconAccount';
-import IconAddressbook from '@/ui/components/iconfont/IconAddressbook';
 import IconEnd from '@/ui/components/iconfont/IconAVector11Stroke';
-import IconBackup from '@/ui/components/iconfont/IconBackup';
-import IconDeveloper from '@/ui/components/iconfont/IconDeveloper';
-import IconLock from '@/ui/components/iconfont/IconLock';
+import { SettingsListItem } from '@/ui/components/settings/list-item';
+import { useProfiles } from '@/ui/hooks/useProfileHook';
+import {
+  COLOR_WHITE_FFFFFF,
+  COLOR_WHITE_ALPHA_10_FFFFFF1A,
+  COLOR_WHITE_ALPHA_40_FFFFFF66,
+} from '@/ui/style/color';
 import { useWallet } from '@/ui/utils';
-import { ReactComponent as Device } from 'ui/assets/svg/device.svg';
-import { ReactComponent as IconLink } from 'ui/assets/svg/Iconlink.svg';
 // Feature flags
 const SHOW_DEVICES = false;
 
@@ -39,14 +46,6 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     width: '100%',
     paddingBottom: '8px',
-  },
-  listItem: {
-    height: '66px',
-    width: '100%',
-    overflow: 'hidden',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
   },
   itemButton: {
     width: '90%',
@@ -93,6 +92,7 @@ const useStyles = makeStyles(() => ({
 const SettingTab = () => {
   const classes = useStyles();
   const usewallet = useWallet();
+  const { profileIds, userInfo } = useProfiles();
   const [isActive, setIsActive] = useState(false);
   const [isKeyphrase, setIsKeyphrase] = useState(false);
 
@@ -114,167 +114,139 @@ const SettingTab = () => {
     <div className="page">
       <LLHeader title={chrome.i18n.getMessage('Settings')} help={false} />
       <div className={classes.listDiv}>
-        <List className={classes.list} sx={{ margin: '8px auto 16px auto', pt: 0, pb: 0 }}>
-          <ListItem
-            component={Link}
-            to="/dashboard/setting/account"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
+        {profileIds && profileIds.length > 1 && (
+          <List sx={{ margin: '8px auto 16px auto', pt: 0, pb: 0 }}>
+            <ListItem component={Link} to="/dashboard/setting/account" sx={{ padding: '0 18px' }}>
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <IconAccount size={18} color="#59A1DB" />
-                </Box>
+                <CardMedia
+                  component="img"
+                  image={userInfo?.avatar}
+                  alt={userInfo?.nickname}
+                  sx={{ width: '40px', height: '40px', borderRadius: '8px' }}
+                />
               </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Profile')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
+              <ListItemText
+                sx={{
+                  color: COLOR_WHITE_FFFFFF,
+                  fontFamily: 'Inter',
+                  fontSize: '14px',
+                  fontStyle: 'normal',
+                  fontWeight: 600,
+                  lineHeight: '120%',
+                  letterSpacing: '-0.084px',
+                  marginLeft: '16px',
+                }}
+              >
+                {userInfo?.nickname}
+              </ListItemText>
+              <ListItemIcon
+                aria-label="end"
+                sx={{
+                  minWidth: '40px',
+                  height: '40px',
+                  padding: '8px',
+                  borderRadius: '100%',
+                  backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '&:hover': {
+                    backgroundColor: COLOR_WHITE_ALPHA_40_FFFFFF66,
+                  },
+                  transition: 'background-color 0.2s ease',
+                }}
+              >
+                <EditIcon width={24} height={24} />
               </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-          <Divider sx={{ width: '90%' }} variant="middle" />
-          <ListItem
-            component={Link}
-            to="/dashboard/setting/changepassword"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <IconLock size={18} color="#59A1DB" />
-                </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Change__Password')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-        </List>
-        <List className={classes.list} sx={{ margin: '8px auto 16px auto', pt: 0, pb: 0 }}>
-          <ListItem
-            component={Link}
-            to="/dashboard/setting/wallet"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <CoinsIcon width={18} height={18} color="#59A1DB" />
-                </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Acc__list')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+            </ListItem>
+          </List>
+        )}
 
-          <Divider sx={{ width: '90%' }} variant="middle" />
-
-          <ListItem
-            component={Link}
-            to="/dashboard/setting/addressbook"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <IconAddressbook size={18} color="#59A1DB" />
-                </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Address__Book')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-
-          <Divider sx={{ width: '90%' }} variant="middle" />
-          {!isActive && (
+        {/* top link */}
+        <List className={classes.list} sx={{ margin: '8px auto 16px auto', padding: '0' }}>
+          <Box sx={{ display: 'flex', width: '100%' }}>
             <ListItem
               component={Link}
-              to="/dashboard/setting/linked"
+              to="/dashboard/setting/addressbook"
               disablePadding
-              className={classes.listItem}
+              sx={{ flex: 1 }}
             >
-              <ListItemButton className={classes.itemButton}>
-                <ListItemIcon sx={{ minWidth: '25px' }}>
-                  <Box className={classes.iconContainer}>
-                    <IconLink style={{ width: '18px', height: '18px', color: '#59A1DB' }} />
-                  </Box>
-                </ListItemIcon>
-                <ListItemText primary={chrome.i18n.getMessage('Linked_Account')} />
-                <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                  <IconEnd size={12} />
-                </ListItemIcon>
+              <ListItemButton
+                className={classes.itemButton}
+                sx={{
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  paddingY: '18px',
+                }}
+              >
+                <Box className={classes.iconContainer}>
+                  <AddressIcon width={28} height={28} />
+                </Box>
+                <ListItemText
+                  primary={chrome.i18n.getMessage('Address')}
+                  sx={{ textAlign: 'center', margin: '0' }}
+                />
               </ListItemButton>
             </ListItem>
-          )}
-
-          <Divider sx={{ width: '90%' }} variant="middle" />
-
-          <ListItem
-            component={Link}
-            to="/dashboard/setting/currency"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
+            <ListItem
+              component={Link}
+              to="/dashboard/setting/wallet"
+              disablePadding
+              sx={{ flex: 1 }}
+            >
+              <ListItemButton
+                className={classes.itemButton}
+                sx={{
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  paddingY: '18px',
+                }}
+              >
                 <Box className={classes.iconContainer}>
-                  <CurrencyExchangeIcon sx={{ width: '18px', height: '18px', color: '#59A1DB' }} />
+                  <AccountListIcon width={28} height={28} />
                 </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Display__Currency')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+                <ListItemText
+                  primary={chrome.i18n.getMessage('Acc__list')}
+                  sx={{ textAlign: 'center', margin: '0' }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Box>
+        </List>
+        <List className={classes.list} sx={{ margin: '8px auto 16px auto', pt: 0, pb: 0 }}>
+          <SettingsListItem
+            to="/dashboard/setting/currency"
+            icon={<CurrencyIcon width={24} height={24} />}
+            text={chrome.i18n.getMessage('Display__Currency')}
+            endIcon={<IconEnd size={12} />}
+          />
 
           {!isActive && <Divider sx={{ width: '90%' }} variant="middle" />}
           {isKeyphrase && (
-            <ListItem
-              component={Link}
+            <SettingsListItem
               to="/dashboard/setting/backups"
-              disablePadding
-              className={classes.listItem}
-            >
-              <ListItemButton className={classes.itemButton}>
-                <ListItemIcon sx={{ minWidth: '25px' }}>
-                  <Box className={classes.iconContainer}>
-                    <IconBackup size={18} color="#59A1DB" />
-                  </Box>
-                </ListItemIcon>
-                <ListItemText primary={chrome.i18n.getMessage('Backup')} />
-                <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                  <IconEnd size={12} />
-                </ListItemIcon>
-              </ListItemButton>
-            </ListItem>
+              icon={<BackupIcon width={24} height={24} />}
+              text={chrome.i18n.getMessage('Backup')}
+              endIcon={<IconEnd size={12} />}
+            />
           )}
+          <Divider sx={{ width: '90%' }} variant="middle" />
+          <SettingsListItem
+            to="/dashboard/setting/changepassword"
+            icon={<SecurityIcon width={24} height={24} />}
+            text={chrome.i18n.getMessage('Security')}
+            endIcon={<IconEnd size={12} />}
+          />
         </List>
-
         <List className={classes.list} sx={{ margin: '8px auto 18px auto', pt: 0, pb: 0 }}>
-          <ListItem
-            disablePadding
-            onClick={() => window.open('https://core.flow.com')}
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <PhoneIphoneIcon sx={{ color: '#59A1DB', width: '18px', height: '18px' }} />
-                </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Try_Our_Mobile_APP')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px', spacing: '8px' }}>
-                {/* <IconEnd size={12} /> */}
+          <SettingsListItem
+            to="https://core.flow.com"
+            icon={<MobileIcon width={24} height={24} />}
+            text={chrome.i18n.getMessage('Try_Our_Mobile_APP')}
+            endIcon={
+              <>
                 <IconButton
                   onClick={() =>
                     window.open(
@@ -293,79 +265,47 @@ const SettingTab = () => {
                 >
                   <AndroidIcon fontSize="small" color="disabled" />
                 </IconButton>
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+              </>
+            }
+          />
 
           <Divider sx={{ width: '90%' }} variant="middle" />
 
-          <ListItem
-            button
-            component={Link}
+          <SettingsListItem
             to="/dashboard/setting/developerMode"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <IconDeveloper size={18} color="#59A1DB" />
-                </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('Developer__Mode')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+            icon={<DevmodeIcon width={24} height={24} />}
+            text={chrome.i18n.getMessage('Developer__Mode')}
+            endIcon={<IconEnd size={12} />}
+          />
 
           <Divider sx={{ width: '90%' }} variant="middle" />
 
           {SHOW_DEVICES && (
             <>
-              <ListItem
-                button
-                component={Link}
+              <SettingsListItem
                 to="/dashboard/setting/devices"
-                disablePadding
-                className={classes.listItem}
-              >
-                <ListItemButton className={classes.itemButton}>
-                  <ListItemIcon sx={{ minWidth: '25px' }}>
-                    <Box className={classes.iconContainer}>
-                      <Device style={{ width: '18px', height: '18px', color: '#59A1DB' }} />
-                    </Box>
-                  </ListItemIcon>
-                  <ListItemText primary={chrome.i18n.getMessage('Devices')} />
-                  <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                    <IconEnd size={12} />
-                  </ListItemIcon>
-                </ListItemButton>
-              </ListItem>
-
+                icon={<DevicesIcon width={24} height={24} />}
+                text={chrome.i18n.getMessage('Devices')}
+                endIcon={<IconEnd size={12} />}
+              />
               <Divider sx={{ width: '90%' }} variant="middle" />
             </>
           )}
 
-          <ListItem
-            button
-            component={Link}
+          <SettingsListItem
             to="/dashboard/setting/about"
-            disablePadding
-            className={classes.listItem}
-          >
-            <ListItemButton className={classes.itemButton}>
-              <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
-                  <IconAbout size={18} color="#59A1DB" />
-                </Box>
-              </ListItemIcon>
-              <ListItemText primary={chrome.i18n.getMessage('About')} />
-              <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
-                <IconEnd size={12} />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
+            icon={<AboutIcon width={24} height={24} />}
+            text={chrome.i18n.getMessage('About')}
+            endIcon={<IconEnd size={12} />}
+          />
+        </List>
+        <List className={classes.list} sx={{ margin: '8px auto 18px auto', pt: 0, pb: 0 }}>
+          <SettingsListItem
+            to="/dashboard/setting"
+            icon={<AddProfileIcon width={24} height={24} />}
+            text={chrome.i18n.getMessage('Add_Profile')}
+            endIcon={<IconEnd size={12} />}
+          />
         </List>
       </div>
     </div>

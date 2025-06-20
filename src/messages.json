@@ -1535,5 +1535,8 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "Get Started"
+  },
+  "Add_Profile": {
+    "message": "Add new profile"
   }
 }

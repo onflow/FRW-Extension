@@ -1526,5 +1526,8 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "はじめる"
+  },
+  "Add_Profile": {
+    "message": "新しいプロファイルを追加"
   }
 }

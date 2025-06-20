@@ -40,7 +40,6 @@ import PrivateKeyPassword from './Setting/privatekey/Privatekeypassword';
 import RecoveryPhasesDetail from './Setting/recoveryphase/Recoveryphasedetail';
 import Recoveryphrasepassword from './Setting/recoveryphase/Recoveryphrasepassword';
 import Security from './Setting/Security';
-import Settingone from './Setting/Settingone';
 import Switchaccount from './Setting/Switchaccount';
 import './Landing.css';
 import WalletList from './Setting/Wallet';
@@ -117,9 +116,6 @@ const InnerRoute = (props: RouteComponentProps) => {
             </PrivateRoute>
             <PrivateRoute path={`${props.match.url}/setting/addressbook`}>
               <AddressBook />
-            </PrivateRoute>
-            <PrivateRoute path={`${props.match.url}/nested/settingone`}>
-              <Settingone />
             </PrivateRoute>
             <PrivateRoute path={`${props.match.url}/nested/security`}>
               <Security />

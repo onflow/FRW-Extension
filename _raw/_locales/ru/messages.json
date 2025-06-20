@@ -1526,5 +1526,8 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "Начать"
+  },
+  "Add_Profile": {
+    "message": "Добавить новый профиль"
   }
 }
