@@ -1,4 +1,3 @@
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Switch, withRouter, type RouteComponentProps } from 'react-router-dom';
 
@@ -50,22 +49,7 @@ import TokenDetail from './TokenDetail';
 import TokenList from './TokenList';
 import AddCustomEvmToken from './Wallet/AddCustom/AddCustomEvmToken';
 
-const useStyles = makeStyles(() => ({
-  innerWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: '100%',
-  },
-  mainBody: {
-    flex: 1,
-    overflowY: 'scroll',
-    height: '100%',
-  },
-}));
-
 const InnerRoute = (props: RouteComponentProps) => {
-  const classes = useStyles();
   const [value, setValue] = useState(0);
 
   const usewallet = useWallet();
@@ -107,7 +91,14 @@ const InnerRoute = (props: RouteComponentProps) => {
 
   return (
     <React.Fragment>
-      <div className={classes.innerWrapper}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100%',
+        }}
+      >
         <Header />
 
         <div id="scrollableTab" style={{ flex: 1, overflowY: 'scroll' }}>

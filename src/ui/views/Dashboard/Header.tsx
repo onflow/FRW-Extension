@@ -13,7 +13,6 @@ import {
 import Box from '@mui/material/Box';
 import { StyledEngineProvider } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -32,23 +31,9 @@ import NewsView from './Components/NewsView';
 import Popup from './Components/Popup';
 import SwitchAccountCover from './Components/SwitchAccountCover';
 
-const useStyles = makeStyles(() => ({
-  appBar: {
-    zIndex: 1399,
-  },
-  paper: {
-    background: '#282828',
-  },
-  active: {
-    background: '#BABABA14',
-    borderRadius: '12px',
-  },
-}));
-
 const Header = ({ _loading = false }) => {
   const usewallet = useWallet();
   const walletLoaded = useWalletLoaded();
-  const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
 
@@ -198,13 +183,13 @@ const Header = ({ _loading = false }) => {
         open={showNewsDrawer}
         anchor="top"
         onClose={toggleNewsDrawer}
-        classes={{ paper: classes.paper }}
         PaperProps={{
           sx: {
             width: '100%',
             marginTop: '56px',
             marginBottom: '144px',
             bgcolor: 'background.paper',
+            background: '#282828',
           },
         }}
       >
@@ -376,7 +361,7 @@ const Header = ({ _loading = false }) => {
   return (
     <StyledEngineProvider injectFirst>
       <SwitchAccountCover open={switchLoading} />
-      <AppBar position="relative" className={classes.appBar} elevation={0}>
+      <AppBar position="relative" sx={{ zIndex: 1399 }} elevation={0}>
         <Toolbar sx={{ px: '12px', backgroundColor: '#282828' }}>
           {walletList && (
             <MenuDrawer

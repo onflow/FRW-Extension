@@ -8,8 +8,9 @@ import {
   Container,
   Grid,
   Box,
+  Divider,
+  IconButton,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -23,6 +24,7 @@ import { useWallet } from '@/ui/utils/WalletContext';
 import placeholder from 'ui/assets/image/placeholder.png';
 
 import EmptyStatus from '../EmptyStatus';
+
 interface ListTabProps {
   data: any;
   setCount: (count: any) => void;
@@ -37,49 +39,6 @@ interface State {
   isCollectionEmpty: boolean;
   ownerAddress: string;
 }
-
-const useStyles = makeStyles(() => ({
-  collectionContainer: {
-    width: '100%',
-    justifyContent: 'center',
-    padding: '0 8px',
-  },
-  collectionCard: {
-    display: 'flex',
-    width: '100%',
-    height: '64px',
-    margin: '12px auto',
-    boxShadow: 'none',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
-    borderRadius: '12px',
-  },
-  skeletonCard: {
-    display: 'flex',
-    width: '100%',
-    height: '72px',
-    margin: '12px auto',
-    boxShadow: 'none',
-    padding: 'auto',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
-    borderRadius: '12px',
-  },
-  collectionImg: {
-    borderRadius: '12px',
-    width: '48px',
-    padding: '8px',
-  },
-  arrow: {
-    position: 'absolute',
-    top: 0,
-  },
-  actionarea: {
-    width: '100%',
-    height: '100%',
-    '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    },
-  },
-}));
 
 const CollectionView = ({
   name,
@@ -99,7 +58,6 @@ const CollectionView = ({
   isAccessible: boolean;
 }) => {
   const history = useHistory();
-  const classes = useStyles();
 
   const handleClick = () => {
     history.push({
@@ -114,15 +72,27 @@ const CollectionView = ({
   return (
     <Card
       key={name}
-      sx={{ borderRadius: '12px', backgroundColor: '#000000' }}
-      className={classes.collectionCard}
+      sx={{
+        borderRadius: '12px',
+        backgroundColor: '#000000',
+        display: 'flex',
+        width: '100%',
+        height: '64px',
+        margin: '12px auto',
+        boxShadow: 'none',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+      }}
     >
       <CardActionArea
         sx={{
           borderRadius: '12px',
           paddingRight: '8px',
+          width: '100%',
+          height: '100%',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          },
         }}
-        className={classes.actionarea}
         onClick={isAccessible ? handleClick : undefined}
       >
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -203,7 +173,6 @@ const checkContractAddressInCollections = (
 
 const ListTab = forwardRef((props: ListTabProps, ref) => {
   const history = useHistory();
-  const classes = useStyles();
   const usewallet = useWallet();
 
   const { currentWallet } = useProfiles();
@@ -221,7 +190,13 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
   }));
 
   return (
-    <Container className={classes.collectionContainer}>
+    <Container
+      sx={{
+        width: '100%',
+        justifyContent: 'center',
+        padding: '0 8px',
+      }}
+    >
       {collectionLoading ? (
         <ListSkeleton />
       ) : isCollectionEmpty ? (

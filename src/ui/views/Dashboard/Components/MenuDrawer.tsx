@@ -11,7 +11,6 @@ import {
   Skeleton,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -34,19 +33,6 @@ import userCircleGear from '../../../assets/svg/user-circle-gear.svg';
 import ErrorModel from '../../../components/PopupModal/errorModel';
 
 import AddAccountPopup from './AddAccountPopup';
-
-const useStyles = makeStyles(() => ({
-  menuDrawer: {
-    zIndex: '1400 !important',
-  },
-  paper: {
-    background: '#0A0A0B',
-  },
-  active: {
-    background: '#BABABA14',
-    borderRadius: '12px',
-  },
-}));
 
 interface MenuDrawerProps {
   drawer: boolean;
@@ -76,7 +62,6 @@ const MenuDrawer = ({
 }: MenuDrawerProps) => {
   const wallet = useWallet();
   const history = useHistory();
-  const classes = useStyles();
   const scrollRef = useRef<HTMLDivElement>(null);
   // Add Account Drawer
   const [showAddAccount, setShowAddAccount] = useState(false);
@@ -134,9 +119,14 @@ const MenuDrawer = ({
     <Drawer
       open={drawer}
       onClose={toggleDrawer}
-      className={classes.menuDrawer}
-      classes={{ paper: classes.paper }}
-      PaperProps={{ sx: { width: '75%', maxWidth: '400px' } }}
+      sx={{ zIndex: '1400 !important' }}
+      PaperProps={{
+        sx: {
+          width: '75%',
+          maxWidth: '400px',
+          background: '#0A0A0B',
+        },
+      }}
     >
       <List
         sx={{
