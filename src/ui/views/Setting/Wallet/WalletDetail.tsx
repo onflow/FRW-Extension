@@ -14,7 +14,6 @@ import {
   CardMedia,
 } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
-import { makeStyles } from '@mui/styles';
 import { styled } from '@mui/system';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -37,105 +36,6 @@ import editEmoji from '../../../assets/svg/editEmoji.svg';
 
 import EditProfile from './EditProfile';
 
-const useStyles = makeStyles(() => ({
-  arrowback: {
-    borderRadius: '100%',
-    margin: '8px',
-  },
-  iconbox: {
-    position: 'sticky',
-    top: 0,
-    // width: '100%',
-    backgroundColor: '#121212',
-    margin: 0,
-    padding: 0,
-  },
-  developerTitle: {
-    zIndex: 20,
-    textAlign: 'center',
-    top: 0,
-    position: 'sticky',
-  },
-  anonymousBox: {
-    width: '90%',
-    // height: '67px',
-    margin: '10px auto',
-    backgroundColor: '#282828',
-    padding: '20px 24px',
-    display: 'flex',
-    flexDirection: 'row',
-    borderRadius: '16px',
-    alignContent: 'space-between',
-    gap: '8px',
-  },
-  radioBox: {
-    width: '90%',
-    borderRadius: '16px',
-    backgroundColor: '#282828',
-    margin: '20px auto',
-    // padding: '10px 24px',
-  },
-  checkboxRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignContent: 'space-between',
-    justifyContent: 'space-between',
-    padding: '20px 24px',
-  },
-  listItem: {
-    height: '66px',
-    width: '100%',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-  itemButton: {
-    width: '90%',
-    height: '100%',
-    margin: '0 auto',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-  list: {
-    // width: '90%',
-    borderRadius: '16px',
-    padding: '0 10px',
-    overflow: 'hidden',
-    backgroundColor: '#282828',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-  noBorder: {
-    border: 'none',
-  },
-  walletname: {
-    width: '90%',
-    borderRadius: '16px',
-    padding: '20px',
-    margin: '20px auto',
-    backgroundColor: '#282828',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  gasBox: {
-    // width: '90%',
-    margin: '10px auto',
-    backgroundColor: '#282828',
-    padding: '20px 24px',
-    display: 'flex',
-    flexDirection: 'row',
-    borderRadius: '16px',
-    alignContent: 'space-between',
-    gap: '8px',
-  },
-}));
-
 const orange = {
   500: '#41CC5D',
 };
@@ -153,7 +53,6 @@ const Root = styled('span')(
     display: inline-block;
     width: 40px;
     height: 20px;
-    // margin: 0;
     margin-left: auto;
     cursor: pointer;
 
@@ -234,7 +133,6 @@ function formatStorageInfo(used: number | undefined, capacity: number | undefine
 }
 
 const WalletDetail = () => {
-  const classes = useStyles();
   const wallet = useWallet();
   const location = useLocation();
   const address = new URLSearchParams(location.search).get('address') || '';
@@ -344,13 +242,41 @@ const WalletDetail = () => {
         }}
       >
         <Box>
-          <List className={classes.list} sx={{ margin: '8px auto 8px auto', pt: 0, pb: 0 }}>
+          <List
+            sx={{
+              borderRadius: '16px',
+              padding: '0 10px',
+              overflow: 'hidden',
+              backgroundColor: '#282828',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+              margin: '8px auto 8px auto',
+              pt: 0,
+              pb: 0,
+            }}
+          >
             <ListItem
               disablePadding
-              className={classes.listItem}
+              sx={{
+                height: '66px',
+                width: '100%',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
               onClick={() => toggleEditProfile()}
             >
-              <ListItemButton className={classes.itemButton}>
+              <ListItemButton
+                sx={{
+                  width: '90%',
+                  height: '100%',
+                  margin: '0 auto',
+                  '&:hover': {
+                    backgroundColor: '#282828',
+                  },
+                }}
+              >
                 <Box
                   sx={{
                     display: 'flex',
@@ -390,15 +316,43 @@ const WalletDetail = () => {
           </List>
           {userWallet && !isValidEthereumAddress(userWallet.address) && (
             <>
-              <List className={classes.list} sx={{ margin: '8px auto 8px auto', pt: 0, pb: 0 }}>
+              <List
+                sx={{
+                  borderRadius: '16px',
+                  padding: '0 10px',
+                  overflow: 'hidden',
+                  backgroundColor: '#282828',
+                  '&:hover': {
+                    backgroundColor: '#282828',
+                  },
+                  margin: '8px auto 8px auto',
+                  pt: 0,
+                  pb: 0,
+                }}
+              >
                 <ListItem
                   button
                   component={Link}
                   to="/dashboard/nested/privatekeypassword"
                   disablePadding
-                  className={classes.listItem}
+                  sx={{
+                    height: '66px',
+                    width: '100%',
+                    '&:hover': {
+                      backgroundColor: '#282828',
+                    },
+                  }}
                 >
-                  <ListItemButton className={classes.itemButton}>
+                  <ListItemButton
+                    sx={{
+                      width: '90%',
+                      height: '100%',
+                      margin: '0 auto',
+                      '&:hover': {
+                        backgroundColor: '#282828',
+                      },
+                    }}
+                  >
                     <ListItemText primary={chrome.i18n.getMessage('Private__Key')} />
                     <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
                       <IconEnd size={12} />
@@ -413,9 +367,24 @@ const WalletDetail = () => {
                     component={Link}
                     to="/dashboard/nested/recoveryphrasepassword"
                     disablePadding
-                    className={classes.listItem}
+                    sx={{
+                      height: '66px',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: '#282828',
+                      },
+                    }}
                   >
-                    <ListItemButton className={classes.itemButton}>
+                    <ListItemButton
+                      sx={{
+                        width: '90%',
+                        height: '100%',
+                        margin: '0 auto',
+                        '&:hover': {
+                          backgroundColor: '#282828',
+                        },
+                      }}
+                    >
                       <ListItemText primary={chrome.i18n.getMessage('Recovery__Phrase')} />
                       <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
                         <IconEnd size={12} />
@@ -426,15 +395,43 @@ const WalletDetail = () => {
               </List>
 
               <Box>
-                <List className={classes.list} sx={{ margin: '8px auto 8px auto', pt: 0, pb: 0 }}>
+                <List
+                  sx={{
+                    borderRadius: '16px',
+                    padding: '0 10px',
+                    overflow: 'hidden',
+                    backgroundColor: '#282828',
+                    '&:hover': {
+                      backgroundColor: '#282828',
+                    },
+                    margin: '8px auto 8px auto',
+                    pt: 0,
+                    pb: 0,
+                  }}
+                >
                   <ListItem
                     button
                     component={Link}
                     to={`/dashboard/nested/keylist?address=${address}`}
                     disablePadding
-                    className={classes.listItem}
+                    sx={{
+                      height: '66px',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: '#282828',
+                      },
+                    }}
                   >
-                    <ListItemButton className={classes.itemButton}>
+                    <ListItemButton
+                      sx={{
+                        width: '90%',
+                        height: '100%',
+                        margin: '0 auto',
+                        '&:hover': {
+                          backgroundColor: '#282828',
+                        },
+                      }}
+                    >
                       <ListItemText primary={'Account Keys'} />
                       <ListItemIcon aria-label="end" sx={{ minWidth: '15px' }}>
                         <IconEnd size={12} />
@@ -444,7 +441,18 @@ const WalletDetail = () => {
                 </List>
               </Box>
 
-              <Box className={classes.gasBox}>
+              <Box
+                sx={{
+                  margin: '10px auto',
+                  backgroundColor: '#282828',
+                  padding: '20px 24px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  borderRadius: '16px',
+                  alignContent: 'space-between',
+                  gap: '8px',
+                }}
+              >
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="body1" color="neutral.contrastText" style={{ weight: 600 }}>
                     {chrome.i18n.getMessage('Free__Gas__Fee')}
@@ -471,7 +479,18 @@ const WalletDetail = () => {
                 />
               </Box>
               {!!storageInfo /* TODO: remove this after the storage usage card is implemented */ && (
-                <Box className={classes.gasBox}>
+                <Box
+                  sx={{
+                    margin: '10px auto',
+                    backgroundColor: '#282828',
+                    padding: '20px 24px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    borderRadius: '16px',
+                    alignContent: 'space-between',
+                    gap: '8px',
+                  }}
+                >
                   <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                     <Typography
                       variant="body1"

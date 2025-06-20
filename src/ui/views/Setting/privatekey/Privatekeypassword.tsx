@@ -1,6 +1,5 @@
 import { Typography, Button, Fade, Input, FormControl } from '@mui/material';
 import Box from '@mui/material/Box';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
@@ -9,28 +8,6 @@ import CancelIcon from '@/ui/components/iconfont/IconClose';
 import SettingsPassword from '@/ui/components/SettingsPassword';
 import SlideRelative from '@/ui/components/SlideRelative';
 import { useWallet } from 'ui/utils';
-
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    // magrinBottom: '64px',
-    zIndex: '999',
-    backgroundColor: '#121212',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
 
 const PrivateKeyPassword = () => {
   return (
