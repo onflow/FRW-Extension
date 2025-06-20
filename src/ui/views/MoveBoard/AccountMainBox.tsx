@@ -1,5 +1,4 @@
 import { Typography, Box, CardMedia, Avatar } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { type Contact } from '@/shared/types/network-types';
@@ -9,6 +8,7 @@ import { useProfiles } from '@/ui/hooks/useProfileHook';
 import accountMove from 'ui/assets/svg/accountMove.svg';
 import { FWMoveDropdown } from 'ui/components';
 import { useWallet } from 'ui/utils';
+
 const USER_CONTACT = {
   contact_name: '',
   avatar: '',

@@ -1,6 +1,5 @@
 import { MenuItem, Select, Typography, Tooltip, Button, Box } from '@mui/material';
 import { styled, StyledEngineProvider } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import QRCodeStyling from 'qr-code-styling';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -14,30 +13,6 @@ import { LLHeader } from 'ui/components';
 import { useWallet } from 'ui/utils';
 
 import TestnetWarning from './TestnetWarning';
-
-const useStyles = makeStyles((theme) => ({
-  page: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'black',
-  },
-  container: {
-    padding: '0 18px',
-    width: '100%',
-  },
-  addressDropdown: {
-    height: '56px',
-    borderRadius: '16px',
-    backgroundColor: '#282828',
-    color: 'white',
-    width: '100%',
-    '&.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline': {
-      border: 'none',
-    },
-  },
-}));
 
 const CopyIconWrapper = styled('div')(() => ({
   position: 'absolute',
@@ -101,7 +76,6 @@ const qrCode = new QRCodeStyling({
 });
 
 const Deposit = () => {
-  const classes = useStyles();
   const usewallet = useWallet();
   const ref = useRef<HTMLDivElement>(null);
   const { currentWalletList, currentWallet, activeAccountType } = useProfiles();
@@ -143,14 +117,32 @@ const Deposit = () => {
 
   return (
     <StyledEngineProvider injectFirst>
-      <div className={`${classes.page} page`}>
+      <Box
+        className="page"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'black',
+        }}
+      >
         <NetworkIndicator network={network} emulatorMode={emulatorModeOn} />
         <LLHeader title={chrome.i18n.getMessage('')} help={false} />
-        <div className={classes.container}>
+        <Box sx={{ padding: '0 18px', width: '100%' }}>
           {currentWalletList && (
             <SelectContainer>
               <Select
-                className={classes.addressDropdown}
+                sx={{
+                  height: '56px',
+                  borderRadius: '16px',
+                  backgroundColor: '#282828',
+                  color: 'white',
+                  width: '100%',
+                  '&.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                }}
                 value={localWalletIndex}
                 onChange={(e) => setLocalWalletIndex(Number(e.target.value))}
                 displayEmpty
@@ -241,8 +233,8 @@ const Deposit = () => {
               </Typography>
             </Box>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
     </StyledEngineProvider>
   );
 };

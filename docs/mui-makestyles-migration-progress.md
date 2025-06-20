@@ -36,14 +36,14 @@ Migration from @mui/styles (makeStyles) to sx API as part of MUI v5 to v6 upgrad
 - `/src/ui/views/InnerRoute.tsx`
 - `/src/ui/views/Setting/index.tsx`
 
-### 🔄 Phase 4: NFT Components (9 files) - PENDING
+### ✅ Phase 4: NFT Components (9 files) - COMPLETED
 
-- `/src/ui/views/NFT/CollectionDetail.tsx`
+- `/src/ui/views/NFT/CollectionDetail.tsx` - Removed unused makeStyles
 - `/src/ui/views/NFT/Detail.tsx`
 - `/src/ui/views/NFT/ListTab.tsx`
 - `/src/ui/views/NFT/NFTList/AddList.tsx`
 - `/src/ui/views/NFT/SendNFT/SendToAddress.tsx`
-- `/src/ui/views/NftEvm/CollectionDetail.tsx`
+- `/src/ui/views/NftEvm/CollectionDetail.tsx` - Removed unused makeStyles
 - `/src/ui/views/NftEvm/Detail.tsx`
 - `/src/ui/views/NftEvm/ListTab.tsx`
 - `/src/ui/views/NftEvm/SendNFT/SendToAddress.tsx`
@@ -76,9 +76,14 @@ Migration from @mui/styles (makeStyles) to sx API as part of MUI v5 to v6 upgrad
 ## Summary
 
 - **Total Files**: ~50
-- **Completed**: 21 files
-- **Remaining**: ~29 files
-- **Progress**: ~42%
+- **Completed**: 30 files
+- **Remaining**: ~20 files
+- **Progress**: ~60%
+
+## Commits
+
+1. Phase 1 & 2: "refactor(935): migrate Phase 1 & 2 components from makeStyles to sx API"
+2. Phase 3 & 4: "refactor: migrate Phase 3 & 4 components from makeStyles to sx API"
 
 ## Key Changes Made
 

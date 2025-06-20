@@ -1,7 +1,6 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, MenuItem, Typography, IconButton, Drawer } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
@@ -28,26 +27,7 @@ import ClaimTokenCard from './ClaimTokenCard';
 import StackingCard from './StackingCard';
 import TokenInfoCard from './TokenInfoCard';
 
-const useStyles = makeStyles(() => ({
-  page: {
-    width: '100%',
-    height: '100%',
-    overflow: 'auto',
-    backgroundColor: 'black',
-  },
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    padding: '0 18px',
-    paddingTop: '0px',
-    width: '100%',
-    paddingBottom: '18px',
-  },
-}));
-
 const TokenDetail = () => {
-  const classes = useStyles();
   const usewallet = useWallet();
   const history = useHistory();
   // Get the token name and id from the url
@@ -192,8 +172,25 @@ const TokenDetail = () => {
   }, [activeAccountType, currentWallet.address, tokenInfo, usewallet]);
 
   return (
-    <Box className={classes.page}>
-      <Box className={classes.container}>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        overflow: 'auto',
+        backgroundColor: 'black',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          padding: '0 18px',
+          paddingTop: '0px',
+          width: '100%',
+          paddingBottom: '18px',
+        }}
+      >
         <Header />
         {!canAccessFt && (
           <Box
