@@ -140,7 +140,6 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
       setErrorMessage(request.errorMessage);
       setErrorCode(request.errorCode);
     }
-    return true;
   }, []);
 
   useEffect(() => {
@@ -149,7 +148,7 @@ const MoveFromChild = (props: SendNFTConfirmationProps) => {
     return () => {
       chrome.runtime.onMessage.removeListener(transactionDoneHandler);
     };
-  }, [props.data.contact, transactionDoneHandler]);
+  }, [props?.data?.contact, transactionDoneHandler]);
 
   const getChildResp = useCallback(async () => {
     const walletList = [...mainAccountContact, ...childAccountsContacts, ...evmAccounts];

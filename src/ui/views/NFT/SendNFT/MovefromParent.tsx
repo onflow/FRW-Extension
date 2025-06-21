@@ -139,7 +139,6 @@ const MovefromParent = (props: SendNFTConfirmationProps) => {
       setErrorMessage(request.errorMessage);
       setErrorCode(request.errorCode);
     }
-    return true;
   }, []);
 
   useEffect(() => {
@@ -148,7 +147,7 @@ const MovefromParent = (props: SendNFTConfirmationProps) => {
     return () => {
       chrome.runtime.onMessage.removeListener(transactionDoneHandler);
     };
-  }, [props.data.contact, transactionDoneHandler]);
+  }, [props?.data?.contact, transactionDoneHandler]);
 
   const getChildResp = useCallback(async () => {
     // Merge usewallet lists

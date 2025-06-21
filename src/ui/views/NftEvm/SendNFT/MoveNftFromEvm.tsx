@@ -128,13 +128,11 @@ const MoveNftFromEvm = (props: SendNFTConfirmationProps) => {
   };
 
   const transactionDoneHandler = useCallback((request) => {
-    // Handle error
     if (request.msg === 'transactionError') {
       setFailed(true);
       setErrorMessage(request.errorMessage);
       setErrorCode(request.errorCode);
     }
-    return true;
   }, []);
 
   useEffect(() => {

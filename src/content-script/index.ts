@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid';
 import { v4 as uuid } from 'uuid';
 
-import { consoleLog } from '@/shared/utils/console-log';
 import { Message } from '@/shared/utils/messaging';
 
 const channelName = nanoid();
@@ -17,11 +16,6 @@ const injectProviderScript = (isDefaultWallet: boolean) => {
   localStorage.setItem(`${channelPrefix}isDefaultWallet`, isDefaultWallet.toString());
   localStorage.setItem(`${channelPrefix}uuid`, uuid());
   localStorage.setItem(`${channelPrefix}extensionId`, extensionId);
-
-  consoleLog(
-    'injectProviderScript get channelName',
-    localStorage.getItem(`${channelPrefix}channelName`)
-  );
 
   const container = document.head || document.documentElement;
   const scriptElement = document.createElement('script');
@@ -129,8 +123,6 @@ const extMessageHandler = (msg, _sender) => {
       window.postMessage(JSON.parse(JSON.stringify(msg || {})), '*');
     }
   }
-
-  return true;
 };
 
 /**

@@ -98,28 +98,6 @@ const EthConnect = ({ params: { icon, name, origin } }: ConnectProps) => {
       });
   };
 
-  const transactionDoneHandler = useCallback(
-    async (request) => {
-      if (request.msg === 'transactionDone') {
-        const mainWallet = await usewallet.getParentAddress();
-        if (!mainWallet) {
-          throw new Error('Main wallet is undefined');
-        }
-      }
-      return true;
-    },
-    [usewallet]
-  );
-
-  useEffect(() => {
-    // Handle listenting for transactionDone event
-    chrome.runtime.onMessage.addListener(transactionDoneHandler);
-
-    return () => {
-      chrome.runtime.onMessage.removeListener(transactionDoneHandler);
-    };
-  }, [transactionDoneHandler]);
-
   const handleCancel = () => {
     // This is called when the user clicks the cancel button
     // This cancels the connection to the dApp

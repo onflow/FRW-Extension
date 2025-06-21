@@ -132,7 +132,6 @@ const TransferConfirmation = ({
       setErrorMessage(request.errorMessage);
       setErrorCode(request.errorCode);
     }
-    return true;
   }, []);
 
   useEffect(() => {

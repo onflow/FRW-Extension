@@ -11,12 +11,12 @@ import {
   Avatar,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { type ReactNode, useEffect, useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { type CoinItem } from '@/shared/types/coin-types';
 import { type ActiveAccountType } from '@/shared/types/wallet-types';
-import { formatLargeNumber } from '@/shared/utils/number';
+import { type ChildAccountFtStore } from '@/shared/utils/cache-data-keys';
 import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
@@ -76,7 +76,7 @@ const CoinList = ({
   isActive,
   activeAccountType,
 }: {
-  ableFt: any[];
+  ableFt: ChildAccountFtStore;
   isActive: boolean;
   activeAccountType: ActiveAccountType;
 }) => {
@@ -197,7 +197,7 @@ const CoinList = ({
             <Box sx={{ display: 'flex', gap: '3px' }}>
               {ableFt.some((item) => {
                 const parts = item.id.split('.');
-                return parts[2] && parts[2].includes(props.name);
+                return parts[2] && props.name && parts[2].includes(props.name);
               }) ||
               isActive ||
               props.id?.toLowerCase().includes('flowtoken') ? (

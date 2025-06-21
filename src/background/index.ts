@@ -425,7 +425,6 @@ const extMessageHandler = (msg, sender, sendResponse) => {
       });
   }
   sendResponse({ status: 'ok' });
-  // return true
 };
 
 /**

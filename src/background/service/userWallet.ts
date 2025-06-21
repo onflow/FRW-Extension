@@ -1638,6 +1638,7 @@ const initAccountLoaders = () => {
     async (network: string, addresses: string[]) => {
       // Load the balances for all addresses
       const balances = await loadAccountListBalance(network, addresses);
+
       // Convert to a record keyed by address
       const result: Record<string, string> = {};
       addresses.forEach((address, index) => {

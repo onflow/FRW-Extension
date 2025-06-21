@@ -3,7 +3,6 @@ import type { TransactionStatus } from '@onflow/typedefs';
 import openapiService, { type FlowTransactionResponse } from '@/background/service/openapi';
 import { type TransferItem } from '@/shared/types/transaction-types';
 import { isValidEthereumAddress, isValidFlowAddress } from '@/shared/utils/address';
-import { getCachedData } from '@/shared/utils/cache-data-access';
 import {
   transferListKey,
   type TransferListStore,
@@ -127,8 +126,6 @@ class Transaction {
       existingTxStore.count = existingTxStore.count + 1;
       await setCachedData(transferListKey(network, address), existingTxStore);
     }
-    // Send a message to the UI to update the transfer list
-    chrome.runtime.sendMessage({ msg: 'transferListUpdated' });
   };
 
   updatePending = async (
@@ -186,12 +183,12 @@ class Transaction {
       const storeItemIndex = existingTxStore.list.findIndex((item) => item.hash.includes(txId));
       if (storeItemIndex !== -1) {
         existingTxStore.list[storeItemIndex] = txItem;
+        existingTxStore.pendingCount = existingTxStore.list.filter(
+          (item) => item.status === 'PENDING'
+        ).length;
         await setCachedData(transferListKey(network, address), existingTxStore);
       }
     }
-
-    // Send a message to the UI to update the transfer list
-    chrome.runtime.sendMessage({ msg: 'transferListUpdated' });
 
     // Return the hash of the transaction
     return combinedTxHash;
@@ -297,7 +294,8 @@ class Transaction {
     this.setPendingList(network, address, existingPendingList);
     const transferListStore: TransferListStore = {
       count: data.total + existingPendingList.length,
-      pendingCount: existingPendingList.length,
+      // This is the number of transaction that are in progress
+      pendingCount: existingPendingList.filter((item) => item.status === 'PENDING').length,
       list: [...existingPendingList, ...txList],
     };
     await setCachedData(transferListKey(network, address, offset, limit), transferListStore);
