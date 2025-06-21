@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 import { parse } from '@babel/parser';
 import traverseDefault from '@babel/traverse';
-import glob from 'glob';
+import { glob } from 'glob';
 import webpack from 'webpack';
 
 import webpackConfig from '../webpack.config.js';

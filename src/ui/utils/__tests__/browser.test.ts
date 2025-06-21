@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest';
+
 import { isChromeOnly } from '../browser';
 
 describe('detect is chrome browser', () => {

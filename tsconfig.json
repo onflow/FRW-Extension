@@ -19,7 +19,7 @@
       "consts": ["./src/constant/index"]
     },
     "lib": ["ES2021.String", "DOM", "DOM.Iterable"],
-    "types": ["chrome", "node", "react", "react-dom", "jest"],
+    "types": ["chrome", "node", "react", "react-dom"],
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,

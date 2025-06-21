@@ -1,4 +1,3 @@
-import { keyBy } from 'lodash';
 import browser from 'webextension-polyfill';
 
 import BroadcastChannelMessage from './message/broadcastChannelMessage';

@@ -5,7 +5,6 @@ import { EventEmitter } from 'events';
 import * as bip39 from 'bip39';
 import encryptor from 'browser-passworder';
 import * as ethUtil from 'ethereumjs-util';
-import { P } from 'ts-toolbelt/out/Object/_api';
 
 import { normalizeAddress } from '@/background/utils';
 import { pubKeyAccountToAccountKey, defaultAccountKey } from '@/background/utils/account-key';

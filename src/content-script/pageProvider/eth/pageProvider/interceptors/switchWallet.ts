@@ -1,5 +1,3 @@
-import { flow } from 'lodash';
-
 import IconFlow from '../../assets/flow.svg';
 import IconMetamask from '../../assets/metamask.svg';
 import { isInSameOriginIframe } from '../../utils/iframe';
@@ -30,7 +28,7 @@ export const switchWalletNotice = (type: 'frw' | 'metamask') => {
         <div>
         Please <a
           href="javascript:window.location.reload();"
-          style="color: #8697FF; text-decoration: underline;">refresh the web page</a> 
+          style="color: #8697FF; text-decoration: underline;">refresh the web page</a>
         and retry
         </div>
       </div>
