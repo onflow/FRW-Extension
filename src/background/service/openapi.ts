@@ -695,7 +695,6 @@ export class OpenApiService {
    * @param token - The custom token to login with
    */
   private _loginWithToken = async (userId: string, token: string) => {
-    this.clearAllStorage();
     await setPersistence(auth, indexedDBLocalPersistence);
     await signInWithCustomToken(auth, token);
     await storage.set(CURRENT_ID_KEY, userId);

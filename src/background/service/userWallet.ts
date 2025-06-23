@@ -136,8 +136,6 @@ class UserWallet {
     } else {
       Object.assign(this.store, USER_WALLET_TEMPLATE);
     }
-    // clear all session storage
-    await storage.clearSession();
   };
 
   isLocked = () => {
