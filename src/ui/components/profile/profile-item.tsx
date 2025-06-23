@@ -36,21 +36,6 @@ export const ProfileItem = ({
   setLoadingId: (profileId: string) => void;
   userInfo: UserInfoResponse | undefined;
 }) => {
-  if (!userInfo) {
-    return (
-      <ListItem disablePadding>
-        <ListItemButton sx={{ padding: '9px 18px' }}>
-          <ListItemIcon>
-            <Skeleton variant="rectangular" width={40} height={40} sx={{ borderRadius: '8px' }} />
-          </ListItemIcon>
-          <ListItemText>
-            <Skeleton variant="text" width={120} height={24} />
-          </ListItemText>
-        </ListItemButton>
-      </ListItem>
-    );
-  }
-
   return (
     <ListItem
       disablePadding
@@ -65,12 +50,16 @@ export const ProfileItem = ({
     >
       <ListItemButton sx={{ padding: '9px 18px' }}>
         <ListItemIcon>
-          <Avatar
-            component="span"
-            src={userInfo?.avatar}
-            sx={{ width: '40px', height: '40px', borderRadius: '8px' }}
-            alt="avatar"
-          />
+          {userInfo?.avatar ? (
+            <Avatar
+              component="span"
+              src={userInfo?.avatar}
+              sx={{ width: '40px', height: '40px', borderRadius: '8px' }}
+              alt="avatar"
+            />
+          ) : (
+            <Skeleton variant="rectangular" width={40} height={40} sx={{ borderRadius: '8px' }} />
+          )}
         </ListItemIcon>
         <ListItemText>
           <Box
@@ -86,7 +75,7 @@ export const ProfileItem = ({
               display="inline"
               sx={{ color: '#fff', fontWeight: '700', fontSize: '14px' }}
             >
-              {userInfo?.nickname}
+              {userInfo?.nickname || <Skeleton variant="text" width={120} height={24} />}
             </Typography>
           </Box>
         </ListItemText>

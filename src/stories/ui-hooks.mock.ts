@@ -8,11 +8,7 @@ export * from '../ui/hooks/use-coin-hooks';
 // Import and re-export mocked hooks
 export { useProfiles } from '../ui/hooks/useProfileHook.mock';
 export { useNetwork } from '../ui/hooks/useNetworkHook.mock';
-export {
-  useFeatureFlag,
-  useFeatureFlags,
-  useLatestVersion,
-} from '../ui/hooks/use-feature-flags.mock';
+export { useFeatureFlag, useLatestVersion } from '../ui/hooks/use-feature-flag.mock';
 
 // Export other hooks with basic mocks if needed
 export const useInitHook = () => ({

@@ -19,7 +19,7 @@ import { type WalletAccount } from '@/shared/types/wallet-types';
 import { consoleError } from '@/shared/utils/console-log';
 import { AccountListing } from '@/ui/components/account/account-listing';
 import { MenuItem } from '@/ui/components/sidebar/menu-item';
-import { useFeatureFlag } from '@/ui/hooks/use-feature-flags';
+import { useFeatureFlag } from '@/ui/hooks/use-feature-flag';
 import {
   COLOR_GREEN_FLOW_THEME_16FF99,
   COLOR_WHITE_ALPHA_10_FFFFFF1A,

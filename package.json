@@ -53,6 +53,7 @@
     "@noble/secp256k1": "^1.7.2",
     "@onflow/fcl": "^1.18.0",
     "@reown/walletkit": "^1.2.7",
+    "@statsig/js-client": "^3.18.0",
     "@trustwallet/wallet-core": "^4.3.6",
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/react": "^3.0.0",

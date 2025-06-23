@@ -80,6 +80,7 @@ import {
   nftService,
   googleSafeHostService,
   mixpanelTrack,
+  remoteConfigService,
 } from './index';
 const { version } = packageJson;
 
@@ -700,7 +701,9 @@ export class OpenApiService {
     await storage.set(CURRENT_ID_KEY, userId);
 
     // Kick off loaders that use the current user id
-    userInfoService.loadUserInfoByUserId(userId);
+    userInfoService
+      .loadUserInfoByUserId(userId)
+      .then((userInfo) => userInfo && remoteConfigService.updateUserInfo(userInfo));
   };
 
   private clearAllStorage = () => {

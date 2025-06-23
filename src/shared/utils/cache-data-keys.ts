@@ -11,7 +11,7 @@ import {
   type CadenceTokenInfo,
   type CustomFungibleTokenInfo,
 } from '../types/coin-types';
-import { type FeatureFlags } from '../types/feature-types';
+import { FeatureFlagKey, type FeatureFlags } from '../types/feature-types';
 import {
   type NewsItem,
   type NFTModelV2,
@@ -81,6 +81,10 @@ export type RemoteConfig = {
 export const userInfoCachekey = (userId: string) => `user-info-${userId}`;
 export const userInfoRefreshRegex = refreshKey(userInfoCachekey);
 export type UserInfoStore = UserInfoResponse;
+
+export const featureFlagKey = (userId: string, featureFlag: string) =>
+  `feature-flag-${userId}-${featureFlag}`;
+export const featureFlagRefreshRegex = refreshKey(featureFlagKey);
 
 // Note we could do this per user but it's not worth the complexity
 export const cadenceScriptsKey = () => `cadence-scripts`;

@@ -3420,10 +3420,6 @@ export class WalletController extends BaseController {
     }
   };
 
-  getFeatureFlags = async (): Promise<FeatureFlags> => {
-    return remoteConfigService.getFeatureFlags();
-  };
-
   getFeatureFlag = async (featureFlag: FeatureFlagKey): Promise<boolean> => {
     return remoteConfigService.getFeatureFlag(featureFlag);
   };

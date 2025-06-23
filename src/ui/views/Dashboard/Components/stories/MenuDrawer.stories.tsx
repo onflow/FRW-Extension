@@ -11,7 +11,7 @@ import {
   useEvmAccount as importedMockUseEvmAccount,
 } from '@/stories/use-account-hooks.mock';
 import { useNftCatalogCollections as importedMockUseNftCatalogCollections } from '@/stories/use-nft-hooks.mock';
-import { useFeatureFlag } from '@/ui/hooks/use-feature-flags';
+import { useFeatureFlag } from '@/ui/hooks/use-feature-flag';
 
 import MenuDrawer from '../MenuDrawer';
 

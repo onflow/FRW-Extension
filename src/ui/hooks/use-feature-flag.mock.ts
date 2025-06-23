@@ -13,14 +13,4 @@ export const useFeatureFlag = (featureFlag: FeatureFlagKey) => {
   return false;
 };
 
-export const useFeatureFlags = () => {
-  // Check if we're in Storybook and have feature flag overrides
-  if (typeof window !== 'undefined' && (window as any).__STORYBOOK_FEATURE_FLAGS__) {
-    return (window as any).__STORYBOOK_FEATURE_FLAGS__;
-  }
-
-  // Default empty object
-  return {};
-};
-
 export const useLatestVersion = () => null;

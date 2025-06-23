@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { checkEnoughBalanceForFees, evaluateStorage } from '@/shared/utils/evaluate-storage';
 
-import { useFeatureFlag } from './use-feature-flags';
+import { useFeatureFlag } from './use-feature-flag';
 import { useProfiles } from './useProfileHook';
 
 interface StorageCheckResult {

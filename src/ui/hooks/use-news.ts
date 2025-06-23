@@ -13,7 +13,7 @@ import packageJson from '../../../package.json';
 import { useWallet } from '../utils';
 
 import { useCachedData, useUserData } from './use-data';
-import { useLatestVersion } from './use-feature-flags';
+import { useLatestVersion } from './use-feature-flag';
 import { useProfiles } from './useProfileHook';
 
 const CURRENT_VERSION = packageJson.version;

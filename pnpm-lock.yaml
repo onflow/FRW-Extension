@@ -38,6 +38,9 @@ importers:
       '@reown/walletkit':
         specifier: ^1.2.7
         version: 1.2.7(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+      '@statsig/js-client':
+        specifier: ^3.18.0
+        version: 3.18.0
       '@trustwallet/wallet-core':
         specifier: ^4.3.6
         version: 4.3.6
@@ -2014,6 +2017,12 @@ packages:
 
   '@sinonjs/text-encoding@0.7.3':
     resolution: {integrity: sha512-DE427ROAphMQzU4ENbliGYrBSYPXF+TtLg9S8vzeA+OF4ZKzoDdzfL8sxuMUGS/lgRhM6j1URSk9ghf7Xo1tyA==}
+
+  '@statsig/client-core@3.18.0':
+    resolution: {integrity: sha512-XwRz4qSd/XdHPEhP+g70ShhX/LRUo3N5i8T1pXthB+qQMxtb0gDLLSJOkqerYFy0Pa1o2bfM1fw8W5tYwqWufA==}
+
+  '@statsig/js-client@3.18.0':
+    resolution: {integrity: sha512-yU4tKywxuP7H16Ri/E4hb+Ti/PN7kEk+ZDrhbzFX9OwEh9qZIjEkoxXOGDFje+3rqn0meN/MuBoSvZwN8qSDYQ==}
 
   '@storybook/addon-docs@9.0.12':
     resolution: {integrity: sha512-bAuFy4BWGEBIC0EAS4N+V8mHj7NZiSdDnJUSr4Al3znEVzNHLpQAMRznkga2Ok8x+gwcyBG7W47dLbDXVqLZDg==}
@@ -9915,6 +9924,12 @@ snapshots:
       lodash: 4.17.21
 
   '@sinonjs/text-encoding@0.7.3': {}
+
+  '@statsig/client-core@3.18.0': {}
+
+  '@statsig/js-client@3.18.0':
+    dependencies:
+      '@statsig/client-core': 3.18.0
 
   '@storybook/addon-docs@9.0.12(@types/react@18.3.23)(storybook@9.0.12(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(prettier@3.5.3)(utf-8-validate@5.0.10))':
     dependencies:
