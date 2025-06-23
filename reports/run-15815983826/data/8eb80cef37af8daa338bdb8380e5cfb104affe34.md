@@ -1,0 +1,89 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - button "🍋":
+    - paragraph: 🍋
+  - paragraph: 🐨
+  - button "Lemon EVM 0x000000...1AEC842B":
+    - text: Lemon EVM 0x000000...1AEC842B
+    - img
+  - button "notification": "7"
+  - button "avatar"
+- paragraph: development build
+- paragraph: $2.28USD
+- button:
+  - img
+- paragraph: Send
+- button:
+  - img
+- paragraph: Receive
+- button:
+  - img
+- paragraph: Swap
+- button:
+  - img
+- paragraph: Buy
+- button:
+  - img
+- paragraph: Move
+- tablist "full width tabs example":
+  - tab "coins":
+    - img
+    - paragraph: coins
+  - tab "NFTs":
+    - img
+    - paragraph: NFTs
+  - tab "Activity" [selected]:
+    - img
+    - paragraph: Activity
+- tabpanel:
+  - listitem:
+    - button "a minute ago":
+      - img
+      - paragraph
+      - paragraph: a minute ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "a minute ago":
+      - img
+      - paragraph
+      - paragraph: a minute ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "a minute ago":
+      - img
+      - paragraph
+      - paragraph: a minute ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "a minute ago":
+      - img
+      - paragraph
+      - paragraph: a minute ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "2 minutes ago":
+      - img
+      - paragraph
+      - paragraph: 2 minutes ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "2 minutes ago":
+      - img
+      - paragraph
+      - paragraph: 2 minutes ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+```
