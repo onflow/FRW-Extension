@@ -61,6 +61,7 @@ export const preferencesKey = 'preference';
 
 export type PreferencesStore = {
   displayCurrency: Currency;
+  hiddenAddresses: string[];
 };
 
 export const getPreferencesData = async (): Promise<PreferencesStore | undefined> => {

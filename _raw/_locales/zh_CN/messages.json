@@ -1063,13 +1063,16 @@
     "message": "编辑关联账户"
   },
   "Accessible": {
-    "message": "可访问"
+    "message": "可访问资产"
   },
   "Collected": {
     "message": "已收集"
   },
   "Hide_Empty_collection": {
     "message": "隐藏空专辑"
+  },
+  "View_Empty": {
+    "message": "查看空专辑"
   },
   "Inaccessible": {
     "message": "不可访问"
@@ -1523,5 +1526,14 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "开始"
+  },
+  "Add_Profile": {
+    "message": "添加新用户"
+  },
+  "Unlink_account": {
+    "message": "取消关联账户"
+  },
+  "Show__in__account__sidebar": {
+    "message": "在账户侧边栏显示"
   }
 }

@@ -17,7 +17,8 @@ test('Remove profile test', async ({ page, extensionId }) => {
   await page.getByLabel('avatar').click();
   await page.getByLabel('avatar').click();
   await page.getByLabel('avatar').click();
-  await page.getByRole('button', { name: 'Profile end' }).click();
+  await page.getByTestId('setting-goto-account-button').click();
+
   await page.getByRole('button', { name: 'Remove Profile' }).click();
   await fillInPassword({ page, password: keysFile.password });
   await page.getByRole('button', { name: 'Remove' }).click();

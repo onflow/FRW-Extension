@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import {
@@ -15,21 +16,33 @@ import {
   CardContent,
   CardActionArea,
   FormControlLabel,
-  Checkbox,
+  Switch,
+  Grid,
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, useLocation } from 'react-router-dom';
 
 import { type NftCollection } from '@/shared/types/network-types';
 import { type ChildAccountNFTs, type ChildAccountNFTsStore } from '@/shared/utils/cache-data-keys';
+import { CopyIcon } from '@/ui/assets/icons/CopyIcon';
 import IconNext from '@/ui/assets/svg/nextgray.svg';
 import { LLHeader, LLSecondaryButton } from '@/ui/components';
 import CheckCircleIcon from '@/ui/components/iconfont/IconCheckmark';
-import IconCopy from '@/ui/components/iconfont/IconCopy';
+import AddressCard from '@/ui/components/settings/address-card';
+import { LinkedAccountCard } from '@/ui/components/settings/linked-account-card';
+import SettingsListCard from '@/ui/components/settings/settings-list-card';
+import SlidingTabSwitch from '@/ui/components/settings/sliding-tab-switch';
 import { useChildAccountAllowTypes, useCurrentId, useUserInfo } from '@/ui/hooks/use-account-hooks';
 import { useChildAccountFt } from '@/ui/hooks/use-coin-hooks';
 import { useChildAccountNfts, useNftCollectionList } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
+import {
+  COLOR_GRAY_808080,
+  COLOR_WHITE_ALPHA_80_FFFFFFCC,
+  COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3,
+  COLOR_WHITE_ALPHA_40_FFFFFF66,
+} from '@/ui/style/color';
+import { formatAddress } from '@/ui/utils';
 
 import EditAccount from './EditAccount';
 import UnlinkAccount from './UnlinkAccount';
@@ -94,189 +107,103 @@ const NftContent = ({
   hideEmpty: boolean;
   navigateWithState: (data: Collection) => void;
 }) => {
-  const filteredNftCollection = availableNftCollection.filter(
-    (item) => !hideEmpty || (hideEmpty && item.total && item.total > 0)
-  );
+  const filteredNftCollection = hideEmpty
+    ? availableNftCollection.filter((item) => item.total > 0)
+    : availableNftCollection;
 
-  return (
-    <Box sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '8px' }}>
-      {filteredNftCollection.length ? (
-        filteredNftCollection.map((item, index) => {
-          const collectedText = chrome.i18n.getMessage('Collected');
+  const items = filteredNftCollection.map((item) => ({
+    iconColor: '#292929',
+    iconUrl: item.logo,
+    iconText: '',
+    title: item.name,
+    subtitle: `${item.total} ${chrome.i18n.getMessage('Collected')}`,
+    onClick: () => navigateWithState(item),
+  }));
 
-          return (
-            <CardActionArea
-              sx={{
-                display: 'flex',
-                height: '64px',
-                marginTop: '8px',
-                padding: '16px 20px',
-                borderRadius: '16px',
-                backgroundColor: '#292929',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-              key={index}
-              onClick={() => navigateWithState(item)}
-            >
-              <img
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '32px',
-                }}
-                src={item.logo}
-                alt={item.name}
-              />
-              <Typography
-                sx={{
-                  color: '#FFF',
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  fontStyle: 'normal',
-                  fontWeight: 600,
-                  lineHeight: '18px',
-                  textTransform: 'capitalize',
-                  marginLeft: '8px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '50%',
-                  alignItems: 'center',
-                }}
-              >
-                {item.name}
-              </Typography>
-              <Box sx={{ flex: 1 }}></Box>
-              <Typography
-                sx={{
-                  color: '#BABABA',
-                  textAlign: 'right',
-                  fontFamily: 'Inter',
-                  fontSize: 12,
-                  fontStyle: 'normal',
-                  fontWeight: 600,
-                  lineHeight: '20px',
-                  alignItems: 'center',
-                }}
-              >
-                {item.total + ' '}
-                {collectedText}
-              </Typography>
-              <CardMedia
-                sx={{
-                  width: '4px',
-                  height: '8px',
-                  marginLeft: '16px',
-                  alignItems: 'center',
-                }}
-                image={IconNext}
-              />
-            </CardActionArea>
-          );
-        })
-      ) : (
-        <Box
+  if (!items.length) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '64px',
+          marginTop: '8px',
+          padding: '8px 20px',
+          borderRadius: '16px',
+          backgroundColor: '#292929',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography
           sx={{
-            display: 'flex',
-            height: '64px',
-            marginTop: '8px',
-            padding: '8px 20px',
-            borderRadius: '16px',
-            backgroundColor: '#292929',
-            justifyContent: 'center',
-            alignItems: 'center',
+            fontSize: '12px',
+            color: '#bababa',
+            textAlign: 'center',
           }}
         >
-          <Typography
-            sx={{
-              fontSize: '12px',
-              color: '#bababa',
-              textAlign: 'center',
-            }}
-          >
-            No accessible NFT
-          </Typography>
-        </Box>
-      )}
-    </Box>
-  );
+          No accessible NFT
+        </Typography>
+      </Box>
+    );
+  }
+
+  return <SettingsListCard items={items} />;
 };
 
-const FtContent = ({ availableFt }: { availableFt: TicketToken[] | undefined }) => (
-  <Box sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '8px' }}>
-    {availableFt?.map((token, index) => {
-      return (
-        <Box
+const FtContent = ({ availableFt }: { availableFt: TicketToken[] | undefined }) => {
+  const items = (availableFt || []).map((item) => ({
+    iconColor: '#333',
+    iconText: '',
+    title: item.id,
+    subtitle: item.balance,
+    onClick: () => {},
+  }));
+
+  if (!items.length) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          height: '64px',
+          marginTop: '8px',
+          padding: '8px 20px',
+          borderRadius: '16px',
+          backgroundColor: '#292929',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography
           sx={{
-            display: 'flex',
-            height: '64px',
-            marginTop: '8px',
-            padding: '16px 20px',
-            borderRadius: '16px',
-            backgroundColor: '#292929',
-            justifyContent: 'space-between',
+            fontSize: '12px',
+            color: '#bababa',
+            textAlign: 'center',
           }}
-          key={index}
         >
-          <img
-            style={{
-              height: '32px',
-              width: '32px',
-              borderRadius: '32px',
-              backgroundColor: 'text.secondary',
-              objectFit: 'cover',
-              marginRight: '8px',
-            }}
-            src={'https://lilico.app/placeholder-2.0.png'}
-          />
-          <Typography
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: '#fff',
-              textAlign: 'right',
-              fontFamily: 'Inter',
-              fontSize: '14px',
-              fontStyle: 'normal',
-              fontWeight: 600,
-              lineHeight: '20px',
-            }}
-          >
-            {token.id.split('.')[2]}
-          </Typography>
-          <Box sx={{ flex: 1 }}></Box>
-          <Typography
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: '#BABABA',
-              textAlign: 'right',
-              fontFamily: 'Inter',
-              fontSize: '12px',
-              fontStyle: 'normal',
-              fontWeight: 600,
-              lineHeight: '20px',
-            }}
-          >
-            {parseFloat(token.balance).toFixed(3)} {token.id.split('.')[2]}
-          </Typography>
-        </Box>
-      );
-    })}
-  </Box>
-);
+          No accessible Coin
+        </Typography>
+      </Box>
+    );
+  }
+
+  return <SettingsListCard items={items} />;
+};
 
 const LinkedDetail = () => {
   const location = useParams();
+  const locationState = useLocation();
 
   const history = useHistory();
   const [unlinking, setUnlinking] = useState<boolean>(false);
   const [isEdit, setEdit] = useState<boolean>(false);
-  const [hideEmpty, setHide] = useState<boolean>(false);
+  const [hideEmpty, setHide] = useState<boolean>(true);
   const [value, setValue] = useState('one');
 
   const { activeAccountType, childAccounts, mainAddress, network } = useProfiles();
+
+  // Extract parentName from URL query parameters
+  const urlParams = new URLSearchParams(locationState.search);
+  const parentName = urlParams.get('parentName') || '';
 
   const active = activeAccountType === 'main';
   // The child account address is the key in the url
@@ -372,136 +299,48 @@ const LinkedDetail = () => {
 
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          px: '16px',
-        }}
-      >
-        <LLHeader title={chrome.i18n.getMessage('Linked_Account')} help={false} />
-
-        <IconButton
-          onClick={() => {
-            toggleEdit();
-          }}
-        >
-          <EditRoundedIcon fontSize="medium" sx={{ color: 'icon.navi', cursor: 'pointer' }} />
-        </IconButton>
-      </Box>
+      <LLHeader title={chrome.i18n.getMessage('Linked_Account')} help={false} />
 
       <Box sx={{ flexGrow: 1 }}>
-        {/* <img src={logo} alt='logo' className={classes.logo} /> */}
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: '18px', height: '100%' }}>
-          <Box sx={{ display: 'flex', gap: '18px', marginBottom: '0px' }}>
-            <Stack
-              direction="column"
-              spacing="12px"
-              sx={{ justifyContent: 'space-between', width: '100%' }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  marginBottom: '20px',
-                  alignItems: 'center',
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <img
-                    style={{
-                      height: '60px',
-                      width: '60px',
-                      borderRadius: '60px',
-                      backgroundColor: 'text.secondary',
-                      objectFit: 'cover',
-                    }}
-                    src={childAccount?.icon ?? 'https://lilico.app/placeholder-2.0.png'}
-                  />
-                  <Typography
-                    sx={{
-                      textAlign: 'center',
-                      fontSize: '16px',
-                      fontWeight: 'bold',
-                      marginTop: '14px',
-                      width: '100%',
-                    }}
-                    color="text.secondary"
-                  >
-                    {childAccount?.name ?? chrome.i18n.getMessage('Linked_Account')}
-                  </Typography>
-                </Box>
-              </Box>
-            </Stack>
-          </Box>
-          <Box sx={{ display: 'block', width: '100%' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                borderRadius: '16px',
-                justifyContent: 'space-between',
-                backgroundColor: '#292929',
-                padding: '17px 20px',
-                alignItems: 'center',
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '14px',
-                  color: '#E6E6E6',
-                  fontWeight: 'bold',
-                  width: '100%',
-                }}
-              >
-                {chrome.i18n.getMessage('Address')}
-              </Typography>
-              <Typography sx={{ fontSize: '14px', color: '#bababa', width: '100%' }}>
-                {childAccountAddress}
-              </Typography>
-              <Button
-                variant="text"
-                onClick={() => {
-                  if (childAccountAddress) {
-                    navigator.clipboard.writeText(childAccountAddress);
-                  }
-                }}
-              >
-                <IconCopy fill="icon.navi" width="12px" />
-              </Button>
-            </Box>
-          </Box>
-          <Divider sx={{ marginY: '24px' }} />
-
           <Box
             sx={{
-              borderRadius: '12px',
-              overflow: 'hidden',
-              width: '100%',
-              display: 'table',
-              marginBottom: '44px',
+              borderRadius: '16px',
+              border: '1px solid #1A1A1A',
+              background: 'rgba(255, 255, 255, 0.10)',
+              padding: '10px',
+              marginBottom: '20px',
             }}
           >
-            <Typography
-              sx={{
-                fontSize: '14px',
-                marginBottom: '14px',
-                textTransform: 'capitalize',
-                color: '#5E5E5E',
-              }}
-            >
-              {chrome.i18n.getMessage('Description')}
-            </Typography>
-            <Typography sx={{ fontSize: '14px', color: '#FFFFFF' }}> {'No Description'}</Typography>
+            <LinkedAccountCard
+              network={network}
+              account={childAccount}
+              active={false}
+              onClick={() => {}}
+              onEditClick={toggleEdit}
+              showCard={false}
+              data-testid="linked-account-detail-card"
+              parentName={parentName}
+            />
+
+            <Divider sx={{ marginY: '8px', px: '8px' }} />
+            <Box sx={{ padding: '8px' }}>
+              <Typography
+                sx={{
+                  fontSize: '12px',
+                  textTransform: 'capitalize',
+                  color: COLOR_GRAY_808080,
+                }}
+              >
+                {chrome.i18n.getMessage('Description')}
+              </Typography>
+              <Typography sx={{ fontSize: '16px', color: COLOR_WHITE_ALPHA_80_FFFFFFCC }}>
+                {'No Description'}
+              </Typography>
+            </Box>
           </Box>
+
+          <AddressCard address={childAccountAddress || ''} label="Address" />
 
           <Box
             sx={{
@@ -528,9 +367,9 @@ const LinkedDetail = () => {
             >
               <Typography
                 sx={{
-                  fontSize: '14px',
+                  fontSize: '16px',
                   textTransform: 'capitalize',
-                  color: '#5E5E5E',
+                  color: COLOR_WHITE_ALPHA_80_FFFFFFCC,
                 }}
               >
                 {chrome.i18n.getMessage('Accessible')}
@@ -538,86 +377,61 @@ const LinkedDetail = () => {
               <Box sx={{ flexGrow: '1' }}></Box>
               <CardActionArea sx={{ width: 'auto' }}>
                 <FormControlLabel
+                  labelPlacement="start"
                   label={
                     <Typography
                       variant="body2"
-                      sx={{ fontSize: '12px', color: '#5e5e5e', marginRight: '0px' }}
+                      sx={{
+                        fontSize: '12px',
+                        color: COLOR_WHITE_ALPHA_40_FFFFFF66,
+                        marginRight: '0px',
+                      }}
                     >
-                      {chrome.i18n.getMessage('Hide_Empty_collection')}
+                      {chrome.i18n.getMessage('View_Empty')}
                     </Typography>
                   }
                   control={
-                    <Checkbox
+                    <Switch
                       size="small"
-                      icon={<CircleOutlinedIcon sx={{ width: '16px', height: '16px' }} />}
-                      sx={{ paddingLeft: '10px' }}
-                      checkedIcon={<CheckCircleIcon color={'#41CC5D'} />}
-                      value="mainnet"
-                      checked={hideEmpty}
-                      onClick={toggleHide}
+                      checked={!hideEmpty}
+                      onChange={toggleHide}
+                      sx={{
+                        width: '51px',
+                        height: '27px',
+                        pt: 0,
+                        '& .MuiSwitch-track': {
+                          width: '51px',
+                          height: '27px',
+                          borderRadius: '27px',
+                          pt: 0,
+                        },
+                        '& .MuiSwitch-thumb': {
+                          width: '23px',
+                          height: '23px',
+                          pt: 0,
+                        },
+                        '& .MuiSwitch-switchBase': {
+                          marginTop: '2px',
+                          pt: 0,
+                        },
+                      }}
                     />
                   }
+                  sx={{
+                    marginLeft: 'auto',
+                    marginRight: 0,
+                  }}
                 />
               </CardActionArea>
             </Box>
-            <Tabs
+            <SlidingTabSwitch
               value={value}
-              onChange={handleChange}
-              textColor="secondary"
-              indicatorColor="secondary"
-              aria-label="secondary tabs example"
-              sx={{
-                '.MuiTabs-indicator': {
-                  display: 'none',
-                },
-              }}
-            >
-              <Tab
-                sx={{
-                  padding: '4px 16px',
-                  flexShrink: 0,
-                  borderRadius: 20,
-                  background: '#292929',
-                  color: '#E6E6E6',
-                  fontFamily: 'Inter',
-                  fontSize: '12px',
-                  fontStyle: 'normal',
-                  fontWeight: 500,
-                  lineHeight: '20px',
-                  textTransform: 'capitalize',
-                  minHeight: '0px',
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(50, 159, 227, 0.16)',
-                    color: ' #329FE3',
-                  },
-                }}
-                value="one"
-                label="Collectables"
-              />
-              <Tab
-                sx={{
-                  padding: '4px 16px',
-                  flexShrink: 0,
-                  borderRadius: 20,
-                  background: '#292929',
-                  color: '#E6E6E6',
-                  fontFamily: 'Inter',
-                  fontSize: '12px',
-                  fontStyle: 'normal',
-                  fontWeight: 500,
-                  lineHeight: '20px',
-                  textTransform: 'capitalize',
-                  marginLeft: '8px',
-                  minHeight: '0px',
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(50, 159, 227, 0.16)',
-                    color: ' #329FE3',
-                  },
-                }}
-                value="two"
-                label="Coins"
-              />
-            </Tabs>
+              onChange={setValue}
+              leftLabel="Collections"
+              rightLabel="Coins"
+              leftValue="one"
+              rightValue="two"
+            />
             {loading ? (
               <Box sx={{ marginBottom: '-24px' }}>
                 {[...Array(2).keys()].map((key) => (
@@ -664,7 +478,23 @@ const LinkedDetail = () => {
             )}
           </Box>
           {active && (
-            <LLSecondaryButton label={'Unlink'} fullWidth onClick={() => showUnlink(true)} />
+            <LLSecondaryButton
+              label={chrome.i18n.getMessage('Unlink_account')}
+              fullWidth
+              onClick={() => showUnlink(true)}
+              sx={{
+                background: '#F04438CC',
+                color: '#fff',
+                borderRadius: '16px',
+                textTransform: 'capitalize',
+                padding: '16px',
+                fontSize: '16px',
+                fontWeight: '600',
+                '&:hover': {
+                  background: '#A93226',
+                },
+              }}
+            />
           )}
         </Box>
         <UnlinkAccount

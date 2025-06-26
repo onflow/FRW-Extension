@@ -3,16 +3,27 @@ import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import { IconButton, Typography, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 
 interface LLHeaderProps {
   title: string | JSX.Element;
   help: boolean | JSX.Element;
+  goBackLink?: string; // Optional link
 }
 
 export const LLHeader = (props: LLHeaderProps) => {
   //   const { label, ...inherentProps } = props;
   const history = useHistory();
+
+  const handleGoBack = () => {
+    if (props.goBackLink) {
+      // Use custom link if provided
+      history.push(props.goBackLink);
+    } else {
+      // Fall back to browser history
+      history.goBack();
+    }
+  };
 
   return (
     <Grid
@@ -24,12 +35,12 @@ export const LLHeader = (props: LLHeaderProps) => {
       }}
     >
       <Grid size={1}>
-        <IconButton onClick={history.goBack}>
+        <IconButton onClick={handleGoBack}>
           <ArrowBackIcon sx={{ color: 'icon.navi' }} />
         </IconButton>
       </Grid>
       <Grid size={10}>
-        <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="20px">
+        <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="16px">
           {props.title}
         </Typography>
       </Grid>

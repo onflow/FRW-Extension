@@ -1051,13 +1051,16 @@
     "message": "Edit Linked Account"
   },
   "Accessible": {
-    "message": "Accessible"
+    "message": "Accessible assets"
   },
   "Collected": {
     "message": "Collected"
   },
   "Hide_Empty_collection": {
     "message": "Hide Empty Collections"
+  },
+  "View_Empty": {
+    "message": "View empty"
   },
   "Inaccessible": {
     "message": "Inaccessible"
@@ -1535,5 +1538,14 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "Get Started"
+  },
+  "Add_Profile": {
+    "message": "Add new profile"
+  },
+  "Unlink_account": {
+    "message": "Unlink account"
+  },
+  "Show__in__account__sidebar": {
+    "message": "Show in account sidebar"
   }
 }

@@ -2,7 +2,7 @@
 
 // Re-export everything from actual hooks that don't need mocking
 export * from '../ui/hooks/use-data';
-export * from '../ui/hooks/preference-hooks';
+export * from './preference-hooks.mock';
 export * from '../ui/hooks/use-coin-hooks';
 
 // Import and re-export mocked hooks

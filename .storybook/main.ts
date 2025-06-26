@@ -46,6 +46,10 @@ const config: StorybookConfig = {
         __dirname,
         '../src/stories/useNetworkHook.mock.ts'
       ),
+      '@/ui/hooks/preference-hooks$': path.resolve(
+        __dirname,
+        '../src/stories/preference-hooks.mock.ts'
+      ),
       // General hooks alias (fallback)
       '@/ui/hooks': path.resolve(__dirname, '../src/stories/ui-hooks.mock.ts'),
       // Other aliases

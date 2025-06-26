@@ -1063,13 +1063,16 @@
     "message": "Редактировать связанный аккаунт"
   },
   "Accessible": {
-    "message": "Доступный"
+    "message": "Доступные активы"
   },
   "Collected": {
     "message": "Собрано"
   },
   "Hide_Empty_collection": {
     "message": "Скрыть Пустые Коллекции"
+  },
+  "View_Empty": {
+    "message": "Посмотреть пустые"
   },
   "Inaccessible": {
     "message": "Недоступный "
@@ -1526,5 +1529,14 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "Начать"
+  },
+  "Add_Profile": {
+    "message": "Добавить новый профиль"
+  },
+  "Unlink_account": {
+    "message": "Отвязать аккаунт"
+  },
+  "Show__in__account__sidebar": {
+    "message": "Показывать в боковой панели аккаунтов"
   }
 }

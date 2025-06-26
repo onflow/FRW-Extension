@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { openIndexPage } from '@/background/webapi/tab';
 import { consoleError } from '@/shared/utils/console-log';
 import { getCurrentProfileId } from '@/shared/utils/current-id';
+import { EditIcon } from '@/ui/assets/icons/settings/Edit';
 import RemoveProfileModal from '@/ui/components/PopupModal/remove-profile-modal';
 import ResetModal from '@/ui/components/PopupModal/resetModal';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
@@ -15,7 +16,7 @@ import { useWallet } from 'ui/utils';
 
 import EditAccount from './EditAccount';
 
-const AccountSettings = () => {
+const Profile = () => {
   const history = useHistory();
   const wallet = useWallet();
   const { profileIds, userInfo, walletList } = useProfiles();
@@ -170,7 +171,7 @@ const AccountSettings = () => {
             toggleEdit();
           }}
         >
-          <EditRoundedIcon fontSize="medium" sx={{ color: 'icon.navi', cursor: 'pointer' }} />
+          <EditIcon width={24} height={24} />
         </IconButton>
       </Box>
       <Box
@@ -337,4 +338,4 @@ const AccountSettings = () => {
   );
 };
 
-export default AccountSettings;
+export default Profile;

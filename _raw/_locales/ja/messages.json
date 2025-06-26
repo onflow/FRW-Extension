@@ -1063,13 +1063,16 @@
     "message": "編集リンクアカウント"
   },
   "Accessible": {
-    "message": "アクセス可能"
+    "message": "アクセス可能な資産"
   },
   "Collected": {
     "message": "収集された"
   },
   "Hide_Empty_collection": {
     "message": "空のコレクションを非表示にする"
+  },
+  "View_Empty": {
+    "message": "空のコレクションを表示"
   },
   "Inaccessible": {
     "message": "アクセス不可 "
@@ -1526,5 +1529,14 @@
   },
   "Import_from_Mobile_Submit": {
     "message": "はじめる"
+  },
+  "Add_Profile": {
+    "message": "新しいプロファイルを追加"
+  },
+  "Unlink_account": {
+    "message": "アカウントをリンク解除"
+  },
+  "Show__in__account__sidebar": {
+    "message": "アカウントサイドバーに表示"
   }
 }

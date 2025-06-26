@@ -3,110 +3,14 @@ import React from 'react';
 
 import { type WalletAccount } from '@/shared/types/wallet-types';
 import { isValidEthereumAddress } from '@/shared/utils/address';
-import { useChildAccounts, useEvmAccount } from '@/ui/hooks/use-account-hooks';
+import { useHiddenAddresses } from '@/ui/hooks/preference-hooks';
+import { useEvmAccount } from '@/ui/hooks/use-account-hooks';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80 } from '@/ui/style/color';
 
 import { AccountCard } from './account-card';
+import { BaseAccountHierarchy } from './base-account-hierarchy';
 import { EnableEvmAccountCard } from './enable-evm-account-card';
-
-type AccountHierarchyProps = {
-  network?: string;
-  account?: WalletAccount;
-  activeAccount?: WalletAccount;
-  onAccountClick?: (address: string, parentAddress?: string) => void;
-  onAccountClickSecondary?: (address: string, parentAddress?: string) => void;
-  secondaryIcon?: React.ReactNode;
-};
-const AccountHierarchy = ({
-  network,
-  account,
-  activeAccount,
-  onAccountClick,
-  onAccountClickSecondary,
-  secondaryIcon,
-}: AccountHierarchyProps) => {
-  const childAccounts = useChildAccounts(network, account?.address);
-  const evmAccount = useEvmAccount(network, account?.address);
-  const loading = network === undefined || account === undefined;
-  if (loading) {
-    return (
-      <Box sx={{ gap: '0px', display: 'flex', flexDirection: 'column' }}>
-        <AccountCard showCard={false} />
-        <AccountCard showCard={false} showLink={true} />
-        <AccountCard showCard={false} showLink={true} />
-      </Box>
-    );
-  }
-
-  return (
-    <Box sx={{ gap: '0px', display: 'flex', flexDirection: 'column' }}>
-      <AccountCard
-        network={network}
-        key={account.address}
-        account={account}
-        active={activeAccount?.address === account.address}
-        onClick={
-          onAccountClick ? () => onAccountClick(account.address, account.address) : undefined
-        }
-        onClickSecondary={
-          onAccountClickSecondary
-            ? () => onAccountClickSecondary(account.address, account.address)
-            : undefined
-        }
-        secondaryIcon={secondaryIcon}
-        showCard={false}
-      />
-
-      {/* If the EVM account is valid, show the EVM account card */}
-      {evmAccount && isValidEthereumAddress(evmAccount.address) && (
-        <AccountCard
-          network={network}
-          key={evmAccount.address}
-          account={evmAccount}
-          parentAccount={account}
-          active={activeAccount?.address === evmAccount.address}
-          onClick={
-            onAccountClick ? () => onAccountClick(evmAccount.address, account.address) : undefined
-          }
-          onClickSecondary={
-            onAccountClickSecondary
-              ? () => onAccountClickSecondary(evmAccount.address, account.address)
-              : undefined
-          }
-          secondaryIcon={secondaryIcon}
-          showLink={true}
-          showCard={false}
-        />
-      )}
-      {childAccounts &&
-        childAccounts.map((linkedAccount) => {
-          return (
-            <AccountCard
-              network={network}
-              key={linkedAccount.address}
-              account={linkedAccount}
-              parentAccount={account}
-              active={activeAccount?.address === linkedAccount.address}
-              onClick={
-                onAccountClick
-                  ? () => onAccountClick(linkedAccount.address, account.address)
-                  : undefined
-              }
-              onClickSecondary={
-                onAccountClickSecondary
-                  ? () => onAccountClickSecondary(linkedAccount.address, account.address)
-                  : undefined
-              }
-              secondaryIcon={secondaryIcon}
-              showLink={true}
-              showCard={false}
-            />
-          );
-        })}
-    </Box>
-  );
-};
 
 type AccountListingProps = {
   network?: string;
@@ -142,6 +46,8 @@ export const AccountListing = ({
   const noEvmAccount = evmAccount && !isValidEthereumAddress(evmAccount.address);
   //const pendingAccountTransactions = [];
   const { pendingAccountTransactions } = useProfiles();
+  const hiddenAddresses = useHiddenAddresses();
+
   return (
     <Box sx={{ gap: '0px', padding: '0 16px', display: 'flex', flexDirection: 'column' }}>
       {/* Active account */}
@@ -213,23 +119,32 @@ export const AccountListing = ({
           </Typography>
         </>
       )}
+
       {/* Loading state */}
       {accountList === undefined && (
-        <AccountHierarchy network={network} account={undefined} activeAccount={activeAccount} />
+        <Box sx={{ gap: '0px', display: 'flex', flexDirection: 'column' }}>
+          <AccountCard showCard={false} />
+          <AccountCard showCard={false} showLink={true} />
+          <AccountCard showCard={false} showLink={true} />
+        </Box>
       )}
-      {accountList?.map((account) => {
-        return (
-          <AccountHierarchy
-            network={network}
-            key={account.address}
-            account={account}
-            activeAccount={activeAccount}
-            onAccountClick={onAccountClick}
-            onAccountClickSecondary={onAccountClickSecondary}
-            secondaryIcon={secondaryIcon}
-          />
-        );
-      })}
+      {accountList
+        ?.filter((account) => !hiddenAddresses.includes(account.address))
+        .map((account) => {
+          return (
+            <BaseAccountHierarchy
+              network={network}
+              key={account.address}
+              account={account}
+              activeAccount={activeAccount}
+              onAccountClick={onAccountClick}
+              onAccountClickSecondary={onAccountClickSecondary}
+              secondaryIcon={secondaryIcon}
+              showCard={false}
+              showLink={true}
+            />
+          );
+        })}
       {pendingAccountTransactions &&
         pendingAccountTransactions.map((transaction) => {
           return (
