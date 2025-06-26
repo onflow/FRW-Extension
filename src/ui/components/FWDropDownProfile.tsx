@@ -8,7 +8,6 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { isValidEthereumAddress } from '@/shared/utils/address';

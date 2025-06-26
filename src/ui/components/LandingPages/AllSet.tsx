@@ -56,6 +56,7 @@ const AllSet = ({ handleSwitchTab, variant = 'register' }: AllSetProps) => {
             borderRadius: '12px',
             textTransform: 'capitalize',
             marginBottom: '8px',
+            zIndex: 100,
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="background.paper">

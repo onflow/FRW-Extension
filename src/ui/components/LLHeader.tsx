@@ -1,6 +1,7 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
-import { Grid, IconButton, Typography, Tooltip } from '@mui/material';
+import { IconButton, Typography, Tooltip } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -22,20 +23,20 @@ export const LLHeader = (props: LLHeaderProps) => {
         px: '8px',
       }}
     >
-      <Grid item xs={1}>
+      <Grid size={1}>
         <IconButton onClick={history.goBack}>
           <ArrowBackIcon sx={{ color: 'icon.navi' }} />
         </IconButton>
       </Grid>
-      <Grid item xs={10}>
+      <Grid size={10}>
         <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="20px">
           {props.title}
         </Typography>
       </Grid>
-      {/* <Grid item xs={1}> */}
-      {/* </Grid> */}
+      {/* <Grid2 size={1}> */}
+      {/* </Grid2> */}
       {props.help && (
-        <Grid item xs={1} sx={{ pl: 0 }}>
+        <Grid size={1} sx={{ pl: 0 }}>
           <a href="https://wallet.flow.com/contact" target="_blank">
             <IconButton>
               <Tooltip title={chrome.i18n.getMessage('Need__Help')} arrow>

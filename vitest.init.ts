@@ -1,11 +1,17 @@
 import dotenv from 'dotenv';
 import { vi } from 'vitest';
 
-dotenv.config({ path: ['.env.dev', '.env.pro', '.env.test'] });
+dotenv.config({ path: ['.env.test'] });
 
 // Set up environment variables
 vi.stubEnv('NODE_ENV', 'test');
-vi.stubEnv('INITIAL_OPENAPI_URL', 'https://test.com');
+
+vi.stubEnv('API_GO_SERVER_URL', 'https://test.com');
+vi.stubEnv('API_BASE_URL', 'https://test.com');
+vi.stubEnv('FB_FUNCTIONS', 'https://test.com');
+
+vi.stubEnv('API_NEWS_PATH', '/config/news.test.json');
+vi.stubEnv('API_CONFIG_PATH', '/config/config.test.json');
 
 // Mock global fetch
 global.fetch = vi.fn();

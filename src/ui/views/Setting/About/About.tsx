@@ -1,5 +1,4 @@
 import { Typography, Box, CardMedia } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -9,79 +8,21 @@ import discord from 'ui/assets/image/discord.png';
 import lilo from 'ui/assets/image/lilo.png';
 import X from 'ui/assets/svg/xLogo.svg';
 const { version } = packageJson;
+const BETA_VERSION = process.env.BETA_VERSION;
 // import '../../Unlock/style.css';
-
-const useStyles = makeStyles(() => ({
-  arrowback: {
-    borderRadius: '100%',
-    margin: '8px',
-  },
-  iconbox: {
-    position: 'sticky',
-    top: 0,
-    width: '100%',
-    minWidth: '100%',
-    // backgroundColor: '#121212',
-    margin: 0,
-    padding: 0,
-    justifyContent: 'space-between',
-  },
-  aboutTitle: {
-    zIndex: 20,
-    textAlign: 'center',
-    top: 0,
-    position: 'sticky',
-  },
-  list: {
-    width: '90%',
-    margin: '80px auto',
-    padding: 0,
-  },
-  listItem: {
-    width: '100%',
-    padding: '24px 0',
-  },
-  itemButton: {
-    margin: 0,
-  },
-  logoBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-    alignItems: 'center',
-  },
-  mediaBox: {
-    width: '65%',
-    margin: '72px auto 16px auto',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '84px',
-    height: '84px',
-    margin: '0 auto',
-  },
-  iconsBox: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-}));
 
 const BRANCH_NAME = process.env.BRANCH_NAME;
 
 const COMMIT_SHA = process.env.COMMIT_SHA;
 
 const About = () => {
-  const classes = useStyles();
-
   const history = useHistory();
 
   return (
     <div className="page">
       <LLHeader title="" help={true} />
 
-      <Box className={classes.logoBox}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
         {/* <img src={logo} alt='logo' className={classes.logo} /> */}
 
         <a href="https://wallet.flow.com" target="_blank">
@@ -109,6 +50,7 @@ const About = () => {
           sx={{ textAlign: 'center', fontWeight: 300 }}
         >
           {chrome.i18n.getMessage('Version')} {`${version}`}
+          {BETA_VERSION && ` (${BETA_VERSION})`}
         </Typography>
 
         {process.env.DEPLOYMENT_ENV !== 'production' && (
@@ -140,7 +82,7 @@ const About = () => {
         )}
       </Box>
 
-      <Box className={classes.mediaBox}>
+      <Box sx={{ width: '65%', margin: '72px auto 16px auto', alignItems: 'center' }}>
         <Typography
           variant="body1"
           component="div"
@@ -149,8 +91,13 @@ const About = () => {
           {chrome.i18n.getMessage('CONTACT__US')}
         </Typography>
         <Box
-          className={classes.iconsBox}
-          sx={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center' }}
+          sx={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
         >
           <a href="https://discord.com/invite/J6fFnh2xx6" target="_blank" style={{ width: '58px' }}>
             <Box

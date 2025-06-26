@@ -3,7 +3,7 @@ import path from 'path';
 
 import parser from '@babel/parser';
 import traverse from '@babel/traverse';
-import glob from 'glob';
+import { glob } from 'glob';
 
 type PackageLocations = {
   background: Set<string>;

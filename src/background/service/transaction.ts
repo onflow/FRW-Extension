@@ -3,12 +3,12 @@ import type { TransactionStatus } from '@onflow/typedefs';
 import openapiService, { type FlowTransactionResponse } from '@/background/service/openapi';
 import { type TransferItem } from '@/shared/types/transaction-types';
 import { isValidEthereumAddress, isValidFlowAddress } from '@/shared/utils/address';
-import { getCachedData } from '@/shared/utils/cache-data-access';
 import {
   transferListKey,
   type TransferListStore,
   transferListRefreshRegex,
 } from '@/shared/utils/cache-data-keys';
+import { consoleError } from '@/shared/utils/console-log';
 
 import {
   getInvalidData,
@@ -127,8 +127,6 @@ class Transaction {
       existingTxStore.count = existingTxStore.count + 1;
       await setCachedData(transferListKey(network, address), existingTxStore);
     }
-    // Send a message to the UI to update the transfer list
-    chrome.runtime.sendMessage({ msg: 'transferListUpdated' });
   };
 
   updatePending = async (
@@ -186,12 +184,12 @@ class Transaction {
       const storeItemIndex = existingTxStore.list.findIndex((item) => item.hash.includes(txId));
       if (storeItemIndex !== -1) {
         existingTxStore.list[storeItemIndex] = txItem;
+        existingTxStore.pendingCount = existingTxStore.list.filter(
+          (item) => item.status === 'PENDING'
+        ).length;
         await setCachedData(transferListKey(network, address), existingTxStore);
       }
     }
-
-    // Send a message to the UI to update the transfer list
-    chrome.runtime.sendMessage({ msg: 'transferListUpdated' });
 
     // Return the hash of the transaction
     return combinedTxHash;
@@ -297,7 +295,8 @@ class Transaction {
     this.setPendingList(network, address, existingPendingList);
     const transferListStore: TransferListStore = {
       count: data.total + existingPendingList.length,
-      pendingCount: existingPendingList.length,
+      // This is the number of transaction that are in progress
+      pendingCount: existingPendingList.filter((item) => item.status === 'PENDING').length,
       list: [...existingPendingList, ...txList],
     };
     await setCachedData(transferListKey(network, address, offset, limit), transferListStore);
@@ -335,18 +334,31 @@ class Transaction {
       );
       return this.setTransaction(network, address, flowResult, offset, limit);
     } else if (isValidEthereumAddress(address)) {
-      const evmResult = await openapiService.getEVMTransfers(
-        address,
-        parseInt(offset ?? '0'),
-        parseInt(limit ?? '15')
-      );
-      const resultAsFlowResponse: FlowTransactionResponse = {
-        total: evmResult.next_page_params
-          ? evmResult.next_page_params.items_count
-          : evmResult.trxs.length,
-        transactions: evmResult.trxs,
-      };
-      return this.setTransaction(network, address, resultAsFlowResponse, offset, limit);
+      try {
+        const evmResult = await openapiService.getEVMTransfers(
+          address,
+          parseInt(offset ?? '0'),
+          parseInt(limit ?? '15')
+        );
+        if (!evmResult.trxs) {
+          throw new Error('Error loading EVM transactions');
+        }
+        const resultAsFlowResponse: FlowTransactionResponse = {
+          total: evmResult.next_page_params
+            ? evmResult.next_page_params.items_count
+            : evmResult.trxs?.length || 0,
+          transactions: evmResult.trxs || [],
+        };
+        return this.setTransaction(network, address, resultAsFlowResponse, offset, limit);
+      } catch (error) {
+        consoleError('Error loading EVM transactions', error);
+        const emptyResult: FlowTransactionResponse = {
+          total: 0,
+          transactions: [],
+        };
+
+        return this.setTransaction(network, address, emptyResult, offset, limit);
+      }
     } else {
       throw new Error('Invalid address');
     }

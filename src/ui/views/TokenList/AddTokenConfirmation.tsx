@@ -1,9 +1,10 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Typography, Drawer, Grid, Button, IconButton, CircularProgress } from '@mui/material';
-import { type TokenInfo } from 'flow-native-token-registry';
+import { Box, Typography, Drawer, Button, IconButton, CircularProgress } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { type TokenInfo } from '@/shared/types/token-info';
 import IconPlus from '@/ui/components/iconfont/IconPlus';
 import { useWallet } from 'ui/utils';
 
@@ -65,8 +66,8 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
           alignItems: 'center',
         }}
       >
-        <Grid item xs={1}></Grid>
-        <Grid item xs={10}>
+        <Grid size={1}></Grid>
+        <Grid size={10}>
           <Box
             sx={{
               display: 'flex',
@@ -80,7 +81,7 @@ const AddTokenConfirmation = (props: AddTokenConfirmationProps) => {
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={1}>
+        <Grid size={1}>
           <IconButton onClick={props.handleCloseIconClicked}>
             <CloseIcon fontSize="medium" sx={{ color: 'icon.navi', cursor: 'pointer' }} />
           </IconButton>

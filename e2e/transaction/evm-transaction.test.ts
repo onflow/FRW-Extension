@@ -62,7 +62,10 @@ export const moveTokenCoaHomepage = async ({ page, tokenname, amount = '0.000000
   await page.getByPlaceholder('Amount').fill(amount);
   await page.getByRole('button', { name: 'Move' }).click();
   // Wait for the transaction to be completed
-  const txId = await waitForTransaction({ page, successtext: /success|Executed/ });
+  const txId = await waitForTransaction({
+    page,
+    successtext: /success|Finalized|Executed|Sealed/,
+  });
   return { txId, tokenname, amount };
 };
 
@@ -86,7 +89,7 @@ test('EVM transactions', async ({ page, extensionId }) => {
     page,
     tokenname: 'flow',
     receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
-    successtext: /success|Executed/,
+    successtext: /success|Finalized|Executed|Sealed/,
     amount: '0.12345678', // 8 decimal places
   });
   txList.push(tx1);
@@ -96,7 +99,7 @@ test('EVM transactions', async ({ page, extensionId }) => {
     page,
     tokenname: 'stFlow',
     receiver: getReceiverEvmAccount({ parallelIndex: test.info().parallelIndex }),
-    successtext: /success|Executed/,
+    successtext: /success|Finalized|Executed|Sealed/,
     amount: '0.00000112134354678',
   });
   txList.push(tx2);
@@ -108,7 +111,7 @@ test('EVM transactions', async ({ page, extensionId }) => {
     page,
     tokenname: 'flow',
     receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
-    successtext: /success|Executed/,
+    successtext: /success|Finalized|Executed|Sealed/,
     amount: '0.00123456', // 8 decimal places
   });
   txList.push(tx3);
@@ -118,7 +121,7 @@ test('EVM transactions', async ({ page, extensionId }) => {
     page,
     tokenname: 'usdc.e',
     receiver: getReceiverCadenceAccount({ parallelIndex: test.info().parallelIndex }),
-    successtext: /success|Executed/,
+    successtext: /success|Finalized|Executed|Sealed/,
     amount: '0.002468', // 6 decimal places
   });
   txList.push(tx4);
@@ -129,7 +132,7 @@ test('EVM transactions', async ({ page, extensionId }) => {
     page,
     tokenname: 'flow',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
-    successtext: /success|Executed/,
+    successtext: /success|Finalized|Executed|Sealed/,
     amount: '0.00123456', // 8 decimal places
   });
   txList.push(tx5);
@@ -139,7 +142,7 @@ test('EVM transactions', async ({ page, extensionId }) => {
     page,
     tokenname: 'beta',
     receiver: process.env.TEST_RECEIVER_METAMASK_EVM_ADDR!,
-    successtext: /success|Executed/,
+    successtext: /success|Finalized|Executed|Sealed/,
     amount: '0.001234567890123456', // 8 decimal places
   });
   txList.push(tx6);

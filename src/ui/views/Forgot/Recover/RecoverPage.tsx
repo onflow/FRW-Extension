@@ -1,6 +1,5 @@
 // import { useTranslation } from 'react-i18next';
 import { Typography, Box, FormControl, Input } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { consoleError } from '@/shared/utils/console-log';
@@ -10,31 +9,8 @@ import SlideRelative from '@/ui/components/SlideRelative';
 import { LLPrimaryButton } from 'ui/components';
 import { useWallet } from 'ui/utils';
 
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    magrinBottom: '64px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
-
 const RecoverPage = ({ dataArray, setArray, goNext }) => {
   const wallet = useWallet();
-  const classes = useStyles();
   const inputEl = useRef<any>(null);
   // const { t } = useTranslation();
   const [showError, setShowError] = useState(false);
@@ -161,7 +137,20 @@ const RecoverPage = ({ dataArray, setArray, goNext }) => {
         <Input
           id="textfield"
           type="password"
-          className={classes.inputBox}
+          sx={{
+            height: '64px',
+            padding: '16px',
+            magrinBottom: '64px',
+            zIndex: '999',
+            backgroundColor: '#282828',
+            border: '2px solid #4C4C4C',
+            borderRadius: '12px',
+            boxSizing: 'border-box',
+            '&.Mui-focused': {
+              border: '2px solid #FAFAFA',
+              boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+            },
+          }}
           placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           autoFocus
           fullWidth

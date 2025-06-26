@@ -2283,7 +2283,7 @@ export const createTestResults = (): ApiTestResults => ({
       timestamp: 1736463323017,
     },
     {
-      functionName: 'getTokenPriceHistory',
+      functionName: 'getTokenPriceHistoryArray',
       functionGroup: 'prices',
       functionParams: {
         token: 'flow',

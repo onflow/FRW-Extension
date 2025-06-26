@@ -35,7 +35,7 @@ const FetchAvatar = ({ username }) => {
     fetchUserAvatar(username);
   }, [fetchUserAvatar, username]);
 
-  return <Avatar src={avatar}></Avatar>;
+  return <Avatar src={avatar} sx={{ width: '40px', height: '40px', borderRadius: '8px' }} />;
 };
 
 const GoogleAccounts = ({ handleSwitchTab, accounts, setUsername }) => {

@@ -5,7 +5,6 @@ import { EventEmitter } from 'events';
 import * as bip39 from 'bip39';
 import encryptor from 'browser-passworder';
 import * as ethUtil from 'ethereumjs-util';
-import { P } from 'ts-toolbelt/out/Object/_api';
 
 import { normalizeAddress } from '@/background/utils';
 import { pubKeyAccountToAccountKey, defaultAccountKey } from '@/background/utils/account-key';
@@ -458,7 +457,7 @@ class KeyringService extends EventEmitter {
   }
 
   hasVault() {
-    return !!this.store.getState().vault;
+    return !!this.store.getState()?.vault?.length;
   }
 
   isUnlocked() {
@@ -661,7 +660,8 @@ class KeyringService extends EventEmitter {
    */
   async verifyOrBoot(password: string): Promise<void> {
     const encryptedBooted = this.store.getState().booted;
-    if (!encryptedBooted) {
+    const hasVault = this.hasVault();
+    if (!encryptedBooted || !hasVault) {
       await this.boot(password);
     } else {
       await this.verifyPassword(password);
@@ -919,7 +919,7 @@ class KeyringService extends EventEmitter {
 
     const vaultArray =
       keyringState.vaultVersion === KEYRING_STATE_VAULT_V3
-        ? keyringState.vault
+        ? (keyringState.vault ?? [])
         : await this.encryptVaultArray(await this.decryptVaultArray(password), password);
 
     const vaultArrayAccountIndex = vaultArray.findIndex(
@@ -1525,7 +1525,9 @@ class KeyringService extends EventEmitter {
       // Ensure vaultArray is an array and filter out null/undefined entries
       const vaultArray = Array.isArray(keyringState.vault)
         ? keyringState.vault.filter(Boolean)
-        : [keyringState.vault];
+        : keyringState.vault
+          ? [keyringState.vault]
+          : [];
 
       return await this.decryptVaultArrayV2(vaultArray, password);
     }

@@ -11,7 +11,6 @@ import {
   Skeleton,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -19,6 +18,7 @@ import type { UserInfoResponse } from '@/shared/types/network-types';
 import { type WalletAccount } from '@/shared/types/wallet-types';
 import { consoleError } from '@/shared/utils/console-log';
 import { AccountListing } from '@/ui/components/account/account-listing';
+import { ProfileItemBase } from '@/ui/components/profile/profile-item-base';
 import { MenuItem } from '@/ui/components/sidebar/menu-item';
 import { useFeatureFlag } from '@/ui/hooks/use-feature-flags';
 import {
@@ -35,23 +35,10 @@ import ErrorModel from '../../../components/PopupModal/errorModel';
 
 import AddAccountPopup from './AddAccountPopup';
 
-const useStyles = makeStyles(() => ({
-  menuDrawer: {
-    zIndex: '1400 !important',
-  },
-  paper: {
-    background: '#0A0A0B',
-  },
-  active: {
-    background: '#BABABA14',
-    borderRadius: '12px',
-  },
-}));
-
 interface MenuDrawerProps {
   drawer: boolean;
   toggleDrawer: () => void;
-  userInfo: UserInfoResponse | null;
+  userInfo?: UserInfoResponse;
   togglePop: () => void;
   walletList: WalletAccount[];
   activeAccount: WalletAccount;
@@ -76,13 +63,13 @@ const MenuDrawer = ({
 }: MenuDrawerProps) => {
   const wallet = useWallet();
   const history = useHistory();
-  const classes = useStyles();
   const scrollRef = useRef<HTMLDivElement>(null);
   // Add Account Drawer
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const canCreateNewAccount = useFeatureFlag('create_new_account');
-  const canImportExistingAccount = useFeatureFlag('import_existing_account');
+  // TODO: Uncomment this when we have the import existing account feature flag
+  const canImportExistingAccount = false; // useFeatureFlag('import_existing_account');
 
   // Error state
   const [showError, setShowError] = useState(false);
@@ -122,13 +109,19 @@ const MenuDrawer = ({
   const toggleAddAccount = () => {
     setShowAddAccount((prevShowAddAccount) => !prevShowAddAccount);
   };
+  const handleEnableEvmClick = useCallback(
+    (parentAddress: string) => {
+      history.push(`/dashboard/enable?parentAddress=${parentAddress}`);
+      toggleDrawer();
+    },
+    [history, toggleDrawer]
+  );
   return (
     <Drawer
       open={drawer}
       onClose={toggleDrawer}
-      className={classes.menuDrawer}
-      classes={{ paper: classes.paper }}
-      PaperProps={{ sx: { width: '75%', maxWidth: '400px' } }}
+      sx={{ zIndex: '1400 !important' }}
+      PaperProps={{ sx: { width: '75%', maxWidth: '400px', background: '#0A0A0B' } }}
     >
       <List
         sx={{
@@ -138,7 +131,7 @@ const MenuDrawer = ({
           height: '100%',
         }}
       >
-        <Box sx={{ padding: '24px 16px' }}>
+        <Box sx={{ padding: '0px 0px 24px 0px' }}>
           <Box
             sx={{
               display: 'flex',
@@ -147,33 +140,14 @@ const MenuDrawer = ({
               justifyContent: 'space-between',
             }}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              {userInfo ? (
-                <img
-                  src={userInfo.avatar}
-                  width={48}
-                  height={48}
-                  style={{ backgroundColor: COLOR_GREEN_FLOW_THEME_16FF99, borderRadius: '8px' }}
-                />
-              ) : (
-                <Skeleton variant="circular" width={48} height={48} />
-              )}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <ListItemText
-                  sx={{ fontSize: '14px', fontWeight: '700', marginLeft: '16px' }}
-                  primary={
-                    ((!mainAddressLoading || noAddress) && userInfo?.nickname) || (
-                      <Skeleton variant="text" width={100} />
-                    )
-                  }
-                />
-              </Box>
-            </Box>
-            <Box sx={{ paddingTop: '4px', px: '2px' }}>
-              <IconButton edge="end" aria-label="close" onClick={togglePop}>
-                <img style={{ display: 'inline-block', width: '24px' }} src={userCircleGear} />
-              </IconButton>
-            </Box>
+            <ProfileItemBase
+              profileId={userInfo?.id}
+              selectedProfileId={userInfo?.id}
+              onClick={(_profileId: string) => togglePop()}
+              setLoadingId={() => {}}
+              userInfo={userInfo}
+              activeProfileVariant={true}
+            />
           </Box>
         </Box>
         <Box
@@ -199,6 +173,7 @@ const MenuDrawer = ({
             activeAccount={activeAccount}
             activeParentAccount={activeParentAccount}
             onAccountClick={setActiveAccount}
+            onEnableEvmClick={handleEnableEvmClick}
             showActiveAccount={true}
           />
         </Box>

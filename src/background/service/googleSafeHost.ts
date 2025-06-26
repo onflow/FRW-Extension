@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import { createPersistStore } from 'background/utils';
 
 interface GoogleHostModel {
@@ -17,9 +15,6 @@ class GoogleSafeHost {
   baseURL = 'https://safebrowsing.googleapis.com';
   key = process.env.GOOGLE_API;
   version = '1.0';
-  safebrowsing = axios.create({
-    baseURL: this.baseURL,
-  });
 
   store!: GoogleSafeHostStore;
 
@@ -50,7 +45,7 @@ class GoogleSafeHost {
     const unique = Array.from(new Set(hostList)).map((host): GoogleHostModel => ({ url: host }));
     const { data } = await this.sendRequest(unique);
     this.setExpiry();
-    if (data.matches && data.matches > 0) {
+    if (data.matches && data.matches.length > 0) {
       const blockList = data.matches.map((item) => item.threat.url);
       blockList
         .filter((block) => !this.store.blockList.includes(block))
@@ -75,11 +70,16 @@ class GoogleSafeHost {
   };
 
   sendRequest = async (urls: GoogleHostModel[]) => {
-    return await axios({
-      method: 'post',
-      url: this.baseURL + '/v4/threatMatches:find',
-      params: { key: this.key },
-      data: {
+    const url = new URL(`${this.baseURL}/v4/threatMatches:find`);
+    if (this.key) {
+      url.searchParams.append('key', this.key);
+    }
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         client: {
           clientId: 'lilico-extension',
           clientVersion: '0.0.1',
@@ -94,10 +94,17 @@ class GoogleSafeHost {
           ],
           platformTypes: ['ALL_PLATFORMS'],
           threatEntryTypes: ['URL'],
-          threatEntries: [urls],
+          threatEntries: urls,
         },
-      },
+      }),
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return { data };
   };
 }
 

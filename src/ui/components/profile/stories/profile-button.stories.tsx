@@ -8,7 +8,7 @@ import userCirclePlus from '@/ui/assets/svg/user-circle-plus.svg';
 import { ProfileButton } from '../profile-button';
 
 const meta: Meta<typeof ProfileButton> = {
-  title: 'Components/ProfileButton',
+  title: 'Components/profile/ProfileButton',
   component: ProfileButton,
   tags: ['autodocs'],
   parameters: {

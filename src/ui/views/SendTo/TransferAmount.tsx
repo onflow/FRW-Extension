@@ -13,7 +13,6 @@ import {
   Tooltip,
 } from '@mui/material';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback } from 'react';
 
 import { type TransactionState } from '@/shared/types/transaction-types';
@@ -26,86 +25,6 @@ import { useCoins } from '@/ui/hooks/useCoinHook';
 import { CurrencyValue } from '../../components/TokenLists/CurrencyValue';
 import { TokenBalance } from '../../components/TokenLists/TokenBalance';
 
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    minHeight: '64px',
-    paddingRight: '12px',
-    paddingLeft: '0',
-    py: '14px',
-    zIndex: '999',
-    fontSize: '24px',
-    backgroundColor: '#282828',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-  },
-  selectRoot: {
-    fontFamily: 'IBM Plex Sans, sans-serif',
-    fontSize: '0.875rem',
-    boxSizing: 'border-box',
-    borderRadius: '0.75em',
-    marginRight: '0',
-    textAlign: 'left',
-    lineHeight: '1.5',
-    display: 'flex',
-    gap: '8px',
-    color: '#CDD2D7',
-    border: '1px solid #282828',
-
-    // &.${selectUnstyledClasses.expanded} {
-    //   &::after {
-    //     content: '▴';
-    //   }
-    // }
-
-    // &::after {
-    //   content: '▾';
-    //   float: right;
-    // }
-    '&ul': {
-      fontFamily: 'IBM Plex Sans, sans-serif',
-      fontSize: '0.875rem',
-      boxSizing: 'border-box',
-      padding: '5px',
-      margin: '10px 0',
-      maxHeight: '400px',
-      backgroundColor: '#282828',
-      border: 'none',
-      borderRadius: '0.75em',
-      color: '#CDD2D7',
-      overflow: 'auto',
-      outline: '0px',
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      border: 'none !important',
-      borderWidth: '0px !important',
-      outline: 'none !important',
-    },
-  },
-  selectList: {
-    fontFamily: 'IBM Plex Sans, sans-serif',
-    fontSize: '0.875rem',
-    boxSizing: 'border-box',
-    padding: '5px',
-    margin: '10px 0',
-    maxHeight: '400px',
-    backgroundColor: '#282828',
-    border: '1px solid #787878',
-    borderRadius: '0.75em',
-    color: '#CDD2D7',
-    overflow: 'auto',
-    outline: '0px',
-  },
-  exceedBox: {
-    background: 'rgba(196,69,54,0.08)',
-    display: 'flex',
-    height: '25px',
-  },
-}));
 const TransferAmount = ({
   transactionState,
   handleAmountChange,
@@ -119,7 +38,6 @@ const TransferAmount = ({
   handleSwitchFiatOrCoin: () => void;
   handleMaxClick: () => void;
 }) => {
-  const classes = useStyles();
   const { amount, fiatAmount } = transactionState;
   const { coins } = useCoins();
   const currency = useCurrency();
@@ -168,7 +86,17 @@ const TransferAmount = ({
             <FormControl sx={{ flex: '1', display: 'flex' }}>
               <Input
                 id="textfield"
-                className={classes.inputBox}
+                sx={{
+                  minHeight: '64px',
+                  paddingRight: '12px',
+                  paddingLeft: '0',
+                  py: '14px',
+                  zIndex: '999',
+                  fontSize: '24px',
+                  backgroundColor: '#282828',
+                  borderRadius: '12px',
+                  boxSizing: 'border-box',
+                }}
                 placeholder={chrome.i18n.getMessage('Amount')}
                 autoFocus
                 fullWidth
@@ -206,7 +134,39 @@ const TransferAmount = ({
               <Select
                 renderValue={renderValue}
                 onChange={(e) => handleTokenChange(e.target.value)}
-                className={classes.selectRoot}
+                sx={{
+                  fontFamily: 'IBM Plex Sans, sans-serif',
+                  fontSize: '0.875rem',
+                  boxSizing: 'border-box',
+                  borderRadius: '0.75em',
+                  marginRight: '0',
+                  textAlign: 'left',
+                  lineHeight: '1.5',
+                  display: 'flex',
+                  gap: '8px',
+                  color: '#CDD2D7',
+                  border: '1px solid #282828',
+                  zIndex: 2000,
+                  '&ul': {
+                    fontFamily: 'IBM Plex Sans, sans-serif',
+                    fontSize: '0.875rem',
+                    boxSizing: 'border-box',
+                    padding: '5px',
+                    margin: '10px 0',
+                    maxHeight: '400px',
+                    backgroundColor: '#282828',
+                    border: 'none',
+                    borderRadius: '0.75em',
+                    color: '#CDD2D7',
+                    overflow: 'auto',
+                    outline: '0px',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none !important',
+                    borderWidth: '0px !important',
+                    outline: 'none !important',
+                  },
+                }}
                 value={transactionState.tokenInfo.symbol}
                 defaultValue={transactionState.tokenInfo.symbol}
                 MenuProps={{
@@ -217,7 +177,6 @@ const TransferAmount = ({
                     },
                   },
                 }}
-                sx={{ zIndex: 2000 }}
               >
                 {coins
                   .filter((coin) => Number(coin.balance) > 0)
@@ -234,7 +193,17 @@ const TransferAmount = ({
             <FormControl sx={{ flex: '1', display: 'flex' }}>
               <Input
                 id="textfield"
-                className={classes.inputBox}
+                sx={{
+                  minHeight: '64px',
+                  paddingRight: '12px',
+                  paddingLeft: '0',
+                  py: '14px',
+                  zIndex: '999',
+                  fontSize: '24px',
+                  backgroundColor: '#282828',
+                  borderRadius: '12px',
+                  boxSizing: 'border-box',
+                }}
                 placeholder={chrome.i18n.getMessage('Amount')}
                 autoFocus
                 fullWidth

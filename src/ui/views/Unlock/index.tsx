@@ -1,6 +1,5 @@
 // import { useTranslation } from 'react-i18next';
 import { Input, Typography, Box, FormControl, CircularProgress } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -15,28 +14,6 @@ import { useWallet, useWalletLoaded } from '@/ui/utils';
 import { openInternalPageInTab } from '@/ui/utils/webapi';
 
 import './style.css';
-
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    magrinBottom: '64px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
 
 const UsernameError: React.FC = () => (
   <Box display="flex" flexDirection="row" alignItems="center">
@@ -60,7 +37,6 @@ const Unlock = () => {
   const wallet = useWallet();
   const walletIsLoaded = useWalletLoaded();
   const history = useHistory();
-  const classes = useStyles();
   const inputEl = useRef<any>(null);
   // const { t } = useTranslation();
   const [showPasswordError, setShowPasswordError] = useState(false);
@@ -154,7 +130,19 @@ const Unlock = () => {
         <Input
           id="textfield"
           type="password"
-          className={classes.inputBox}
+          sx={{
+            height: '64px',
+            padding: '16px',
+            zIndex: '999',
+            backgroundColor: '#282828',
+            border: '2px solid #4C4C4C',
+            borderRadius: '12px',
+            boxSizing: 'border-box',
+            '&.Mui-focused': {
+              border: '2px solid #FAFAFA',
+              boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+            },
+          }}
           placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           autoFocus
           fullWidth

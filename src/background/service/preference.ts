@@ -1,5 +1,4 @@
 import compareVersions from 'compare-versions';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { storage } from '@/background/webapi';
 import { type Currency, DEFAULT_CURRENCY } from '@/shared/types/wallet-types';
@@ -7,7 +6,7 @@ import { createPersistStore } from 'background/utils';
 
 import { type FlowNetwork, MAINNET_NETWORK } from '../../shared/types/network-types';
 
-import { keyringService, sessionService, i18n } from './index';
+import { keyringService, i18n } from './index';
 
 const version = process.env.release || '0';
 export interface PreferenceAccount {
@@ -181,7 +180,7 @@ class PreferenceService {
   // };
 
   getHiddenAddresses = (): PreferenceAccount[] => {
-    return cloneDeep(this.store.hiddenAddresses);
+    return structuredClone(this.store.hiddenAddresses);
   };
 
   hideAddress = (type: string, address: string, brandName: string) => {
@@ -218,7 +217,7 @@ class PreferenceService {
   };
 
   getCurrentAccount = (): PreferenceAccount | undefined | null => {
-    return cloneDeep(this.store.currentAccount);
+    return structuredClone(this.store.currentAccount);
   };
 
   setCurrentAccount = (account: PreferenceAccount | null) => {

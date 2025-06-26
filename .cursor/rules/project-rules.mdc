@@ -1,0 +1,99 @@
+---
+description: Flow Wallet Project Guide
+globs:
+alwaysApply: false
+---
+# Flow Reference Wallet Project Guide
+
+This document provides a guide to the structure, conventions, and key technologies used in the Flow Reference Wallet Chrome Extension.
+
+## Overview
+
+This project is a Web3 wallet for the Flow blockchain, built as a Chrome Extension.
+
+- **Framework**: [React.js](mdc:src/ui/index.tsx)
+- **Language**: [TypeScript](mdc:tsconfig.json)
+- **Styling**: [MUI (Material-UI)](mdc:https:/mui.com)
+- **Routing**: [React Router v5](mdc:package.json)
+- **Testing**: [Vitest](mdc:vitest.config.ts) for unit tests and [Playwright](mdc:playwright.config.ts) for e2e tests.
+- **Component Development**: [Storybook](mdc:.storybook/main.cjs)
+
+## Package Management
+
+This project uses [pnpm](mdc:https:/pnpm.io) for package management. Always use `pnpm` for installing, removing, or updating packages.
+
+```bash
+# Install dependencies
+pnpm install
+
+# Add a new dependency
+pnpm add <package-name>
+```
+
+## Scripts
+
+- **`pnpm build:dev`**: Creates a development build of the extension in the `dist/` directory.
+- **`pnpm test:run`**: Runs the unit tests using Vitest.
+- **`pnpm test:e2e`**: Runs end-to-end tests using Playwright.
+- **`pnpm lint`**: Lints the codebase with ESLint.
+- **`pnpm format`**: Formats the code with Prettier.
+- **`pnpm storybook`**: Starts the Storybook server for component development.
+
+## Directory Structure
+
+- **`src/background`**: Contains the code for the extension's background script.
+    - **`service/`**: Houses various services that run in the background, like API calls and wallet logic. See [userWallet.ts](mdc:src/background/service/userWallet.ts).
+    - **`utils/`**: Utilities for the background script.
+- **`src/ui`**: Contains all UI-related code.
+    - **`components/`**: Shared, reusable React components. See [FRWProfile.tsx](mdc:src/ui/components/FRWProfile.tsx).
+    - **`hooks/`**: Custom React hooks. See [use-account-hooks.ts](mdc:src/ui/hooks/use-account-hooks.ts).
+    - **`views/`**: Components that represent full pages or views within the extension's UI. See [views/Locked/](mdc:src/ui/views/Locked/index.tsx).
+    - **`utils/`**: Utility functions and context providers for the UI.
+- **`src/content-script`**: Code for content scripts that run in the context of web pages.
+- **`src/constant`**: Contains constant definitions.
+
+## File Naming Conventions
+
+To maintain consistency, please adhere to the following naming conventions for new files:
+
+- **React Components**: `PascalCase.tsx`. (e.g., `MyComponent.tsx`)
+- **Hooks**: `use-kebab-case.ts`. (e.g., `use-my-hook.ts`)
+- **Other TypeScript Files (utils, services, etc.)**: `kebab-case.ts`. (e.g., `my-utility.ts`)
+
+## Key Libraries & Concepts
+
+- **Flow Interaction**: The [@onflow/fcl](mdc:https:/github.com/onflow/fcl-js) library is used for all interactions with the Flow blockchain.
+- **State Management**: The application uses a combination of React hooks, and data cache storage using chrome storage.
+- **Firebase**: Used for remote configuration. See [firebaseConfig.ts](mdc:src/background/utils/firebaseConfig.ts).
+- **Internationalization (i18n)**: Text is managed in [messages.json](mdc:src/messages.json) and loaded via `i18n.ts`.
+
+## Data Caching
+
+The extension uses a custom stale-while-revalidate caching system designed for the browser extension environment. This is necessary because the React application state is destroyed each time the popup closes. For a detailed explanation, see the [Cache Data Model Architecture](mdc:docs/cache-data-model.md) documentation.
+
+### Core Concepts
+
+- **Two Types of Storage**:
+  1.  **Session Storage (Cache Data)**: For temporary, refreshable data synced between the background script and the UI.
+  2.  **Local Storage (User Data)**: For persistent user settings.
+
+- **Data Flow**:
+    1. The UI requests data using a hook like `useCachedData`.
+    2. If the data is stale or missing, a refresh is triggered in the background service worker.
+    3. The background worker fetches new data, updates the cache using `setCachedData`, and the UI is automatically updated via storage listeners.
+
+- **Key Principle**: Data is **only ever set or modified by the background script**. The UI reads data and requests refreshes.
+
+### Key Files
+
+- **`docs/cache-data-model.md`**: The primary documentation for this system.
+- **`src/shared/utils/cache-data-keys.ts`**: Defines keys and data types for temporary session data.
+- **`src/shared/utils/user-data-keys.ts`**: Defines keys and data types for persistent user data.
+- **`src/background/utils/data-cache.ts`**: Contains the core logic for the caching mechanism, including `registerRefreshListener` for single items and `registerBatchRefreshListener` for batching multiple requests.
+
+### Implementation Pattern
+
+To add new data to the cache:
+1.  **Define Keys**: Add key generation functions and type definitions in `cache-data-keys.ts` or `user-data-keys.ts`.
+2.  **Create Background Loader**: In a background service, use `registerRefreshListener` or `registerBatchRefreshListener` to define how data is fetched.
+3.  **Use Frontend Hooks**: Access data in UI components with the `useCachedData` or `useUserData` hooks.

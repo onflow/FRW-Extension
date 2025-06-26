@@ -1,85 +1,9 @@
 import { Typography, Card, CardActionArea, CardMedia, CardContent, Box } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { PostMedia } from '@/ui/utils/url';
 import fallback from 'ui/assets/image/errorImage.png';
-
-const useStyles = makeStyles(() => ({
-  titleWrapper: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '0 9px',
-  },
-  title: {
-    fontSize: '22px',
-    color: '#F2F2F2',
-    lineHeight: '32px',
-    fontWeight: 600,
-    padding: '18px',
-    flex: 1,
-  },
-  actionarea: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '8px',
-    '&:hover': {
-      color: '#222222',
-      backgroundColor: '#222222',
-    },
-  },
-  card: {
-    flex: '0 0 50%',
-    backgroundColor: 'inherit',
-    boxShadow: 'none',
-    margin: 0,
-    borderRadius: '8px',
-    padding: '8px',
-    display: 'inline-block',
-    '&:hover': {
-      color: '#222222',
-      backgroundColor: '#222222',
-    },
-  },
-  grid: {
-    width: '100%',
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignContent: 'flex-start',
-    padding: '10px 13px',
-  },
-  cardmedia: {
-    height: '159px',
-    width: '100%',
-    overflow: 'hidden',
-    justifyContent: 'center',
-  },
-  media: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '8px',
-    margin: '0 auto',
-    objectFit: 'cover',
-  },
-  content: {
-    padding: '5px 0',
-    backgroundColor: 'inherit',
-    borderRadius: '0 0 8px 8px',
-  },
-  nftname: {
-    color: '#E6E6E6',
-    fontSize: '14px',
-    fontWeight: '700',
-  },
-  nftprice: {
-    color: '#808080',
-    fontSize: '14px',
-  },
-}));
 
 interface GridViewProps {
   data: any;
@@ -108,7 +32,6 @@ const GridView = (props: GridViewProps) => {
     searchTerm,
   } = props;
 
-  const classes = useStyles();
   const [loaded, setLoaded] = useState(false);
   const [isAccessible, setAccessible] = useState(true);
   const [media, setGetMediea] = useState<PostMedia | null>(null);
@@ -180,7 +103,13 @@ const GridView = (props: GridViewProps) => {
           (media.image ? (
             <img
               src={replaceIPFS(media.image)}
-              className={classes.media}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '8px',
+                margin: '0 auto',
+                objectFit: 'cover',
+              }}
               onLoad={() => setLoaded(true)}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null; // prevents looping
@@ -203,7 +132,7 @@ const GridView = (props: GridViewProps) => {
                   borderRadius: '8px',
                 }}
               >
-                <source src={replaceIPFS(media.video)} type="video/mp4" className={classes.media} />
+                <source src={replaceIPFS(media.video)} type="video/mp4" />
               </video>
             </>
           ))}
@@ -247,19 +176,63 @@ const GridView = (props: GridViewProps) => {
   };
 
   return (
-    <Card className={classes.card} elevation={0}>
+    <Card
+      sx={{
+        flex: '0 0 50%',
+        backgroundColor: 'inherit',
+        boxShadow: 'none',
+        margin: 0,
+        borderRadius: '8px',
+        padding: '8px',
+        display: 'inline-block',
+        '&:hover': {
+          color: '#222222',
+          backgroundColor: '#222222',
+        },
+      }}
+      elevation={0}
+    >
       <CardActionArea
         component={Link}
-        className={classes.actionarea}
+        sx={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '8px',
+          '&:hover': {
+            color: '#222222',
+            backgroundColor: '#222222',
+          },
+        }}
         to={{
           pathname: detailPath,
           state: navigateState,
         }}
         onClick={navigateWithState}
       >
-        <CardMedia className={classes.cardmedia}>{getUri()}</CardMedia>
-        <CardContent className={classes.content}>
-          <Typography className={classes.nftname}>
+        <CardMedia
+          sx={{
+            height: '159px',
+            width: '100%',
+            overflow: 'hidden',
+            justifyContent: 'center',
+          }}
+        >
+          {getUri()}
+        </CardMedia>
+        <CardContent
+          sx={{
+            padding: '5px 0',
+            backgroundColor: 'inherit',
+            borderRadius: '0 0 8px 8px',
+          }}
+        >
+          <Typography
+            sx={{
+              color: '#E6E6E6',
+              fontSize: '14px',
+              fontWeight: '700',
+            }}
+          >
             {TilteWordWrapped(media?.title || data?.name) || ''}
             {!isAccessibleNft && (
               <Box

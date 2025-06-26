@@ -18,7 +18,13 @@ import {
   COLOR_GREEN_FLOW_DARKMODE_00EF8B,
 } from '@/ui/style/color';
 
-export const EnableEvmAccountCard = ({ showCard = false }) => {
+export const EnableEvmAccountCard = ({
+  onEnableEvmClick,
+  showCard = false,
+}: {
+  onEnableEvmClick: () => void;
+  showCard: boolean;
+}) => {
   const history = useHistory();
 
   const gradientStyle: React.CSSProperties = {
@@ -31,6 +37,7 @@ export const EnableEvmAccountCard = ({ showCard = false }) => {
     fontWeight: 600,
     letterSpacing: '0.1px',
   };
+
   return (
     <Card
       sx={{
@@ -52,12 +59,12 @@ export const EnableEvmAccountCard = ({ showCard = false }) => {
           display: 'flex',
           width: '100%',
           justifyContent: 'space-between',
-          paddingY: '16px',
-          paddingLeft: '16px',
+          paddingY: '8px',
+          paddingLeft: '8px',
           paddingRight: '8px',
           cursor: 'pointer',
         }}
-        onClick={() => history.push('/dashboard/enable')}
+        onClick={onEnableEvmClick}
       >
         <Box>
           <Typography

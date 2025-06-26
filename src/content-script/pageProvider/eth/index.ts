@@ -23,6 +23,7 @@ declare const __frw__isOpera;
 
 const log = (event, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line
     consoleLog(
       `%c [frw] (${new Date().toTimeString().slice(0, 8)}) ${event}`,
       'font-weight: bold; background-color: #7d6ef9; color: white;',
@@ -36,6 +37,12 @@ let isDefaultWallet =
   typeof __frw__isDefaultWallet !== 'undefined' ? __frw__isDefaultWallet : false;
 let isOpera = typeof __frw__isOpera !== 'undefined' ? __frw__isOpera : false;
 let uuid = typeof __frw__uuid !== 'undefined' ? __frw__uuid : '';
+let extensionId = '';
+
+const DEPLOYMENT_ENV = process.env.DEPLOYMENT_ENV;
+const IS_BETA = process.env.IS_BETA === 'true';
+
+const channelPrefix = IS_BETA ? 'frw-beta:' : DEPLOYMENT_ENV === 'production' ? 'frw:' : 'frw-dev:';
 
 // Check if we're running in MAIN world by looking for the bridge UUID event
 let isMainWorld = false;
@@ -92,21 +99,26 @@ const waitForWalletUUID = (): Promise<string> => {
 };
 
 const getParams = () => {
-  if (localStorage.getItem('frw:channelName')) {
-    channelName = localStorage.getItem('frw:channelName') as string;
-    localStorage.removeItem('frw:channelName');
+  consoleLog('eth getParams', localStorage.getItem(`${channelPrefix}channelName`));
+  if (localStorage.getItem(`${channelPrefix}channelName`)) {
+    channelName = localStorage.getItem(`${channelPrefix}channelName`) as string;
+    localStorage.removeItem(`${channelPrefix}channelName`);
   }
-  if (localStorage.getItem('frw:isDefaultWallet')) {
-    isDefaultWallet = localStorage.getItem('frw:isDefaultWallet') === 'true';
-    localStorage.removeItem('frw:isDefaultWallet');
+  if (localStorage.getItem(`${channelPrefix}isDefaultWallet`)) {
+    isDefaultWallet = localStorage.getItem(`${channelPrefix}isDefaultWallet`) === 'true';
+    localStorage.removeItem(`${channelPrefix}isDefaultWallet`);
   }
-  if (localStorage.getItem('frw:uuid')) {
-    uuid = localStorage.getItem('frw:uuid') as string;
-    localStorage.removeItem('frw:uuid');
+  if (localStorage.getItem(`${channelPrefix}uuid`)) {
+    uuid = localStorage.getItem(`${channelPrefix}uuid`) as string;
+    localStorage.removeItem(`${channelPrefix}uuid`);
   }
-  if (localStorage.getItem('frw:isOpera')) {
-    isOpera = localStorage.getItem('frw:isOpera') === 'true';
-    localStorage.removeItem('frw:isOpera');
+  if (localStorage.getItem(`${channelPrefix}isOpera`)) {
+    isOpera = localStorage.getItem(`${channelPrefix}isOpera`) === 'true';
+    localStorage.removeItem(`${channelPrefix}isOpera`);
+  }
+  if (localStorage.getItem(`${channelPrefix}extensionId`)) {
+    extensionId = localStorage.getItem(`${channelPrefix}extensionId`) as string;
+    localStorage.removeItem(`${channelPrefix}extensionId`);
   }
 };
 getParams();
@@ -309,7 +321,10 @@ export class EthereumProvider extends EventEmitter {
       }
 
       return this._bcm
-        .request(data)
+        .request({
+          ...data,
+          extensionId,
+        })
         .then((res) => {
           if (data.method !== 'eth_call') {
             log('[request: success]', data.method, res);
@@ -482,19 +497,31 @@ const initializeFlowProvider = () => {
 };
 
 const requestHasOtherProvider = async () => {
-  const provider = await flowProviderPromise;
-  return provider.requestInternalMethods({
-    method: 'hasOtherProvider',
-    params: [],
-  });
+  try {
+    const provider = await flowProviderPromise;
+
+    return await provider.requestInternalMethods({
+      method: 'hasOtherProvider',
+      params: [],
+    });
+  } catch (error) {
+    consoleError('Error checking for other providers:', error);
+    return false;
+  }
 };
 
 const requestIsDefaultWallet = async () => {
-  const provider = await flowProviderPromise;
-  return provider.requestInternalMethods({
-    method: 'isDefaultWallet',
-    params: [],
-  }) as Promise<boolean>;
+  try {
+    const provider = await flowProviderPromise;
+
+    return (await provider.requestInternalMethods({
+      method: 'isDefaultWallet',
+      params: [],
+    })) as Promise<boolean>;
+  } catch (error) {
+    consoleError('Error checking default wallet status:', error);
+    return false;
+  }
 };
 
 // Check if user is connected to Flow Wallet
@@ -588,6 +615,7 @@ const initOperaProvider = async () => {
 
 const initProvider = async () => {
   const provider = await flowProviderPromise;
+
   provider._isReady = true;
   provider.on('defaultWalletChanged', switchWalletNotice);
   patchProvider(provider);
@@ -611,58 +639,76 @@ const initProvider = async () => {
         },
         ethereum: {
           get() {
-            log('ethereum get');
-            // This proxy is the key to multi-wallet interoperability.
-            // It intercepts requests and routes them to our wallet or the default
-            // wallet based on the connection state and method type.
+            // Proxy that routes specific methods
             const currentProvider = window.flowWalletRouter.currentProvider;
             const flowProvider = window.flowWalletRouter.flowProvider;
 
-            // The proxy is always returned, wrapping the current default provider.
-            // This ensures we can intercept requests even if our wallet is not the active one.
+            // If current provider is Flow Wallet, return it directly
+            if (currentProvider === flowProvider) {
+              return currentProvider;
+            }
+
+            // Proxy that intercepts specific methods
             return new Proxy(currentProvider, {
               get(target, prop) {
                 // Handle request method specially
                 if (prop === 'request') {
                   return async (data) => {
-                    // Check if user is connected to Flow Wallet
-                    const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
+                    try {
+                      // Check if user is connected to Flow Wallet
+                      const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
 
-                    if (data && shouldRouteToFlowWallet(data.method, connectedToFlowWallet)) {
-                      return flowProvider.request(data);
+                      if (data && shouldRouteToFlowWallet(data.method, connectedToFlowWallet)) {
+                        return await flowProvider.request(data);
+                      }
+                      // Route other methods to the default provider
+                      return await target.request(data);
+                    } catch (error) {
+                      consoleError('Error in request proxy:', error);
+                      throw error;
                     }
-                    // Route other methods to the default provider
-                    return target.request(data);
                   };
                 }
                 // Handle sendAsync method
                 if (prop === 'sendAsync') {
                   return async (payload, callback) => {
-                    const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
+                    try {
+                      const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
 
-                    if (
-                      payload &&
-                      !Array.isArray(payload) &&
-                      shouldRouteToFlowWallet(payload.method, connectedToFlowWallet)
-                    ) {
-                      return flowProvider.sendAsync(payload, callback);
+                      if (
+                        payload &&
+                        !Array.isArray(payload) &&
+                        shouldRouteToFlowWallet(payload.method, connectedToFlowWallet)
+                      ) {
+                        return await flowProvider.sendAsync(payload, callback);
+                      }
+                      return await target.sendAsync(payload, callback);
+                    } catch (error) {
+                      consoleError('Error in sendAsync proxy:', error);
+                      if (callback) callback(error, null);
+                      throw error;
                     }
-                    return target.sendAsync(payload, callback);
                   };
                 }
                 // Handle send method
                 if (prop === 'send') {
                   return async (payload, callback) => {
-                    const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
+                    try {
+                      const connectedToFlowWallet = isConnectedToFlowWallet(flowProvider);
 
-                    if (
-                      typeof payload === 'object' &&
-                      payload.method &&
-                      shouldRouteToFlowWallet(payload.method, connectedToFlowWallet)
-                    ) {
-                      return flowProvider.send(payload, callback);
+                      if (
+                        typeof payload === 'object' &&
+                        payload.method &&
+                        shouldRouteToFlowWallet(payload.method, connectedToFlowWallet)
+                      ) {
+                        return await flowProvider.send(payload, callback);
+                      }
+                      return await target.send(payload, callback);
+                    } catch (error) {
+                      consoleError('Error in send proxy:', error);
+                      if (callback) callback(error, null);
+                      throw error;
                     }
-                    return target.send(payload, callback);
                   };
                 }
                 // For other properties, return from the target
@@ -730,21 +776,15 @@ const providerInitPromise = flowProviderPromise.then((provider) => {
     checkInit();
   });
 });
-
-(async () => {
+// Initialize provider async
+const initializeWallet = async () => {
   try {
     if (isOpera) {
-      await initOperaProvider();
+      initOperaProvider();
     } else {
       await initProvider();
     }
-  } catch (e) {
-    consoleError('An error occurred while initializing the Flow wallet provider', e);
-  }
-})();
 
-(async () => {
-  try {
     const provider = await flowProviderPromise;
     const frwAsDefault = await requestIsDefaultWallet();
     // Set our wallet as the default if configured, but do not overwrite
@@ -753,7 +793,9 @@ const providerInitPromise = flowProviderPromise.then((provider) => {
   } catch (e) {
     consoleError('An error occurred while checking if the Flow wallet is the default wallet', e);
   }
-})();
+};
+
+initializeWallet();
 
 const EIP6963Icon =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8xMzc2MV8zNTIxKSI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiByeD0iNDYuODc1IiBmaWxsPSJ3aGl0ZSIvPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDFfMTM3NjFfMzUyMSkiPgo8cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzEzNzYxXzM1MjEpIi8+CjxwYXRoIGQ9Ik0xMjUgMjE3LjUyOUMxNzYuMTAyIDIxNy41MjkgMjE3LjUyOSAxNzYuMTAyIDIxNy41MjkgMTI1QzIxNy41MjkgNzMuODk3NSAxNzYuMTAyIDMyLjQ3MDcgMTI1IDMyLjQ3MDdDNzMuODk3NSAzMi40NzA3IDMyLjQ3MDcgNzMuODk3NSAzMi40NzA3IDEyNUMzMi40NzA3IDE3Ni4xMDIgNzMuODk3NSAyMTcuNTI5IDEyNSAyMTcuNTI5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE2NS4zODIgMTEwLjQyMkgxMzkuNTg1VjEzNi43OEgxNjUuMzgyVjExMC40MjJaIiBmaWxsPSJibGFjayIvPgo8cGF0aCBkPSJNMTEzLjIyNyAxMzYuNzhIMTM5LjU4NVYxMTAuNDIySDExMy4yMjdWMTM2Ljc4WiIgZmlsbD0iIzQxQ0M1RCIvPgo8L2c+CjwvZz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8xMzc2MV8zNTIxIiB4MT0iMCIgeTE9IjAiIHgyPSIyNTAiIHkyPSIyNTAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzFDRUI4QSIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0MUNDNUQiLz4KPC9saW5lYXJHcmFkaWVudD4KPGNsaXBQYXRoIGlkPSJjbGlwMF8xMzc2MV8zNTIxIj4KPHJlY3Qgd2lkdGg9IjI1MCIgaGVpZ2h0PSIyNTAiIHJ4PSI0Ni44NzUiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjxjbGlwUGF0aCBpZD0iY2xpcDFfMTM3NjFfMzUyMSI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSJ3aGl0ZSIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+Cjwvc3ZnPgo=';

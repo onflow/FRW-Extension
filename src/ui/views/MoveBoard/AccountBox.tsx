@@ -1,5 +1,4 @@
 import { Typography, Box, CardMedia } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { storage } from '@/background/webapi';

@@ -14,28 +14,11 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 import zxcvbn from 'zxcvbn';
 
 import { BpUncheked, BpCheckedIcon } from '@/ui/assets/icons/CustomCheckboxIcons';
 import { LLSpinner } from '@/ui/components';
-
-const useStyles = makeStyles(() => ({
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
 
 // Password Indicator Component
 interface PasswordIndicatorProps {
@@ -91,7 +74,7 @@ interface PasswordInputProps {
   readOnly?: boolean;
   placeholder?: string;
   autoFocus?: boolean;
-  className?: string;
+  sx?: any;
 }
 
 export const PasswordInput = ({
@@ -102,15 +85,27 @@ export const PasswordInput = ({
   readOnly = false,
   placeholder = chrome.i18n.getMessage('Create__a__password'),
   autoFocus = false,
-  className,
+  sx,
 }: PasswordInputProps) => {
-  const classes = useStyles();
-
   return (
     <Input
       type={isVisible ? 'text' : 'password'}
       value={value}
-      className={className || classes.inputBox}
+      sx={
+        sx || {
+          height: '64px',
+          padding: '16px',
+          zIndex: '999',
+          backgroundColor: '#282828',
+          border: '2px solid #4C4C4C',
+          borderRadius: '12px',
+          boxSizing: 'border-box',
+          '&.Mui-focused': {
+            border: '2px solid #FAFAFA',
+            boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+          },
+        }
+      }
       readOnly={readOnly}
       autoFocus={autoFocus}
       placeholder={placeholder}

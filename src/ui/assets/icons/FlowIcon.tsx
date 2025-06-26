@@ -1,15 +1,17 @@
 import React from 'react';
 
-import { COLOR_GREEN_FLOW_THEME_16FF99 } from '@/ui/style/color';
+import { COLOR_GREEN_FLOW_DARKMODE_00EF8B } from '@/ui/style/color';
 
 export const FlowIcon = ({
-  color = COLOR_GREEN_FLOW_THEME_16FF99,
+  color = COLOR_GREEN_FLOW_DARKMODE_00EF8B,
   width = 45,
   height = 45,
+  showWhiteBackground = false,
 }: {
   color?: string;
   width?: number;
   height?: number;
+  showWhiteBackground?: boolean;
 }) => {
   return (
     <svg
@@ -19,6 +21,7 @@ export const FlowIcon = ({
       fill={color}
       xmlns="http://www.w3.org/2000/svg"
     >
+      {showWhiteBackground && <circle cx="22.5" cy="22.5" r="22.5" fill="#FDFBF9" />}
       <path
         fillRule="evenodd"
         clipRule="evenodd"

@@ -65,12 +65,7 @@ const Security = () => {
       </Box>
       <nav aria-label="secondary part">
         <List sx={{ paddingTop: '0px', paddingBottom: '0px' }}>
-          <ListItem
-            button
-            component={Link}
-            to="/dashboard/nested/privatekeypassword"
-            disablePadding
-          >
+          <ListItem component={Link} to="/dashboard/nested/privatekeypassword" disablePadding>
             <ListItemButton>
               <ListItemText primary={chrome.i18n.getMessage('Private__Key')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '25px' }}>
@@ -83,12 +78,7 @@ const Security = () => {
       <Divider />
       <nav aria-label="third part">
         <List sx={{ paddingTop: '0px', paddingBottom: '0px' }}>
-          <ListItem
-            button
-            component={Link}
-            to="/dashboard/nested/recoveryphrasepassword"
-            disablePadding
-          >
+          <ListItem component={Link} to="/dashboard/nested/recoveryphrasepassword" disablePadding>
             <ListItemButton>
               <ListItemText primary={chrome.i18n.getMessage('Recovery__Phrase')} />
               <ListItemIcon aria-label="end" sx={{ minWidth: '25px' }}>

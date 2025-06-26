@@ -23,7 +23,7 @@ export const CurrencyValue: React.FC<CurrencyValueProps> = ({
       className={className}
       prefix={currencySymbol}
       postFix={showCurrencyCode ? currencyCode : undefined}
-      decimals={2}
+      displayDecimals={2}
     />
   );
 };

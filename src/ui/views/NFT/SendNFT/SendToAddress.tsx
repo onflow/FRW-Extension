@@ -12,7 +12,6 @@ import {
   ListItemText,
 } from '@mui/material';
 import { StyledEngineProvider, useTheme } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import { isEmpty } from 'lodash';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -39,38 +38,6 @@ export enum SendPageTabOptions {
   AddressBook = 'AddressBook',
   Accounts = 'Accounts',
 }
-
-const useStyles = makeStyles((_theme) => ({
-  page: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
-  },
-  inputWrapper: {
-    paddingLeft: '18px',
-    paddingRight: '18px',
-    width: '100%',
-  },
-  inputBox: {
-    minHeight: '56px',
-    // borderRadius: theme.spacing(2),
-    backgroundColor: '#282828',
-    zIndex: '999',
-    // width: '100%',
-    borderRadius: '16px',
-    boxSizing: 'border-box',
-    // margin: '2px 18px 10px 18px',
-    width: '100%',
-    padding: '19px 16px',
-  },
-  listWrapper: {
-    flexGrow: 1,
-    justifyContent: 'space-between',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-}));
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -131,7 +98,6 @@ const USER_CONTACT: Contact = {
 };
 
 const SendToAddress = () => {
-  const classes = useStyles();
   const theme = useTheme();
   const usewallet = useWallet();
   const location = useLocation();
@@ -433,12 +399,34 @@ const SendToAddress = () => {
 
   return (
     <StyledEngineProvider injectFirst>
-      <div className={`${classes.page} page`}>
+      <Box
+        className="page"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+        }}
+      >
         <LLHeader title={chrome.i18n.getMessage('Send_to')} help={true} />
-        <div className={classes.inputWrapper}>
+        <Box
+          sx={{
+            paddingLeft: '18px',
+            paddingRight: '18px',
+            width: '100%',
+          }}
+        >
           <Input
             type="search"
-            className={classes.inputBox}
+            sx={{
+              minHeight: '56px',
+              backgroundColor: '#282828',
+              zIndex: '999',
+              borderRadius: '16px',
+              boxSizing: 'border-box',
+              width: '100%',
+              padding: '19px 16px',
+            }}
             placeholder={chrome.i18n.getMessage('Search__Address__or__Flow__domain')}
             autoFocus
             endAdornment={
@@ -449,10 +437,17 @@ const SendToAddress = () => {
             onChange={handleFilterAndSearch}
             onKeyDown={checkKey}
           />
-        </div>
+        </Box>
 
         {!searching ? (
-          <div className={classes.listWrapper}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              justifyContent: 'space-between',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <Tabs
               value={tabValue}
               sx={{ width: '100%' }}
@@ -528,7 +523,7 @@ const SendToAddress = () => {
                 />
               </TabPanel>
             </Box>
-          </div>
+          </Box>
         ) : (
           <div>
             {!searched && (
@@ -619,7 +614,7 @@ const SendToAddress = () => {
             }}
           />
         )}
-      </div>
+      </Box>
     </StyledEngineProvider>
   );
 };

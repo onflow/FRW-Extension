@@ -9,7 +9,6 @@ import {
   InputLabel,
   type SelectChangeEvent,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { type Contact } from '@/shared/types/network-types';

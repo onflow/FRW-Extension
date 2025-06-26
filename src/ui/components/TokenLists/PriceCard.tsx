@@ -12,11 +12,16 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import dayjs from 'dayjs';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { AreaChart, Area, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-import { Period, type PriceProvider } from '@/shared/types/network-types';
-import { getPeriodFrequency } from '@/shared/utils/getPeriodFrequency';
+import {
+  getPriceProvider,
+  Period,
+  type TokenPriceHistory,
+  type PriceProvider,
+} from '@/shared/types/network-types';
+import { consoleWarn } from '@/shared/utils/console-log';
 import {
   IconKraken,
   IconBinance,
@@ -118,17 +123,17 @@ const Huobi = () => {
   );
 };
 
-const PriceCard = ({ token, price, setPrice, providers }) => {
+const PriceCard = ({ token }) => {
   const wallet = useWallet();
-  const [data, setData] = useState([]);
-  // const [loading, setLoading] = useState(false)
-  const [period, setPeriod] = React.useState(Period.oneDay);
+  const [priceHistoryData, setPriceHistoryData] = useState<TokenPriceHistory[]>([]);
+  const [period, setPeriod] = useState<Period>(Period.oneDay);
   const [change, setChange] = useState(0);
+  const [price, setPrice] = useState(0);
   const mountedRef = useRef(true);
-  //   const [priceProvider, setPriceProvider] = useState('binance')
 
-  // FIX ME: Add HUOBI
-  const priceProviders = providers;
+  const priceProviders = useMemo(() => {
+    return getPriceProvider(token);
+  }, [token]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -148,52 +153,46 @@ const PriceCard = ({ token, price, setPrice, providers }) => {
 
   const fetchPrice = useCallback(
     async (provider: PriceProvider) => {
-      const response = await wallet.openapi.getTokenPrice(token, provider);
+      const tokenPriceResponse = await wallet.getTokenPrice(token, provider);
       if (mountedRef.current) {
-        setPrice(response['price']['last']);
-        const percentage = response['price']['change']['percentage'] * 100;
+        setPrice(tokenPriceResponse.price.last);
+        const percentage = tokenPriceResponse.price.change.percentage * 100;
         setChange(percentage);
       }
     },
-    [token, wallet.openapi, setPrice]
+    [token, wallet]
   );
 
   const fetchPriceHistory = useCallback(
     async (period: Period, provider: PriceProvider) => {
-      wallet.openapi.getTokenPriceHistory(token, period, provider).then((response) => {
-        const frequency = getPeriodFrequency(period);
-        const data = response[frequency].map((item) => ({
-          closeTime: item[0],
-          openPrice: item[1],
-          highPrice: item[2],
-          lowPrice: item[3],
-          price: item[4],
-          volume: item[5],
-          quoteVolume: item[6],
-        }));
-        setData(data);
-      });
+      try {
+        const priceHistoryDataResponse = await wallet.getTokenPriceHistory(token, period, provider);
+        if (mountedRef.current) {
+          setPriceHistoryData(priceHistoryDataResponse);
+        }
+      } catch (error) {
+        consoleWarn(error);
+        setPriceHistoryData([]);
+      }
     },
-    [token, wallet.openapi]
+    [token, wallet]
   );
-  const currentProvider = useCallback((): PriceProvider => {
+  const currentProvider = useMemo((): PriceProvider => {
     return priceProviders[selectedIndex] as PriceProvider;
   }, [selectedIndex, priceProviders]);
 
   useEffect(() => {
-    // FIX ME: Memory leak
-    const timerId = setTimeout(() => {
-      fetchPrice(currentProvider());
-      fetchPriceHistory(period, currentProvider());
-    }, 400);
-
-    return () => clearTimeout(timerId);
-  }, [fetchPrice, fetchPriceHistory, period, currentProvider]);
-
-  useEffect(() => {
-    fetchPrice(currentProvider());
-    fetchPriceHistory(period, currentProvider());
-  }, [selectedIndex, period, fetchPrice, fetchPriceHistory, currentProvider]);
+    fetchPrice(currentProvider);
+    fetchPriceHistory(period, currentProvider);
+  }, [
+    selectedIndex,
+    period,
+    token,
+    priceProviders,
+    fetchPrice,
+    currentProvider,
+    fetchPriceHistory,
+  ]);
 
   const isUp = (): boolean => {
     return change >= 0;
@@ -203,12 +202,12 @@ const PriceCard = ({ token, price, setPrice, providers }) => {
     const period = newPeriod as Period;
     if (period) {
       setPeriod(period);
-      fetchPriceHistory(period, currentProvider());
+      fetchPriceHistory(period, currentProvider);
     }
   };
 
-  const Provider = (index) => {
-    const priceProvider = providers[index];
+  const Provider = (index: number): React.ReactNode => {
+    const priceProvider = priceProviders[index];
     switch (priceProvider) {
       case 'kraken':
         return <Kraken />;
@@ -226,7 +225,13 @@ const PriceCard = ({ token, price, setPrice, providers }) => {
   };
 
   const CustomTooltip = ({ active, payload }) => {
-    if (active && data && payload && data.length > 0 && payload.length > 0) {
+    if (
+      active &&
+      priceHistoryData &&
+      payload &&
+      priceHistoryData.length > 0 &&
+      payload.length > 0
+    ) {
       const data = payload[0].payload;
       const date = dayjs.unix(data.closeTime);
       const showHour = period === Period.oneDay || period === Period.oneWeek;
@@ -373,7 +378,7 @@ const PriceCard = ({ token, price, setPrice, providers }) => {
         <AreaChart
           width={500}
           height={400}
-          data={data}
+          data={priceHistoryData}
           margin={{
             right: -15,
           }}

@@ -115,6 +115,7 @@ type AccountListingProps = {
   activeParentAccount?: WalletAccount;
   onAccountClick?: (address: string, parentAddress?: string) => void;
   onAccountClickSecondary?: (address: string, parentAddress?: string) => void;
+  onEnableEvmClick?: (parentAddress: string) => void;
   secondaryIcon?: React.ReactNode;
   showActiveAccount?: boolean;
 };
@@ -126,6 +127,7 @@ export const AccountListing = ({
   activeParentAccount,
   onAccountClick,
   onAccountClickSecondary,
+  onEnableEvmClick,
   secondaryIcon,
   showActiveAccount = false,
 }: AccountListingProps) => {
@@ -138,6 +140,7 @@ export const AccountListing = ({
   );
   // Check if the EVM account is not valid
   const noEvmAccount = evmAccount && !isValidEthereumAddress(evmAccount.address);
+  //const pendingAccountTransactions = [];
   const { pendingAccountTransactions } = useProfiles();
   return (
     <Box sx={{ gap: '0px', padding: '0 16px', display: 'flex', flexDirection: 'column' }}>
@@ -181,7 +184,16 @@ export const AccountListing = ({
             data-testid="active-account-card"
           />
           {/* If the EVM account is not valid, show the EnableEvmAccountCard */}
-          {noEvmAccount && <EnableEvmAccountCard showCard={false} />}
+          {noEvmAccount && (
+            <EnableEvmAccountCard
+              showCard={false}
+              onEnableEvmClick={() =>
+                activeParentAccount?.address
+                  ? onEnableEvmClick?.(activeParentAccount?.address)
+                  : undefined
+              }
+            />
+          )}
 
           <Typography
             variant="body1"

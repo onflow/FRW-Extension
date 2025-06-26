@@ -1,9 +1,7 @@
-import { Switch, switchClasses } from '@mui/base/Switch';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
-import { Typography, IconButton, Box, Avatar } from '@mui/material';
+import { Typography, IconButton, Box, Avatar, Switch } from '@mui/material';
 import Button from '@mui/material/Button';
-import { styled } from '@mui/system';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -16,83 +14,6 @@ import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useWallet } from 'ui/utils';
 
 import EditAccount from './EditAccount';
-const orange = {
-  500: '#41CC5D',
-};
-
-const grey = {
-  400: '#BABABA',
-  500: '#787878',
-  600: '#5E5E5E',
-};
-
-const Root = styled('span')(
-  ({ theme }) => `
-    font-size: 0;
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-    // margin: 0;
-    margin-left: auto;
-    cursor: pointer;
-
-    &.${switchClasses.disabled} {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    & .${switchClasses.track} {
-      background: ${theme.palette.mode === 'dark' ? grey[600] : grey[400]};
-      border-radius: 10px;
-      display: block;
-      height: 100%;
-      width: 100%;
-      position: absolute;
-    }
-
-    & .${switchClasses.thumb} {
-      display: block;
-      width: 14px;
-      height: 14px;
-      top: 3px;
-      left: 3px;
-      border-radius: 16px;
-      background-color: #fff;
-      position: relative;
-      transition: all 200ms ease;
-    }
-
-    &.${switchClasses.focusVisible} .${switchClasses.thumb} {
-      background-color: ${grey[500]};
-      box-shadow: 0 0 1px 8px rgba(0, 0, 0, 0.25);
-    }
-
-    &.${switchClasses.checked} {
-      .${switchClasses.thumb} {
-        left: 17px;
-        top: 3px;
-        background-color: #fff;
-      }
-
-      .${switchClasses.track} {
-        background: ${orange[500]};
-      }
-    }
-
-    & .${switchClasses.input} {
-      cursor: inherit;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      z-index: 1;
-      margin: 0;
-    }
-    `
-);
 
 const AccountSettings = () => {
   const history = useHistory();
@@ -321,9 +242,6 @@ const AccountSettings = () => {
             </Box>
             <Switch
               checked={modeAnonymous}
-              slots={{
-                root: Root,
-              }}
               onChange={() => {
                 switchAnonymousMode();
               }}

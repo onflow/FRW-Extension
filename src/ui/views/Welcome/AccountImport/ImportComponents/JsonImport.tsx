@@ -8,9 +8,9 @@ import {
   TextareaAutosize,
   InputAdornment,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
+import { type PublicKeyAccount } from '@/shared/types/wallet-types';
 import { consoleError } from '@/shared/utils/console-log';
 import PasswordTextarea from '@/ui/components/PasswordTextarea';
 import { useWallet } from '@/ui/utils/WalletContext';
@@ -19,50 +19,17 @@ import { LLSpinner } from 'ui/components';
 import ErrorModel from '../../../../components/PopupModal/errorModel';
 import { KEY_TYPE } from '../../../../utils/modules/constants';
 
-const useStyles = makeStyles(() => ({
-  form: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  textarea: {
-    width: '100%',
-    borderRadius: '16px',
-    backgroundColor: '#2C2C2C',
-    padding: '20px',
-    color: '#fff',
-    marginBottom: '16px',
-    resize: 'none',
-    fontSize: '16px',
-    fontFamily: 'Inter',
-    fontWeight: 400,
-  },
-  inputChild: {
-    width: '100%',
-    borderRadius: '16px',
-    backgroundColor: '#2C2C2C',
-    padding: '20px 0',
-    color: '#fff',
-    marginBottom: '16px',
-    resize: 'none',
-    fontSize: '16px',
-    fontFamily: 'Inter',
-    fontWeight: 400,
-  },
-  input: {
-    '& .MuiInputBase-input': {
-      padding: '0 20px',
-      fontWeight: 400,
-    },
-  },
-  button: {
-    width: '100%',
-    fontWeight: 'bold',
-  },
-}));
-
-const JsonImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
-  const classes = useStyles();
+const JsonImport = ({
+  onOpen,
+  onImport,
+  setPk,
+  isSignLoading,
+}: {
+  onOpen: () => void;
+  onImport: (accounts: PublicKeyAccount[]) => void;
+  setPk: (pk: string) => void;
+  isSignLoading: boolean;
+}) => {
   const usewallet = useWallet();
   const [isLoading, setLoading] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
@@ -124,7 +91,11 @@ const JsonImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
         return;
       }
 
-      const accounts = foundAccounts.map((account) => ({ ...account, type: KEY_TYPE.KEYSTORE }));
+      const accounts: (PublicKeyAccount & { type: string })[] = foundAccounts.map((account) => ({
+        ...account,
+        type: KEY_TYPE.KEYSTORE,
+      }));
+
       onImport(accounts);
     } catch (error) {
       consoleError('Error during import:', error);
@@ -149,7 +120,11 @@ const JsonImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
 
   return (
     <Box sx={{ padding: '0' }}>
-      <form id="seed" onSubmit={handleImport} className={classes.form}>
+      <form
+        id="seed"
+        onSubmit={handleImport}
+        style={{ width: '100%', display: 'flex', flexDirection: 'column' }}
+      >
         <PasswordTextarea
           minRows={5}
           placeholder={chrome.i18n.getMessage('You_can_import_the')}
@@ -161,10 +136,26 @@ const JsonImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
           required
           placeholder={chrome.i18n.getMessage('Enter_password_for_json_file')}
           type={isVisible ? 'text' : 'password'}
-          className={classes.input}
           name="password"
+          sx={{
+            '& .MuiInputBase-input': {
+              padding: '0 20px',
+              fontWeight: 400,
+            },
+          }}
           InputProps={{
-            className: classes.inputChild,
+            sx: {
+              width: '100%',
+              borderRadius: '16px',
+              backgroundColor: '#2C2C2C',
+              padding: '20px 0',
+              color: '#fff',
+              marginBottom: '16px',
+              resize: 'none',
+              fontSize: '16px',
+              fontFamily: 'Inter',
+              fontWeight: 400,
+            },
             endAdornment: (
               <InputAdornment position="end" sx={{ paddingRight: '20px' }}>
                 <IconButton onClick={toggleVisibility} edge="end">
@@ -177,7 +168,18 @@ const JsonImport = ({ onOpen, onImport, setPk, isSignLoading }) => {
 
         <TextareaAutosize
           placeholder={chrome.i18n.getMessage('Enter_your_flow_address')}
-          className={classes.textarea}
+          style={{
+            width: '100%',
+            borderRadius: '16px',
+            backgroundColor: '#2C2C2C',
+            padding: '20px',
+            color: '#fff',
+            marginBottom: '16px',
+            resize: 'none',
+            fontSize: '16px',
+            fontFamily: 'Inter',
+            fontWeight: 400,
+          }}
           defaultValue={''}
           name="address"
         />

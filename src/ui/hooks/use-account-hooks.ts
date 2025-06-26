@@ -1,12 +1,17 @@
+import { useMemo } from 'react';
+
 import {
   CURRENT_ID_KEY,
   KEYRING_STATE_CURRENT_KEY,
+  type VaultEntryV2,
+  type VaultEntryV3,
   type KeyringState,
 } from '@/shared/types/keyring-types';
 import {
   type MainAccount,
   type WalletAccount,
   type PendingTransaction,
+  getActiveAccountTypeForAddress,
 } from '@/shared/types/wallet-types';
 import {
   childAccountsKey,
@@ -111,6 +116,23 @@ export const useActiveAccounts = (
   return activeAccounts;
 };
 
+export const useActiveAccountType = (
+  network: string | undefined | null,
+  publicKey: string | undefined | null
+) => {
+  const activeAccounts = useActiveAccounts(network, publicKey);
+
+  const activeAccountType = useMemo(
+    () =>
+      getActiveAccountTypeForAddress(
+        activeAccounts?.currentAddress ?? null,
+        activeAccounts?.parentAddress ?? null
+      ),
+    [activeAccounts?.currentAddress, activeAccounts?.parentAddress]
+  );
+  return activeAccountType;
+};
+
 export const useUserWallets = () => {
   return useUserData<UserWalletStore>(userWalletsKey);
 };
@@ -124,7 +146,7 @@ export const useKeyringIds = () => {
   if (!keyringState) {
     return null;
   }
-  return keyringState.vault.map((vaultEntry) => vaultEntry.id);
+  return keyringState.vault?.map((vaultEntry: VaultEntryV2 | VaultEntryV3) => vaultEntry.id) ?? [];
 };
 
 export const useRegisterStatus = (pubKey: string | undefined | null) => {

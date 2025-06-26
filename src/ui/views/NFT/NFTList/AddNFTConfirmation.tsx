@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Typography, Drawer, Grid, Button, IconButton } from '@mui/material';
+import { Box, Typography, Drawer, Button, IconButton } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -74,8 +75,8 @@ const AddNFTConfirmation = ({
           alignItems: 'center',
         }}
       >
-        <Grid item xs={1}></Grid>
-        <Grid item xs={10}>
+        <Grid size={1}></Grid>
+        <Grid size={10}>
           <Box
             sx={{
               display: 'flex',
@@ -89,7 +90,7 @@ const AddNFTConfirmation = ({
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={1}>
+        <Grid size={1}>
           <IconButton onClick={handleCloseIconClicked}>
             <CloseIcon fontSize="medium" sx={{ color: 'icon.navi' }} />
           </IconButton>

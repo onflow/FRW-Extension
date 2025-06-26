@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Typography, Box, Drawer, Grid, Stack, InputBase, CircularProgress } from '@mui/material';
+import { Typography, Box, Drawer, Stack, InputBase, CircularProgress } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import React, { useEffect } from 'react';
 import { useForm, type FieldValues } from 'react-hook-form';
@@ -95,13 +96,13 @@ const EditAccount = (props: EditAccountProps) => {
           alignItems: 'center',
         }}
       >
-        <Grid item xs={1}></Grid>
-        <Grid item xs={10}>
+        <Grid size={1}></Grid>
+        <Grid size={10}>
           <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="20px">
             Edit Account
           </Typography>
         </Grid>
-        <Grid item xs={1}>
+        <Grid size={1}>
           <CloseIcon
             fontSize="medium"
             sx={{ color: 'icon.navi', cursor: 'pointer', align: 'center' }}

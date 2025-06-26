@@ -32,7 +32,7 @@ const evmWalletAccount: WalletAccount = {
 };
 
 const meta: Meta<typeof AccountCard> = {
-  title: 'Components/AccountCard',
+  title: 'Components/account/AccountCard',
   tags: ['autodocs'],
 
   component: AccountCard,

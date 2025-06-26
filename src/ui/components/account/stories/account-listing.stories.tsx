@@ -5,6 +5,7 @@ import emojisJson from '@/background/utils/emoji.json';
 const { emojis } = emojisJson as { emojis: Emoji[] };
 import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
 import { type Emoji, type WalletAccount } from '@/shared/types/wallet-types';
+import { useProfiles as importedMockUseProfiles } from '@/stories/ui-hooks.mock';
 import {
   useChildAccounts as importedMockUseChildAccounts, // Aliased import from the mock file
   useEvmAccount as importedMockUseEvmAccount, // Aliased import from the mock file
@@ -89,7 +90,11 @@ const childWallet2: WalletAccount = {
 
 // Helper to create mock data for stories
 const createMockData = (config: {
-  [address: string]: { evm?: WalletAccount; children?: WalletAccount[]; nfts?: number };
+  [address: string]: {
+    evm?: WalletAccount;
+    children?: WalletAccount[];
+    nfts?: number;
+  };
 }) => {
   const evmAccounts: Record<string, WalletAccount | undefined> = {};
   const childAccounts: Record<string, WalletAccount[] | undefined> = {};
@@ -105,7 +110,7 @@ const createMockData = (config: {
 };
 
 const meta: Meta<typeof AccountListing> = {
-  title: 'Components/AccountListing',
+  title: 'Components/account/AccountListing',
   tags: ['autodocs'],
 
   component: AccountListing,
@@ -123,6 +128,7 @@ const meta: Meta<typeof AccountListing> = {
       importedMockUseChildAccounts.mockReset();
       importedMockUseEvmAccount.mockReset();
       importedMockUseNftCatalogCollections.mockReset();
+      importedMockUseProfiles.mockReset();
       const { mockData } = context.parameters;
       if (mockData) {
         importedMockUseEvmAccount.mockImplementation((_network, address) => {
@@ -142,6 +148,17 @@ const meta: Meta<typeof AccountListing> = {
             return [{ count: mockData.nfts[address] }];
           }
           return [];
+        });
+        importedMockUseProfiles.mockImplementation(() => {
+          return {
+            pendingAccountTransactions: mockData.pendingAccountTransactions || [],
+          };
+        });
+      } else {
+        importedMockUseProfiles.mockImplementation(() => {
+          return {
+            pendingAccountTransactions: [],
+          };
         });
       }
       return <Story />;
@@ -269,5 +286,59 @@ export const LoadingActive: Story = {
     accountList: undefined,
     activeAccount: undefined,
     showActiveAccount: true,
+  },
+};
+
+export const PendingAccountTransaction: Story = {
+  args: {
+    network: 'mainnet',
+    accountList: [mainWalletAccount],
+    activeAccount: mainWalletAccount,
+    activeParentAccount: mainWalletAccount,
+    showActiveAccount: true,
+  },
+  parameters: {
+    mockData: {
+      ...createMockData({
+        [mainWalletAccount.address]: {
+          evm: noEvmWalletAccount,
+          children: [childWallet2], // ChildWallet1 is omitted as per original story logic
+        },
+        [childWallet1.address]: {
+          nfts: 65000,
+        },
+        [childWallet2.address]: {
+          nfts: 12,
+        },
+      }),
+      pendingAccountTransactions: ['1'],
+    },
+  },
+};
+
+export const MultiplePendingAccountTransaction: Story = {
+  args: {
+    network: 'mainnet',
+    accountList: [mainWalletAccount],
+    activeAccount: mainWalletAccount,
+    activeParentAccount: mainWalletAccount,
+    showActiveAccount: true,
+  },
+  parameters: {
+    mockData: {
+      ...createMockData({
+        [mainWalletAccount.address]: {
+          evm: evmWalletAccount2,
+          children: [childWallet1, childWallet2], // ChildWallet1 is omitted as per original story logic
+        },
+        [childWallet1.address]: {
+          nfts: 65000,
+        },
+        [childWallet2.address]: {
+          nfts: 12,
+        },
+      }),
+      pendingAccountTransactions: ['1', '2', '3'],
+    },
   },
 };

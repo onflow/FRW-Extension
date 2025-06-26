@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { formatPrice } from '@/shared/utils/formatTokenValue';
-import { numberWithCommas, trimDecimalAmount } from '@/shared/utils/number';
+import { formatTokenValueOrPrice } from '@/shared/utils/formatTokenValue';
+import { trimDecimalAmount } from '@/shared/utils/number';
 
 interface TokenBalanceProps {
   value: string;
   decimals?: number;
+  displayDecimals?: number;
   className?: string;
   showFull?: boolean;
   prefix?: string;
@@ -15,6 +16,7 @@ interface TokenBalanceProps {
 export const TokenBalance: React.FC<TokenBalanceProps> = ({
   value,
   decimals = 18, // default to max decimals
+  displayDecimals = -1,
   className = '',
   showFull = false,
   prefix = '',
@@ -23,29 +25,25 @@ export const TokenBalance: React.FC<TokenBalanceProps> = ({
   if (!value || value === '') {
     return <span className={className}>{''}</span>;
   }
-  if (value === '0') {
-    return <span className={className}>{'0'}</span>;
-  }
+
   if (showFull) {
     return (
       <span className={className} data-testid={`token-balance-${value}`}>
         {prefix}
-        <span>{numberWithCommas(value)}</span>
+        <span>{value}</span>
         {postFix && <span style={{ marginLeft: '0.25rem' }}>{postFix}</span>}
       </span>
     );
   }
   const decimalBalance = trimDecimalAmount(value, decimals, 'exact');
 
-  const { formattedPrice } = formatPrice(decimalBalance);
-  const { leadingPart, zeroPart, endingPart } = formattedPrice;
+  const { formattedTokenValue } = formatTokenValueOrPrice(decimalBalance, 4, displayDecimals);
+  const { leadingPart, zeroPart, endingPart } = formattedTokenValue;
 
   return (
     <span className={className} data-testid={`token-balance-${value}`}>
       {prefix}
-      <span style={leadingPart === '' ? { padding: '0 0.25rem' } : undefined}>
-        {numberWithCommas(leadingPart)}
-      </span>
+      <span style={leadingPart === '' ? { padding: '0 0.25rem' } : undefined}>{leadingPart}</span>
       {zeroPart !== null && (
         <sub
           style={{

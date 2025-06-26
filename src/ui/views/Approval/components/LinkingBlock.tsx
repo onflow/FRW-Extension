@@ -7,7 +7,6 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useEffect, useState } from 'react';
 
 import { UserInfoResponse } from '@/shared/types/network-types';
@@ -15,21 +14,7 @@ import IconCheck from 'ui/assets/check.svg';
 import Link from 'ui/assets/svg/link.svg';
 import { useWallet } from 'ui/utils';
 
-const useStyles = makeStyles({
-  IconCheck: {
-    display: 'inline',
-    backgroundColor: '#00E075',
-    borderRadius: '20px',
-    width: '14px',
-    height: '14px',
-    padding: '3px',
-    color: '#000',
-  },
-});
-
 export const LinkingBlock = ({ image, accountTitle, userInfo }) => {
-  const classes = useStyles();
-
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', margin: '18px', gap: '12px' }}>
       <Box sx={{ display: 'flex', gap: '18px', marginBottom: '0px' }}>
@@ -118,12 +103,34 @@ export const LinkingBlock = ({ image, accountTitle, userInfo }) => {
           {chrome.i18n.getMessage('This_App_would_like_to')}
         </Typography>
         <Typography sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '4px' }}>
-          <img className={classes.IconCheck} src={IconCheck} /> Delegate dApp account to your Flow
-          Wallet
+          <img
+            style={{
+              display: 'inline',
+              backgroundColor: '#00E075',
+              borderRadius: '20px',
+              width: '14px',
+              height: '14px',
+              padding: '3px',
+              color: '#000',
+            }}
+            src={IconCheck}
+          />{' '}
+          Delegate dApp account to your Flow Wallet
         </Typography>
         <Typography sx={{ fontSize: '14px', color: '#FFFFFF', marginTop: '8px' }}>
-          <img className={classes.IconCheck} src={IconCheck} /> Flow Wallet will manage linked
-          account{' '}
+          <img
+            style={{
+              display: 'inline',
+              backgroundColor: '#00E075',
+              borderRadius: '20px',
+              width: '14px',
+              height: '14px',
+              padding: '3px',
+              color: '#000',
+            }}
+            src={IconCheck}
+          />{' '}
+          Flow Wallet will manage linked account{' '}
         </Typography>
       </Box>
     </Box>

@@ -4,7 +4,6 @@ import {
   Box,
   Input,
   InputAdornment,
-  Grid,
   Card,
   CardMedia,
   Skeleton,
@@ -13,8 +12,8 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 
 // import { useHistory } from 'react-router-dom';
@@ -31,46 +30,7 @@ import VerifiedIcon from '../../assets/svg/verfied-check.svg';
 
 import AddTokenConfirmation from './AddTokenConfirmation';
 
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    minHeight: '46px',
-    zIndex: '999',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    margin: '2px 18px 10px 18px',
-  },
-  grid: {
-    width: '100%',
-    margin: 0,
-    // paddingLeft: '15px',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignContent: 'flex-start',
-    padding: '10px 13px',
-    // marginLeft: 'auto'
-  },
-  skeletonCard: {
-    display: 'flex',
-    backgroundColor: 'transparent',
-    width: '100%',
-    height: '72px',
-    margin: '12px auto',
-    boxShadow: 'none',
-    padding: 'auto',
-    border: '1px solid rgba(255, 255, 255, 0.12)',
-    borderRadius: '12px',
-  },
-}));
-
 const TokenList = () => {
-  const classes = useStyles();
   const wallet = useWallet();
   const { coins, tokenFilter, updateTokenFilter } = useCoins();
   const [keyword, setKeyword] = useState('');
@@ -183,16 +143,13 @@ const TokenList = () => {
             type="search"
             value={keyword}
             onChange={(e) => filter(e)}
-            className={classes.inputBox}
-            placeholder={chrome.i18n.getMessage('Search_Token')}
-            autoFocus
-            disableUnderline
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon sx={{ ml: '10px', my: '5px', color: 'rgba(255, 255, 255, 0.6)' }} />
-              </InputAdornment>
-            }
             sx={{
+              minHeight: '46px',
+              zIndex: '999',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+              boxSizing: 'border-box',
+              margin: '2px 18px 10px 18px',
               border: 'none',
               color: '#FFFFFF',
               '& input': {
@@ -206,6 +163,14 @@ const TokenList = () => {
                 backgroundColor: 'rgba(255, 255, 255, 0.12)',
               },
             }}
+            placeholder={chrome.i18n.getMessage('Search_Token')}
+            autoFocus
+            disableUnderline
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon sx={{ ml: '10px', my: '5px', color: 'rgba(255, 255, 255, 0.6)' }} />
+              </InputAdornment>
+            }
           />
 
           <Box
@@ -240,7 +205,18 @@ const TokenList = () => {
           </Box>
 
           {isLoading ? (
-            <Grid container className={classes.grid}>
+            <Grid
+              container
+              sx={{
+                width: '100%',
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignContent: 'flex-start',
+                padding: '10px 13px',
+              }}
+            >
               {[...Array(4).keys()].map((key) => (
                 <Card
                   key={key}
@@ -249,8 +225,12 @@ const TokenList = () => {
                     backgroundColor: 'transparent',
                     padding: '12px',
                     border: '1px solid rgba(255, 255, 255, 0.12)',
+                    display: 'flex',
+                    width: '100%',
+                    height: '72px',
+                    margin: '12px auto',
+                    boxShadow: 'none',
                   }}
-                  className={classes.skeletonCard}
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                     <CardMedia

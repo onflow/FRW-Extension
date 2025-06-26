@@ -1,4 +1,5 @@
-import { Box, Grid, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 

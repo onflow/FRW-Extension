@@ -367,7 +367,8 @@ class GoogleDriveService {
 
       const decryptedMnemonic = this.decrypt(backup.data, password);
       return bip39.validateMnemonic(decryptedMnemonic);
-    } catch (_) {
+    } catch (err) {
+      consoleError('testProfileBackupDecryption - error', err);
       // Silently handle decryption errors
       return false;
     }

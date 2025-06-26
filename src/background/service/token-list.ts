@@ -1,12 +1,14 @@
-import { type TokenInfo } from 'flow-native-token-registry';
-
+import {
+  type FungibleTokenInfo,
+  type CustomFungibleTokenInfo,
+  type EvmCustomTokenInfo,
+} from '@/shared/types/coin-types';
 import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
 import { tokenListKey, tokenListRefreshRegex } from '@/shared/utils/cache-data-keys';
-import { consoleError } from '@/shared/utils/console-log';
+import { setUserData } from '@/shared/utils/user-data-access';
+import { evmCustomTokenKey, getEvmCustomTokenData } from '@/shared/utils/user-data-keys';
 
 import { getValidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
-import { storage } from '../webapi';
 
 import openapiService from './openapi';
 
@@ -40,11 +42,41 @@ class TokenList {
     }
     return tokens;
   };
+  addCustomEvmToken = async (network: string, token: CustomFungibleTokenInfo) => {
+    const evmTokens = await getEvmCustomTokenData(network);
+    const existingIndex = evmTokens.findIndex((t) => t.address === token.address);
+    if (existingIndex !== -1) {
+      evmTokens[existingIndex] = {
+        ...evmTokens[existingIndex],
+        coin: token.name,
+        unit: token.symbol,
+        flowIdentifier: token.flowIdentifier,
+        address: token.address,
+        custom: true,
+      };
+    } else {
+      evmTokens.push({
+        ...token,
+        coin: token.name,
+        unit: token.symbol,
+        flowIdentifier: token.flowIdentifier,
+        address: token.address,
+        custom: true,
+      });
+    }
+    await setUserData(evmCustomTokenKey(network), evmTokens);
+  };
 
-  mergeCustomTokens = (tokens, customTokens) => {
+  removeCustomEvmToken = async (network: string, tokenAddress: string) => {
+    const evmTokens = await getEvmCustomTokenData(network);
+    const filteredEvmTokens = evmTokens.filter((t) => t.address !== tokenAddress);
+    await setUserData(evmCustomTokenKey(network), filteredEvmTokens);
+  };
+
+  mergeCustomTokens = (tokens: CustomFungibleTokenInfo[], customTokens: EvmCustomTokenInfo[]) => {
     customTokens.forEach((custom) => {
       const existingToken = tokens.find(
-        (token) => token.address.toLowerCase() === custom.address.toLowerCase()
+        (token) => token.address?.toLowerCase() === custom.address?.toLowerCase()
       );
 
       if (existingToken) {
@@ -53,16 +85,15 @@ class TokenList {
       } else {
         // If the custom token is not found, add it to the tokens array
         tokens.push({
+          ...custom,
+          custom: true,
           chainId: MAINNET_CHAIN_ID,
-          address: custom.address,
           symbol: custom.unit,
           name: custom.coin,
-          decimals: custom.decimals,
+          decimals: 18,
           logoURI: '',
           flowIdentifier: custom.flowIdentifier,
           tags: [],
-          balance: 0,
-          custom: true,
         });
       }
     });
@@ -72,26 +103,29 @@ class TokenList {
     network: string,
     chainType: string,
     name: string
-  ): Promise<TokenInfo | undefined> => {
+  ): Promise<CustomFungibleTokenInfo | undefined> => {
     // FIX ME: Get defaultTokenList from firebase remote config
 
     const tokens = await this.getTokenList(network, chainType);
     return tokens.find((item) => item.symbol.toLowerCase() === name.toLowerCase());
   };
 
-  getTokenList = async (network: string, chainType: string): Promise<TokenInfo[]> => {
-    const ftList = await getValidData<TokenInfo[]>(tokenListKey(network, chainType));
+  getTokenList = async (network: string, chainType: string): Promise<CustomFungibleTokenInfo[]> => {
+    const ftList = await getValidData<CustomFungibleTokenInfo[]>(tokenListKey(network, chainType));
     if (ftList) return ftList;
 
     return await this.loadTokenList(network, chainType);
   };
 
-  loadTokenList = async (network: string, chainType: string): Promise<TokenInfo[]> => {
+  loadTokenList = async (network: string, chainType: string): Promise<FungibleTokenInfo[]> => {
     const tokens = await openapiService.fetchFTListFull(network, chainType);
 
     if (chainType === 'evm') {
-      const evmCustomToken = (await storage.get(`${network}evmCustomToken`)) || [];
-      this.mergeCustomTokens(tokens, evmCustomToken);
+      const evmCustomToken = await getEvmCustomTokenData(network);
+      this.mergeCustomTokens(
+        tokens.map((token) => ({ ...token, custom: false })),
+        evmCustomToken
+      );
     }
     setCachedData(tokenListKey(network, chainType), tokens);
     return tokens;
@@ -104,7 +138,7 @@ class TokenList {
     network: string,
     chainType: string,
     filterNetwork = true
-  ): Promise<TokenInfo[]> => {
+  ): Promise<CustomFungibleTokenInfo[]> => {
     const list = await this.getTokenList(network, chainType);
     return filterNetwork ? list.filter((item) => item.address) : list;
   };

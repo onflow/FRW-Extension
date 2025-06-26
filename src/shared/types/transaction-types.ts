@@ -1,6 +1,4 @@
-import { type TokenInfo } from 'flow-native-token-registry';
-
-import { type ExtendedTokenInfo, type CoinItem } from './coin-types';
+import { type ExtendedTokenInfo } from './coin-types';
 import { type Contact } from './network-types';
 import { type WalletAddress } from './wallet-types';
 

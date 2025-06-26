@@ -1,6 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
-import { Box, Typography, Drawer, Stack, Grid, CardMedia, IconButton, Button } from '@mui/material';
+import { Box, Typography, Drawer, Stack, CardMedia, IconButton, Button } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import Web3 from 'web3';
@@ -178,7 +179,6 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
       setErrorMessage(request.errorMessage);
       setErrorCode(request.errorCode);
     }
-    return true;
   }, []);
 
   useEffect(() => {
@@ -265,8 +265,8 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
             alignItems: 'center',
           }}
         >
-          <Grid item xs={1}></Grid>
-          <Grid item xs={10}>
+          <Grid size={1}></Grid>
+          <Grid size={10}>
             {tid ? (
               <Box
                 sx={{
@@ -286,7 +286,7 @@ const SendNFTConfirmation = (props: SendNFTConfirmationProps) => {
               </Typography>
             )}
           </Grid>
-          <Grid item xs={1}>
+          <Grid size={1}>
             <IconButton onClick={props.handleCloseIconClicked}>
               <CloseIcon fontSize="medium" sx={{ color: 'icon.navi', cursor: 'pointer' }} />
             </IconButton>

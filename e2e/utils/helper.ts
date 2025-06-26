@@ -71,7 +71,7 @@ export const loginToExtensionAccount = async ({ page, extensionId, addr, passwor
   if (flowAddr !== addr) {
     // switch to the correct account
     await page.getByTestId('account-menu-button').click();
-    await page.getByRole('button', { name: 'close' }).click();
+    await page.getByTestId('switch-profile-button').click();
     await expect(page.getByText('Profiles', { exact: true })).toBeVisible();
     // Switch to the correct account. Note doest not handle more than 3 accounts loaded
     await page.getByTestId(`profile-item-nickname-${nickname}`).click();
@@ -259,8 +259,8 @@ export const importAccountBySeedPhrase = async ({
 
     // We're already logged in so we need to click import profile
     await page.getByTestId('account-menu-button').click();
-    await page.getByTestId('add-account-button').click();
-    await page.getByTestId('import-existing-account-button').click();
+    await page.getByTestId('switch-profile-button').click();
+    await page.getByTestId('recover-profile-button').click();
     // Close all pages except the current page (the extension opens them in the background)
     await closeOpenedPages(page);
   }
@@ -287,7 +287,7 @@ export const importAccountBySeedPhrase = async ({
     // We've already imported the account before
     await fillInPassword({ page, password });
 
-    await page.getByRole('button', { name: 'Login' }).click();
+    await page.getByRole('button', { name: /Login|Register/i }).click();
     // await page.getByRole('button', { name: 'Login' }).click();
   } else if (step.includes('2')) {
     // We haven't imported the account before
@@ -296,7 +296,7 @@ export const importAccountBySeedPhrase = async ({
 
     await fillInPassword({ page, password });
 
-    await page.getByRole('button', { name: 'Login' }).click();
+    await page.getByRole('button', { name: /Login|Register/i }).click();
   }
 
   // Wait for the Google Drive backup text to be visible

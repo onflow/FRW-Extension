@@ -11,12 +11,13 @@ import {
   Avatar,
 } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { type ReactNode, useEffect, useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { type CoinItem } from '@/shared/types/coin-types';
 import { type ActiveAccountType } from '@/shared/types/wallet-types';
-import { formatLargeNumber } from '@/shared/utils/number';
+import { type ChildAccountFtStore } from '@/shared/utils/cache-data-keys';
+import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
@@ -75,7 +76,7 @@ const CoinList = ({
   isActive,
   activeAccountType,
 }: {
-  ableFt: any[];
+  ableFt: ChildAccountFtStore;
   isActive: boolean;
   activeAccountType: ActiveAccountType;
 }) => {
@@ -89,36 +90,52 @@ const CoinList = ({
 
   const isLoading = coins === undefined;
 
-  const EndListItemText = (props: {
-    primary: ReactNode;
-    secondary: ReactNode;
+  const CoinBalance = ({
+    balance,
+    decimals,
+    fiatBalance,
+    unit,
+  }: {
+    balance?: string;
+    decimals?: number;
+    fiatBalance?: string;
     unit: string;
-    change: number;
   }) => {
+    const loading = isLoading || balance === undefined || fiatBalance === undefined;
     return (
       <ListItemText
         disableTypography={true}
         primary={
-          !isLoading ? (
-            <Typography
-              variant="body1"
-              sx={{ fontSize: 14, fontWeight: '550', textAlign: 'end', color: 'text.title' }}
-              data-testid={`coin-balance-${props.unit.toLowerCase()}`}
-            >
-              {formatLargeNumber(props.primary)}{' '}
-              {props.unit.length > 6 ? `${props.unit.slice(0, 6)}` : props.unit.toUpperCase()}{' '}
-            </Typography>
-          ) : (
-            <Skeleton variant="text" width={35} height={15} />
-          )
+          <Typography
+            variant="body1"
+            sx={{ fontSize: 14, fontWeight: '550', textAlign: 'end', color: 'text.title' }}
+            data-testid={`coin-balance-${unit.toLowerCase()}`}
+          >
+            {loading ? (
+              <Skeleton variant="text" width={35} height={15} />
+            ) : (
+              <>
+                <TokenBalance value={balance} decimals={decimals} displayDecimals={2} />{' '}
+                {unit.length > 6 ? `${unit.slice(0, 6)}` : unit.toUpperCase()}
+              </>
+            )}
+          </Typography>
         }
         secondary={
-          !isLoading ? (
+          !loading ? (
             <Typography
               variant="body1"
               sx={{ fontSize: 12, fontWeight: '500', textAlign: 'end', color: 'text.secondary' }}
             >
-              {props.secondary === null || props.secondary === 0 ? '' : props.secondary}
+              {fiatBalance === null || fiatBalance === '0' || parseFloat(balance) === 0 ? (
+                ''
+              ) : (
+                <CurrencyValue
+                  value={fiatBalance}
+                  currencyCode={currencyCode ?? ''}
+                  currencySymbol={currencySymbol ?? ''}
+                />
+              )}
             </Typography>
           ) : (
             <Skeleton variant="text" width={35} height={15} />
@@ -180,7 +197,7 @@ const CoinList = ({
             <Box sx={{ display: 'flex', gap: '3px' }}>
               {ableFt.some((item) => {
                 const parts = item.id.split('.');
-                return parts[2] && parts[2].includes(props.name);
+                return parts[2] && props.name && parts[2].includes(props.name);
               }) ||
               isActive ||
               props.id?.toLowerCase().includes('flowtoken') ? (
@@ -295,17 +312,11 @@ const CoinList = ({
                   key={coin.id}
                   data-testid={`token-${coin.unit.toLowerCase()}`}
                   secondaryAction={
-                    <EndListItemText
-                      primary={parseFloat(coin.balance).toFixed(3)}
-                      secondary={
-                        <CurrencyValue
-                          value={String(coin.total)}
-                          currencyCode={currencyCode ?? ''}
-                          currencySymbol={currencySymbol ?? ''}
-                        />
-                      }
+                    <CoinBalance
+                      balance={coin.availableBalance || coin.balance}
+                      decimals={coin.decimals || 18}
+                      fiatBalance={coin.total}
                       unit={coin.unit}
-                      change={parseFloat(coin.change24h?.toFixed(2) || '0')}
                     />
                   }
                   disablePadding
@@ -337,12 +348,7 @@ const CoinList = ({
         ) : (
           [1, 2].map((index) => {
             return (
-              <ListItem
-                key={index}
-                secondaryAction={
-                  <EndListItemText primary="..." secondary="..." unit="..." change={0} />
-                }
-              >
+              <ListItem key={index} secondaryAction={<CoinBalance unit={`unit${index}`} />}>
                 <ListItemAvatar>
                   <Skeleton variant="circular" width={36} height={36} />
                 </ListItemAvatar>

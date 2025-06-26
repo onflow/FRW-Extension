@@ -11,6 +11,13 @@ If you'd like to contribute to the extension, you'll need to install Node.js, pn
 5. `pnpm build:dev`
 6. Load Unpacked at `chrome://extensions/` in developer mode and pick the `dist` folder created by build:dev
 
+## Documentation
+
+- [Wallet Account Structure](docs/wallet-account-structure.md): Overview of wallet account organization and structure.
+- [Cache Data Model](docs/cache-data-model.md): Details on the extension's cache data structure and usage.
+- [Cadence Scripts Usage Analysis](docs/cadence-scripts-usage-analysis.md): Analysis of Cadence script usage in the extension.
+- [Import Profile/Accounts from Mobile](docs/import-from-mobile.md): How to import profiles and accounts from the mobile app using WalletConnect.
+
 ### Install Node & Dependencies
 
 1. Install Node.js version v22.11 or later using a [package manager](https://nodejs.org/en/download/package-manager)

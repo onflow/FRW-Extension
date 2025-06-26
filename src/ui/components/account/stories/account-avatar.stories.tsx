@@ -6,7 +6,7 @@ const { emojis } = emojisJson;
 import AccountAvatar from '@/ui/components/account/account-avatar';
 
 const meta: Meta<typeof AccountAvatar> = {
-  title: 'Components/AccountAvatar',
+  title: 'Components/account/AccountAvatar',
   tags: ['autodocs'],
   component: AccountAvatar,
   argTypes: {
@@ -61,7 +61,6 @@ type Story = StoryObj<typeof AccountAvatar>;
 
 // Basic States
 export const Default: Story = {
-  name: 'Default State',
   args: {
     network: 'mainnet',
     emoji: emojis[2].emoji,
@@ -72,7 +71,6 @@ export const Default: Story = {
 };
 
 export const Active: Story = {
-  name: 'Active Account',
   args: {
     network: 'mainnet',
     emoji: emojis[2].emoji,
@@ -102,7 +100,6 @@ export const Spinning: Story = {
 
 // Network Variations
 export const MainnetActive: Story = {
-  name: 'Mainnet Active',
   args: {
     network: 'mainnet',
     emoji: emojis[1].emoji,
@@ -113,7 +110,6 @@ export const MainnetActive: Story = {
 };
 
 export const TestnetActive: Story = {
-  name: 'Testnet Active',
   args: {
     network: 'testnet',
     emoji: emojis[3].emoji,
@@ -125,7 +121,6 @@ export const TestnetActive: Story = {
 
 // Child Account Variations
 export const ChildAccount: Story = {
-  name: 'Child Account',
   args: {
     network: 'mainnet',
     emoji: emojis[4].emoji,
@@ -138,7 +133,6 @@ export const ChildAccount: Story = {
 };
 
 export const ChildAccountActive: Story = {
-  name: 'Child Account Active',
   args: {
     network: 'mainnet',
     emoji: emojis[5].emoji,
@@ -151,7 +145,6 @@ export const ChildAccountActive: Story = {
 };
 
 export const ChildAccountSpinning: Story = {
-  name: 'Child Account Processing',
   args: {
     network: 'mainnet',
     emoji: emojis[6].emoji,
@@ -165,7 +158,6 @@ export const ChildAccountSpinning: Story = {
 
 // Pending Account States
 export const PendingAccount: Story = {
-  name: 'Pending Account Creation',
   args: {
     network: 'mainnet',
     emoji: 'pendingAccount',
@@ -177,7 +169,6 @@ export const PendingAccount: Story = {
 };
 
 export const PendingAccountActive: Story = {
-  name: 'Pending Account Active',
   args: {
     network: 'mainnet',
     emoji: 'pendingAccount',
@@ -189,8 +180,7 @@ export const PendingAccountActive: Story = {
 };
 
 // External Account (with image URL)
-export const ExternalAccount: Story = {
-  name: 'External Account (Dapper)',
+export const ExternalAccountDapper: Story = {
   args: {
     network: 'mainnet',
     emoji: 'https://accounts.meetdapper.com/static/img/dapper/dapper.png',
@@ -201,7 +191,6 @@ export const ExternalAccount: Story = {
 };
 
 export const ExternalAccountActive: Story = {
-  name: 'External Account Active',
   args: {
     network: 'mainnet',
     emoji: 'https://accounts.meetdapper.com/static/img/dapper/dapper.png',
@@ -213,7 +202,6 @@ export const ExternalAccountActive: Story = {
 
 // Color Variations
 export const ColorVariations: Story = {
-  name: 'Different Colors',
   render: () => (
     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', padding: '16px' }}>
       {emojis.slice(0, 8).map((emoji, index) => (
@@ -232,7 +220,6 @@ export const ColorVariations: Story = {
 
 // Interactive Demo
 export const InteractiveDemo: Story = {
-  name: 'Interactive Demo',
   args: {
     network: 'mainnet',
     emoji: emojis[2].emoji,
@@ -245,7 +232,6 @@ export const InteractiveDemo: Story = {
 
 // Account Hierarchy Demo
 export const AccountHierarchy: Story = {
-  name: 'Account Hierarchy',
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -296,7 +282,6 @@ export const AccountHierarchy: Story = {
 
 // Edge Cases
 export const EdgeCases: Story = {
-  name: 'Edge Cases',
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

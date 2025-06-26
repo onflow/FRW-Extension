@@ -1,5 +1,4 @@
 import { Box, Typography, Avatar, Skeleton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { useProfiles } from '@/ui/hooks/useProfileHook';

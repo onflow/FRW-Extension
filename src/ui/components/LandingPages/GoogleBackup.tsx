@@ -22,26 +22,22 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
   username,
   password,
 }) => {
-  const wallets = useWallet();
+  const wallet = useWallet();
   const [loading, setLoading] = useState(false);
   const [backupErr, setBackupErr] = useState(false);
 
-  const handleBackup = () => {
+  const handleBackup = async () => {
     try {
       setLoading(true);
       setBackupErr(false);
-      wallets
-        .uploadMnemonicToGoogleDrive(mnemonic, username, password)
-        .then(() => {
-          setLoading(false);
-          handleSwitchTab();
-        })
-        .catch(() => {
-          setLoading(false);
-          setBackupErr(true);
-        });
+
+      await wallet.uploadMnemonicToGoogleDrive(mnemonic, username, password);
+      // No error thrown
+      handleSwitchTab();
     } catch (e) {
       consoleError(e);
+      setBackupErr(true);
+    } finally {
       setLoading(false);
     }
   };

@@ -1,5 +1,4 @@
 import { Box, Typography, Avatar, Skeleton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 
 import { formatAddress, isEmoji } from 'ui/utils';

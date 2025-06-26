@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Typography, Box, Drawer, Grid, Stack, InputBase, CircularProgress } from '@mui/material';
+import { Typography, Box, Drawer, Stack, InputBase, CircularProgress } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import { isAddress } from 'ethers';
 import React, { useState, useEffect } from 'react';
@@ -144,15 +145,15 @@ const AddOrEditAddress = (props: AddOrEditAddressProps) => {
           alignItems: 'center',
         }}
       >
-        <Grid item xs={1}></Grid>
-        <Grid item xs={10}>
+        <Grid size={1}></Grid>
+        <Grid size={10}>
           <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="20px">
             {props.isEdit
               ? chrome.i18n.getMessage('Edit__Address')
               : chrome.i18n.getMessage('Add__Address')}
           </Typography>
         </Grid>
-        <Grid item xs={1}>
+        <Grid size={1}>
           <CloseIcon
             fontSize="medium"
             sx={{ color: 'icon.navi', cursor: 'pointer', align: 'center' }}

@@ -1,27 +1,10 @@
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { Box, Typography, Avatar, IconButton, CardMedia, Skeleton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import closex from 'ui/assets/closex.svg';
 import { useWallet, formatAddress, isEmoji } from 'ui/utils';
-
-const useStyles = makeStyles(() => ({
-  ContactCardAvatar: {
-    mr: '13px',
-    color: 'primary.main',
-    backgroundColor: 'neutral.main',
-  },
-  ContactCardContainer: {
-    display: 'flex',
-    // border: '1px solid #4C4C4C',
-    // borderRadius: '8px',
-    // padding: ''
-    alignItems: 'center',
-    px: '18px',
-  },
-}));
 
 export const ContactCard = ({ contact, tokenInfo, isLoading = false }) => {
   const history = useHistory();

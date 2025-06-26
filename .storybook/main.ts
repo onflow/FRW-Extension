@@ -29,22 +29,22 @@ const config: StorybookConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       // Specific hook aliases first
-      '@/ui/hooks/use-feature-flags': path.resolve(
+      '@/ui/hooks/use-feature-flags$': path.resolve(
         __dirname,
-        '../src/ui/hooks/use-feature-flags.mock.ts'
+        '../src/stories/use-feature-flags.mock.ts'
       ),
-      '@/ui/hooks/use-account-hooks': path.resolve(
+      '@/ui/hooks/use-account-hooks$': path.resolve(
         __dirname,
         '../src/stories/use-account-hooks.mock.ts'
       ),
-      '@/ui/hooks/useNftHook': path.resolve(__dirname, '../src/stories/use-nft-hooks.mock.ts'),
-      '@/ui/hooks/useProfileHook': path.resolve(
+      '@/ui/hooks/useNftHook$': path.resolve(__dirname, '../src/stories/use-nft-hooks.mock.ts'),
+      '@/ui/hooks/useProfileHook$': path.resolve(
         __dirname,
-        '../src/ui/hooks/useProfileHook.mock.ts'
+        '../src/stories/useProfileHook.mock.ts'
       ),
-      '@/ui/hooks/useNetworkHook': path.resolve(
+      '@/ui/hooks/useNetworkHook$': path.resolve(
         __dirname,
-        '../src/ui/hooks/useNetworkHook.mock.ts'
+        '../src/stories/useNetworkHook.mock.ts'
       ),
       // General hooks alias (fallback)
       '@/ui/hooks': path.resolve(__dirname, '../src/stories/ui-hooks.mock.ts'),
@@ -52,11 +52,6 @@ const config: StorybookConfig = {
       '@/ui/utils/WalletContext': path.resolve(__dirname, '../src/stories/wallet-context.mock.ts'),
       'ui/utils$': path.resolve(__dirname, '../src/stories/ui-utils.mock.ts'),
       'react-router-dom': path.resolve(__dirname, '../src/stories/react-router-dom.mock.ts'),
-      '@/ui/hooks/use-account-hooks$': path.resolve(
-        __dirname,
-        '../src/stories/use-account-hooks.mock.ts'
-      ),
-      '@/ui/hooks/useNftHook$': path.resolve(__dirname, '../src/stories/use-nft-hooks.mock.ts'),
       '@/ui/utils/WalletContext$': path.resolve(__dirname, '../src/stories/wallet-context.mock.ts'),
       '@': path.resolve(__dirname, '../src'),
       ui: path.resolve(__dirname, '../src/ui'),

@@ -164,7 +164,9 @@ const Confetti = () => {
   if (!isInitialized) {
     return null;
   }
-  return <Particles id="tsparticles" options={CONFETTI_OPTIONS} />;
+  return (
+    <Particles id="tsparticles" options={CONFETTI_OPTIONS} style={{ pointerEvents: 'none' }} />
+  );
 };
 
 export default Confetti;

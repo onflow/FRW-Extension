@@ -1,32 +1,10 @@
 import { Typography, CardMedia, Skeleton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
 import React from 'react';
 import { QRCode } from 'react-qrcode-logo';
 
 import lilo from 'ui/assets/image/lilo.png';
 import scanIcon from 'ui/assets/scan.svg';
-
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
 
 interface SyncQrProps {
   uri: string;
@@ -35,7 +13,6 @@ interface SyncQrProps {
 }
 
 const SyncQr = ({ uri, loadingString, secondLine }: SyncQrProps) => {
-  const classes = useStyles();
   return (
     <>
       <Box

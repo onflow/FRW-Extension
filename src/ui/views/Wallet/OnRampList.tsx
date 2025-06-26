@@ -1,6 +1,7 @@
 import { generateOnRampURL } from '@coinbase/cbpay-js';
 import CloseIcon from '@mui/icons-material/Close';
-import { Typography, ButtonBase, Grid, IconButton } from '@mui/material';
+import { Typography, ButtonBase, IconButton } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -75,13 +76,13 @@ const OnRampList = ({ close }) => {
           px: '8px',
         }}
       >
-        <Grid item xs={1}></Grid>
-        <Grid item xs={10}>
+        <Grid size={1}></Grid>
+        <Grid size={10}>
           <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="20px">
             {chrome.i18n.getMessage('Choose_provider')}
           </Typography>
         </Grid>
-        <Grid item xs={1}>
+        <Grid size={1}>
           <IconButton onClick={close}>
             <CloseIcon sx={{ color: 'icon.navi' }} />
           </IconButton>

@@ -196,7 +196,7 @@ export const AccountCard = ({
               )
             ) : // Main account or EVM account
             balance !== undefined ? ( // Balance is available
-              <TokenBalance value={balance} decimals={4} showFull={false} postFix="Flow" />
+              <TokenBalance value={balance} decimals={2} showFull={false} postFix="Flow" />
             ) : (
               <Skeleton variant="text" width="130px" />
             )}

@@ -20,7 +20,6 @@ src/background/utils/firebase.config.json
 dist.rar
 dist.7z
 .cursorrules
-.cursor
 /test-results/
 /playwright-report/
 /blob-report/

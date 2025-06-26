@@ -30,7 +30,7 @@ test('Remove profile test', async ({ page, extensionId }) => {
   // Check that the sender account is not visible
   // switch to the correct account
   await page.getByTestId('account-menu-button').click();
-  await page.getByRole('button', { name: 'close' }).click();
+  await page.getByTestId('switch-profile-button').click();
 
   expect(await page.getByTestId('profile-item-nickname-sender').count()).toBe(0);
 });

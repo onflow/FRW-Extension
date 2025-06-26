@@ -5,7 +5,6 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import {
   Typography,
   Card,
-  Grid,
   Button,
   Box,
   IconButton,
@@ -15,8 +14,8 @@ import {
   ButtonBase,
   Tooltip,
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
@@ -60,111 +59,6 @@ interface NFT {
   postMedia: PostMedia;
 }
 
-const useStyles = makeStyles(() => ({
-  title: {
-    fontSize: '22px',
-    color: '#F2F2F2',
-    lingHeight: '32px',
-    fontWeight: 600,
-    margin: '18px',
-  },
-  card: {
-    width: '185px',
-    height: '225px',
-    backgroundColor: '#1B1B1B',
-    padding: '0',
-    boxShadow: 'none',
-    margin: 0,
-    borderRadius: '8px',
-  },
-  cardNoHover: {
-    flex: '50%',
-    padding: '13px',
-    // height: '211px',
-    backgroundColor: 'inherit',
-    boxShadow: 'none',
-    margin: 0,
-    borderRadius: '8px',
-    display: 'inline-block',
-  },
-  actionarea: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '8px',
-    padding: '13px',
-    '&:hover': {
-      color: '#282828',
-      backgroundColor: '#282828',
-    },
-  },
-  grid: {
-    width: '100%',
-    minHeight: '360px',
-    backgroundColor: '#1B1B1B',
-    borderRadius: '16px 16px 0 0',
-    padding: '10px 13px',
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignContent: 'flex-start',
-    // marginLeft: 'auto'
-    marginBottom: '20px',
-    overflow: 'auto',
-  },
-  cardmedia: {
-    height: '159px',
-    width: '100%',
-    justifyContent: 'center',
-  },
-  media: {
-    maxWidth: '100%',
-    maxHeight: '100%',
-    borderRadius: '8px',
-    margin: '0 auto',
-  },
-  content: {
-    height: '40px',
-    padding: '5px 0',
-    backgroundColor: 'inherit',
-    borderRadius: '0 0 8px 8px',
-  },
-  nftname: {
-    color: '#E6E6E6',
-    fontSize: '14px',
-  },
-  nftprice: {
-    color: '#808080',
-    fontSize: '14px',
-  },
-  collectionCard: {
-    display: 'flex',
-    width: '100%',
-    height: '64px',
-    margin: '11px auto',
-    borderRadius: '16px',
-    boxShadow: 'none',
-  },
-  collectionImg: {
-    borderRadius: '12px',
-    width: '48px',
-    margin: '8px',
-  },
-  arrowback: {
-    borderRadius: '100%',
-    margin: '8px',
-  },
-  iconbox: {
-    position: 'sticky',
-    top: 0,
-    backgroundColor: '#121212',
-    width: '100%',
-    margin: 0,
-    padding: 0,
-    zIndex: 5,
-  },
-}));
-
 interface CollectionDetailState {
   collection: any;
   ownerAddress: any;
@@ -174,7 +68,6 @@ interface CollectionDetailState {
 const LinkedCollection = (props) => {
   const usewallet = useWallet();
 
-  const classes = useStyles();
   const location = useParams();
 
   const uselocation = useLocation<CollectionDetailState>();
@@ -287,8 +180,24 @@ const LinkedCollection = (props) => {
   return (
     <StyledEngineProvider injectFirst>
       <div className="page" id="scrollableDiv" style={{ overflow: 'auto' }}>
-        <Box className={classes.iconbox}>
-          <IconButton onClick={() => history.goBack()} className={classes.arrowback}>
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 0,
+            backgroundColor: '#121212',
+            width: '100%',
+            margin: 0,
+            padding: 0,
+            zIndex: 5,
+          }}
+        >
+          <IconButton
+            onClick={() => history.goBack()}
+            sx={{
+              borderRadius: '100%',
+              margin: '8px',
+            }}
+          >
             <ArrowBackIcon sx={{ color: 'icon.navi' }} />
           </IconButton>
         </Box>
@@ -297,7 +206,6 @@ const LinkedCollection = (props) => {
           <>
             <Grid container sx={{ width: '100%', p: '0 25px 18px 25px' }}>
               <Grid
-                item
                 sx={{
                   justifyContent: 'center',
                   backgroundColor: '#121212',
@@ -311,7 +219,7 @@ const LinkedCollection = (props) => {
                   style={{ borderRadius: '12px', width: '100%', height: '100%' }}
                 />
               </Grid>
-              <Grid item sx={{ ml: 0, pl: '18px' }}>
+              <Grid sx={{ ml: 0, pl: '18px' }}>
                 <Typography component="div" color="text.primary" variant="h6">
                   {truncate(info?.name || info.contract_name, 16)}
                 </Typography>
@@ -395,10 +303,44 @@ const LinkedCollection = (props) => {
             </Grid>
 
             {loading ? (
-              <Grid container className={classes.grid}>
+              <Grid
+                container
+                sx={{
+                  width: '100%',
+                  minHeight: '360px',
+                  backgroundColor: '#1B1B1B',
+                  borderRadius: '16px 16px 0 0',
+                  padding: '10px 13px',
+                  margin: 0,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignContent: 'flex-start',
+                  marginBottom: '20px',
+                  overflow: 'auto',
+                }}
+              >
                 {[...Array(4).keys()].map((key) => (
-                  <Card className={classes.card} elevation={0} key={key}>
-                    <CardMedia className={classes.cardmedia}>
+                  <Card
+                    sx={{
+                      width: '185px',
+                      height: '225px',
+                      backgroundColor: '#1B1B1B',
+                      padding: '0',
+                      boxShadow: 'none',
+                      margin: 0,
+                      borderRadius: '8px',
+                    }}
+                    elevation={0}
+                    key={key}
+                  >
+                    <CardMedia
+                      sx={{
+                        height: '159px',
+                        width: '100%',
+                        justifyContent: 'center',
+                      }}
+                    >
                       <Skeleton
                         variant="rectangular"
                         width={150}
@@ -406,7 +348,14 @@ const LinkedCollection = (props) => {
                         sx={{ margin: '0 auto', borderRadius: '8px' }}
                       />
                     </CardMedia>
-                    <CardContent className={classes.content}>
+                    <CardContent
+                      sx={{
+                        height: '40px',
+                        padding: '5px 0',
+                        backgroundColor: 'inherit',
+                        borderRadius: '0 0 8px 8px',
+                      }}
+                    >
                       <Skeleton variant="text" width={150} sx={{ margin: '0 auto' }} />
                     </CardContent>
                   </Card>
@@ -425,10 +374,37 @@ const LinkedCollection = (props) => {
                     borderRadius: '16px 16px 0 0',
                   }}
                 >
-                  <Grid container className={classes.grid}>
+                  <Grid
+                    container
+                    sx={{
+                      width: '100%',
+                      minHeight: '360px',
+                      backgroundColor: '#1B1B1B',
+                      borderRadius: '16px 16px 0 0',
+                      padding: '10px 13px',
+                      margin: 0,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignContent: 'flex-start',
+                      marginBottom: '20px',
+                      overflow: 'auto',
+                    }}
+                  >
                     {list && list.map(createGridCard)}
                     {list.length % 2 !== 0 && (
-                      <Card className={classes.cardNoHover} elevation={0} />
+                      <Card
+                        sx={{
+                          flex: '50%',
+                          padding: '13px',
+                          backgroundColor: 'inherit',
+                          boxShadow: 'none',
+                          margin: 0,
+                          borderRadius: '8px',
+                          display: 'inline-block',
+                        }}
+                        elevation={0}
+                      />
                     )}
                   </Grid>
                 </InfiniteScroll>
@@ -436,10 +412,45 @@ const LinkedCollection = (props) => {
             )}
           </>
         ) : (
-          <Grid container className={classes.grid}>
+          <Grid
+            container
+            sx={{
+              width: '100%',
+              minHeight: '360px',
+              backgroundColor: '#1B1B1B',
+              borderRadius: '16px 16px 0 0',
+              padding: '10px 13px',
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignContent: 'flex-start',
+              marginBottom: '20px',
+              overflow: 'auto',
+            }}
+          >
             {[...Array(4).keys()].map((key) => (
-              <Card className={classes.card} elevation={0} key={key}>
-                <CardMedia className={classes.cardmedia}>
+              <Card
+                sx={{
+                  flex: '50%',
+                  padding: '13px',
+                  backgroundColor: 'inherit',
+                  boxShadow: 'none',
+                  margin: 0,
+                  borderRadius: '8px',
+                  display: 'inline-block',
+                }}
+                elevation={0}
+                key={key}
+              >
+                <CardMedia
+                  sx={{
+                    margin: '0 auto',
+                    borderRadius: '8px',
+                    width: '150px',
+                    height: '150px',
+                  }}
+                >
                   <Skeleton
                     variant="rectangular"
                     width={150}
@@ -447,7 +458,12 @@ const LinkedCollection = (props) => {
                     sx={{ margin: '0 auto', borderRadius: '8px' }}
                   />
                 </CardMedia>
-                <CardContent className={classes.content}>
+                <CardContent
+                  sx={{
+                    padding: '8px 0',
+                    textAlign: 'center',
+                  }}
+                >
                   <Skeleton variant="text" width={150} sx={{ margin: '0 auto' }} />
                 </CardContent>
               </Card>

@@ -51,13 +51,12 @@ import {
   mainAccountStorageBalanceKey,
   mainAccountStorageBalanceRefreshRegex,
   type MainAccountStorageBalanceStore,
-  getCachedMainAccounts,
   pendingAccountCreationTransactionsKey,
   placeholderAccountsKey,
   placeholderAccountsRefreshRegex,
   pendingAccountCreationTransactionsRefreshRegex,
 } from '@/shared/utils/cache-data-keys';
-import { consoleError, consoleLog, consoleWarn } from '@/shared/utils/console-log';
+import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 import { retryOperation } from '@/shared/utils/retryOperation';
 import { setUserData } from '@/shared/utils/user-data-access';
 import {
@@ -82,8 +81,8 @@ import {
   clearCachedData,
   getValidData,
   registerRefreshListener,
+  registerBatchRefreshListener,
   setCachedData,
-  triggerRefresh,
 } from '../utils/data-cache';
 import { getEmojiByIndex } from '../utils/emoji-util';
 import {
@@ -1190,7 +1189,7 @@ const loadAccountListBalance = async (network: string, addressList: string[]) =>
       await setCachedData(
         accountBalanceKey(network, address),
         accountsBalances[address] || '0.00000000',
-        Number(accountsBalances[address]) > 0 ? 60_000 : 1_000
+        5_000
       );
       return accountsBalances[address];
     })
@@ -1394,6 +1393,7 @@ export const loadChildAccountsOfParent = async (
   if (!(await fclConfirmNetwork(network))) {
     throw new Error('Network has been switched');
   }
+
   const childAccountMap: ChildAccountMap = await fcl.query({
     cadence: script,
     args: (arg, t) => [arg(mainAccountAddress, t.Address)],
@@ -1415,7 +1415,7 @@ export const loadChildAccountsOfParent = async (
   );
 
   // Save the child accounts to the cache
-  setCachedData(childAccountsKey(network, mainAccountAddress), childAccounts, 60_000);
+  setCachedData(childAccountsKey(network, mainAccountAddress), childAccounts, 10_000);
 
   return childAccounts;
 };
@@ -1484,7 +1484,7 @@ export const loadEvmAccountOfParent = async (
       id: index,
     };
     // Save the EVM account to the cache
-    setCachedData(evmAccountKey(network, mainAccountAddress), evmAccount, 60_000);
+    setCachedData(evmAccountKey(network, mainAccountAddress), evmAccount, 10_000);
 
     return evmAccount;
   } else {
@@ -1631,7 +1631,26 @@ const initAccountLoaders = () => {
   registerRefreshListener(mainAccountsRefreshRegex, loadMainAccountsWithPubKey);
   registerRefreshListener(childAccountsRefreshRegex, loadChildAccountsOfParent);
   registerRefreshListener(evmAccountRefreshRegex, loadEvmAccountOfParent);
-  registerRefreshListener(accountBalanceRefreshRegex, loadAccountBalance);
+
+  // Use batch refresh for account balances to avoid hitting the backend too hard
+  registerBatchRefreshListener(
+    accountBalanceRefreshRegex,
+    async (network: string, addresses: string[]) => {
+      // Load the balances for all addresses
+      const balances = await loadAccountListBalance(network, addresses);
+
+      // Convert to a record keyed by address
+      const result: Record<string, string> = {};
+      addresses.forEach((address, index) => {
+        result[address] = balances[index] || '0.00000000';
+      });
+      return result;
+    },
+    (matches) => matches[2], // Extract address from the regex match
+    (network: string, address: string) => accountBalanceKey(network, address),
+    100 // 100ms batch window
+  );
+
   registerRefreshListener(mainAccountStorageBalanceRefreshRegex, loadMainAccountStorageBalance);
   registerRefreshListener(placeholderAccountsRefreshRegex, clearPlaceholderAccounts);
   registerRefreshListener(

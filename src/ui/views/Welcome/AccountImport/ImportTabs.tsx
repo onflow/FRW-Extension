@@ -1,6 +1,7 @@
 import { Box, Tabs, Tab, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
+import { type PublicKeyAccount } from '@/shared/types/wallet-types';
 import { QrCodeIcon } from '@/ui/assets/icons/QrCodeIcon';
 import ErrorModel from '@/ui/components/PopupModal/errorModel';
 import {
@@ -47,7 +48,7 @@ const ImportTabs = ({
 }: {
   setMnemonic: (mnemonic: string) => void;
   setPk: (pk: string) => void;
-  setAccounts: (accounts: any[]) => void;
+  setAccounts: (accounts: PublicKeyAccount[]) => void;
   goPassword: () => void;
   handleSwitchTab: () => void;
   setErrorMessage: (errorMessage: string) => void;
@@ -76,15 +77,15 @@ const ImportTabs = ({
     setSelectedTab(newValue);
   };
 
-  const handleImport = async (accountKey?: any) => {
-    setAccounts(accountKey);
-    const result = await usewallet.openapi.checkImport(accountKey[0].publicKey);
+  const handleImport = async (accounts: PublicKeyAccount[]) => {
+    setAccounts(accounts);
+    const result = await usewallet.openapi.checkImport(accounts[0].publicKey);
     if (result.status === 409) {
       // The account has been previously imported, so just retrieve the current user name
       goPassword();
     } else {
       // The key has never been imported before, we need to set a username and confirm / create a password
-      if (!accountKey[0].address) {
+      if (!accounts[0].address) {
         handleNotFoundPopup();
         return;
       }

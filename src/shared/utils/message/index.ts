@@ -66,14 +66,14 @@ abstract class Message extends EventEmitter {
         res = await this.listenCallback(data);
       } catch (e: any) {
         err = {
-          message: e.message,
-          stack: e.stack,
+          message: e?.message || 'Unknown error',
+          stack: e?.stack || 'Unknown stack',
         };
-        if (e.code) {
-          err.code = e.code;
+        if (e?.code) {
+          err.code = e?.code;
         }
-        if (e.data) {
-          err.data = e.data;
+        if (e?.data) {
+          err.data = e?.data;
         }
       }
 

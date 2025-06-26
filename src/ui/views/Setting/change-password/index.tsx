@@ -13,7 +13,6 @@ import {
   Typography,
 } from '@mui/material';
 import Box from '@mui/material/Box';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -30,61 +29,7 @@ import { GoogleWarningDialog } from './google-warning';
 import { PasswordIndicator } from './password-indicator';
 import { ProfileBackupSelectionDialog } from './profile-backup-selection';
 
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    width: '355px',
-    height: '48px',
-    padding: '18px',
-    marginLeft: '18px',
-    marginRight: '18px',
-    zIndex: '999',
-    border: '1px solid #4C4C4C',
-    borderRadius: '8px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '1px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-  inputBox2: {
-    width: '355px',
-    height: '48px',
-    padding: '18px',
-    marginLeft: '18px',
-    marginRight: '18px',
-    zIndex: '999',
-    border: '1px solid #4C4C4C',
-    borderRadius: '8px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '1px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-  inputBox3: {
-    width: '355px',
-    height: '48px',
-    padding: '18px',
-    marginLeft: '18px',
-    marginRight: '18px',
-    zIndex: '999',
-    border: '1px solid #4C4C4C',
-    borderRadius: '8px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '1px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
-
 const ChangePassword = () => {
-  const classes = useStyles();
   const wallet = useWallet();
   const [isCurrentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
@@ -365,13 +310,29 @@ const ChangePassword = () => {
               {chrome.i18n.getMessage('Current__Password')}
             </Typography>
             <Input
-              sx={{ fontSize: '12px', fontFamily: 'Inter', fontStyle: 'normal' }}
+              sx={{
+                fontSize: '12px',
+                fontFamily: 'Inter',
+                fontStyle: 'normal',
+                width: '355px',
+                height: '48px',
+                padding: '18px',
+                marginLeft: '18px',
+                marginRight: '18px',
+                zIndex: '999',
+                border: '1px solid #4C4C4C',
+                borderRadius: '8px',
+                boxSizing: 'border-box',
+                '&.Mui-focused': {
+                  border: '1px solid #FAFAFA',
+                  boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+                },
+              }}
               id="pass"
               name="password"
               type={isCurrentPasswordVisible ? 'text' : 'password'}
               placeholder={chrome.i18n.getMessage('Enter__Current__Password')}
               value={confirmCurrentPassword}
-              className={classes.inputBox}
               fullWidth
               autoFocus
               disableUnderline
@@ -414,19 +375,31 @@ const ChangePassword = () => {
               {chrome.i18n.getMessage('New__Password')}
             </Typography>
             <Input
+              id="pass1"
+              type={isPasswordVisible ? 'text' : 'password'}
+              name="password1"
+              placeholder={chrome.i18n.getMessage('Enter__New__Password')}
+              value={password}
               sx={{
                 pb: '15px',
                 marginTop: password ? '0px' : '0px',
                 fontSize: '12px',
                 fontFamily: 'Inter',
                 fontStyle: 'normal',
+                width: '355px',
+                height: '48px',
+                padding: '18px',
+                marginLeft: '18px',
+                marginRight: '18px',
+                zIndex: '999',
+                border: '1px solid #4C4C4C',
+                borderRadius: '8px',
+                boxSizing: 'border-box',
+                '&.Mui-focused': {
+                  border: '1px solid #FAFAFA',
+                  boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+                },
               }}
-              id="pass1"
-              type={isPasswordVisible ? 'text' : 'password'}
-              name="password1"
-              placeholder={chrome.i18n.getMessage('Enter__New__Password')}
-              value={password}
-              className={classes.inputBox2}
               fullWidth
               disableUnderline
               autoComplete="new-password"
@@ -463,19 +436,31 @@ const ChangePassword = () => {
               {chrome.i18n.getMessage('Confirm__Password')}
             </Typography>
             <Input
+              id="pass2"
+              type={isConfirmPasswordVisible ? 'text' : 'password'}
+              name="password2"
+              placeholder={chrome.i18n.getMessage('Confirm__Password')}
+              value={confirmPassword}
               sx={{
                 pb: '15px',
                 marginTop: password ? '0px' : '0px',
                 fontSize: '12px',
                 fontFamily: 'Inter',
                 fontStyle: 'normal',
+                width: '355px',
+                height: '48px',
+                padding: '18px',
+                marginLeft: '18px',
+                marginRight: '18px',
+                zIndex: '999',
+                border: '1px solid #4C4C4C',
+                borderRadius: '8px',
+                boxSizing: 'border-box',
+                '&.Mui-focused': {
+                  border: '1px solid #FAFAFA',
+                  boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+                },
               }}
-              id="pass2"
-              type={isConfirmPasswordVisible ? 'text' : 'password'}
-              name="password2"
-              placeholder={chrome.i18n.getMessage('Confirm__Password')}
-              value={confirmPassword}
-              className={classes.inputBox3}
               autoComplete="new-password"
               fullWidth
               disableUnderline

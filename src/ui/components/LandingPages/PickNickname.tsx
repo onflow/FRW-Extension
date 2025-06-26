@@ -7,7 +7,6 @@ import {
   Input,
   InputAdornment,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -19,37 +18,15 @@ import CancelIcon from '@/ui/components/iconfont/IconClose';
 import SlideRelative from '@/ui/components/SlideRelative';
 import { useWallet } from 'ui/utils';
 
-const useStyles = makeStyles((_theme) => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
-
-const PickUsername = ({
+const PickNickname = ({
   handleSwitchTab,
-  username,
-  setUsername,
+  nickname,
+  setNickname,
 }: {
   handleSwitchTab: () => void;
-  username: string;
-  setUsername: (username: string) => void;
+  nickname: string;
+  setNickname: (username: string) => void;
 }) => {
-  const classes = useStyles();
   const wallet = useWallet();
   const [isLoading, setLoading] = useState(false);
   const [usernameValid, setUsernameValid] = useState(false);
@@ -179,7 +156,7 @@ const PickUsername = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newUsername = event.target.value;
       // Set the username
-      setUsername(newUsername);
+      setNickname(newUsername);
 
       // Validate username
       validateUsername(newUsername);
@@ -195,8 +172,8 @@ const PickUsername = ({
   }, []);
 
   const handleClearUsername = useCallback(() => {
-    setUsername('');
-  }, [setUsername]);
+    setNickname('');
+  }, [setNickname]);
 
   const msgBgColor = isLoading ? 'neutral.light' : usernameValid ? 'success.light' : 'error.light';
   return (
@@ -217,13 +194,25 @@ const PickUsername = ({
             <Input
               id="textfield"
               autoComplete="nickname"
-              className={classes.inputBox}
+              sx={{
+                height: '64px',
+                padding: '16px',
+                zIndex: '999',
+                backgroundColor: '#282828',
+                border: '2px solid #4C4C4C',
+                borderRadius: '12px',
+                boxSizing: 'border-box',
+                '&.Mui-focused': {
+                  border: '2px solid #FAFAFA',
+                  boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+                },
+              }}
               placeholder={chrome.i18n.getMessage('Username')}
               autoFocus
               fullWidth
               disableUnderline
               // Making uncontrolled component
-              defaultValue={username}
+              defaultValue={nickname}
               onChange={handleUsernameChange}
               startAdornment={
                 <InputAdornment position="start">
@@ -241,7 +230,7 @@ const PickUsername = ({
                 </InputAdornment>
               }
             />
-            <SlideRelative direction="down" show={!!username}>
+            <SlideRelative direction="down" show={!!nickname}>
               <Box
                 sx={{
                   width: '95%',
@@ -283,4 +272,4 @@ const PickUsername = ({
   );
 };
 
-export default PickUsername;
+export default PickNickname;

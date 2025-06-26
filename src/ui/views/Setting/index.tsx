@@ -13,7 +13,6 @@ import {
   IconButton,
   Box,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -32,66 +31,7 @@ import { ReactComponent as IconLink } from 'ui/assets/svg/Iconlink.svg';
 // Feature flags
 const SHOW_DEVICES = false;
 
-// Styles
-const useStyles = makeStyles(() => ({
-  listDiv: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    paddingBottom: '8px',
-  },
-  listItem: {
-    height: '66px',
-    width: '100%',
-    overflow: 'hidden',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-  itemButton: {
-    width: '90%',
-    height: '100%',
-    overflow: 'hidden',
-    margin: '0 auto',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-  list: {
-    width: '90%',
-    borderRadius: '16px',
-    overflow: 'hidden',
-    backgroundColor: '#282828',
-    '&:hover': {
-      backgroundColor: '#282828',
-    },
-  },
-  listIcon: {
-    minWidth: '25px',
-  },
-  icon: {
-    color: '#59A1DB',
-    width: '18px',
-    height: '18px',
-    marginRight: '14px',
-  },
-  iconOthers: {
-    color: '#59A1DB',
-    width: '18px',
-    height: '18px',
-    marginRight: '14px',
-  },
-  iconContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '18px',
-    height: '18px',
-  },
-}));
-
 const SettingTab = () => {
-  const classes = useStyles();
   const usewallet = useWallet();
   const [isActive, setIsActive] = useState(false);
   const [isKeyphrase, setIsKeyphrase] = useState(false);
@@ -113,17 +53,62 @@ const SettingTab = () => {
   return (
     <div className="page">
       <LLHeader title={chrome.i18n.getMessage('Settings')} help={false} />
-      <div className={classes.listDiv}>
-        <List className={classes.list} sx={{ margin: '8px auto 16px auto', pt: 0, pb: 0 }}>
+      <Box
+        sx={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          paddingBottom: '8px',
+        }}
+      >
+        <List
+          sx={{
+            width: '90%',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            backgroundColor: '#282828',
+            '&:hover': {
+              backgroundColor: '#282828',
+            },
+            margin: '8px auto 16px auto',
+            pt: 0,
+            pb: 0,
+          }}
+        >
           <ListItem
             component={Link}
             to="/dashboard/setting/account"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <IconAccount size={18} color="#59A1DB" />
                 </Box>
               </ListItemIcon>
@@ -138,11 +123,36 @@ const SettingTab = () => {
             component={Link}
             to="/dashboard/setting/changepassword"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <IconLock size={18} color="#59A1DB" />
                 </Box>
               </ListItemIcon>
@@ -153,16 +163,54 @@ const SettingTab = () => {
             </ListItemButton>
           </ListItem>
         </List>
-        <List className={classes.list} sx={{ margin: '8px auto 16px auto', pt: 0, pb: 0 }}>
+        <List
+          sx={{
+            width: '90%',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            backgroundColor: '#282828',
+            '&:hover': {
+              backgroundColor: '#282828',
+            },
+            margin: '8px auto 16px auto',
+            pt: 0,
+            pb: 0,
+          }}
+        >
           <ListItem
             component={Link}
             to="/dashboard/setting/wallet"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <CoinsIcon width={18} height={18} color="#59A1DB" />
                 </Box>
               </ListItemIcon>
@@ -179,11 +227,36 @@ const SettingTab = () => {
             component={Link}
             to="/dashboard/setting/addressbook"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <IconAddressbook size={18} color="#59A1DB" />
                 </Box>
               </ListItemIcon>
@@ -200,11 +273,36 @@ const SettingTab = () => {
               component={Link}
               to="/dashboard/setting/linked"
               disablePadding
-              className={classes.listItem}
+              sx={{
+                height: '66px',
+                width: '100%',
+                overflow: 'hidden',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
             >
-              <ListItemButton className={classes.itemButton}>
+              <ListItemButton
+                sx={{
+                  width: '90%',
+                  height: '100%',
+                  overflow: 'hidden',
+                  margin: '0 auto',
+                  '&:hover': {
+                    backgroundColor: '#282828',
+                  },
+                }}
+              >
                 <ListItemIcon sx={{ minWidth: '25px' }}>
-                  <Box className={classes.iconContainer}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '18px',
+                      height: '18px',
+                    }}
+                  >
                     <IconLink style={{ width: '18px', height: '18px', color: '#59A1DB' }} />
                   </Box>
                 </ListItemIcon>
@@ -222,11 +320,36 @@ const SettingTab = () => {
             component={Link}
             to="/dashboard/setting/currency"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <CurrencyExchangeIcon sx={{ width: '18px', height: '18px', color: '#59A1DB' }} />
                 </Box>
               </ListItemIcon>
@@ -243,11 +366,36 @@ const SettingTab = () => {
               component={Link}
               to="/dashboard/setting/backups"
               disablePadding
-              className={classes.listItem}
+              sx={{
+                height: '66px',
+                width: '100%',
+                overflow: 'hidden',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
             >
-              <ListItemButton className={classes.itemButton}>
+              <ListItemButton
+                sx={{
+                  width: '90%',
+                  height: '100%',
+                  overflow: 'hidden',
+                  margin: '0 auto',
+                  '&:hover': {
+                    backgroundColor: '#282828',
+                  },
+                }}
+              >
                 <ListItemIcon sx={{ minWidth: '25px' }}>
-                  <Box className={classes.iconContainer}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '18px',
+                      height: '18px',
+                    }}
+                  >
                     <IconBackup size={18} color="#59A1DB" />
                   </Box>
                 </ListItemIcon>
@@ -260,15 +408,53 @@ const SettingTab = () => {
           )}
         </List>
 
-        <List className={classes.list} sx={{ margin: '8px auto 18px auto', pt: 0, pb: 0 }}>
+        <List
+          sx={{
+            width: '90%',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            backgroundColor: '#282828',
+            '&:hover': {
+              backgroundColor: '#282828',
+            },
+            margin: '8px auto 18px auto',
+            pt: 0,
+            pb: 0,
+          }}
+        >
           <ListItem
             disablePadding
             onClick={() => window.open('https://core.flow.com')}
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <PhoneIphoneIcon sx={{ color: '#59A1DB', width: '18px', height: '18px' }} />
                 </Box>
               </ListItemIcon>
@@ -300,15 +486,39 @@ const SettingTab = () => {
           <Divider sx={{ width: '90%' }} variant="middle" />
 
           <ListItem
-            button
             component={Link}
             to="/dashboard/setting/developerMode"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <IconDeveloper size={18} color="#59A1DB" />
                 </Box>
               </ListItemIcon>
@@ -324,15 +534,39 @@ const SettingTab = () => {
           {SHOW_DEVICES && (
             <>
               <ListItem
-                button
                 component={Link}
                 to="/dashboard/setting/devices"
                 disablePadding
-                className={classes.listItem}
+                sx={{
+                  height: '66px',
+                  width: '100%',
+                  overflow: 'hidden',
+                  '&:hover': {
+                    backgroundColor: '#282828',
+                  },
+                }}
               >
-                <ListItemButton className={classes.itemButton}>
+                <ListItemButton
+                  sx={{
+                    width: '90%',
+                    height: '100%',
+                    overflow: 'hidden',
+                    margin: '0 auto',
+                    '&:hover': {
+                      backgroundColor: '#282828',
+                    },
+                  }}
+                >
                   <ListItemIcon sx={{ minWidth: '25px' }}>
-                    <Box className={classes.iconContainer}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '18px',
+                        height: '18px',
+                      }}
+                    >
                       <Device style={{ width: '18px', height: '18px', color: '#59A1DB' }} />
                     </Box>
                   </ListItemIcon>
@@ -348,15 +582,39 @@ const SettingTab = () => {
           )}
 
           <ListItem
-            button
             component={Link}
             to="/dashboard/setting/about"
             disablePadding
-            className={classes.listItem}
+            sx={{
+              height: '66px',
+              width: '100%',
+              overflow: 'hidden',
+              '&:hover': {
+                backgroundColor: '#282828',
+              },
+            }}
           >
-            <ListItemButton className={classes.itemButton}>
+            <ListItemButton
+              sx={{
+                width: '90%',
+                height: '100%',
+                overflow: 'hidden',
+                margin: '0 auto',
+                '&:hover': {
+                  backgroundColor: '#282828',
+                },
+              }}
+            >
               <ListItemIcon sx={{ minWidth: '25px' }}>
-                <Box className={classes.iconContainer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '18px',
+                    height: '18px',
+                  }}
+                >
                   <IconAbout size={18} color="#59A1DB" />
                 </Box>
               </ListItemIcon>
@@ -367,7 +625,7 @@ const SettingTab = () => {
             </ListItemButton>
           </ListItem>
         </List>
-      </div>
+      </Box>
     </div>
   );
 };

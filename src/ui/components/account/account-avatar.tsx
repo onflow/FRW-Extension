@@ -39,7 +39,7 @@ const ImageIcon = ({ image, size = 24 }: { image: string; size?: number }) => {
 
 const Icon = ({ icon, isPending }: { icon?: string; isPending?: boolean }) => {
   if (isPending) {
-    return <FlowIcon width={36} height={36} />;
+    return <FlowIcon width={36} height={36} showWhiteBackground />;
   }
   if (!icon) {
     return <Skeleton variant="circular" width="36px" height="36px" />;
@@ -55,6 +55,16 @@ const Icon = ({ icon, isPending }: { icon?: string; isPending?: boolean }) => {
  * An Account Avatar component that displays an emoji and a parent emoji.
  * It also displays a spinning indicator if the account has a pending transaction.
  * It also displays a border if the account is active.
+ * It also displays a pending transaction indicator if the account has a pending transaction.
+ * @param network - The network of the account.
+ * @param emoji - The emoji of the account.
+ * @param color - The color of the account.
+ * @param parentEmoji - The emoji of the parent account.
+ * @param parentColor - The color of the parent account.
+ * @param active - Whether the account is active.
+ * @param spinning - Whether the account is spinning.
+ * @param onClick - The function to call when the account is clicked.
+ * @param isPending - Whether this account is pending creation (is in the process of being created).
  */
 export const AccountAvatar = ({
   network,

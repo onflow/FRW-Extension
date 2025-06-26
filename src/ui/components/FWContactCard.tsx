@@ -1,6 +1,5 @@
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { Box, Typography, Avatar, IconButton, CardMedia, Skeleton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -8,24 +7,7 @@ import { ContactType } from '@/shared/types/network-types';
 import closex from 'ui/assets/closex.svg';
 import { useWallet, formatAddress } from 'ui/utils';
 
-const useStyles = makeStyles(() => ({
-  ContactCardAvatar: {
-    mr: '13px',
-    color: 'primary.main',
-    backgroundColor: 'neutral.main',
-  },
-  ContactCardContainer: {
-    display: 'flex',
-    // border: '1px solid #4C4C4C',
-    // borderRadius: '8px',
-    // padding: ''
-    alignItems: 'center',
-    px: '18px',
-  },
-}));
-
 export const FWContactCard = ({ contact, hideCloseButton, isSend = false, isLoading = false }) => {
-  const classes = useStyles();
   const wallet = useWallet();
 
   const history = useHistory();

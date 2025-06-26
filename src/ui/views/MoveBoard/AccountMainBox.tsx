@@ -1,5 +1,4 @@
 import { Typography, Box, CardMedia, Avatar } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { type Contact } from '@/shared/types/network-types';

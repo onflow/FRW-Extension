@@ -2,28 +2,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { List, ListItemText, ListItem, ListSubheader, ListItemAvatar, Input } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import InputAdornment from '@mui/material/InputAdornment';
-import { makeStyles } from '@mui/styles';
 import _ from 'lodash';
 import React, { useState } from 'react';
-
-const useStyles = makeStyles((theme) => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    width: '364px',
-    height: '32px',
-    padding: '16px,16px,0px,16px',
-    zIndex: '999',
-    // backgroundColor: '#E5E5E5',
-    border: '1px solid #5E5E5E',
-    borderRadius: '16px',
-    boxSizing: 'border-box',
-    margin: '17px 18px 16px 18px',
-  },
-}));
 
 const CONTACTS = [
   {
@@ -77,7 +57,6 @@ const Settingone = () => {
   const group = CONTACTS.sort((a, b) => a.name.localeCompare(b.name));
   const grouped = _.groupBy(group, (contact) => contact.name[0]);
 
-  const classes = useStyles();
   const [name, setName] = useState('');
   const [foundContacts, setFoundContacts] = useState(group);
 
@@ -102,7 +81,16 @@ const Settingone = () => {
         type="search"
         value={name}
         onChange={filter}
-        className={classes.inputBox}
+        sx={{
+          width: '364px',
+          height: '32px',
+          padding: '16px,16px,0px,16px',
+          zIndex: '999',
+          border: '1px solid #5E5E5E',
+          borderRadius: '16px',
+          boxSizing: 'border-box',
+          margin: '17px 18px 16px 18px',
+        }}
         placeholder={chrome.i18n.getMessage('Search')}
         autoFocus
         disableUnderline

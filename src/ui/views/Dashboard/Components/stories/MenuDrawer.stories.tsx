@@ -5,6 +5,7 @@ import emojisJson from '@/background/utils/emoji.json';
 const { emojis } = emojisJson as { emojis: Emoji[] };
 import { MAINNET_CHAIN_ID, type UserInfoResponse } from '@/shared/types/network-types';
 import { type Emoji, type WalletAccount } from '@/shared/types/wallet-types';
+import { useProfiles as importedMockUseProfiles } from '@/stories/ui-hooks.mock';
 import {
   useChildAccounts as importedMockUseChildAccounts,
   useEvmAccount as importedMockUseEvmAccount,
@@ -146,7 +147,7 @@ const meta: Meta<typeof MenuDrawer> = {
       importedMockUseChildAccounts.mockReset();
       importedMockUseEvmAccount.mockReset();
       importedMockUseNftCatalogCollections.mockReset();
-
+      importedMockUseProfiles.mockReset();
       const { mockData, pendingTransactions, featureFlags } = context.parameters;
 
       // Set up feature flag mocks
@@ -167,39 +168,6 @@ const meta: Meta<typeof MenuDrawer> = {
         (window as any).__STORYBOOK_FEATURE_FLAGS__ = flagsToSet;
       }
 
-      // Set up global useProfiles mock with pending transactions
-      if (typeof window !== 'undefined') {
-        (window as any).__STORYBOOK_MOCKS__ = {
-          useProfiles: () => ({
-            fetchProfileData: () => {},
-            clearProfileData: () => {},
-            currentWallet: null,
-            mainAddress: '',
-            evmAddress: '',
-            childAccounts: [],
-            evmWallet: null,
-            userInfo: null,
-            otherAccounts: [],
-            walletList: [],
-            currentBalance: '0',
-            parentAccountStorageBalance: null,
-            parentWallet: null,
-            parentWalletIndex: -1,
-            evmLoading: false,
-            mainAddressLoading: false,
-            profileIds: [],
-            activeAccountType: 'none',
-            noAddress: false,
-            registerStatus: false,
-            canMoveToChild: false,
-            currentWalletList: [],
-            payer: false,
-            network: 'mainnet',
-            pendingAccountTransactions: pendingTransactions || [],
-          }),
-        };
-      }
-
       if (mockData) {
         importedMockUseEvmAccount.mockImplementation((_network, address) => {
           if (typeof address === 'string' && mockData.evmAccounts) {
@@ -218,6 +186,17 @@ const meta: Meta<typeof MenuDrawer> = {
             return [{ count: mockData.nfts[address] }];
           }
           return [];
+        });
+        importedMockUseProfiles.mockImplementation(() => {
+          return {
+            pendingAccountTransactions: mockData.pendingAccountTransactions || [],
+          };
+        });
+      } else {
+        importedMockUseProfiles.mockImplementation(() => {
+          return {
+            pendingAccountTransactions: [],
+          };
         });
       }
 
@@ -354,7 +333,7 @@ export const EmptyWalletState: Story = {
 export const Loading: Story = {
   args: {
     drawer: true,
-    userInfo: null,
+    userInfo: undefined,
     walletList: [],
     activeAccount: undefined,
     activeParentAccount: mockMainAccount,

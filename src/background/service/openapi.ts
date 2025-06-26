@@ -1,5 +1,6 @@
 import * as fcl from '@onflow/fcl';
 import type { Account as FclAccount } from '@onflow/typedefs';
+import BigNumber from 'bignumber.js';
 import dayjs from 'dayjs';
 import { initializeApp, getApp } from 'firebase/app';
 import {
@@ -13,7 +14,6 @@ import {
   type User,
 } from 'firebase/auth/web-extension';
 import { getInstallations, getId } from 'firebase/installations';
-import type { TokenInfo } from 'flow-native-token-registry';
 
 import fetchConfig from '@/background/service/remoteConfig';
 import { findKeyAndInfo } from '@/background/utils';
@@ -22,40 +22,19 @@ import { getFirbaseConfig, getFirbaseFunctionUrl } from '@/background/utils/fire
 import { verifySignature } from '@/background/utils/modules/publicPrivateKey';
 import { storage } from '@/background/webapi';
 import type {
-  ExtendedTokenInfo,
   BalanceMap,
   EvmTokenInfo,
   CadenceTokenInfo,
+  FungibleTokenListResponse,
+  FungibleTokenInfo,
+  CustomFungibleTokenInfo,
 } from '@/shared/types/coin-types';
-import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
 import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
-import { type NFTCollections } from '@/shared/types/nft-types';
-import {
-  type LoggedInAccountWithIndex,
-  type LoggedInAccount,
-  type FlowAddress,
-  type PublicKeyAccount,
-  type ActiveAccountType,
-  type Currency,
-  DEFAULT_CURRENCY,
-} from '@/shared/types/wallet-types';
-import { isValidFlowAddress, isValidEthereumAddress } from '@/shared/utils/address';
-import { getStringFromHashAlgo, getStringFromSignAlgo } from '@/shared/utils/algo';
-import { cadenceScriptsKey } from '@/shared/utils/cache-data-keys';
-import { consoleError, consoleLog } from '@/shared/utils/console-log';
-import { returnCurrentProfileId } from '@/shared/utils/current-id';
-import { getPeriodFrequency } from '@/shared/utils/getPeriodFrequency';
-import { type NetworkScripts } from '@/shared/utils/script-types';
-import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from 'consts';
-
-import packageJson from '../../../package.json';
 import {
   type AccountKeyRequest,
   type CheckResponse,
   type SignInResponse,
   type UserInfoResponse,
-  type TokenModel,
-  type NFTModel_depreciated,
   type StorageInfo,
   type NewsItem,
   type NewsConditionType,
@@ -65,10 +44,32 @@ import {
   type Contact,
   type NFTModelV2,
   type DeviceInfoRequest,
-  MAINNET_CHAIN_ID,
   type KeyResponseItem,
   type NftCollection,
-} from '../../shared/types/network-types';
+  getPriceProvider,
+  type PeriodFrequency,
+} from '@/shared/types/network-types';
+import { type NFTCollections } from '@/shared/types/nft-types';
+import type { TokenInfo } from '@/shared/types/token-info';
+import {
+  type LoggedInAccountWithIndex,
+  type LoggedInAccount,
+  type FlowAddress,
+  type PublicKeyAccount,
+  type ActiveAccountType,
+  type Currency,
+  DEFAULT_CURRENCY,
+} from '@/shared/types/wallet-types';
+import { isValidFlowAddress } from '@/shared/utils/address';
+import { getStringFromHashAlgo, getStringFromSignAlgo } from '@/shared/utils/algo';
+import { cadenceScriptsKey } from '@/shared/utils/cache-data-keys';
+import { consoleError, consoleLog } from '@/shared/utils/console-log';
+import { returnCurrentProfileId } from '@/shared/utils/current-id';
+import { getPeriodFrequency } from '@/shared/utils/getPeriodFrequency';
+import { type NetworkScripts } from '@/shared/utils/script-types';
+import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from 'consts';
+
+import packageJson from '../../../package.json';
 
 import {
   userWalletService,
@@ -504,8 +505,9 @@ export class OpenApiService {
   };
 
   /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens has price information.
+   * Return the USDC price pair for a given provider
+   * @param provider - The provider to get the USDC price pair for
+   * @returns The USDC price pair for the provider
    */
   private getUSDCPricePair = (provider: PriceProvider): string | null => {
     switch (provider) {
@@ -521,29 +523,10 @@ export class OpenApiService {
   };
 
   /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens has price information.
-   */
-  getPriceProvider = (token: string): PriceProvider[] => {
-    switch (token) {
-      case 'usdc':
-        return [PriceProvider.binance, PriceProvider.kakren, PriceProvider.huobi];
-      case 'flow':
-        return [
-          PriceProvider.binance,
-          PriceProvider.kakren,
-          PriceProvider.coinbase,
-          PriceProvider.kucoin,
-          PriceProvider.huobi,
-        ];
-      default:
-        return [];
-    }
-  };
-
-  /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens has price information.
+   * Return the price pair for a given token and provider
+   * @param token - The token to get the price pair for
+   * @param provider - The provider to get the price pair for
+   * @returns The price pair for the token and provider
    */
   getUSDCPrice = async (provider = PriceProvider.binance): Promise<CheckResponse> => {
     const config = this.store.config.crypto_map;
@@ -555,8 +538,9 @@ export class OpenApiService {
   };
 
   /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens has price information.
+   * Return the price pair for a given provider
+   * @param provider - The provider to get the price pair for
+   * @returns The price pair for the provider
    */
   private getFlowPricePair = (provider: PriceProvider): string => {
     switch (provider) {
@@ -576,8 +560,10 @@ export class OpenApiService {
   };
 
   /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens instead. It will have token info and price.
+   * Return the price by symbol
+   * @param symbol - The symbol to get the price for
+   * @param data - The data to get the price from
+   * @returns The price for the symbol
    */
   getPricesBySymbol = async (symbol: string, data) => {
     const key = symbol.toUpperCase();
@@ -585,8 +571,10 @@ export class OpenApiService {
   };
 
   /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens instead. It will have token info and price.
+   * Return the price by address
+   * @param symbol - The symbol to get the price for
+   * @param data - The data to get the price from
+   * @returns The price for the symbol
    */
   getPricesByAddress = async (symbol: string, data) => {
     const key = symbol.toLowerCase();
@@ -623,10 +611,22 @@ export class OpenApiService {
   };
 
   /**
-   * @deprecated This method is not used in the codebase.
-   * Use getUserTokens instead. It will have token info and price.
+   * Get the price of a token
+   * @param token - The token to get the price for
+   * @param provider - The provider to get the price from
+   * @returns The price of the token
    */
-  getTokenPrice = async (token: string, provider = PriceProvider.binance) => {
+  getTokenPrice = async (
+    token: string,
+    provider = PriceProvider.binance
+  ): Promise<{
+    price: {
+      change: {
+        percentage: number;
+      };
+      last: number;
+    };
+  }> => {
     const config = this.store.config.crypto_flow;
     const pair = this.getTokenPair(token, provider);
     if (!pair) {
@@ -639,15 +639,24 @@ export class OpenApiService {
     return data.data.result;
   };
 
-  getTokenPriceHistory = async (
+  /**
+   * Get the price history of a token
+   * @param token - The token to get the price history for
+   * @param period - The period to get the price history for
+   * @param provider - The provider to get the price history from
+   * @returns The price history of the token
+   */
+  getTokenPriceHistoryArray = async (
     token: string,
     period = Period.oneDay,
     provider = PriceProvider.binance
-  ): Promise<CheckResponse> => {
+  ): Promise<
+    Record<PeriodFrequency, [number, number, number, number, number, number, number, number][]>
+  > => {
     let after = dayjs();
     const periods = getPeriodFrequency(period);
 
-    const providers = this.getPriceProvider(token);
+    const providers = getPriceProvider(token);
     if (providers.length === 0) {
       throw new Error('no price provider found');
     }
@@ -1292,12 +1301,15 @@ export class OpenApiService {
       storageCapacity: result['storageCapacity'],
     };
   };
-  getTokenBalanceWithModel = async (address: string, token: TokenInfo) => {
+  getTokenBalanceWithModel = async (address: string, token: CustomFungibleTokenInfo) => {
     const script = await getScripts(
       userWalletService.getNetwork(),
       'basic',
       'getTokenBalanceWithModel'
     );
+    if (!token.contractName || !token.path || !token.address) {
+      throw new Error('Invalid token');
+    }
     const network = await userWalletService.getNetwork();
     const cadence = script
       .replaceAll('<Token>', token.contractName)
@@ -1326,9 +1338,9 @@ export class OpenApiService {
     return data.tokens;
   };
 
-  fetchFTListFull = async (network: string, chainType: string): Promise<TokenInfo[]> => {
+  fetchFTListFull = async (network: string, chainType: string): Promise<FungibleTokenInfo[]> => {
     const config = this.store.config.get_ft_list_full;
-    const data = await this.sendRequest(
+    const data: FungibleTokenListResponse = await this.sendRequest(
       config.method,
       config.path,
       {
@@ -1343,14 +1355,16 @@ export class OpenApiService {
   };
 
   // todo
-  isTokenStorageEnabled = async (address: string, token: TokenInfo) => {
+  isTokenStorageEnabled = async (address: string, token: CustomFungibleTokenInfo) => {
     const network = await userWalletService.getNetwork();
     const script = await getScripts(
       userWalletService.getNetwork(),
       'basic',
       'isTokenStorageEnabled'
     );
-
+    if (!token.contractName || !token.path || !token.address) {
+      throw new Error('Invalid token');
+    }
     const cadence = script
       .replaceAll('<Token>', token.contractName)
       .replaceAll('<TokenBalancePath>', token.path.balance)
@@ -1910,10 +1924,30 @@ export class OpenApiService {
       {},
       WEB_NEXT_URL
     );
-    if (!response!.data?.result) {
-      throw new Error('No token info found');
+    if (!response?.data?.result || !response?.data?.storage) {
+      throw new Error('Could not fetch token info');
     }
-    return response?.data?.result;
+
+    // TODO: TB remove this after the API is updated
+    const storageInfo: StorageResponse = response?.data?.storage;
+    const cadenceTokenInfo: CadenceTokenInfo[] = response?.data?.result.map((token) => {
+      if (token.symbol.toUpperCase() === 'FLOW') {
+        return {
+          ...token,
+          balance: storageInfo.availableBalanceToUse,
+          displayBalance: storageInfo.availableBalanceToUse,
+          balanceInFLOW: storageInfo.availableBalanceToUse,
+          balanceInUSD: BigNumber(storageInfo.availableBalanceToUse)
+            .multipliedBy(BigNumber(token.priceInUSD))
+            .toString(),
+          balanceInCurrency: BigNumber(storageInfo.availableBalanceToUse)
+            .multipliedBy(BigNumber(token.priceInCurrency))
+            .toString(),
+        };
+      }
+      return token;
+    });
+    return cadenceTokenInfo;
   }
 
   async fetchEvmTokenInfo(

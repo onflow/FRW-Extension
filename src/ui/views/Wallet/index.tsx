@@ -71,8 +71,14 @@ const WalletTab = ({ network }) => {
   const [showMoveBoard, setShowMoveBoard] = useState(false);
 
   const isMainOrEvmActive = activeAccountType === 'main' || activeAccountType === 'evm';
-  const incrementSwapLink =
-    network === 'mainnet' ? 'https://app.increment.fi/swap' : 'https://demo.increment.fi/swap';
+  const swapLink =
+    activeAccountType === 'evm'
+      ? network === 'mainnet'
+        ? 'https://swap.kittypunch.xyz/swap'
+        : 'https://swap.kittypunch.xyz/swap'
+      : network === 'mainnet'
+        ? 'https://app.increment.fi/swap'
+        : 'https://demo.increment.fi/swap';
 
   // Note that if any of the arguments are undefined, the hook will return undefined
   // So can safely pass undefined for the childAccount argument if the activeAccountType is not 'child'
@@ -169,7 +175,7 @@ const WalletTab = ({ network }) => {
         <ButtonRow
           onSendClick={() => history.push('/dashboard/token/flow/send')}
           onReceiveClick={() => history.push('/dashboard/wallet/deposit')}
-          onSwapClick={() => window.open(incrementSwapLink, '_blank', 'noopener,noreferrer')}
+          onSwapClick={() => window.open(swapLink, '_blank', 'noopener,noreferrer')}
           onBuyClick={() => setShowOnRamp(true)}
           onMoveClick={() => goMoveBoard()}
           canMoveChild={canMoveToOtherAccount ?? false}

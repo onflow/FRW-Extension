@@ -65,6 +65,7 @@ const AddAccountPopup = (props: TransferConfirmationProps) => {
               }}
             />
           )}
+
           {props.importExistingAccount && (
             <ProfileButton
               icon={importExisting}
@@ -74,6 +75,17 @@ const AddAccountPopup = (props: TransferConfirmationProps) => {
             />
           )}
         </Box>
+
+        {!props.importExistingAccount && (
+          <Box
+            sx={{
+              height: '49px',
+              width: '100%',
+              padding: '1px 16px',
+              backgroundColor: 'transparent',
+            }}
+          />
+        )}
       </Box>
     </Drawer>
   );

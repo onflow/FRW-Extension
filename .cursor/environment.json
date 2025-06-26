@@ -1,0 +1,14 @@
+{
+  "agentCanUpdateSnapshot": true,
+  "install": "pnpm i",
+  "terminals": [
+    {
+      "name": "Extension Dev CI",
+      "command": "pnpm build:dev-ci"
+    },
+    {
+      "name": "unit tests",
+      "command": "pnpm test:run"
+    }
+  ]
+}

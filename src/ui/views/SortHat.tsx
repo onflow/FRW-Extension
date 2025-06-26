@@ -33,7 +33,7 @@ const SortHat = () => {
       approval = undefined;
     }
 
-    if (!(await wallet.isBooted())) {
+    if (!(await wallet.isBooted()) && !isInTab) {
       openInternalPageInTab('welcome');
       return;
     }

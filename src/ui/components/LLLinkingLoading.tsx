@@ -1,27 +1,13 @@
 import { Box, CardMedia, Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import IconCheck from 'ui/assets/check.svg';
 import { LLPrimaryButton } from 'ui/components';
 
-const useStyles = makeStyles({
-  IconCheck: {
-    display: 'inline',
-    backgroundColor: '#00E075',
-    borderRadius: '20px',
-    width: '24px',
-    height: '24px',
-    padding: '3px',
-    color: '#000',
-  },
-});
-
 export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo }) => {
   const history = useHistory();
-  const classes = useStyles();
   const [count, setCount] = useState(0);
   const colorArray = [
     'rgba(94,94,94,0.3)',
@@ -175,7 +161,18 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
                 marginBottom: '100px',
               }}
             >
-              <img className={classes.IconCheck} src={IconCheck} />
+              <img
+                style={{
+                  display: 'inline',
+                  backgroundColor: '#00E075',
+                  borderRadius: '20px',
+                  width: '24px',
+                  height: '24px',
+                  padding: '3px',
+                  color: '#000',
+                }}
+                src={IconCheck}
+              />
               <Typography
                 sx={{
                   fontSize: '16px',

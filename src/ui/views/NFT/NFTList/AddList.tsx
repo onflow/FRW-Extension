@@ -7,11 +7,10 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Grid,
   Skeleton,
   Button,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import Grid from '@mui/material/Grid';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import { type NFTModelV2, type NFTModel_depreciated } from '@/shared/types/network-types';
@@ -27,49 +26,12 @@ import { useWallet } from 'ui/utils';
 import CollectionCard from './AddNFTCard';
 import AddNFTConfirmation from './AddNFTConfirmation';
 
-const useStyles = makeStyles(() => ({
-  inputWrapper: {
-    paddingLeft: '18px',
-    paddingRight: '18px',
-    // width: '100%',
-  },
-  inputBox: {
-    minHeight: '56px',
-    backgroundColor: '#282828',
-    zIndex: '999',
-    borderRadius: '16px',
-    boxSizing: 'border-box',
-    width: '100%',
-  },
-  grid: {
-    width: '100%',
-    margin: 0,
-    // paddingLeft: '15px',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignContent: 'flex-start',
-    padding: '10px 13px',
-    // marginLeft: 'auto'
-  },
-  skeletonCard: {
-    display: 'flex',
-    backgroundColor: '#000000',
-    width: '100%',
-    height: '72px',
-    margin: '12px auto',
-    boxShadow: 'none',
-    padding: 'auto',
-  },
-}));
-
 export interface CollectionItem extends NFTModelV2 {
   hidden?: boolean;
   added?: boolean;
 }
 
 const AddList = () => {
-  const classes = useStyles();
   const usewallet = useWallet();
   const [collections, setCollections] = useState<Array<CollectionItem>>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -159,10 +121,22 @@ const AddList = () => {
       <LLHeader title={chrome.i18n.getMessage('Add__Collection')} help={false} />
 
       <Box>
-        <div className={classes.inputWrapper}>
+        <Box
+          sx={{
+            paddingLeft: '18px',
+            paddingRight: '18px',
+          }}
+        >
           <Input
             type="search"
-            className={classes.inputBox}
+            sx={{
+              minHeight: '56px',
+              backgroundColor: '#282828',
+              zIndex: '999',
+              borderRadius: '16px',
+              boxSizing: 'border-box',
+              width: '100%',
+            }}
             placeholder={chrome.i18n.getMessage('Seach__NFT__Collection')}
             autoFocus
             startAdornment={
@@ -172,15 +146,34 @@ const AddList = () => {
             }
             onChange={handleSearch}
           />
-        </div>
+        </Box>
         <Box sx={{ padding: '8px 18px', display: 'flex', flexDirection: 'column' }}>
           {loading && (
-            <Grid container className={classes.grid}>
+            <Grid
+              container
+              sx={{
+                width: '100%',
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignContent: 'flex-start',
+                padding: '10px 13px',
+              }}
+            >
               {[...Array(4).keys()].map((key) => (
                 <Card
                   key={key}
-                  sx={{ borderRadius: '12px', backgroundColor: 'transparent', padding: '12px' }}
-                  className={classes.skeletonCard}
+                  sx={{
+                    borderRadius: '12px',
+                    backgroundColor: 'transparent',
+                    padding: '12px',
+                    display: 'flex',
+                    width: '100%',
+                    height: '72px',
+                    margin: '12px auto',
+                    boxShadow: 'none',
+                  }}
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                     <CardMedia

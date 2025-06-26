@@ -6,7 +6,6 @@ import {
   ListItemButton,
   Box,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -15,34 +14,7 @@ import IconEnd from '@/ui/components/iconfont/IconAVector11Stroke';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import EmptyStateImage from 'ui/assets/image/search_user.png';
 
-const useStyles = makeStyles(() => ({
-  logoBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '18px',
-    alignItems: 'center',
-  },
-  mediaBox: {
-    width: '65%',
-    margin: '72px auto 16px auto',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '84px',
-    height: '84px',
-    margin: '0 auto',
-  },
-  iconsBox: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-}));
-
 const Linked = () => {
-  const classes = useStyles();
-
   const { childAccounts } = useProfiles();
 
   return (
@@ -62,7 +34,14 @@ const Linked = () => {
         </Typography>
       )}
       {childAccounts && childAccounts.length > 0 ? (
-        <Box className={classes.logoBox}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '18px',
+            alignItems: 'center',
+          }}
+        >
           {childAccounts.map((childAccount) => (
             <ListItem
               key={childAccount.address}

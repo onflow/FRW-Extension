@@ -10,7 +10,7 @@ import userCircleGear from '@/ui/assets/svg/user-circle-gear.svg';
 import { MenuItem } from '../menu-item';
 
 const meta: Meta<typeof MenuItem> = {
-  title: 'Components/Sidebar/MenuItem',
+  title: 'Components/sidebar/MenuItem',
   component: MenuItem,
   tags: ['autodocs'],
   parameters: {

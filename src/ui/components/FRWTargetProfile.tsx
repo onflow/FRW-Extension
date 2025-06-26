@@ -1,6 +1,5 @@
 import { Box, Typography, Avatar, Skeleton } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { useProfiles } from '@/ui/hooks/useProfileHook';

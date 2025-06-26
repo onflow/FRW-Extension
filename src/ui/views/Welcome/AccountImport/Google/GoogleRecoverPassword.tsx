@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { makeStyles, styled } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import zxcvbn from 'zxcvbn';
@@ -22,47 +22,6 @@ import { LLSpinner, LLNotFound } from '@/ui/components';
 import CheckCircleIcon from '@/ui/components/iconfont/IconCheckmark';
 import CancelIcon from '@/ui/components/iconfont/IconClose';
 import { useWallet } from 'ui/utils';
-
-// const helperTextStyles = makeStyles(() => ({
-//   root: {
-//     size: '16px',
-//     color: '#BABABA',
-//   },
-// }));
-
-const useStyles = makeStyles(() => ({
-  customInputLabel: {
-    '& legend': {
-      visibility: 'visible',
-    },
-  },
-  inputBox: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-  inputBox2: {
-    height: '64px',
-    padding: '16px',
-    zIndex: '999',
-    backgroundColor: '#282828',
-    border: '2px solid #4C4C4C',
-    borderRadius: '12px',
-    boxSizing: 'border-box',
-    '&.Mui-focused': {
-      border: '2px solid #FAFAFA',
-      boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-    },
-  },
-}));
 
 const BpIcon = styled('span')(() => ({
   borderRadius: 8,
@@ -131,7 +90,6 @@ const PasswordIndicator = (props) => {
 };
 
 const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPassword }) => {
-  const classes = useStyles();
   const usewallet = useWallet();
 
   const [isPasswordVisible, setPasswordVisible] = useState(false);
@@ -258,7 +216,19 @@ const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPasswo
                 name="password"
                 placeholder={chrome.i18n.getMessage('Create__a__password')}
                 value={password}
-                className={classes.inputBox}
+                sx={{
+                  height: '64px',
+                  padding: '16px',
+                  zIndex: '999',
+                  backgroundColor: '#282828',
+                  border: '2px solid #4C4C4C',
+                  borderRadius: '12px',
+                  boxSizing: 'border-box',
+                  '&.Mui-focused': {
+                    border: '2px solid #FAFAFA',
+                    boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
+                  },
+                }}
                 fullWidth
                 disableUnderline
                 onChange={(event) => {

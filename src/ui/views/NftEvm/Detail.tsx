@@ -3,7 +3,6 @@ import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { Typography, Container, Box, IconButton, Button, CardMedia } from '@mui/material';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import { saveAs } from 'file-saver';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -15,64 +14,6 @@ import SendIcon from 'ui/assets/svg/detailSend.svg';
 import { useWallet } from 'ui/utils';
 
 import MoveNftFromEvm from './SendNFT/MoveNftFromEvm';
-
-const useStyles = makeStyles(() => ({
-  pageContainer: {
-    height: '100%',
-    width: '100%',
-    overflowY: 'scroll',
-    justifyContent: 'space-between',
-    padding: 0,
-    margin: 0,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  detailContainer: {
-    width: '100%',
-    backgroundColor: '#282828',
-    borderRadius: '16px 16px 0 0',
-    padding: '18px',
-    margin: 0,
-  },
-  metadata: {
-    borderRadius: '12px',
-    border: '1px solid rgba(186, 186, 186, 0.4)',
-    padding: '6px 10px',
-    maxWidth: '360px',
-  },
-  mediabox: {
-    width: '100%',
-    // minHeight: '354px',
-    justifyContent: 'center',
-    backgroundColor: 'inherit',
-    flexGrow: 1,
-    paddingBottom: '10px',
-  },
-  media: {
-    width: '100%',
-    borderRadius: '8px',
-  },
-  arrowback: {
-    borderRadius: '100%',
-    margin: '8px',
-  },
-  iconbox: {
-    position: 'sticky',
-    top: 0,
-    width: '100%',
-    backgroundColor: '#121212',
-    margin: 0,
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  extendMore: {
-    borderRadius: '100%',
-    margin: '8px',
-    marginRight: 0,
-  },
-}));
 
 interface NFTDetailState {
   nft: any;
@@ -92,7 +33,6 @@ const Detail = () => {
     },
   };
 
-  const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
   const usewallet = useWallet();
@@ -200,7 +140,14 @@ const Detail = () => {
 
   const MetaBox = (props) => {
     return (
-      <Box className={classes.metadata}>
+      <Box
+        sx={{
+          borderRadius: '12px',
+          border: '1px solid rgba(186, 186, 186, 0.4)',
+          padding: '6px 10px',
+          maxWidth: '360px',
+        }}
+      >
         <Typography color="neutral2.main" variant="caption" sx={{ textTransform: 'uppercase' }}>
           {props.name}
         </Typography>
@@ -254,7 +201,7 @@ const Detail = () => {
           (media.image ? (
             <img
               src={replaceIPFS(media.image)}
-              className={classes.media}
+              style={{ width: '100%', borderRadius: '8px' }}
               onLoad={() => setMediaLoading(true)}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null; // prevents looping
@@ -279,7 +226,7 @@ const Detail = () => {
                   borderRadius: '8px',
                 }}
               >
-                <source src={media.video} type="video/mp4" className={classes.media} />
+                <source src={media.video} type="video/mp4" />
               </video>
             </>
           ))}
@@ -290,7 +237,12 @@ const Detail = () => {
   const getMedia = () => {
     return (
       <>
-        {mediaLoading && <img src={replaceIPFS(media?.image || null)} className={classes.media} />}
+        {mediaLoading && (
+          <img
+            src={replaceIPFS(media?.image || null)}
+            style={{ width: '100%', borderRadius: '8px' }}
+          />
+        )}
         <video
           loop
           autoPlay
@@ -302,7 +254,7 @@ const Detail = () => {
           onLoadedData={() => setMediaLoading(false)}
           style={{ visibility: mediaLoading ? 'hidden' : 'visible', width: '100%' }}
         >
-          <source src={media?.video || undefined} type="video/mp4" className={classes.media} />
+          <source src={media?.video || undefined} type="video/mp4" />
         </video>
       </>
     );
@@ -314,21 +266,47 @@ const Detail = () => {
         className="page"
         style={{ display: 'flex', position: 'relative', flexDirection: 'column' }}
       >
-        <Box className={classes.iconbox}>
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 0,
+            width: '100%',
+            backgroundColor: '#121212',
+            margin: 0,
+            padding: 0,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
           <IconButton
             onClick={() =>
               history.push({
                 pathname: `/dashboard`,
               })
             }
-            className={classes.arrowback}
+            sx={{
+              borderRadius: '100%',
+              margin: '8px',
+            }}
           >
             <ArrowBackIcon sx={{ color: 'icon.navi' }} />
           </IconButton>
         </Box>
 
         {nftDetail && (
-          <Container className={classes.pageContainer} sx={{ width: '100%' }}>
+          <Container
+            sx={{
+              height: '100%',
+              width: '100%',
+              overflowY: 'scroll',
+              justifyContent: 'space-between',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <Box
               sx={{
                 padding: '10px 18px',
@@ -339,7 +317,15 @@ const Detail = () => {
                 flexGrow: 1,
               }}
             >
-              <Box className={classes.mediabox}>
+              <Box
+                sx={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  backgroundColor: 'inherit',
+                  flexGrow: 1,
+                  paddingBottom: '10px',
+                }}
+              >
                 {media && media?.video !== null ? getMedia() : getUri()}
               </Box>
               <Box
@@ -409,7 +395,15 @@ const Detail = () => {
               </Box>
             </Box>
 
-            <Container className={classes.detailContainer}>
+            <Container
+              sx={{
+                width: '100%',
+                backgroundColor: '#282828',
+                borderRadius: '16px 16px 0 0',
+                padding: '18px',
+                margin: 0,
+              }}
+            >
               <Box
                 sx={{
                   display: 'inline-flex',

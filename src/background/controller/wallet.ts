@@ -6,7 +6,6 @@ import { ethErrors } from 'eth-rpc-errors';
 import * as ethUtil from 'ethereumjs-util';
 import { getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth/web-extension';
-import { type TokenInfo } from 'flow-native-token-registry';
 import { encode } from 'rlp';
 import web3, { TransactionError, Web3 } from 'web3';
 
@@ -27,11 +26,13 @@ import {
 } from '@/background/utils/modules/publicPrivateKey';
 import { generateRandomId } from '@/background/utils/random-id';
 import eventBus from '@/eventBus';
+import { type CustomFungibleTokenInfo } from '@/shared/types/coin-types';
 import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
 import { type PublicPrivateKeyTuple, type PublicKeyTuple } from '@/shared/types/key-types';
 import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
-import { ContactType, MAINNET_CHAIN_ID } from '@/shared/types/network-types';
+import { ContactType, MAINNET_CHAIN_ID, Period, PriceProvider } from '@/shared/types/network-types';
 import { type NFTCollections, type NFTCollectionData } from '@/shared/types/nft-types';
+import { type TokenInfo } from '@/shared/types/token-info';
 import { type TrackingEvents } from '@/shared/types/tracking-types';
 import { type TransferItem, type TransactionState } from '@/shared/types/transaction-types';
 import {
@@ -75,6 +76,7 @@ import {
 } from '@/shared/utils/cache-data-keys';
 import { consoleError, consoleWarn } from '@/shared/utils/console-log';
 import { returnCurrentProfileId } from '@/shared/utils/current-id';
+import { getPeriodFrequency } from '@/shared/utils/getPeriodFrequency';
 import { convertToIntegerAmount, validateAmount } from '@/shared/utils/number';
 import { retryOperation } from '@/shared/utils/retryOperation';
 import { type CategoryScripts } from '@/shared/utils/script-types';
@@ -122,6 +124,7 @@ import type {
   Contact,
   FlowNetwork,
   NFTModelV2,
+  TokenPriceHistory,
   UserInfoResponse,
 } from '../../shared/types/network-types';
 import DisplayKeyring from '../service/keyring/display';
@@ -184,15 +187,17 @@ export class WalletController extends BaseController {
   boot = async (password) => {
     // When wallet first initializes through install, it will add a encrypted password to boot state. If is boot is false, it means there's no password set.
     const isBooted = await keyringService.isBooted();
-    if (isBooted) {
+    const hasVault = await keyringService.hasVault();
+
+    if (isBooted && hasVault) {
       await keyringService.updateUnlocked(password);
     } else {
       await keyringService.boot(password);
     }
   };
-  isBooted = () => keyringService.isBooted();
-  isUnlocked = () => keyringService.isUnlocked();
-  verifyPassword = (password: string) => keyringService.verifyPassword(password);
+  isBooted = async () => keyringService.isBooted() && keyringService.hasVault();
+  isUnlocked = async () => keyringService.isUnlocked();
+  verifyPassword = async (password: string) => keyringService.verifyPassword(password);
 
   verifyPasswordIfBooted = async (password: string) => {
     if (await this.isBooted()) {
@@ -2120,7 +2125,7 @@ export class WalletController extends BaseController {
     ]);
   };
 
-  getTokenInfo = async (symbol: string): Promise<TokenInfo | undefined> => {
+  getTokenInfo = async (symbol: string): Promise<CustomFungibleTokenInfo | undefined> => {
     const network = await this.getNetwork();
     const activeAccountType = await this.getActiveAccountType();
     return await tokenListService.getTokenInfo(
@@ -2128,6 +2133,53 @@ export class WalletController extends BaseController {
       activeAccountType === 'evm' ? 'evm' : 'flow',
       symbol
     );
+  };
+
+  /**
+   * Get the price of a token
+   * @param token - The token to get the price for
+   * @param provider - The provider to get the price from
+   * @returns The price of the token
+   */
+  getTokenPrice = async (token: string, provider = PriceProvider.binance) => {
+    return await openapiService.getTokenPrice(token, provider);
+  };
+
+  /**
+   * Get the price history of a token
+   * @param token - The token to get the price history for
+   * @param period - The period to get the price history for
+   * @param provider - The provider to get the price history from
+   * @returns The price history of the token
+   */
+  getTokenPriceHistory = async (
+    token: string,
+    period = Period.oneDay,
+    provider = PriceProvider.binance
+  ): Promise<TokenPriceHistory[]> => {
+    const rawPriceHistory = await openapiService.getTokenPriceHistoryArray(token, period, provider);
+    const frequency = getPeriodFrequency(period);
+    if (!rawPriceHistory[frequency]) {
+      throw new Error('No price history found for this period');
+    }
+
+    return rawPriceHistory[frequency].map((item) => ({
+      closeTime: item[0],
+      openPrice: item[1],
+      highPrice: item[2],
+      lowPrice: item[3],
+      price: item[4],
+      volume: item[5],
+      quoteVolume: item[6],
+    }));
+  };
+
+  addCustomEvmToken = async (network: string, token: CustomFungibleTokenInfo) => {
+    return await tokenListService.addCustomEvmToken(network, token);
+  };
+
+  removeCustomEvmToken = async (network: string, tokenAddress: string) => {
+    return await tokenListService.removeCustomEvmToken(network, tokenAddress);
   };
 
   // TODO: Replace with generic token
@@ -2149,6 +2201,9 @@ export class WalletController extends BaseController {
 
     await this.getNetwork();
 
+    if (!token.contractName || !token.path || !token.address) {
+      throw new Error('Invalid token');
+    }
     const txID = await userWalletService.sendTransaction(
       script
         .replaceAll('<Token>', token.contractName)
@@ -2219,6 +2274,9 @@ export class WalletController extends BaseController {
       'storage',
       'enableTokenStorage'
     );
+    if (!token.contractName || !token.path || !token.address) {
+      throw new Error('Invalid token');
+    }
 
     return await userWalletService.sendTransaction(
       script
@@ -2275,7 +2333,7 @@ export class WalletController extends BaseController {
       from_address: (await this.getCurrentAddress()) || '',
       to_address: childAddress,
       amount: amount,
-      ft_identifier: token.contractName,
+      ft_identifier: 'flow',
       type: 'flow',
     });
     return result;
@@ -2310,7 +2368,7 @@ export class WalletController extends BaseController {
       from_address: childAddress,
       to_address: receiver,
       amount: amount,
-      ft_identifier: token.contractName,
+      ft_identifier: 'flow',
       type: 'flow',
     });
     return result;
@@ -2940,10 +2998,10 @@ export class WalletController extends BaseController {
     if (isEvm === 'evm') {
       switch (network) {
         case 'testnet':
-          baseURL = 'https://evm-testnet.flowscan.io';
+          baseURL = 'https://testnet.flowscan.io/evm';
           break;
         case 'mainnet':
-          baseURL = 'https://evm.flowscan.io';
+          baseURL = 'https://flowscan.io/evm';
           break;
       }
     } else {
@@ -3009,37 +3067,38 @@ export class WalletController extends BaseController {
 
   pollTransferList = async (address: string, txHash: string, maxAttempts = 5) => {
     const network = await this.getNetwork();
+    const currency = (await this.getDisplayCurrency())?.code || 'USD';
     let attempts = 0;
-    const poll = async () => {
-      if (attempts >= maxAttempts) {
-        consoleWarn('Max polling attempts reached');
-        return;
-      }
+    try {
+      const poll = async () => {
+        if (attempts >= maxAttempts) {
+          consoleWarn('Max polling attempts reached');
+          return;
+        }
 
-      const { list: newTransactions } = await transactionService.loadTransactions(
-        network,
-        address,
-        '0',
-        '15'
-      );
-      // Copy the list as we're going to modify the original list
-
-      const foundTx = newTransactions?.find((tx) => txHash.includes(tx.hash));
-      if (foundTx && foundTx.indexed) {
-        // Send a message to the UI to update the transfer list
-        chrome.runtime.sendMessage({ msg: 'transferListUpdated' });
-        // Refresh the coin list
-        triggerRefresh(
-          coinListKey(network, address, (await this.getDisplayCurrency())?.code || 'USD')
+        const { list: newTransactions } = await transactionService.loadTransactions(
+          network,
+          address,
+          '0',
+          '15'
         );
-      } else {
-        // All of the transactions have not been picked up by the indexer yet
-        attempts++;
-        setTimeout(poll, 5000); // Poll every 5 seconds
-      }
-    };
+        // Copy the list as we're going to modify the original list
 
-    await poll();
+        const foundTx = newTransactions?.find((tx) => txHash.includes(tx.hash));
+        if (foundTx && foundTx.indexed) {
+          // Refresh the coin list
+          triggerRefresh(coinListKey(network, address, currency));
+        } else {
+          // All of the transactions have not been picked up by the indexer yet
+          attempts++;
+          setTimeout(poll, 5000); // Poll every 5 seconds
+        }
+      };
+
+      await poll();
+    } catch (error) {
+      consoleError('pollTransferList error', error);
+    }
   };
 
   listenTransaction = async (
@@ -3054,27 +3113,18 @@ export class WalletController extends BaseController {
     }
     const address = (await this.getCurrentAddress()) || '0x';
     const network = await this.getNetwork();
+    const currency = (await this.getDisplayCurrency())?.code || 'USD';
     let txHash = txId;
     try {
-      chrome.storage.session.set({
-        transactionPending: { txId, network, date: new Date() },
-      });
-      eventBus.emit('transactionPending');
-      chrome.runtime.sendMessage({
-        msg: 'transactionPending',
-        network: network,
-      });
       transactionService.setPending(network, address, txId, icon, title);
-
+      const fclTx = fcl.tx(txId);
       // Listen to the transaction until it's sealed.
       // This will throw an error if there is an error with the transaction
-      const txStatus = await fcl.tx(txId).onceExecuted();
+      const txStatusFinalized = await fclTx.onceFinalized();
+
       // Update the pending transaction with the transaction status
-      txHash = await transactionService.updatePending(network, address, txId, txStatus);
-      // Refresh the coin list
-      triggerRefresh(
-        coinListKey(network, address, (await this.getDisplayCurrency())?.code || 'USD')
-      );
+      txHash = await transactionService.updatePending(network, address, txId, txStatusFinalized);
+
       // Track the transaction result
       mixpanelTrack.track('transaction_result', {
         tx_id: txId,
@@ -3088,7 +3138,7 @@ export class WalletController extends BaseController {
           if (baseURL.includes('evm')) {
             // It's an EVM transaction
             // Look through the events in txStatus
-            const evmEvent = txStatus.events.find(
+            const evmEvent = txStatusFinalized.events.find(
               (event) => event.type.includes('EVM') && !!event.data?.hash
             );
             if (evmEvent) {
@@ -3111,6 +3161,29 @@ export class WalletController extends BaseController {
         // We don't want to throw an error if the notification fails
         consoleError('listenTransaction notification error ', err);
       }
+
+      // Wait for the transacton to be executed
+      // Listen to the transaction until it's sealed.
+      // This will throw an error if there is an error with the transaction
+      const txStatusExecuted = await fclTx.onceExecuted();
+
+      // Update the pending transaction with the transaction status
+      txHash = await transactionService.updatePending(network, address, txId, txStatusExecuted);
+      // Refresh the account balance
+      triggerRefresh(accountBalanceKey(network, address));
+      // Refresh the coin list
+      triggerRefresh(coinListKey(network, address, currency));
+
+      // Wait for the transaction to be sealed
+      const txStatusSealed = await fclTx.onceSealed();
+
+      // Update the pending transaction with the transaction status
+      txHash = await transactionService.updatePending(network, address, txId, txStatusSealed);
+
+      // Refresh the account balance after sealed status - just to be sure
+      triggerRefresh(accountBalanceKey(network, address));
+      // Refresh the coin list after sealed status - just to be sure
+      triggerRefresh(coinListKey(network, address, currency));
     } catch (err: unknown) {
       // An error has occurred while listening to the transaction
       let errorMessage = 'unknown error';
@@ -3151,15 +3224,6 @@ export class WalletController extends BaseController {
         errorCode,
       });
     } finally {
-      // Remove the pending transaction from the UI
-      await chrome.storage.session.remove('transactionPending');
-
-      // Message the UI that the transaction is done
-      eventBus.emit('transactionDone');
-      chrome.runtime.sendMessage({
-        msg: 'transactionDone',
-      });
-
       if (txHash) {
         // Start polling for transfer list updates
         await this.pollTransferList(address, txHash);

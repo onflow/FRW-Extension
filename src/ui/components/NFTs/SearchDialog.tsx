@@ -1,4 +1,5 @@
-import { Dialog, Box, Typography, Grid } from '@mui/material';
+import { Dialog, Box, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 
 import { type NFTItem } from '@/shared/types/nft-types';

@@ -43,18 +43,16 @@ const MainAccountsComponent = (props: MainAccountsProps) => {
     <>
       <Tooltip title={isBalanceLoading ? 'Loading balance...' : ''} arrow>
         <span>
-          <ListItem
-            onClick={() => {
-              if (props.address === props.currentWallet['address']) {
-                toggleExpand();
-              } else {
-                props.setWallets(props.walletList[props.props_id], null, props.props_id);
-              }
-            }}
-            sx={{ mb: 0, padding: '0', cursor: 'pointer' }}
-            disabled={isBalanceLoading}
-          >
+          <ListItem sx={{ mb: 0, padding: '0' }}>
             <ListItemButton
+              onClick={() => {
+                if (props.address === props.currentWallet['address']) {
+                  toggleExpand();
+                } else {
+                  props.setWallets(props.walletList[props.props_id], null, props.props_id);
+                }
+              }}
+              disabled={isBalanceLoading}
               data-testid={`main-account-${props.mainAddress}`}
               sx={{
                 my: 0,
