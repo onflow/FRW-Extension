@@ -40,6 +40,7 @@ import {
   tokenListService,
   remoteConfigService,
   newsService,
+  contentScriptInjectionService,
 } from './service';
 import { getFirbaseConfig } from './utils/firebaseConfig';
 import { setEnvironmentBadge } from './utils/setEnvironmentBadge';
@@ -131,6 +132,7 @@ async function restoreAppState() {
   await tokenListService.init();
   await remoteConfigService.init();
   await newsService.init();
+  await contentScriptInjectionService.init();
   // rpcCache.start();
 
   appStoreLoaded = true;

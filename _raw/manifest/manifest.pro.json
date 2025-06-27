@@ -30,18 +30,20 @@
   "background": {
     "service_worker": "sw.js"
   },
-  "content_scripts": [
-    {
-      "js": ["content-script.js", "script.js"],
-      "matches": ["file://*/*", "http://*/*", "https://*/*"],
-      "all_frames": true
-    }
-  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self' 'wasm-unsafe-eval';"
   },
-  "permissions": ["storage", "activeTab", "tabs", "notifications", "identity", "camera", "*://*/*"],
-  "host_permissions": ["https://api.mixpanel.com/*"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "notifications",
+    "identity",
+    "camera",
+    "scripting",
+    "*://*/*"
+  ],
+  "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
       "resources": [

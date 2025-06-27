@@ -59,6 +59,12 @@ export default defineConfig({
   // timeout: 3_600_000,
   /* Configure projects for major browsers */
   projects: [
+    // dApp
+    {
+      name: 'd-app-test',
+      testMatch: /.*d-app\.test\.ts/i,
+      fullyParallel: false,
+    },
     // registration
     {
       name: 'registration-setup',

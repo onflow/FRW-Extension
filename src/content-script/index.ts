@@ -1,7 +1,16 @@
+// This content script is no longer used.
+// We now inject scripts directly from the background service worker using chrome.scripting API.
+// This file is kept as a stub to avoid build issues.
+
 import { nanoid } from 'nanoid';
 import { v4 as uuid } from 'uuid';
 
+import { consoleLog } from '@/shared/utils/console-log';
 import { Message } from '@/shared/utils/messaging';
+
+consoleLog('Legacy content script loaded but not used.');
+
+// Export empty object to satisfy module requirements
 
 const channelName = nanoid();
 const extensionId = chrome.runtime.id;
@@ -27,7 +36,7 @@ const injectProviderScript = (isDefaultWallet: boolean) => {
   return scriptElement;
 };
 
-injectProviderScript(true); // Initial call to check and inject if needed
+// injectProviderScript(true); // Initial call to check and inject if needed
 
 const initListener = (channelName: string) => {
   const { BroadcastChannelMessage, PortMessage } = Message;

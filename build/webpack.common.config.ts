@@ -28,6 +28,7 @@ const config = (env: { config: 'dev' | 'pro' | 'none' }): webpack.Configuration 
     entry: {
       background: paths.rootResolve('src/background/index.ts'),
       'content-script': paths.rootResolve('src/content-script/index.ts'),
+      'message-bridge': paths.rootResolve('src/content-script/message-bridge.ts'),
       pageProvider: paths.rootResolve('src/content-script/pageProvider/eth/index.ts'),
       // pageProvider: paths.rootResolve(
       //   'node_modules/@rabby-wallet/page-provider/dist/index.js'
