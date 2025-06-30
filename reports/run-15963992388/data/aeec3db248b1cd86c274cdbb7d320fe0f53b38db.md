@@ -1,0 +1,28 @@
+# Page snapshot
+
+```yaml
+- button "Need Help?":
+  - link "Need Help?":
+    - /url: https://wallet.flow.com/contact
+    - paragraph: Need Help?
+- button:
+  - img
+- paragraph: STEP 4/6
+- heading "Create Password" [level=4]
+- paragraph: Flow Wallet uses this password to protect your recovery phrase.
+- textbox "Create a password": dojgab-peqCy1-nakzeq
+- button
+- paragraph: At least 8 characters
+- textbox "Confirm your password": dojgab-peqCy1-nakzeq
+- button
+- checkbox "I agree to Flow Wallet's Privacy Policy and Terms of Service ."
+- paragraph:
+  - text: I agree to Flow Wallet's
+  - link "Privacy Policy":
+    - /url: https://lilico.app/about/privacy-policy
+  - text: and
+  - link "Terms of Service":
+    - /url: https://lilico.app/about/terms
+  - text: .
+- button "Register" [disabled]
+```
