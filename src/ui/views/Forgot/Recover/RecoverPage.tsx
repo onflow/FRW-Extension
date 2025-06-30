@@ -4,17 +4,18 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
-import CancelIcon from '@/ui/components/iconfont/IconClose';
-import SlideRelative from '@/ui/components/SlideRelative';
+import { PasswordInput } from '@/ui/components/password/PasswordInput';
 import { LLPrimaryButton } from 'ui/components';
 import { useWallet } from 'ui/utils';
 
 const RecoverPage = ({ dataArray, setArray, goNext }) => {
   const wallet = useWallet();
+
   const inputEl = useRef<any>(null);
   // const { t } = useTranslation();
   const [showError, setShowError] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [retrieved, setRetrieved] = useState(false);
   useEffect(() => {
@@ -76,21 +77,6 @@ const RecoverPage = ({ dataArray, setArray, goNext }) => {
       .catch((err) => consoleError('Failed to copy to clipboard: ', err));
   };
 
-  const usernameError = () => (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-    >
-      <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-      <Typography variant="body1" color="text.secondary">
-        {chrome.i18n.getMessage('Incorrect__Password')}
-      </Typography>
-    </Box>
-  );
-
   return (
     <Box
       sx={{
@@ -134,47 +120,19 @@ const RecoverPage = ({ dataArray, setArray, goNext }) => {
       </Box>
 
       <FormControl sx={{ flexGrow: 1, width: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Input
-          id="textfield"
-          type="password"
-          sx={{
-            height: '64px',
-            padding: '16px',
-            magrinBottom: '64px',
-            zIndex: '999',
-            backgroundColor: '#282828',
-            border: '2px solid #4C4C4C',
-            borderRadius: '12px',
-            boxSizing: 'border-box',
-            '&.Mui-focused': {
-              border: '2px solid #FAFAFA',
-              boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-            },
-          }}
-          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-          autoFocus
-          fullWidth
-          disableUnderline
+        <PasswordInput
           value={password}
-          onChange={(event) => {
+          onChange={(value) => {
             setShowError(false);
-            setPassword(event.target.value);
+            setPassword(value);
           }}
+          showPassword={isPasswordVisible}
+          setShowPassword={setPasswordVisible}
+          errorText={showError ? chrome.i18n.getMessage('Incorrect__Password') : undefined}
+          autoFocus={true}
+          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           onKeyDown={handleKeyDown}
         />
-
-        <SlideRelative direction="down" show={showError}>
-          <Box
-            sx={{
-              width: '95%',
-              backgroundColor: 'error.light',
-              mx: 'auto',
-              borderRadius: '0 0 12px 12px',
-            }}
-          >
-            <Box sx={{ p: '4px' }}>{usernameError()}</Box>
-          </Box>
-        </SlideRelative>
       </FormControl>
 
       <Box

@@ -1,14 +1,11 @@
-import { Typography, Button, Input, FormControl } from '@mui/material';
-import Box from '@mui/material/Box';
+import { Typography, Button, FormControl, Box } from '@mui/material';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
-import { LLHeader } from '@/ui/components';
-import CancelIcon from '@/ui/components/iconfont/IconClose';
-import SlideRelative from '@/ui/components/SlideRelative';
-
-import { useWallet } from '../utils';
+import { LLHeader } from '@/ui/components/LLHeader';
+import { PasswordInput } from '@/ui/components/password/PasswordInput';
+import { useWallet } from '@/ui/utils/WalletContext';
 
 type PassMatch = 'match' | 'no-match' | 'unverified';
 const SettingsPassword = ({
@@ -21,6 +18,7 @@ const SettingsPassword = ({
   const wallet = useWallet();
   const history = useHistory();
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [passMatch, setPassMatch] = useState<PassMatch>('unverified');
 
   const verify = useCallback(() => {
@@ -47,24 +45,15 @@ const SettingsPassword = ({
     });
   }, [history, verifiedUrl, password]);
 
+  const goBack = useCallback(async () => {
+    history.replace({
+      pathname: '/dashboard',
+    });
+  }, [history]);
+
   useEffect(() => {
     verify();
   }, [password, verify]);
-
-  const passwordError = () => (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-    >
-      <CancelIcon size={14} color={'#E54040'} style={{ margin: '8px' }} />
-      <Typography color={'#E54040'} sx={{ color: '#E54040' }}>
-        {chrome.i18n.getMessage('Incorrect__Password')}
-      </Typography>
-    </Box>
-  );
 
   return (
     <div className="page">
@@ -88,44 +77,21 @@ const SettingsPassword = ({
             paddingTop: '12px',
           }}
         >
-          <Input
-            id="textfield"
-            type="password"
-            sx={{
-              height: '64px',
-              padding: '16px',
-              zIndex: '999',
-              backgroundColor: '#121212',
-              border: '2px solid #4C4C4C',
-              borderRadius: '12px',
-              boxSizing: 'border-box',
-              '&.Mui-focused': {
-                border: '2px solid #FAFAFA',
-                boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-              },
-            }}
-            placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-            autoFocus
-            fullWidth
-            disableUnderline
+          <PasswordInput
             value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
+            onChange={(value) => {
+              setPassword(value);
             }}
+            showPassword={isPasswordVisible}
+            setShowPassword={setPasswordVisible}
+            errorText={
+              !!password && passMatch === 'no-match'
+                ? chrome.i18n.getMessage('Incorrect__Password')
+                : undefined
+            }
+            autoFocus={true}
+            placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           />
-
-          <SlideRelative direction="down" show={!!password && passMatch === 'no-match'}>
-            <Box
-              sx={{
-                width: '95%',
-                backgroundColor: 'error.light',
-                mx: 'auto',
-                borderRadius: '0 0 12px 12px',
-              }}
-            >
-              <Box sx={{ p: '4px' }}>{passwordError()}</Box>
-            </Box>
-          </SlideRelative>
           {children}
         </FormControl>
 
@@ -143,8 +109,7 @@ const SettingsPassword = ({
         >
           <Button
             variant="contained"
-            component={Link}
-            to="/dashboard"
+            onClick={goBack}
             size="large"
             sx={{
               backgroundColor: '#333333',

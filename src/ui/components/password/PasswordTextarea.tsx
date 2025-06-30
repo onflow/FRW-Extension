@@ -102,7 +102,6 @@ const PasswordTextarea = ({
       sx={{ ...defaultSx, ...sx }}
       fullWidth
       multiline
-      rows={minRows}
       minRows={minRows}
       maxRows={maxRows}
       InputProps={{

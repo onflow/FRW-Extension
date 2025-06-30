@@ -1,46 +1,27 @@
-// import { useTranslation } from 'react-i18next';
-import { Input, Typography, Box, FormControl, CircularProgress } from '@mui/material';
+import { Typography, Box, FormControl, CircularProgress } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { consoleError } from '@/shared/utils/console-log';
 import { DEFAULT_PASSWORD } from '@/shared/utils/default';
 import lilo from '@/ui/assets/image/lilo.png';
-import { LLPrimaryButton } from '@/ui/components';
-import CancelIcon from '@/ui/components/iconfont/IconClose';
-import SlideRelative from '@/ui/components/SlideRelative';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { LLPrimaryButton } from '@/ui/components/LLPrimaryButton';
+import { PasswordInput } from '@/ui/components/password/PasswordInput';
 import { useWallet, useWalletLoaded } from '@/ui/utils';
 import { openInternalPageInTab } from '@/ui/utils/webapi';
 
 import './style.css';
 
-const UsernameError: React.FC = () => (
-  <Box display="flex" flexDirection="row" alignItems="center">
-    <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-    <Typography variant="body1" color="text.secondary">
-      {chrome.i18n.getMessage('Incorrect__Password')}
-    </Typography>
-  </Box>
-);
-
-const UnexpectedError: React.FC = () => (
-  <Box display="flex" flexDirection="row" alignItems="center">
-    <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-    <Typography variant="body1" color="text.secondary">
-      {chrome.i18n.getMessage('Oops__unexpected__error')}
-    </Typography>
-  </Box>
-);
-
 const Unlock = () => {
   const wallet = useWallet();
   const walletIsLoaded = useWalletLoaded();
   const history = useHistory();
+
   const inputEl = useRef<any>(null);
-  // const { t } = useTranslation();
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showUnexpectedError, setShowUnexpectedError] = useState(false);
+
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
   const [unlocking, setUnlocking] = useState<boolean>(false);
 
@@ -51,6 +32,7 @@ const Unlock = () => {
 
   const restPass = useCallback(async () => {
     await wallet.lockWallet();
+
     openInternalPageInTab('forgot');
   }, [wallet]);
 
@@ -127,48 +109,25 @@ const Unlock = () => {
           position: 'relative',
         }}
       >
-        <Input
-          id="textfield"
-          type="password"
-          sx={{
-            height: '64px',
-            padding: '16px',
-            zIndex: '999',
-            backgroundColor: '#282828',
-            border: '2px solid #4C4C4C',
-            borderRadius: '12px',
-            boxSizing: 'border-box',
-            '&.Mui-focused': {
-              border: '2px solid #FAFAFA',
-              boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
-            },
-          }}
-          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
-          autoFocus
-          fullWidth
-          disableUnderline
+        <PasswordInput
           value={password}
-          onChange={(event) => {
+          onChange={(value) => {
             setShowPasswordError(false);
-            setPassword(event.target.value);
+            setPassword(value);
           }}
+          errorText={
+            showPasswordError
+              ? chrome.i18n.getMessage('Incorrect__Password')
+              : showUnexpectedError
+                ? chrome.i18n.getMessage('Oops__unexpected__error')
+                : undefined
+          }
+          showPassword={isPasswordVisible}
+          setShowPassword={setPasswordVisible}
+          autoFocus={true}
+          placeholder={chrome.i18n.getMessage('Enter__Your__Password')}
           onKeyDown={handleKeyDown}
         />
-
-        <SlideRelative direction="down" show={showPasswordError || showUnexpectedError}>
-          <Box
-            sx={{
-              width: '95%',
-              backgroundColor: 'error.light',
-              mx: 'auto',
-              borderRadius: '0 0 12px 12px',
-            }}
-          >
-            <Box display="flex" flexDirection="row" sx={{ p: '4px' }}>
-              {showPasswordError ? <UsernameError /> : <UnexpectedError />}
-            </Box>
-          </Box>
-        </SlideRelative>
       </FormControl>
 
       <Box sx={{ width: '90%', marginBottom: '32px' }}>

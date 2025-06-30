@@ -1,13 +1,8 @@
-import { Typography, Button, Fade, Input, FormControl } from '@mui/material';
+import { Typography, Fade } from '@mui/material';
 import Box from '@mui/material/Box';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React from 'react';
 
-import { LLHeader } from '@/ui/components';
-import CancelIcon from '@/ui/components/iconfont/IconClose';
-import SettingsPassword from '@/ui/components/SettingsPassword';
-import SlideRelative from '@/ui/components/SlideRelative';
-import { useWallet } from 'ui/utils';
+import SettingsPassword from '@/ui/components/password/SettingsPassword';
 
 const PrivateKeyPassword = () => {
   return (

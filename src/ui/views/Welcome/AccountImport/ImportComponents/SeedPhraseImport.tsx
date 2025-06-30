@@ -6,7 +6,7 @@ import { useWallet } from '@/ui/utils/WalletContext';
 import { LLSpinner } from 'ui/components';
 
 import KeyPathInput from '../../../../components/KeyPathInputs';
-import PasswordTextarea from '../../../../components/PasswordTextarea';
+import PasswordTextarea from '../../../../components/password/PasswordTextarea';
 import { KEY_TYPE } from '../../../../utils/modules/constants';
 
 const SeedPhraseImport = ({

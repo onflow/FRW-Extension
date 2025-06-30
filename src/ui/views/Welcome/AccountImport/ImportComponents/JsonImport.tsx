@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 
 import { type PublicKeyAccount } from '@/shared/types/wallet-types';
 import { consoleError } from '@/shared/utils/console-log';
-import PasswordTextarea from '@/ui/components/PasswordTextarea';
+import PasswordTextarea from '@/ui/components/password/PasswordTextarea';
 import { useWallet } from '@/ui/utils/WalletContext';
 import { LLSpinner } from 'ui/components';
 
