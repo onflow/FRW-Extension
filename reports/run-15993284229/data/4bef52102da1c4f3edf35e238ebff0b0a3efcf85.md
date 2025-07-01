@@ -1,0 +1,50 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - button "🦁":
+    - paragraph: 🦁
+  - button "Lion 0xbd2f55be82df6d30":
+    - text: Lion 0xbd2f55be82df6d30
+    - img
+  - button "notification": "7"
+  - button "avatar"
+- paragraph: development build
+- paragraph
+- button:
+  - img
+- paragraph: Send
+- button:
+  - img
+- paragraph: Receive
+- button:
+  - img
+- paragraph: Swap
+- button:
+  - img
+- paragraph: Buy
+- button:
+  - img
+- paragraph: Move
+- tablist "full width tabs example":
+  - tab "coins" [selected]:
+    - img
+    - paragraph: coins
+  - tab "NFTs":
+    - img
+    - paragraph: NFTs
+  - tab "Activity":
+    - img
+    - paragraph: Activity
+- tabpanel:
+  - button "Manage":
+    - img "Manage"
+  - button "Add":
+    - img "Add"
+  - list:
+    - listitem:
+      - paragraph
+    - listitem:
+      - paragraph
+- tooltip "Copy Address"
+```
