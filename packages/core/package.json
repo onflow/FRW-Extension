@@ -15,7 +15,7 @@
   "dependencies": {
     "@onflow/fcl": "*",
     "@onflow/types": "*",
-    "@onflow/util-encode-key": "*",
+    "@onflow/util-encode-key": "~1.2.4",
     "bignumber.js": "*",
     "ethers": "*"
   },
@@ -23,9 +23,6 @@
     "@types/node": "*",
     "typescript": "*",
     "vitest": "*"
-  },
-  "peerDependencies": {
-    "@frw/storage-adapters": "workspace:*"
   },
   "files": [
     "dist",

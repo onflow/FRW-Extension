@@ -1,1 +1,1 @@
-export * from '@/shared/utils/algo-constants';
+export * from '@frw/core/utils/algo-constants';

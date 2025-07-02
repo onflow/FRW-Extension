@@ -86,11 +86,9 @@
       ]
     }
   ],
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2jsG1AXKEZGJuZecVwBsajHj6MqNGvcM+X/zQCuvec85xmgTJun+MGLHNAOaulMx5tMDR7+t3wkV3FiNMYQUBeGMHNpIoWHt5hBwX1FSL5uTPQFjqueuagICOKK6CCPIe0hr9eCXKmbMPQvJbawdn/q7qsPMJiBwqnyTO0jOtSpQfKVRYs5Bf1xpleHeWLWCdxuBNBwthmLw2kcx7GibsqPXA233ZXcfyivHT7PvT9KrNEq7m55pu3ZZ1kihNxDXJQzoKkXgmiAUJivxNf9cGQ3242vZ52AQvVzeCIWBrBv974FTgrQMZ+gDscsXgWuV10nPAcuuYmPKWjuB0IBsGwIDAQAB",
   "oauth2": {
-    "client_id": "246247206636-7gr0kikuns0bgo6kpkrievloqom1sfp1.apps.googleusercontent.com",
     "scopes": [
-      "https://www.googleapis.com/auth/drive.appdata"
+      ""
     ]
   }
 }
