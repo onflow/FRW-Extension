@@ -1,3 +1,8 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+  - 'build-dependencies/*'
+
 onlyBuiltDependencies:
   - '@swc/core'
   - '@tsparticles/engine'

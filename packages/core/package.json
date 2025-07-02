@@ -1,0 +1,35 @@
+{
+  "name": "@frw/core",
+  "version": "1.0.0",
+  "description": "Core wallet services for Flow Reference Wallet",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@onflow/fcl": "*",
+    "@onflow/types": "*",
+    "@onflow/util-encode-key": "*",
+    "bignumber.js": "*",
+    "ethers": "*"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "typescript": "*",
+    "vitest": "*"
+  },
+  "peerDependencies": {
+    "@frw/storage-adapters": "workspace:*"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@frw/react-hooks",
+  "version": "1.0.0",
+  "description": "React hooks and reducers for Flow Reference Wallet",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@frw/cache": "workspace:*",
+    "@frw/core": "workspace:*",
+    "@frw/storage-adapters": "workspace:*",
+    "react": "*"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "@types/react": "*",
+    "typescript": "*",
+    "vitest": "*"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "license": "MIT"
+}

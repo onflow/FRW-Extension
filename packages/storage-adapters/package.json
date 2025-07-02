@@ -1,0 +1,29 @@
+{
+  "name": "@frw/storage-adapters",
+  "version": "1.0.0",
+  "description": "Storage adapters for Flow Reference Wallet",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "lint": "eslint src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@frw/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/chrome": "*",
+    "@types/node": "*",
+    "typescript": "*",
+    "vitest": "*"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "license": "MIT"
+}
