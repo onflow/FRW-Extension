@@ -1,0 +1,474 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - button "🍋":
+    - paragraph: 🍋
+  - paragraph: 🦁
+  - button "Lemon EVM 0x000000...21d883F5":
+    - text: Lemon EVM 0x000000...21d883F5
+    - img
+  - button "notification": "7"
+  - button "avatar"
+- paragraph: development build
+- paragraph: $0.96USD
+- button:
+  - img
+- paragraph: Send
+- button:
+  - img
+- paragraph: Receive
+- button:
+  - img
+- paragraph: Swap
+- button:
+  - img
+- paragraph: Buy
+- button:
+  - img
+- paragraph: Move
+- tablist "full width tabs example":
+  - tab "coins":
+    - img
+    - paragraph: coins
+  - tab "NFTs":
+    - img
+    - paragraph: NFTs
+  - tab "Activity" [selected]:
+    - img
+    - paragraph: Activity
+- tabpanel:
+  - listitem:
+    - button "a few seconds ago":
+      - img
+      - paragraph
+      - paragraph: a few seconds ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "a few seconds ago":
+      - img
+      - paragraph
+      - paragraph: a few seconds ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "a minute ago":
+      - img
+      - paragraph
+      - paragraph: a minute ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "a minute ago":
+      - img
+      - paragraph
+      - paragraph: a minute ago
+      - paragraph
+    - paragraph
+    - paragraph: Sealed
+  - listitem:
+    - button "Send Increment Staked FLOW a minute ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: a minute ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW a minute ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: a minute ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Send BETA 3 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send BETA
+      - paragraph: 3 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.001234567890123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 3 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 3 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FiatTokenProxy 3 minutes ago To 0x0000...5C27Ecab3B":
+      - img
+      - paragraph: Send FiatTokenProxy
+      - paragraph: 3 minutes ago
+      - paragraph: To 0x0000...5C27Ecab3B
+    - paragraph: "-0.002468"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 3 minutes ago To 0x0000...0000000000":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 3 minutes ago
+      - paragraph: To 0x0000...0000000000
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send Increment Staked FLOW 3 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: 3 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 3 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 3 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 4 minutes ago From 0x0000...fa1aec842b":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 4 minutes ago
+      - paragraph: From 0x0000...fa1aec842b
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 12 minutes ago To 0x0000...0000000000":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 12 minutes ago
+      - paragraph: To 0x0000...0000000000
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send Increment Staked FLOW 12 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: 12 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 13 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 13 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 14 minutes ago From 0x0000...fa1aec842b":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 14 minutes ago
+      - paragraph: From 0x0000...fa1aec842b
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 19 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 19 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 19 minutes ago From 0x0000...0000000000":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 19 minutes ago
+      - paragraph: From 0x0000...0000000000
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 19 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 19 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 19 minutes ago From 0x0000...0000000000":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 19 minutes ago
+      - paragraph: From 0x0000...0000000000
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 19 minutes ago From 0x0000...fa1aec842b":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 19 minutes ago
+      - paragraph: From 0x0000...fa1aec842b
+    - paragraph: "+0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Send BETA 23 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send BETA
+      - paragraph: 23 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.001234567890123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 23 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 23 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FiatTokenProxy 23 minutes ago To 0x0000...5C27Ecab3B":
+      - img
+      - paragraph: Send FiatTokenProxy
+      - paragraph: 23 minutes ago
+      - paragraph: To 0x0000...5C27Ecab3B
+    - paragraph: "-0.002468"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 23 minutes ago To 0x0000...0000000000":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 23 minutes ago
+      - paragraph: To 0x0000...0000000000
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send Increment Staked FLOW 23 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: 23 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 23 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 23 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Send BETA 25 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send BETA
+      - paragraph: 25 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.001234567890123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 25 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 25 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FiatTokenProxy 25 minutes ago To 0x0000...5C27Ecab3B":
+      - img
+      - paragraph: Send FiatTokenProxy
+      - paragraph: 25 minutes ago
+      - paragraph: To 0x0000...5C27Ecab3B
+    - paragraph: "-0.002468"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 25 minutes ago To 0x0000...0000000000":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 25 minutes ago
+      - paragraph: To 0x0000...0000000000
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send Increment Staked FLOW 25 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: 25 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 25 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 25 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Send FiatTokenProxy 26 minutes ago To 0x0000...5C27Ecab3B":
+      - img
+      - paragraph: Send FiatTokenProxy
+      - paragraph: 26 minutes ago
+      - paragraph: To 0x0000...5C27Ecab3B
+    - paragraph: "-0.002468"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 26 minutes ago To 0x0000...0000000000":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 26 minutes ago
+      - paragraph: To 0x0000...0000000000
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send Increment Staked FLOW 26 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: 26 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 26 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 26 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 27 minutes ago From 0x0000...fa1aec842b":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 27 minutes ago
+      - paragraph: From 0x0000...fa1aec842b
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 41 minutes ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 41 minutes ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 41 minutes ago From 0x0000...0000000000":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 41 minutes ago
+      - paragraph: From 0x0000...0000000000
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW 41 minutes ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: 41 minutes ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 41 minutes ago From 0x0000...0000000000":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 41 minutes ago
+      - paragraph: From 0x0000...0000000000
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW 41 minutes ago From 0x0000...fa1aec842b":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: 41 minutes ago
+      - paragraph: From 0x0000...fa1aec842b
+    - paragraph: "+0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Send BETA an hour ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send BETA
+      - paragraph: an hour ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.001234567890123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW an hour ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: an hour ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FiatTokenProxy an hour ago To 0x0000...5C27Ecab3B":
+      - img
+      - paragraph: Send FiatTokenProxy
+      - paragraph: an hour ago
+      - paragraph: To 0x0000...5C27Ecab3B
+    - paragraph: "-0.002468"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW an hour ago To 0x0000...0000000000":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: an hour ago
+      - paragraph: To 0x0000...0000000000
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send Increment Staked FLOW an hour ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send Increment Staked FLOW
+      - paragraph: an hour ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.00000112134354678"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW an hour ago To 0x0000...FA1AEC842B":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: an hour ago
+      - paragraph: To 0x0000...FA1AEC842B
+    - paragraph: "-0.12345678"
+    - paragraph: success
+  - listitem:
+    - button "Receive FLOW an hour ago From 0x0000...fa1aec842b":
+      - img
+      - paragraph: Receive FLOW
+      - paragraph: an hour ago
+      - paragraph: From 0x0000...fa1aec842b
+    - paragraph: "+0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send BETA an hour ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send BETA
+      - paragraph: an hour ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.001234567890123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FLOW an hour ago To 0x3918...d1312Bddb8":
+      - img
+      - paragraph: Send FLOW
+      - paragraph: an hour ago
+      - paragraph: To 0x3918...d1312Bddb8
+    - paragraph: "-0.00123456"
+    - paragraph: success
+  - listitem:
+    - button "Send FiatTokenProxy an hour ago To 0x0000...5C27Ecab3B":
+      - img
+      - paragraph: Send FiatTokenProxy
+      - paragraph: an hour ago
+      - paragraph: To 0x0000...5C27Ecab3B
+    - paragraph: "-0.002468"
+    - paragraph: success
+  - button "View more transactions"
+```
