@@ -1,9 +1,9 @@
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { EVENTS } from '@/shared/constant/events';
-import eventBus from '@/shared/utils/message/eventBus';
-import { Message } from '@/shared/utils/messaging';
+import { EVENTS } from '@onflow/flow-wallet-shared/constant/events';
+import eventBus from '@onflow/flow-wallet-shared/utils/message/eventBus';
+import { Message } from '@onflow/flow-wallet-shared/utils/messaging';
 import { getUITypeName } from '@/ui/utils';
 
 import Views from './views';

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Route, Routes } from 'react-router';
 
 import PrivateRoute from '@/ui/components/PrivateRoute';
-import { useWallet, useWalletLoaded } from '@/ui/hooks/use-wallet';
+import { useWallet, useWalletLoaded } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import Dashboard from './Dashboard';
 import Header from './Dashboard/Header';

@@ -1,4 +1,4 @@
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 export async function detectBrowsers() {
   // Detect Brave (Brave exposes a special API)

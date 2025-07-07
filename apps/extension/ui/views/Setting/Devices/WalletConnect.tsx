@@ -10,15 +10,15 @@ import {
   type AccountKeyRequest,
   type DeviceInfo,
   type DeviceInfoRequest,
-} from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
-import { FCLWalletConnectMethod } from '@/shared/utils/type';
+} from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { FCLWalletConnectMethod } from '@onflow/flow-wallet-shared/utils/type';
 import closeCircle from '@/ui/assets/image/closeCircle.png';
 import dicon from '@/ui/assets/image/dicon.png';
 import licon from '@/ui/assets/image/licon.png';
 import micone from '@/ui/assets/image/micone.png';
 import { LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import QrScannerComponent from './QrScannerComponent';
 

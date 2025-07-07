@@ -2,19 +2,19 @@ import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { withRouter } from 'storybook-addon-remix-react-router';
 
-import type { NFTCollections } from '@/shared/types/nft-types';
-import type { WalletAccount } from '@/shared/types/wallet-types';
+import type { NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import type { WalletAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
 import {
   useChildAccountAllowTypes,
   useChildAccountDescription,
   useCurrentId,
   useMainAccount,
   useUserInfo,
-} from '@/ui/hooks/use-account-hooks.mock';
-import { useChildAccountFt } from '@/ui/hooks/use-coin-hooks.mock';
-import { useWallet } from '@/ui/hooks/use-wallet.mock';
-import { useNftCatalogCollections, useNftCollectionList } from '@/ui/hooks/useNftHook.mock';
-import { useProfiles } from '@/ui/hooks/useProfileHook.mock';
+} from '@onflow/flow-wallet-hooks/use-account-hooks.mock';
+import { useChildAccountFt } from '@onflow/flow-wallet-hooks/use-coin-hooks.mock';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet.mock';
+import { useNftCatalogCollections, useNftCollectionList } from '@onflow/flow-wallet-hooks/useNftHook.mock';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook.mock';
 
 import LinkedDetail from '../LinkedDetail';
 

@@ -13,7 +13,7 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import IconEnd from '@/ui/components/iconfont/IconAVector11Stroke';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const Security = () => {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
-import { FLOW_BIP44_PATH } from '@/shared/constant/algo-constants';
-import { type PublicPrivateKeyTuple } from '@/shared/types/key-types';
-import { type AccountKeyRequest } from '@/shared/types/network-types';
-import { type PublicKeyAccount } from '@/shared/types/wallet-types';
+import { FLOW_BIP44_PATH } from '@onflow/flow-wallet-shared/constant/algo-constants';
+import { type PublicPrivateKeyTuple } from '@onflow/flow-wallet-shared/types/key-types';
+import { type AccountKeyRequest } from '@onflow/flow-wallet-shared/types/network-types';
+import { type PublicKeyAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
 
 import {
   accountKeyRequestForAccount,

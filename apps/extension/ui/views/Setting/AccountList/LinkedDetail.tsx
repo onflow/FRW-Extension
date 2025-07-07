@@ -14,7 +14,7 @@ import {
 import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
-import { type NFTCollections } from '@/shared/types/nft-types';
+import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
 import { EditIcon } from '@/ui/assets/icons/settings/Edit';
 import { LLHeader, LLSecondaryButton } from '@/ui/components';
 import { AccountCard } from '@/ui/components/account/account-card';
@@ -26,11 +26,11 @@ import {
   useCurrentId,
   useMainAccount,
   useUserInfo,
-} from '@/ui/hooks/use-account-hooks';
-import { useChildAccountFt } from '@/ui/hooks/use-coin-hooks';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useNftCatalogCollections, useNftCollectionList } from '@/ui/hooks/useNftHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+} from '@onflow/flow-wallet-hooks/use-account-hooks';
+import { useChildAccountFt } from '@onflow/flow-wallet-hooks/use-coin-hooks';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useNftCatalogCollections, useNftCollectionList } from '@onflow/flow-wallet-hooks/useNftHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 import {
   COLOR_GRAY_808080,
   COLOR_WHITE_ALPHA_40_FFFFFF66,

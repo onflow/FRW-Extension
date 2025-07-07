@@ -1,9 +1,9 @@
 import React, { type ReactNode, createContext } from 'react';
 
-import type { WalletController as WalletControllerClass } from '@/background/controller/wallet';
-import { walletLoadedKey } from '@/shared/utils/cache-data-keys';
-import type { IExtractFromPromise } from '@/shared/utils/type';
-import { useCachedData } from '@/ui/hooks/use-data';
+import type { WalletController as WalletControllerClass } from '@onflow/flow-wallet-shared/background/controller/wallet';
+import { walletLoadedKey } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import type { IExtractFromPromise } from '@onflow/flow-wallet-shared/utils/type';
+import { useCachedData } from './use-data';
 
 export type WalletControllerType = {
   [key in keyof WalletControllerClass]: WalletControllerClass[key] extends (

@@ -1,6 +1,6 @@
 import * as bip39 from 'bip39';
 
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared';
 
 export const STEPS = {
   USERNAME: 'username',

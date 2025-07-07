@@ -7,16 +7,16 @@ import Tooltip from '@mui/material/Tooltip';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { isValidEthereumAddress } from '@/shared/utils/address';
-import { consoleError, consoleWarn } from '@/shared/utils/console-log';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError, consoleWarn } from '@onflow/flow-wallet-shared/utils/console-log';
 import { AccountAvatar } from '@/ui/components/account/account-avatar';
 import IconCopy from '@/ui/components/iconfont/IconCopy';
 import StorageExceededAlert from '@/ui/components/StorageExceededAlert';
-import { useNews } from '@/ui/hooks/use-news';
-import { useWallet, useWalletLoaded } from '@/ui/hooks/use-wallet';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
-import { useTransferList } from '@/ui/hooks/useTransferListHook';
+import { useNews } from '@onflow/flow-wallet-hooks/use-news';
+import { useWallet, useWalletLoaded } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
+import { useTransferList } from '@onflow/flow-wallet-hooks/useTransferListHook';
 import { formatAddress } from '@/ui/utils';
 
 import MenuDrawer from './Components/MenuDrawer';

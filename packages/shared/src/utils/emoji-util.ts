@@ -1,5 +1,5 @@
-import emoji from '@/shared/constant/emoji.json';
-import { type Emoji } from '@/shared/types/wallet-types';
+import emoji from '../constant/emoji.json';
+import { type Emoji } from '../types/wallet-types';
 
 export const getEmojiList = (): Emoji[] => {
   return emoji.emojis;

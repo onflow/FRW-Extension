@@ -4,7 +4,7 @@ import React from 'react';
 import createNew from '@/ui/assets/svg/create-new.svg';
 import importExisting from '@/ui/assets/svg/import-existing.svg';
 import { ProfileButton } from '@/ui/components/profile/profile-button';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 interface TransferConfirmationProps {
   isConfirmationOpen: boolean;

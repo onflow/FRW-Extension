@@ -1,4 +1,4 @@
-import type { TokenInfo } from '@/shared/types/token-info';
+import type { TokenInfo } from './token-info';
 
 export type CoinItem = {
   id: string;

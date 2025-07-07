@@ -5,7 +5,7 @@ import Link from '@/ui/assets/svg/link.svg';
 import mainnetsvg from '@/ui/assets/svg/mainnet.svg';
 import testnetsvg from '@/ui/assets/svg/testnet.svg';
 import { LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { networkColor } from '@/ui/style/color';
 
 interface ShowSwitchProps {

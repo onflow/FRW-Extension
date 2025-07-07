@@ -1,4 +1,4 @@
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import fallback from '@/ui/assets/image/errorImage.png';
 
 export const query2obj = (str: string) => {

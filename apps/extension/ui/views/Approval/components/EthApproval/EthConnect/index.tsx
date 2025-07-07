@@ -1,18 +1,18 @@
 import { Box, CardMedia, Divider, Stack, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@/shared/types/network-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
+import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import flowgrey from '@/ui/assets/svg/flow-grey.svg';
 import linkGlobe from '@/ui/assets/svg/linkGlobe.svg';
 import { LLConnectLoading, LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
 import { EnableEvm } from '@/ui/components/EnableEvm';
 import CheckCircleIcon from '@/ui/components/iconfont/IconCheckmark';
-import { useApproval } from '@/ui/hooks/use-approval';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useApproval } from '@onflow/flow-wallet-hooks/use-approval';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 import { formatAddress } from '@/ui/utils';
 
 import IconWithPlaceholder from '../EthApprovalComponents/IconWithPlaceholder';

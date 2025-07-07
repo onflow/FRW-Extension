@@ -9,7 +9,7 @@ import { LLNotFound, LLSpinner } from '@/ui/components';
 import CheckCircleIcon from '@/ui/components/iconfont/IconCheckmark';
 import CancelIcon from '@/ui/components/iconfont/IconClose';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const BpIcon = styled('span')(() => ({
   borderRadius: 8,

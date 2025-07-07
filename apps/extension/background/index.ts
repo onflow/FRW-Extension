@@ -12,13 +12,13 @@ import 'reflect-metadata';
 import providerController from '@/background/controller/provider';
 import { preAuthzServiceDefinition } from '@/background/controller/serviceDefinition';
 import walletController, { type WalletController } from '@/background/controller/wallet';
-import { EVENTS } from '@/shared/constant/events';
-import { type WalletAddress } from '@/shared/types/wallet-types';
-import { isValidFlowAddress } from '@/shared/utils/address';
-import { consoleError, consoleLog } from '@/shared/utils/console-log';
-import eventBus from '@/shared/utils/message/eventBus';
-import { Message } from '@/shared/utils/messaging';
-import storage from '@/shared/utils/storage';
+import { EVENTS } from '@onflow/flow-wallet-shared/constant/events';
+import { type WalletAddress } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { isValidFlowAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError, consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
+import eventBus from '@onflow/flow-wallet-shared/utils/message/eventBus';
+import { Message } from '@onflow/flow-wallet-shared/utils/messaging';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 import {
   addressBookService,

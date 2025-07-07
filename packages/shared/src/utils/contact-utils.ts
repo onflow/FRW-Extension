@@ -1,4 +1,4 @@
-import { ContactType, type Contact } from '@/shared/types/network-types';
+import { ContactType, type Contact } from '../types/network-types';
 
 export const filterContacts = (keyword: string, contacts: Contact[]) => {
   // Look for the keyword in any of the contact properties

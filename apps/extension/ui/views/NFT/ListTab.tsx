@@ -12,14 +12,14 @@ import Grid from '@mui/material/Grid';
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type NFTCollections } from '@/shared/types/nft-types';
-import { refreshNftCatalogCollections } from '@/shared/utils/cache-data-keys';
+import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import { refreshNftCatalogCollections } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
 import placeholder from '@/ui/assets/image/placeholder.png';
 import ListSkeleton from '@/ui/components/NFTs/ListSkeleton';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
+import { useNftCatalogCollections } from '@onflow/flow-wallet-hooks/useNftHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 import EmptyStatus from '../EmptyStatus';
 interface ListTabProps {

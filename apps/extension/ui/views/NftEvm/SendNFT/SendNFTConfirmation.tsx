@@ -6,19 +6,19 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Web3 from 'web3';
 
-import { EVM_ENDPOINT } from '@/shared/constant/domain-constants';
-import erc721 from '@/shared/constant/erc721.abi.json';
-import { type Contact } from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { EVM_ENDPOINT } from '@onflow/flow-wallet-shared/constant/domain-constants';
+import erc721 from '@onflow/flow-wallet-shared/constant/erc721.abi.json';
+import { type Contact } from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import IconNext from '@/ui/assets/svg/next.svg';
 import { FRWProfile, LLProfile, LLSpinner } from '@/ui/components';
 import IconFlow from '@/ui/components/iconfont/IconFlow';
 import SlideRelative from '@/ui/components/SlideRelative';
 import StorageExceededAlert from '@/ui/components/StorageExceededAlert';
 import { WarningStorageLowSnackbar } from '@/ui/components/WarningStorageLowSnackbar';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useStorageCheck } from '@/ui/hooks/useStorageCheck';
-import { useTransferList } from '@/ui/hooks/useTransferListHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useStorageCheck } from '@onflow/flow-wallet-hooks/useStorageCheck';
+import { useTransferList } from '@onflow/flow-wallet-hooks/useTransferListHook';
 import { type MatchMedia, MatchMediaType } from '@/ui/utils/url';
 
 interface SendNFTConfirmationProps {

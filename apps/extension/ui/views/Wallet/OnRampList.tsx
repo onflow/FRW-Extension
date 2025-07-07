@@ -12,7 +12,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import Coinbase from '@/ui/assets/svg/coinbase-pay.svg';
 import MoonPay from '@/ui/assets/svg/moonpay.svg';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const OnRampList = ({ close }) => {
   const wallet = useWallet();

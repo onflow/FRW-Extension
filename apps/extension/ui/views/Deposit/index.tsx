@@ -4,8 +4,8 @@ import React, { useEffect, useRef } from 'react';
 
 import { LLHeader } from '@/ui/components';
 import { NetworkIndicator } from '@/ui/components/NetworkIndicator';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 const qrCode = new QRCodeStyling({
   width: 160,

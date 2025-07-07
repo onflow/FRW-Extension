@@ -2,11 +2,11 @@ import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { withRouter } from 'storybook-addon-remix-react-router';
 
-import { useUserInfo as useUserInfoMock } from '@/ui/hooks/use-account-hooks.mock';
-import { useUserData } from '@/ui/hooks/use-data.mock';
-import { useWallet as useWalletMock } from '@/ui/hooks/use-wallet.mock';
-import { useNetwork } from '@/ui/hooks/useNetworkHook.mock';
-import { USE_PROFILES_MOCK, useProfiles } from '@/ui/hooks/useProfileHook.mock';
+import { useUserInfo as useUserInfoMock } from '@onflow/flow-wallet-hooks/use-account-hooks.mock';
+import { useUserData } from '@onflow/flow-wallet-hooks/use-data.mock';
+import { useWallet as useWalletMock } from '@onflow/flow-wallet-hooks/use-wallet.mock';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook.mock';
+import { USE_PROFILES_MOCK, useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook.mock';
 
 import SettingTab from '../index';
 

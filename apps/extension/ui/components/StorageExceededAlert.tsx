@@ -3,7 +3,7 @@ import { Box, Button, IconButton, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
-import eventBus from '@/shared/utils/message/eventBus';
+import eventBus from '@onflow/flow-wallet-shared/utils/message/eventBus';
 
 interface StorageExceededAlertProps {
   open: boolean;

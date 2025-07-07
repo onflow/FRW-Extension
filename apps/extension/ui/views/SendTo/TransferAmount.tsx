@@ -14,14 +14,14 @@ import {
 } from '@mui/material';
 import React, { useCallback } from 'react';
 
-import { type TransactionState } from '@/shared/types/transaction-types';
+import { type TransactionState } from '@onflow/flow-wallet-shared/types/transaction-types';
 import CancelIcon from '@/ui/components/iconfont/IconClose';
 import IconSwitch from '@/ui/components/iconfont/IconSwitch';
 import SlideRelative from '@/ui/components/SlideRelative';
 import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
 import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
-import { useCurrency } from '@/ui/hooks/preference-hooks';
-import { useCoins } from '@/ui/hooks/useCoinHook';
+import { useCurrency } from '@onflow/flow-wallet-hooks/preference-hooks';
+import { useCoins } from '@onflow/flow-wallet-hooks/useCoinHook';
 
 const TransferAmount = ({
   transactionState,

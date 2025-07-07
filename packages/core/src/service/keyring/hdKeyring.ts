@@ -1,6 +1,6 @@
 import { ethers, HDNodeWallet } from 'ethers';
 
-import { FLOW_BIP44_PATH } from '@/shared/constant/algo-constants';
+import { FLOW_BIP44_PATH } from '@onflow/flow-wallet-shared/constant/algo-constants';
 
 export type HDKeyringSerializedData = {
   mnemonic?: string;

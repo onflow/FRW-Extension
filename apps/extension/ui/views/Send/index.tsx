@@ -20,18 +20,18 @@ import { StyledEngineProvider, useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { type Contact } from '@/shared/types/network-types';
-import { type WalletAddress } from '@/shared/types/wallet-types';
-import { isValidAddress } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
-import { checkAddressBookContacts, filterContacts } from '@/shared/utils/contact-utils';
+import { type Contact } from '@onflow/flow-wallet-shared/types/network-types';
+import { type WalletAddress } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { isValidAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { checkAddressBookContacts, filterContacts } from '@onflow/flow-wallet-shared/utils/contact-utils';
 import AccountsList from '@/ui/components/AddressLists/AccountsList';
 import AddressBookList from '@/ui/components/AddressLists/AddressBookList';
 import RecentList from '@/ui/components/AddressLists/RecentList';
 import SearchList from '@/ui/components/AddressLists/SearchList';
 import IconAbout from '@/ui/components/iconfont/IconAbout';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useContacts } from '@/ui/hooks/useContactHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useContacts } from '@onflow/flow-wallet-hooks/useContactHook';
 
 export enum SendPageTabOptions {
   Recent = 'Recent',

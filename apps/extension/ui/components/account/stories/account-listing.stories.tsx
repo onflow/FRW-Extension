@@ -2,18 +2,18 @@ import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { withRouter } from 'storybook-addon-remix-react-router';
 
-import emojisJson from '@/shared/constant/emoji.json';
-import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
-import { type NFTCollections } from '@/shared/types/nft-types';
-import { type Emoji, type MainAccount, type WalletAccount } from '@/shared/types/wallet-types';
+import emojisJson from '@onflow/flow-wallet-shared/constant/emoji.json';
+import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
+import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import { type Emoji, type MainAccount, type WalletAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
 import { AccountListing } from '@/ui/components/account/account-listing';
 import {
   useNftCatalogCollections as importedMockUseNftCatalogCollections, // Aliased import from the mock file
-} from '@/ui/hooks/useNftHook.mock';
+} from '@onflow/flow-wallet-hooks/useNftHook.mock';
 import {
   USE_PROFILES_MOCK,
   useProfiles as importedMockUseProfiles,
-} from '@/ui/hooks/useProfileHook.mock';
+} from '@onflow/flow-wallet-hooks/useProfileHook.mock';
 const { emojis } = emojisJson as { emojis: Emoji[] };
 
 const mainWalletAccount: MainAccount = {

@@ -1,8 +1,8 @@
 import { Box, Skeleton, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 import { formatAddress, isEmoji } from '@/ui/utils';
 
 const tempEmoji = {

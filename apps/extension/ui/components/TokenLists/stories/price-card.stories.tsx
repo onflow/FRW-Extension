@@ -3,7 +3,7 @@ import React from 'react';
 import { fn } from 'storybook/test';
 
 import PriceCard from '@/ui/components/TokenLists/PriceCard';
-import { useWallet as useWalletMock } from '@/ui/hooks/use-wallet.mock';
+import { useWallet as useWalletMock } from '@onflow/flow-wallet-hooks/use-wallet.mock';
 
 const meta: Meta<typeof PriceCard> = {
   title: 'Components/TokenLists/PriceCard',

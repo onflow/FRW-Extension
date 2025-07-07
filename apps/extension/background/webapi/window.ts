@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 
-import { IS_WINDOWS } from '@/shared/constant/environment';
+import { IS_WINDOWS } from '@onflow/flow-wallet-shared/constant/environment';
 
 const event = new EventEmitter();
 

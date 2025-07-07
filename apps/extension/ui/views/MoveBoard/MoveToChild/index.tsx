@@ -2,17 +2,17 @@ import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { isValidEthereumAddress } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import alertMark from '@/ui/assets/svg/alertMark.svg';
 import { NFTDrawer } from '@/ui/components/GeneralPages';
 import WarningSnackbar from '@/ui/components/WarningSnackbar';
 import { WarningStorageLowSnackbar } from '@/ui/components/WarningStorageLowSnackbar';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
-import { useStorageCheck } from '@/ui/hooks/useStorageCheck';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
+import { useNftCatalogCollections } from '@onflow/flow-wallet-hooks/useNftHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
+import { useStorageCheck } from '@onflow/flow-wallet-hooks/useStorageCheck';
 
 import AccountMainBox from '../AccountMainBox';
 import MoveCollectionSelect from '../MoveCollectionSelect';

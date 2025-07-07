@@ -6,15 +6,15 @@ import {
   HASH_ALGO_NUM_SHA3_256,
   SIGN_ALGO_NUM_ECDSA_P256,
   SIGN_ALGO_NUM_ECDSA_secp256k1,
-} from '@/shared/constant/algo-constants';
+} from '@onflow/flow-wallet-shared/constant/algo-constants';
 import {
   type PrivateKeyTuple,
   type PublicKeyTuple,
   type PublicPrivateKeyTuple,
-} from '@/shared/types/key-types';
-import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
-import { consoleError } from '@/shared/utils/console-log';
-import storage from '@/shared/utils/storage';
+} from '@onflow/flow-wallet-shared/types/key-types';
+import { CURRENT_ID_KEY } from '@onflow/flow-wallet-shared/types/keyring-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 const jsonToKey = async (json: string, password: string) => {
   try {

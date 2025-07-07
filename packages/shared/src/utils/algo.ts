@@ -1,4 +1,4 @@
-import type { HashAlgoString, SignAlgoString } from '@/shared/types/algo-types';
+import type { HashAlgoString, SignAlgoString } from '../types/algo-types';
 
 import {
   HASH_ALGO_NUM_KMAC128_BLS_BLS12_381,

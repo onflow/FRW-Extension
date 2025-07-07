@@ -6,7 +6,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { TypedDataUtils } from '../provider/controller';
 
 // Mock all necessary services
-vi.mock('@/core/service', () => ({
+vi.mock('@onflow/flow-wallet-core/service', () => ({
   openapiService: {
     getFeatureFlag: vi.fn().mockResolvedValue(false),
   },

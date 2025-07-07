@@ -18,14 +18,14 @@ import {
   API_TEST_RESULTS,
   type ApiTestResult,
   type FetchDetail,
-} from '@/shared/test-data/api-test-results';
+} from '@onflow/flow-wallet-shared/test-data/api-test-results';
 import {
   type ApiTestFunction,
   type CommonParams,
   createTestGroups,
-} from '@/shared/test-data/test-groups';
-import { consoleError } from '@/shared/utils/console-log';
-import { useWallet } from '@/ui/hooks/use-wallet';
+} from '@onflow/flow-wallet-shared/test-data/test-groups';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const addFunctionResult = (prev: ApiTestResult[], result: ApiTestResult) => {
   const prevFunctionResult = prev.find((r) => r.functionName === result.functionName);

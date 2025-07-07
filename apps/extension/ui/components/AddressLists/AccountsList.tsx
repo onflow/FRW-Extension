@@ -2,7 +2,7 @@ import { List, ListSubheader, ButtonBase, Box } from '@mui/material';
 import React from 'react';
 
 import { LLContactCard, LLContactEth, FWContactCard } from '@/ui/components';
-import { useContacts } from '@/ui/hooks/useContactHook';
+import { useContacts } from '@onflow/flow-wallet-hooks/useContactHook';
 
 const AccountsList = ({ handleClick }) => {
   const { cadenceAccounts, evmAccounts, childAccountsContacts } = useContacts();

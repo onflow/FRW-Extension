@@ -2,10 +2,10 @@ import { Box, Button, FormControl, Typography } from '@mui/material';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared/utils/default';
 import { LLHeader } from '@/ui/components/LLHeader';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 type PassMatch = 'match' | 'no-match' | 'unverified';
 const SettingsPassword = ({

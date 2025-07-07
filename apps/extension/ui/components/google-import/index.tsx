@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import React, { useState } from 'react';
 
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared/utils/default';
 import AllSet from '@/ui/components/LandingPages/AllSet';
 import LandingComponents from '@/ui/components/LandingPages/LandingComponents';
 import RecoveryPhrase from '@/ui/components/LandingPages/RecoveryPhrase';

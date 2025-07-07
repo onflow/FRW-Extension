@@ -2,13 +2,13 @@ import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import alertMark from '@/ui/assets/svg/alertMark.svg';
 import { NFTDrawer } from '@/ui/components/GeneralPages';
 import WarningSnackbar from '@/ui/components/WarningSnackbar';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
-import { useStorageCheck } from '@/ui/hooks/useStorageCheck';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
+import { useStorageCheck } from '@onflow/flow-wallet-hooks/useStorageCheck';
 
 import AccountBox from '../AccountBox';
 import MoveCollectionSelect from '../MoveCollectionSelect';

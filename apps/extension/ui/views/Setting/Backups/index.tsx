@@ -2,13 +2,13 @@ import { Box, Button, IconButton, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { LLHeader, LLSpinner } from '@/ui/components';
 import BrowserWarning from '@/ui/components/BrowserWarning';
 import CheckCircleIcon from '@/ui/components/iconfont/IconCheckmark';
 import IconGoogleDrive from '@/ui/components/iconfont/IconGoogleDrive';
 import { LLDeleteBackupPopup } from '@/ui/components/LLDeleteBackupPopup';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 /**
  * Manage Backups to Google Drive

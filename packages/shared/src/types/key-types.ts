@@ -1,7 +1,7 @@
 import {
   SIGN_ALGO_NUM_ECDSA_P256,
   SIGN_ALGO_NUM_ECDSA_secp256k1,
-} from '@/shared/constant/algo-constants';
+} from '../constant/algo-constants';
 
 export type PublicPrivateKey = {
   publicKey: string;

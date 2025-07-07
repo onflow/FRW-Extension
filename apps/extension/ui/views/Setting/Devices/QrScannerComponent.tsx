@@ -1,7 +1,7 @@
 import QrScanner from 'qr-scanner';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 const QrScannerComponent = ({ setUrl }) => {
   const videoRef = useRef(null);

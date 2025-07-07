@@ -2,7 +2,7 @@ import { Alert, Box, Snackbar } from '@mui/material';
 import React, { useEffect, useReducer } from 'react';
 import { useNavigate } from 'react-router';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import Google from '@/ui/components/google-import';
 import ImportTabs from '@/ui/components/import-components/ImportTabs';
 import AllSet from '@/ui/components/LandingPages/AllSet';
@@ -10,12 +10,12 @@ import GoogleBackup from '@/ui/components/LandingPages/GoogleBackup';
 import LandingComponents from '@/ui/components/LandingPages/LandingComponents';
 import PickNickname from '@/ui/components/LandingPages/PickNickname';
 import SetPassword from '@/ui/components/LandingPages/SetPassword';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import {
   IMPORT_STEPS,
   importProfileReducer,
   INITIAL_IMPORT_STATE,
-} from '@/ui/reducers/import-profile-reducer';
+} from '@onflow/flow-wallet-reducers/import-profile-reducer';
 
 const ImportAccount = () => {
   const navigate = useNavigate();

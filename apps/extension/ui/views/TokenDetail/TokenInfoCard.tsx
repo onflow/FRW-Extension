@@ -7,9 +7,9 @@ import {
   type CustomFungibleTokenInfo,
   type EvmCustomTokenInfo,
   type ExtendedTokenInfo,
-} from '@/shared/types/coin-types';
-import { type ActiveAccountType } from '@/shared/types/wallet-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
+} from '@onflow/flow-wallet-shared/types/coin-types';
+import { type ActiveAccountType } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
 import buyIcon from '@/ui/assets/svg/buyIcon.svg';
 import receiveIcon from '@/ui/assets/svg/receiveIcon.svg';
 import sendIcon from '@/ui/assets/svg/sendIcon.svg';
@@ -18,8 +18,8 @@ import VerifiedIcon from '@/ui/assets/svg/verfied-check.svg';
 import { IconButton } from '@/ui/components/IconButton';
 import IconChevronRight from '@/ui/components/iconfont/IconChevronRight';
 import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
-import { useCurrency } from '@/ui/hooks/preference-hooks';
-import { useCoins } from '@/ui/hooks/useCoinHook';
+import { useCurrency } from '@onflow/flow-wallet-hooks/preference-hooks';
+import { useCoins } from '@onflow/flow-wallet-hooks/useCoinHook';
 
 const TokenInfoCard = ({
   tokenInfo,

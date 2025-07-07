@@ -1,9 +1,9 @@
-import { type FeatureFlagKey, type FeatureFlags } from '@/shared/types/feature-types';
+import { type FeatureFlagKey, type FeatureFlags } from '@onflow/flow-wallet-shared/types/feature-types';
 import {
   type RemoteConfig,
   remoteConfigKey,
   remoteConfigRefreshRegex,
-} from '@/shared/utils/cache-data-keys';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
 
 import { getValidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
 

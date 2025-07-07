@@ -1,13 +1,13 @@
-import { type UserInfoResponse } from '@/shared/types/network-types';
-import { type LoggedInAccount } from '@/shared/types/wallet-types';
+import { type UserInfoResponse } from '@onflow/flow-wallet-shared/types/network-types';
+import { type LoggedInAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
 import {
   userInfoCachekey,
   userInfoRefreshRegex,
   type UserInfoStore,
-} from '@/shared/utils/cache-data-keys';
-import { consoleError } from '@/shared/utils/console-log';
-import { getCurrentProfileId, returnCurrentProfileId } from '@/shared/utils/current-id';
-import storage from '@/shared/utils/storage';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { getCurrentProfileId, returnCurrentProfileId } from '@onflow/flow-wallet-shared/utils/current-id';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 import { getValidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
 import createSessionStore from '../utils/persistStore';

@@ -8,7 +8,7 @@ import Mobile from '@/ui/assets/image/mobile.png';
 import Pc from '@/ui/assets/image/pc.png';
 import QR from '@/ui/assets/image/QR2.png';
 import { LLHeader } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import WalletConnect from './WalletConnect';
 

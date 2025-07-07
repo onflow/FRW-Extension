@@ -8,8 +8,8 @@ import movenft from '@/ui/assets/image/movenft.png';
 import moveftbg from '@/ui/assets/svg/moveftbg.svg';
 import movenftbg from '@/ui/assets/svg/movenftbg.svg';
 import LLComingSoon from '@/ui/components/LLComingSoonWarning';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 import MoveEvm from './MoveEvm';
 import MoveFromChild from './MoveFromChild';

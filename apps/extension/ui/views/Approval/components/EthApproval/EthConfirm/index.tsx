@@ -2,11 +2,11 @@ import { Box, Stack } from '@mui/material';
 import * as fcl from '@onflow/fcl';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
-import { useApproval } from '@/ui/hooks/use-approval';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useApproval } from '@onflow/flow-wallet-hooks/use-approval';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import { DefaultBlock } from './DefaultBlock';
 import { TransactionBlock } from './TransactionBlock';

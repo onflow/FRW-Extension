@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
-import { HASH_ALGO_NUM_DEFAULT, SIGN_ALGO_NUM_DEFAULT } from '@/shared/constant/algo-constants';
-import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
+import { HASH_ALGO_NUM_DEFAULT, SIGN_ALGO_NUM_DEFAULT } from '@onflow/flow-wallet-shared/constant/algo-constants';
+import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
 import {
   type MainAccount,
   type WalletAccount,
   getActiveAccountTypeForAddress,
-} from '@/shared/types/wallet-types';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
+} from '@onflow/flow-wallet-shared/types/wallet-types';
+import { useNetwork } from './useNetworkHook';
 
 import {
   useAccountBalance,

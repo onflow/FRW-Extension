@@ -1,4 +1,4 @@
-import { type FlowAddress, type EvmAddress } from '@/shared/types/wallet-types';
+import { type FlowAddress, type EvmAddress } from '../types/wallet-types';
 
 export function sansPrefix(address: string): FlowAddress | EvmAddress | null {
   if (!address) return null;

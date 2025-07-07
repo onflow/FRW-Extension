@@ -2,12 +2,12 @@ import { Box } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
-import { type Emoji, type WalletAccount } from '@/shared/types/wallet-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
+import { type Emoji, type WalletAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
 import { LLHeader } from '@/ui/components';
 import { AccountListing } from '@/ui/components/account/account-listing';
 import IconEnd from '@/ui/components/iconfont/IconAVector11Stroke';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 const tempEmoji: Emoji[] = [
   {

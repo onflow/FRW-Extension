@@ -1,9 +1,9 @@
 import type { Account as FclAccount } from '@onflow/typedefs';
 import * as ethUtil from 'ethereumjs-util';
 
-import { EMULATOR_HOST_MAINNET, EMULATOR_HOST_TESTNET } from '@/core/utils/fclConfig';
-import { type FlowNetwork } from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { EMULATOR_HOST_MAINNET, EMULATOR_HOST_TESTNET } from './fclConfig';
+import { type FlowNetwork } from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 // {a:{b: string}} => {1: 'a.b'}
 // later same [source] value will override [result] key generated before

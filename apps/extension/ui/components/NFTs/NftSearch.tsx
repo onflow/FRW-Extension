@@ -2,7 +2,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Box, InputAdornment, Input, IconButton } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
-import { type NFTItem } from '@/shared/types/nft-types';
+import { type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
 import { ReactComponent as SearchIcon } from '@/ui/assets/svg/searchIcon.svg';
 
 interface NftSearchProps {

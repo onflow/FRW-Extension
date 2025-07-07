@@ -16,18 +16,18 @@ import { isEmpty } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 
-import { ContactType, type Contact } from '@/shared/types/network-types';
-import { isValidEthereumAddress, withPrefix } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
+import { ContactType, type Contact } from '@onflow/flow-wallet-shared/types/network-types';
+import { isValidEthereumAddress, withPrefix } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { LLHeader } from '@/ui/components';
 import AccountsList from '@/ui/components/AddressLists/AccountsList';
 import AddressBookList from '@/ui/components/AddressLists/AddressBookList';
 import RecentList from '@/ui/components/AddressLists/RecentList';
 import SearchList from '@/ui/components/AddressLists/SearchList';
 import IconAbout from '@/ui/components/iconfont/IconAbout';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useAllNftList } from '@/ui/hooks/useNftHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useAllNftList } from '@onflow/flow-wallet-hooks/useNftHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 import { returnFilteredCollections } from '@/ui/utils';
 import { type MatchMedia } from '@/ui/utils/url';
 

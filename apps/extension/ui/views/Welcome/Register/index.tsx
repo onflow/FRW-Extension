@@ -9,13 +9,13 @@ import PickNickname from '@/ui/components/LandingPages/PickNickname';
 import RecoveryPhrase from '@/ui/components/LandingPages/RecoveryPhrase';
 import RepeatPhrase from '@/ui/components/LandingPages/RepeatPhrase';
 import SetPassword from '@/ui/components/LandingPages/SetPassword';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import {
   INITIAL_REGISTER_STATE,
   initRegisterState,
   registerReducer,
   STEPS,
-} from '@/ui/reducers/register-reducer';
+} from '@onflow/flow-wallet-reducers/register-reducer';
 
 const Register = () => {
   const navigate = useNavigate();

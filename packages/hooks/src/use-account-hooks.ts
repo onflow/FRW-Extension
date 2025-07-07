@@ -6,12 +6,12 @@ import {
   type KeyringState,
   type VaultEntryV2,
   type VaultEntryV3,
-} from '@/shared/types/keyring-types';
+} from '@onflow/flow-wallet-shared/types/keyring-types';
 import {
   getActiveAccountTypeForAddress,
   type MainAccount,
   type PendingTransaction,
-} from '@/shared/types/wallet-types';
+} from '@onflow/flow-wallet-shared/types/wallet-types';
 import {
   accountBalanceKey,
   childAccountAllowTypesKey,
@@ -23,13 +23,13 @@ import {
   registerStatusKey,
   userInfoCachekey,
   type UserInfoStore,
-} from '@/shared/utils/cache-data-keys';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
 import {
   activeAccountsKey,
   type ActiveAccountsStore,
   userWalletsKey,
   type UserWalletStore,
-} from '@/shared/utils/user-data-keys';
+} from '@onflow/flow-wallet-shared/utils/user-data-keys';
 
 import { useCachedData, useUserData } from './use-data';
 

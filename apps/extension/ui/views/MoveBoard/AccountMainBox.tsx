@@ -1,12 +1,12 @@
 import { Avatar, Box, CardMedia, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { type Contact } from '@/shared/types/network-types';
+import { type Contact } from '@onflow/flow-wallet-shared/types/network-types';
 import accountMove from '@/ui/assets/svg/accountMove.svg';
 import { FWMoveDropdown } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useContacts } from '@/ui/hooks/useContactHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useContacts } from '@onflow/flow-wallet-hooks/useContactHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 const USER_CONTACT = {
   contact_name: '',
   avatar: '',

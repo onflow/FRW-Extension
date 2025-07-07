@@ -1,8 +1,8 @@
 import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 
-import emojisJson from '@/shared/constant/emoji.json';
-import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
-import { type WalletAccount } from '@/shared/types/wallet-types';
+import emojisJson from '@onflow/flow-wallet-shared/constant/emoji.json';
+import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
+import { type WalletAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
 const { emojis } = emojisJson;
 
 import { useAccountBalance } from '../../../hooks/use-account-hooks.mock';

@@ -3,17 +3,17 @@ import {
   type CustomFungibleTokenInfo,
   type ExtendedTokenInfo,
   type TokenFilter,
-} from '@/shared/types/coin-types';
-import { triggerRefresh } from '@/shared/utils/cache-data-access';
+} from '@onflow/flow-wallet-shared/types/coin-types';
+import { triggerRefresh } from '@onflow/flow-wallet-shared/utils/cache-data-access';
 import {
   type ChildAccountFtStore,
   childAccountFtKey,
   coinListKey,
   tokenFilterKey,
   tokenListKey,
-} from '@/shared/utils/cache-data-keys';
-import { setUserData } from '@/shared/utils/user-data-access';
-import { evmCustomTokenKey } from '@/shared/utils/user-data-keys';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { setUserData } from '@onflow/flow-wallet-shared/utils/user-data-access';
+import { evmCustomTokenKey } from '@onflow/flow-wallet-shared/utils/user-data-keys';
 
 import { useCachedData, useUserData } from './use-data';
 

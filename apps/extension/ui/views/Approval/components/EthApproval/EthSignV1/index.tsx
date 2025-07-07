@@ -7,16 +7,16 @@ import {
   MAINNET_CHAIN_ID,
   TESTNET_CHAIN_ID,
   type UserInfoResponse,
-} from '@/shared/types/network-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
+} from '@onflow/flow-wallet-shared/types/network-types';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
 import {
   LLConnectLoading,
   LLLinkingLoading,
   LLPrimaryButton,
   LLSecondaryButton,
 } from '@/ui/components';
-import { useApproval } from '@/ui/hooks/use-approval';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useApproval } from '@onflow/flow-wallet-hooks/use-approval';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import IconWithPlaceholder from '../EthApprovalComponents/IconWithPlaceholder';
 

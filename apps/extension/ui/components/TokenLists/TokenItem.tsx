@@ -17,7 +17,7 @@ import VerifiedIcon from '@/ui/assets/svg/verfied-check.svg';
 import IconCheckmark from '@/ui/components/iconfont/IconCheckmark';
 import IconPlus from '@/ui/components/iconfont/IconPlus';
 import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
-import { useCurrency } from '@/ui/hooks/preference-hooks';
+import { useCurrency } from '@onflow/flow-wallet-hooks/preference-hooks';
 
 // Custom styled ListItem to override default secondaryAction styles
 const CustomListItem = styled(ListItem)({

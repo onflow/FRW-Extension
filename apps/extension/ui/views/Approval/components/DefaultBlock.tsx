@@ -13,7 +13,7 @@ import Fade from '@mui/material/Fade';
 import React from 'react';
 import Highlight from 'react-highlight';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import IconFlow from '@/ui/components/iconfont/IconFlow';
 
 export const DefaultBlock = ({

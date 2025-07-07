@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 
 import Spin from '@/ui/components/Spin';
-import { useApproval } from '@/ui/hooks/use-approval';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useApproval } from '@onflow/flow-wallet-hooks/use-approval';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { getUiType } from '@/ui/utils';
 import { openInternalPageInTab } from '@/ui/utils/webapi';
 

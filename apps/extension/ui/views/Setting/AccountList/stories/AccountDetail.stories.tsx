@@ -2,13 +2,13 @@ import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { withRouter } from 'storybook-addon-remix-react-router';
 
-import type { StorageInfo } from '@/shared/types/network-types';
-import type { Emoji, MainAccount } from '@/shared/types/wallet-types';
-import { toggleAccountHidden, useAccountHidden } from '@/ui/hooks/preference-hooks.mock';
-import { useMainAccount } from '@/ui/hooks/use-account-hooks.mock';
-import { useFeatureFlag } from '@/ui/hooks/use-feature-flags.mock';
-import { useWallet } from '@/ui/hooks/use-wallet.mock';
-import { useNetwork } from '@/ui/hooks/useNetworkHook.mock';
+import type { StorageInfo } from '@onflow/flow-wallet-shared/types/network-types';
+import type { Emoji, MainAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { toggleAccountHidden, useAccountHidden } from '@onflow/flow-wallet-hooks/preference-hooks.mock';
+import { useMainAccount } from '@onflow/flow-wallet-hooks/use-account-hooks.mock';
+import { useFeatureFlag } from '@onflow/flow-wallet-hooks/use-feature-flags.mock';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet.mock';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook.mock';
 
 import AccountDetail from '../AccountDetail';
 

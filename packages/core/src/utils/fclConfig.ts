@@ -1,6 +1,6 @@
 import * as fcl from '@onflow/fcl';
 
-import { isValidNetwork, type FlowNetwork } from '@/shared/types/network-types';
+import { isValidNetwork, type FlowNetwork } from '@onflow/flow-wallet-shared/types/network-types';
 
 const HOST_TESTNET = 'https://rest-testnet.onflow.org';
 const HOST_MAINNET = 'https://rest-mainnet.onflow.org';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useUserInfo } from '@/ui/hooks/use-account-hooks';
+import { useUserInfo } from '@onflow/flow-wallet-hooks/use-account-hooks';
 
 import { ProfileItemBase } from './profile-item-base';
 

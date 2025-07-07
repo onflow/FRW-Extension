@@ -2,7 +2,7 @@ import { Box, ButtonBase, Typography } from '@mui/material';
 import React from 'react';
 
 import Claim from '@/ui/assets/image/claim.png';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
 
 const ClaimTokenCard = ({ token }) => {
   const { network } = useNetwork();

@@ -5,7 +5,7 @@ import { useLocation } from 'react-router';
 
 import { LLHeader } from '@/ui/components';
 import IconCopy from '@/ui/components/iconfont/IconCopy';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const RecoveryPhasesDetail = () => {
   const location = useLocation();

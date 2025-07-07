@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 
 import { ethErrors, serializeError } from 'eth-rpc-errors';
 
-import { consoleError, consoleLog } from '@/shared/utils/console-log';
+import { consoleError, consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import DedupePromise from './pageProvider/dedupePromise';
 import { switchChainNotice } from './pageProvider/interceptors/switchChain';

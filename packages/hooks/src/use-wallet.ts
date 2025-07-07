@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
-import { walletLoadedKey } from '@/shared/utils/cache-data-keys';
-import { type WalletControllerType, WalletContext } from '@/ui/utils/WalletContext';
+import { walletLoadedKey } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { type WalletControllerType, WalletContext } from './WalletContext';
 
 import { useCachedData } from './use-data';
 

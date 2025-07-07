@@ -5,7 +5,7 @@ import { withRouter } from 'storybook-addon-remix-react-router';
 // eslint-disable-next-line import/order
 import { fn } from 'storybook/test';
 
-import { useWallet as useWalletMock } from '@/ui/hooks/use-wallet.mock';
+import { useWallet as useWalletMock } from '@onflow/flow-wallet-hooks/use-wallet.mock';
 
 import RecoverProfile from '../index';
 

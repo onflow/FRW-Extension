@@ -1,8 +1,8 @@
 import { max } from 'lodash';
 import LRU from 'lru-cache';
 
-import { INTERNAL_REQUEST_ORIGIN } from '@/shared/constant/domain-constants';
-import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
+import { INTERNAL_REQUEST_ORIGIN } from '@onflow/flow-wallet-shared/constant/domain-constants';
+import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
 
 import createPersistStore from '../utils/persistStore';
 

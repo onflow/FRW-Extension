@@ -1,4 +1,4 @@
-import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
+import { CURRENT_ID_KEY } from '../types/keyring-types';
 
 import storage from './storage';
 

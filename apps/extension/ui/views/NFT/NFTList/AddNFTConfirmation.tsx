@@ -4,10 +4,10 @@ import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type NFTModelV2 } from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { type NFTModelV2 } from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { LLSpinner } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 interface AddNFTConfirmationProps {
   isConfirmationOpen: boolean;

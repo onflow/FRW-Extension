@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import type { AccountBalanceInfo } from '@/shared/types/network-types';
+import type { AccountBalanceInfo } from '../types/network-types';
 
 export type EvaluateStorageResult = {
   isStorageSufficient: boolean;

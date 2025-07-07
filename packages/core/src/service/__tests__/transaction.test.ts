@@ -1,13 +1,13 @@
 import type { TransactionExecutionStatus, TransactionStatus } from '@onflow/typedefs';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import openapiService from '@/core/service/openapi';
-import { type FlowNetwork } from '@/shared/types/network-types';
+import openapiService from '../../service/openapi';
+import { type FlowNetwork } from '@onflow/flow-wallet-shared/types/network-types';
 
 import transaction from '../transaction';
 
 // Mock storage functions
-vi.mock('@/shared/utils/storage', () => ({
+vi.mock('@onflow/flow-wallet-shared/utils/storage', () => ({
   default: {
     getSession: vi.fn().mockImplementation((key) => {
       const now = Date.now();
@@ -124,7 +124,7 @@ describe('Transaction Service', () => {
   });
 
   // Add the openapi service mock
-  vi.mock('@/core/service/openapi', () => {
+  vi.mock('../../service/openapi', () => {
     const mockData = {
       transactions: [
         {
@@ -494,7 +494,7 @@ describe('Transaction Service', () => {
   });
 });
 
-vi.mock('@/shared/utils/cache-data-access', () => ({
+vi.mock('@onflow/flow-wallet-shared/utils/cache-data-access', () => ({
   getCachedData: vi.fn().mockImplementation(async (key) => {
     return mockStorageState.session.get(key);
   }),
@@ -509,7 +509,7 @@ vi.mock('@/shared/utils/cache-data-access', () => ({
   }),
 }));
 
-vi.mock('@/core/utils/data-cache', () => ({
+vi.mock('../../utils/data-cache', () => ({
   getValidData: vi.fn().mockImplementation(async (key) => {
     return mockStorageState.session.get(key);
   }),

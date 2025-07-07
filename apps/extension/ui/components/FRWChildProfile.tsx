@@ -1,7 +1,7 @@
 import { Avatar, Box, Typography } from '@mui/material';
 import React from 'react';
 
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 export const FRWChildProfile = ({ contact, address, isLoading = false }) => {
   const usewallet = useWallet();

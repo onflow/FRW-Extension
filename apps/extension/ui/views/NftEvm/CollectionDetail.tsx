@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
-import { triggerRefresh } from '@/shared/utils/cache-data-access';
-import { evmNftCollectionListKey } from '@/shared/utils/cache-data-keys';
-import { consoleError } from '@/shared/utils/console-log';
+import { triggerRefresh } from '@onflow/flow-wallet-shared/utils/cache-data-access';
+import { evmNftCollectionListKey } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import CollectionDetailGrid from '@/ui/components/NFTs/CollectionDetailGrid';
 import GridView from '@/ui/components/NFTs/GridView';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useEvmNftCollectionList, useNftHook } from '@/ui/hooks/useNftHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
+import { useEvmNftCollectionList, useNftHook } from '@onflow/flow-wallet-hooks/useNftHook';
 import { type PostMedia } from '@/ui/utils/url';
 
 interface CollectionDisplay {

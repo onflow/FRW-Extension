@@ -3,9 +3,9 @@ import { Box, CardMedia, IconButton, Skeleton, Typography } from '@mui/material'
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { ContactType } from '@/shared/types/network-types';
+import { ContactType } from '@onflow/flow-wallet-shared/types/network-types';
 import closex from '@/ui/assets/closex.svg';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { formatAddress } from '@/ui/utils';
 
 export const FWContactCard = ({ contact, hideCloseButton, isSend = false, isLoading = false }) => {

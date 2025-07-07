@@ -2,7 +2,7 @@ import { Dialog, Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 
-import { type NFTItem } from '@/shared/types/nft-types';
+import { type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
 
 import NftSearch from './NftSearch';
 

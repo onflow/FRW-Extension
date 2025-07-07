@@ -130,7 +130,7 @@ vi.mock('firebase/auth/web-extension', () => ({
 }));
 
 // Mock storage utility
-vi.mock('@/core/utils/storage', () => ({
+vi.mock('@onflow/flow-wallet-core/utils/storage', () => ({
   default: {
     get: vi.fn().mockResolvedValue({}),
     set: vi.fn().mockResolvedValue(undefined),
@@ -140,7 +140,7 @@ vi.mock('@/core/utils/storage', () => ({
 }));
 
 // Mock MixpanelService
-vi.mock('@/core/service/mixpanel', () => ({
+vi.mock('@onflow/flow-wallet-core/service/mixpanel', () => ({
   mixpanelTrack: {
     track: vi.fn(),
     identify: vi.fn(),

@@ -1,12 +1,12 @@
 import { Box, Button, TextareaAutosize, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
-import { KEY_TYPE } from '@/shared/constant/algo-constants';
-import { type PublicKeyAccount } from '@/shared/types/wallet-types';
+import { KEY_TYPE } from '@onflow/flow-wallet-shared/constant/algo-constants';
+import { type PublicKeyAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
 import KeyPathInput from '@/ui/components/KeyPathInputs';
 import { LLSpinner } from '@/ui/components/LLSpinner';
 import PasswordTextarea from '@/ui/components/password/PasswordTextarea';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { COLOR_DARKMODE_WHITE_3pc } from '@/ui/style/color';
 
 const SeedPhraseImport = ({

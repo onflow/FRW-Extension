@@ -15,7 +15,7 @@ import {
 } from 'firebase/auth/web-extension';
 import { getId, getInstallations } from 'firebase/installations';
 
-import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from '@/shared/constant/domain-constants';
+import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from '@onflow/flow-wallet-shared/constant/domain-constants';
 import type {
   BalanceMap,
   CadenceTokenInfo,
@@ -23,8 +23,8 @@ import type {
   EvmTokenInfo,
   FungibleTokenInfo,
   FungibleTokenListResponse,
-} from '@/shared/types/coin-types';
-import { CURRENT_ID_KEY } from '@/shared/types/keyring-types';
+} from '@onflow/flow-wallet-shared/types/coin-types';
+import { CURRENT_ID_KEY } from '@onflow/flow-wallet-shared/types/keyring-types';
 import {
   type AccountBalanceInfo,
   type AccountKeyRequest,
@@ -43,9 +43,9 @@ import {
   type SignInResponse,
   type StorageInfo,
   type UserInfoResponse,
-} from '@/shared/types/network-types';
-import { type NFTCollections } from '@/shared/types/nft-types';
-import type { TokenInfo } from '@/shared/types/token-info';
+} from '@onflow/flow-wallet-shared/types/network-types';
+import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import type { TokenInfo } from '@onflow/flow-wallet-shared/types/token-info';
 import {
   type ActiveAccountType,
   type Currency,
@@ -54,15 +54,15 @@ import {
   type LoggedInAccount,
   type LoggedInAccountWithIndex,
   type PublicKeyAccount,
-} from '@/shared/types/wallet-types';
-import { isValidFlowAddress } from '@/shared/utils/address';
-import { getStringFromHashAlgo, getStringFromSignAlgo } from '@/shared/utils/algo';
-import { cadenceScriptsKey } from '@/shared/utils/cache-data-keys';
-import { consoleError, consoleLog } from '@/shared/utils/console-log';
-import { returnCurrentProfileId } from '@/shared/utils/current-id';
-import { getPeriodFrequency } from '@/shared/utils/getPeriodFrequency';
-import { type NetworkScripts } from '@/shared/utils/script-types';
-import storage from '@/shared/utils/storage';
+} from '@onflow/flow-wallet-shared/types/wallet-types';
+import { isValidFlowAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { getStringFromHashAlgo, getStringFromSignAlgo } from '@onflow/flow-wallet-shared/utils/algo';
+import { cadenceScriptsKey } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { consoleError, consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
+import { returnCurrentProfileId } from '@onflow/flow-wallet-shared/utils/current-id';
+import { getPeriodFrequency } from '@onflow/flow-wallet-shared/utils/getPeriodFrequency';
+import { type NetworkScripts } from '@onflow/flow-wallet-shared/utils/script-types';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 import { findKeyAndInfo } from '../utils';
 import { getValidData, setCachedData } from '../utils/data-cache';

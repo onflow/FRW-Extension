@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 import BackButtonIcon from '@/ui/components/iconfont/IconBackButton';
 import RegisterHeader from '@/ui/components/LandingPages/RegisterHeader';
 import SlideLeftRight from '@/ui/components/SlideLeftRight';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import RecoverPage from './RecoverPage';
 import ShowKey from './ShowKey';

@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared/utils/default';
 import { BpUncheked, BpCheckedIcon } from '@/ui/assets/icons/CustomCheckboxIcons';
 import { LLSpinner } from '@/ui/components';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';

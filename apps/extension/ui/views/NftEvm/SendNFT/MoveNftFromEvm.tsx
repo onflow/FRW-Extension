@@ -5,19 +5,19 @@ import Grid from '@mui/material/Grid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type Contact } from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { type Contact } from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { FRWDropdownProfileCard, FRWProfileCard, LLSpinner } from '@/ui/components';
 import IconFlow from '@/ui/components/iconfont/IconFlow';
 import SlideRelative from '@/ui/components/SlideRelative';
 import StorageExceededAlert from '@/ui/components/StorageExceededAlert';
 import { WarningNFTNotOnboardedSnackbar } from '@/ui/components/WarningNFTNotOnboardedSnackbar';
 import { WarningStorageLowSnackbar } from '@/ui/components/WarningStorageLowSnackbar';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useContacts } from '@/ui/hooks/useContactHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
-import { useStorageCheck } from '@/ui/hooks/useStorageCheck';
-import { useTransferList } from '@/ui/hooks/useTransferListHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useContacts } from '@onflow/flow-wallet-hooks/useContactHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
+import { useStorageCheck } from '@onflow/flow-wallet-hooks/useStorageCheck';
+import { useTransferList } from '@onflow/flow-wallet-hooks/useTransferListHook';
 import { MatchMediaType } from '@/ui/utils/url';
 
 interface SendNFTConfirmationProps {

@@ -7,8 +7,8 @@ import type {
   CoinItem,
   CustomFungibleTokenInfo,
   EvmCustomTokenInfo,
-} from '@/shared/types/coin-types';
-import { isValidFlowAddress } from '@/shared/utils/address';
+} from '@onflow/flow-wallet-shared/types/coin-types';
+import { isValidFlowAddress } from '@onflow/flow-wallet-shared/utils/address';
 
 export const SecurityCard: React.FC<{
   tokenInfo: CoinItem | CustomFungibleTokenInfo | EvmCustomTokenInfo;

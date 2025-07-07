@@ -2,11 +2,11 @@
 import { Box, FormControl, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { consoleError } from '@/shared/utils/console-log';
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared/utils/default';
 import { LLPrimaryButton } from '@/ui/components';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const RecoverPage = ({ dataArray, setArray, goNext }) => {
   const wallet = useWallet();

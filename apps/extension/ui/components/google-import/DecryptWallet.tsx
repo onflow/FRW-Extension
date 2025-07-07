@@ -2,9 +2,9 @@ import { Button, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useState } from 'react';
 
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared/utils/default';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const DecryptWallet = ({ handleSwitchTab, setMnemonic, username }) => {
   const usewallet = useWallet();

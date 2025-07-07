@@ -1,6 +1,6 @@
-import { FLOW_BIP44_PATH } from '@/shared/constant/algo-constants';
-import { type PublicKeyAccount } from '@/shared/types/wallet-types';
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { FLOW_BIP44_PATH } from '@onflow/flow-wallet-shared';
+import { type PublicKeyAccount } from '@onflow/flow-wallet-shared';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared';
 
 export const IMPORT_STEPS = {
   IMPORT: 'import',

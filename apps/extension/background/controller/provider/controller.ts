@@ -13,14 +13,14 @@ import {
   permissionService,
   sessionService,
   signTextHistoryService,
-} from '@/core/service';
-import { getAccountsByPublicKeyTuple } from '@/core/utils/modules/findAddressWithPubKey';
-import { signWithKey } from '@/core/utils/modules/publicPrivateKey';
-import { EVM_ENDPOINT } from '@/shared/constant/domain-constants';
-import { tupleToPrivateKey } from '@/shared/types/key-types';
-import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@/shared/types/network-types';
-import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
+} from '@onflow/flow-wallet-core/service';
+import { getAccountsByPublicKeyTuple } from '@onflow/flow-wallet-core/utils/modules/findAddressWithPubKey';
+import { signWithKey } from '@onflow/flow-wallet-core/utils/modules/publicPrivateKey';
+import { EVM_ENDPOINT } from '@onflow/flow-wallet-shared/constant/domain-constants';
+import { tupleToPrivateKey } from '@onflow/flow-wallet-shared/types/key-types';
+import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
+import { ensureEvmAddressPrefix, isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import notificationService from '../notification';
 

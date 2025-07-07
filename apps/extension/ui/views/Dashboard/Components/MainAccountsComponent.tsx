@@ -6,9 +6,9 @@ import {
   type WalletAccount,
   type ActiveChildType_depreciated,
   type WalletAddress,
-} from '@/shared/types/wallet-types';
+} from '@onflow/flow-wallet-shared/types/wallet-types';
 import IconEnd from '@/ui/components/iconfont/IconAVector11Stroke';
-import { useAccountBalance } from '@/ui/hooks/use-account-hooks';
+import { useAccountBalance } from '@onflow/flow-wallet-hooks/use-account-hooks';
 
 interface MainAccountsProps {
   props_id: number;

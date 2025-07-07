@@ -1,10 +1,10 @@
-import { isValidEthereumAddress } from '@/shared/utils/address';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
 import {
   evmNftCollectionListKey,
   evmNftCollectionListRefreshRegex,
   evmNftIdsKey,
   evmNftIdsRefreshRegex,
-} from '@/shared/utils/cache-data-keys';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
 
 import { registerRefreshListener, setCachedData } from '../utils/data-cache';
 import { fclConfirmNetwork } from '../utils/fclConfig';

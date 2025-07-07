@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, Divider, Drawer, ListItem, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
-import { ContactType, type Contact } from '@/shared/types/network-types';
+import { ContactType, type Contact } from '@onflow/flow-wallet-shared/types/network-types';
 import { LLContactCard, LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
 import IconSubtract from '@/ui/components/iconfont/IconSubtract';
 

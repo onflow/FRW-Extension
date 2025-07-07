@@ -1,4 +1,4 @@
-import storage from '@/shared/utils/storage';
+import storage from './storage';
 
 /**
  * Get user data from local storage

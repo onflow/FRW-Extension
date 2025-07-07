@@ -1,4 +1,4 @@
-import storage, { type StorageChange } from '@/shared/utils/storage';
+import storage, { type StorageChange } from './storage';
 
 import { type CacheDataItem } from '../types/data-cache-types';
 

@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash';
 
-import { INTERNAL_REQUEST_ORIGIN } from '@/shared/constant/domain-constants';
+import { INTERNAL_REQUEST_ORIGIN } from '@onflow/flow-wallet-shared/constant/domain-constants';
 
 import createPersistStore from '../utils/persistStore';
 

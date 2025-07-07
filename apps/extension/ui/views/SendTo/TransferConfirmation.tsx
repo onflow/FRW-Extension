@@ -5,8 +5,8 @@ import Grid from '@mui/material/Grid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type TransactionState } from '@/shared/types/transaction-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { type TransactionState } from '@onflow/flow-wallet-shared/types/transaction-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import IconNext from '@/ui/assets/svg/next.svg';
 import { LLSpinner } from '@/ui/components';
 import { Profile } from '@/ui/components/Send/Profile';
@@ -15,11 +15,11 @@ import StorageExceededAlert from '@/ui/components/StorageExceededAlert';
 import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
 import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { WarningStorageLowSnackbar } from '@/ui/components/WarningStorageLowSnackbar';
-import { useCurrency } from '@/ui/hooks/preference-hooks';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useContact } from '@/ui/hooks/useContactHook';
-import { useStorageCheck } from '@/ui/hooks/useStorageCheck';
-import { useTransferList } from '@/ui/hooks/useTransferListHook';
+import { useCurrency } from '@onflow/flow-wallet-hooks/preference-hooks';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useContact } from '@onflow/flow-wallet-hooks/useContactHook';
+import { useStorageCheck } from '@onflow/flow-wallet-hooks/useStorageCheck';
+import { useTransferList } from '@onflow/flow-wallet-hooks/useTransferListHook';
 
 interface TransferConfirmationProps {
   transactionState: TransactionState;

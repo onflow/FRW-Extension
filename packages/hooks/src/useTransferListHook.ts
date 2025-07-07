@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { transferListKey, type TransferListStore } from '@/shared/utils/cache-data-keys';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { transferListKey, type TransferListStore } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { useWallet } from './use-wallet';
+import { useProfiles } from './useProfileHook';
 
 import { useCachedData } from './use-data';
 import { useNetwork } from './useNetworkHook';

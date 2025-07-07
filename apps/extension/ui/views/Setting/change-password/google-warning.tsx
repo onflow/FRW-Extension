@@ -2,12 +2,12 @@ import { Warning } from '@mui/icons-material';
 import { DialogContent, DialogContentText, DialogTitle, Stack } from '@mui/material';
 import React from 'react';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { CustomDialog } from '@/ui/components/custom-dialog';
 import { LLPrimaryButton } from '@/ui/components/LLPrimaryButton';
 import { LLSecondaryButton } from '@/ui/components/LLSecondaryButton';
 import { LLWarningButton } from '@/ui/components/LLWarningButton';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 export const GoogleWarningDialog = ({
   open,

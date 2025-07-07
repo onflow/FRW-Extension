@@ -496,6 +496,6 @@ export {
   type NewsType,
   type NewsDisplayType,
   type NewsConditionType,
-} from '@/shared/types/news-types';
+} from './news-types';
 
 export type NetworkType = 'mainnet' | 'testnet';

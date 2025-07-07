@@ -10,12 +10,12 @@ import {
 } from '@mui/material';
 import React from 'react';
 
-import { type WalletAccount } from '@/shared/types/wallet-types';
-import { isValidEthereumAddress } from '@/shared/utils/address';
+import { type WalletAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
 import { CopyIcon } from '@/ui/assets/icons/CopyIcon';
 import { LinkIcon } from '@/ui/assets/icons/LinkIcon';
-import { useAccountBalance } from '@/ui/hooks/use-account-hooks';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
+import { useAccountBalance } from '@onflow/flow-wallet-hooks/use-account-hooks';
+import { useNftCatalogCollections } from '@onflow/flow-wallet-hooks/useNftHook';
 import {
   COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
   COLOR_DARKMODE_TEXT_PRIMARY_FFFFFF,

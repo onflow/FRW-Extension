@@ -3,7 +3,7 @@ import HDWallet from 'ethereum-hdwallet';
 import {
   HASH_ALGO_NUM_SHA2_256,
   SIGN_ALGO_NUM_ECDSA_secp256k1,
-} from '@/shared/constant/algo-constants';
+} from '../constant/algo-constants';
 
 import { type ApiTestResult, type ApiTestResults } from './api-test-results';
 

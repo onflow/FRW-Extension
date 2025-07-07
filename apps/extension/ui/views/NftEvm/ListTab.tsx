@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 
 import placeholder from '@/ui/assets/image/placeholder.png';
 import ListSkeleton from '@/ui/components/NFTs/ListSkeleton';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import EmptyStatus from '../EmptyStatus';
 

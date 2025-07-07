@@ -3,12 +3,12 @@ import Box from '@mui/material/Box';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { consoleError } from '@/shared/utils/console-log';
-import { DEFAULT_PASSWORD } from '@/shared/utils/default';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { DEFAULT_PASSWORD } from '@onflow/flow-wallet-shared/utils/default';
 import CheckCircleIcon from '@/ui/components/iconfont/IconCheckmark';
 import { LLHeader } from '@/ui/components/LLHeader';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import { GoogleWarningDialog } from './google-warning';
 import { ProfileBackupSelectionDialog } from './profile-backup-selection';

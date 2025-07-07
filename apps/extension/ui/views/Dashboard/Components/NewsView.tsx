@@ -1,7 +1,7 @@
 import { Box, Typography, Button } from '@mui/material';
 import React from 'react';
 
-import { useNews } from '@/ui/hooks/use-news';
+import { useNews } from '@onflow/flow-wallet-hooks/use-news';
 
 import { NewsItemCard } from './news-item';
 

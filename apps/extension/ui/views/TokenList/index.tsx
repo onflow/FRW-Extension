@@ -16,14 +16,14 @@ import { StyledEngineProvider } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 // import { useNavigate } from 'react-router';
-import { type ExtendedTokenInfo } from '@/shared/types/coin-types';
+import { type ExtendedTokenInfo } from '@onflow/flow-wallet-shared/types/coin-types';
 import VerifiedIcon from '@/ui/assets/svg/verfied-check.svg';
 import { LLHeader } from '@/ui/components';
 import TokenItem from '@/ui/components/TokenLists/TokenItem';
-import { useAllTokenInfo } from '@/ui/hooks/use-coin-hooks';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useCoins } from '@/ui/hooks/useCoinHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useAllTokenInfo } from '@onflow/flow-wallet-hooks/use-coin-hooks';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useCoins } from '@onflow/flow-wallet-hooks/useCoinHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 import AddTokenConfirmation from './AddTokenConfirmation';
 

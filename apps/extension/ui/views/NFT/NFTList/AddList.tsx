@@ -13,14 +13,14 @@ import {
 import Grid from '@mui/material/Grid';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { type NFTModelV2 } from '@/shared/types/network-types';
-import { consoleError } from '@/shared/utils/console-log';
+import { type NFTModelV2 } from '@onflow/flow-wallet-shared/types/network-types';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import alertMark from '@/ui/assets/svg/alert.svg';
 import { LLHeader } from '@/ui/components';
 import WarningSnackbar from '@/ui/components/WarningSnackbar';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useAllNftList } from '@/ui/hooks/useNftHook';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useAllNftList } from '@onflow/flow-wallet-hooks/useNftHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 import CollectionCard from './AddNFTCard';
 import AddNFTConfirmation from './AddNFTConfirmation';

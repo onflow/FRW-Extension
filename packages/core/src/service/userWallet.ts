@@ -5,18 +5,18 @@ import * as ethUtil from 'ethereumjs-util';
 import { getApp } from 'firebase/app';
 import { getAuth, signInAnonymously } from 'firebase/auth/web-extension';
 
-import { DEFAULT_WEIGHT, FLOW_BIP44_PATH } from '@/shared/constant/algo-constants';
+import { DEFAULT_WEIGHT, FLOW_BIP44_PATH } from '@onflow/flow-wallet-shared/constant/algo-constants';
 import {
   combinePubPkString,
   type PublicPrivateKeyTuple,
   tupleToPrivateKey,
-} from '@/shared/types/key-types';
+} from '@onflow/flow-wallet-shared/types/key-types';
 import {
   type AccountKeyRequest,
   type DeviceInfoRequest,
   type FlowNetwork,
   networkToChainId,
-} from '@/shared/types/network-types';
+} from '@onflow/flow-wallet-shared/types/network-types';
 import {
   type ActiveAccountType,
   type ChildAccountMap,
@@ -28,13 +28,13 @@ import {
   type PublicKeyAccount,
   type WalletAccount,
   type WalletAddress,
-} from '@/shared/types/wallet-types';
+} from '@onflow/flow-wallet-shared/types/wallet-types';
 import {
   ensureEvmAddressPrefix,
   isValidEthereumAddress,
   isValidFlowAddress,
   withPrefix,
-} from '@/shared/utils/address';
+} from '@onflow/flow-wallet-shared/utils/address';
 import {
   accountBalanceKey,
   accountBalanceRefreshRegex,
@@ -49,19 +49,19 @@ import {
   placeholderAccountsRefreshRegex,
   userMetadataKey,
   type UserMetadataStore,
-} from '@/shared/utils/cache-data-keys';
-import { consoleError, consoleWarn } from '@/shared/utils/console-log';
-import { getEmojiByIndex } from '@/shared/utils/emoji-util';
-import { retryOperation } from '@/shared/utils/retryOperation';
-import storage from '@/shared/utils/storage';
-import { removeUserData, setUserData } from '@/shared/utils/user-data-access';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { consoleError, consoleWarn } from '@onflow/flow-wallet-shared/utils/console-log';
+import { getEmojiByIndex } from '@onflow/flow-wallet-shared/utils/emoji-util';
+import { retryOperation } from '@onflow/flow-wallet-shared/utils/retryOperation';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
+import { removeUserData, setUserData } from '@onflow/flow-wallet-shared/utils/user-data-access';
 import {
   activeAccountsKey,
   type ActiveAccountsStore,
   getActiveAccountsData,
   userWalletsKey,
   type UserWalletStore,
-} from '@/shared/utils/user-data-keys';
+} from '@onflow/flow-wallet-shared/utils/user-data-keys';
 
 import { defaultAccountKey, pubKeyAccountToAccountKey } from '../utils/account-key';
 import {

@@ -1,5 +1,5 @@
-import { consoleError } from '@/shared/utils/console-log';
-import storage from '@/shared/utils/storage';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 import { setCachedData } from './data-cache';
 

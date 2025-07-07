@@ -3,19 +3,19 @@ import BN from 'bignumber.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type TransactionState } from '@/shared/types/transaction-types';
-import { isValidAddress, isValidEthereumAddress } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
+import { type TransactionState } from '@onflow/flow-wallet-shared/types/transaction-types';
+import { isValidAddress, isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { LLHeader } from '@/ui/components';
 import CancelIcon from '@/ui/components/iconfont/IconClose';
 import { ContactCard } from '@/ui/components/Send/ContactCard';
 import SlideRelative from '@/ui/components/SlideRelative';
 import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
 import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
-import { useCurrency } from '@/ui/hooks/preference-hooks';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useContact } from '@/ui/hooks/useContactHook';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import { useCurrency } from '@onflow/flow-wallet-hooks/preference-hooks';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useContact } from '@onflow/flow-wallet-hooks/useContactHook';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
 
 import TransferAmount from './TransferAmount';
 import TransferConfirmation from './TransferConfirmation';

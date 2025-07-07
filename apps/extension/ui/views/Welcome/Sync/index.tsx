@@ -10,14 +10,14 @@ import { useNavigate } from 'react-router';
 import {
   HASH_ALGO_NUM_SHA2_256,
   SIGN_ALGO_NUM_ECDSA_secp256k1,
-} from '@/shared/constant/algo-constants';
-import { isValidFlowAddress, withPrefix } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
-import { FCLWalletConnectMethod, type FCLWalletConnectSyncAccountInfo } from '@/shared/utils/type';
+} from '@onflow/flow-wallet-shared/constant/algo-constants';
+import { isValidFlowAddress, withPrefix } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { FCLWalletConnectMethod, type FCLWalletConnectSyncAccountInfo } from '@onflow/flow-wallet-shared/utils/type';
 import AllSet from '@/ui/components/LandingPages/AllSet';
 import LandingComponents from '@/ui/components/LandingPages/LandingComponents';
 import SetPassword from '@/ui/components/LandingPages/SetPassword';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 import SyncQr from './SyncQr';
 

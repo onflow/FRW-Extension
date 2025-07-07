@@ -9,9 +9,9 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-import { consoleError } from '@/shared/utils/console-log';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import networkLink from '@/ui/assets/svg/networkLink.svg';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { networkColor } from '@/ui/style/color';
 
 const bgColor = (network: string) => {

@@ -10,14 +10,14 @@ import {
   FLOW_BIP44_PATH,
   SIGN_ALGO_NUM_ECDSA_P256,
   SIGN_ALGO_NUM_ECDSA_secp256k1,
-} from '@/shared/constant/algo-constants';
+} from '@onflow/flow-wallet-shared/constant/algo-constants';
 import {
   combinePubPkTuple,
   type PrivateKeyTuple,
   type PublicKeyTuple,
   type PublicPrivateKey,
   type PublicPrivateKeyTuple,
-} from '@/shared/types/key-types';
+} from '@onflow/flow-wallet-shared/types/key-types';
 import {
   CURRENT_ID_KEY,
   KEYRING_DEEP_VAULT_KEY,
@@ -32,11 +32,11 @@ import {
   type KeyringState,
   type VaultEntryV2,
   type VaultEntryV3,
-} from '@/shared/types/keyring-types';
-import { type LoggedInAccount } from '@/shared/types/wallet-types';
-import { consoleError, consoleInfo, consoleWarn } from '@/shared/utils/console-log';
-import { returnCurrentProfileId } from '@/shared/utils/current-id';
-import storage from '@/shared/utils/storage';
+} from '@onflow/flow-wallet-shared/types/keyring-types';
+import { type LoggedInAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { consoleError, consoleInfo, consoleWarn } from '@onflow/flow-wallet-shared/utils/console-log';
+import { returnCurrentProfileId } from '@onflow/flow-wallet-shared/utils/current-id';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 import { normalizeAddress } from '../../utils';
 import { defaultAccountKey, pubKeyAccountToAccountKey } from '../../utils/account-key';

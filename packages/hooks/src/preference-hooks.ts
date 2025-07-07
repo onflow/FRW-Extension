@@ -1,10 +1,10 @@
-import { DEFAULT_CURRENCY } from '@/shared/types/wallet-types';
+import { DEFAULT_CURRENCY } from '@onflow/flow-wallet-shared/types/wallet-types';
 import {
   type SupportedCurrenciesStore,
   supportedCurrenciesKey,
-} from '@/shared/utils/cache-data-keys';
-import { setUserData, getUserData } from '@/shared/utils/user-data-access';
-import { preferencesKey, type PreferencesStore } from '@/shared/utils/user-data-keys';
+} from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { setUserData, getUserData } from '@onflow/flow-wallet-shared/utils/user-data-access';
+import { preferencesKey, type PreferencesStore } from '@onflow/flow-wallet-shared/utils/user-data-keys';
 
 import { useCachedData, useUserData } from './use-data';
 

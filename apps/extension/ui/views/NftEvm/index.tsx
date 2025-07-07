@@ -1,8 +1,8 @@
 import { Box, Button } from '@mui/material';
 import React, { useRef, useState } from 'react';
 
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 import ListTab from './ListTab';
 

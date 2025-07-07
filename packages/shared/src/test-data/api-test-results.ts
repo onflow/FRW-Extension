@@ -1,4 +1,4 @@
-import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from '@/shared/constant/domain-constants';
+import { INITIAL_OPENAPI_URL, WEB_NEXT_URL } from '../constant/domain-constants';
 
 export type FetchDetail = {
   url: string;

@@ -1,4 +1,4 @@
-import storage from '@/shared/utils/storage';
+import storage from '../utils/storage';
 
 export type VaultEntryV2 = {
   id: string;

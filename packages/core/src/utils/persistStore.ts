@@ -1,4 +1,4 @@
-import storage from '@/shared/utils/storage';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 
 const persistStorage = (name: string, obj: object) => {
   storage.set(name, obj);

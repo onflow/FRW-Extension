@@ -6,11 +6,11 @@ import { isAddress } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { useForm, type FieldValues } from 'react-hook-form';
 
-import type { Contact } from '@/shared/types/network-types';
-import { withPrefix } from '@/shared/utils/address';
-import { consoleError } from '@/shared/utils/console-log';
+import type { Contact } from '@onflow/flow-wallet-shared/types/network-types';
+import { withPrefix } from '@onflow/flow-wallet-shared/utils/address';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { LLFormHelperText, LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const StyledInput = styled(InputBase)(({ theme }) => ({
   zIndex: 1,

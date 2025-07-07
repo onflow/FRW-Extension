@@ -17,11 +17,11 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React from 'react';
 
-import { formatString } from '@/shared/utils/address';
+import { formatString } from '@onflow/flow-wallet-shared/utils/address';
 import activity from '@/ui/assets/svg/activity.svg';
 import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
-import { useTransferList } from '@/ui/hooks/useTransferListHook';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
+import { useTransferList } from '@onflow/flow-wallet-hooks/useTransferListHook';
 
 dayjs.extend(relativeTime);
 

@@ -2,8 +2,8 @@ import { Box, Skeleton, Typography } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 import theme from '@/ui/style/LLTheme';
 import { formatAddress, isEmoji } from '@/ui/utils';
 

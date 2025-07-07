@@ -1,5 +1,5 @@
 // Mock for preference-hooks that doesn't use Chrome APIs
-import { DEFAULT_CURRENCY } from '@/shared/types/wallet-types';
+import { DEFAULT_CURRENCY } from '@onflow/flow-wallet-shared/types/wallet-types';
 
 export const useCurrency = () => {
   return DEFAULT_CURRENCY;

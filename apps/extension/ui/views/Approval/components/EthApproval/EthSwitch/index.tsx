@@ -3,13 +3,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@/shared/types/network-types';
+import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
 import Link from '@/ui/assets/svg/link.svg';
 import mainnetsvg from '@/ui/assets/svg/mainnet.svg';
 import testnetsvg from '@/ui/assets/svg/testnet.svg';
 import { LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
-import { useApproval } from '@/ui/hooks/use-approval';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useApproval } from '@onflow/flow-wallet-hooks/use-approval';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { networkColor } from '@/ui/style/color';
 
 interface ConnectProps {

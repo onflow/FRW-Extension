@@ -1,7 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 
-import { consoleLog } from '@/shared/utils/console-log';
+import { consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
 import { EditIcon } from '@/ui/assets/icons/settings/Edit';
 
 import { ProfileItemBase } from '../profile-item-base';

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { BuildIndicator } from '@/ui/components/build-indicator';
 import { NetworkIndicator } from '@/ui/components/NetworkIndicator';
-import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import { useNetwork } from '@onflow/flow-wallet-hooks/useNetworkHook';
 
 import WalletTab from '../Wallet';
 

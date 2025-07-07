@@ -2,11 +2,11 @@ import {
   type CustomFungibleTokenInfo,
   type EvmCustomTokenInfo,
   type FungibleTokenInfo,
-} from '@/shared/types/coin-types';
-import { MAINNET_CHAIN_ID } from '@/shared/types/network-types';
-import { tokenListKey, tokenListRefreshRegex } from '@/shared/utils/cache-data-keys';
-import { setUserData } from '@/shared/utils/user-data-access';
-import { evmCustomTokenKey, getEvmCustomTokenData } from '@/shared/utils/user-data-keys';
+} from '@onflow/flow-wallet-shared/types/coin-types';
+import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
+import { tokenListKey, tokenListRefreshRegex } from '@onflow/flow-wallet-shared/utils/cache-data-keys';
+import { setUserData } from '@onflow/flow-wallet-shared/utils/user-data-access';
+import { evmCustomTokenKey, getEvmCustomTokenData } from '@onflow/flow-wallet-shared/utils/user-data-keys';
 
 import { getValidData, registerRefreshListener, setCachedData } from '../utils/data-cache';
 

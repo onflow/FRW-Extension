@@ -11,9 +11,9 @@ import {
 } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import storage from '@/shared/utils/storage';
+import storage from '@onflow/flow-wallet-shared/utils/storage';
 import { LLHeader } from '@/ui/components';
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 
 const DeveloperMode = () => {
   const usewallet = useWallet();

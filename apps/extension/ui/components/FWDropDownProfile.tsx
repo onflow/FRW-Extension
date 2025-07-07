@@ -1,7 +1,7 @@
 import { Avatar, Box, FormControl, MenuItem, Select, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
 import { formatAddress, isEmoji } from '@/ui/utils';
 
 export const FWDropDownProfile = ({

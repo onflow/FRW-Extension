@@ -1,4 +1,4 @@
-import { keyringService, preferenceService } from '@/core/service';
+import { keyringService, preferenceService } from '@onflow/flow-wallet-core/service';
 
 const tabCheckin = ({
   data: {

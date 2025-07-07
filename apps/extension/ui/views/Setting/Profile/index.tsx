@@ -5,13 +5,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { openIndexPage } from '@/background/webapi/tab';
-import { consoleError } from '@/shared/utils/console-log';
-import { getCurrentProfileId } from '@/shared/utils/current-id';
+import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { getCurrentProfileId } from '@onflow/flow-wallet-shared/utils/current-id';
 import { EditIcon } from '@/ui/assets/icons/settings/Edit';
 import RemoveProfileModal from '@/ui/components/PopupModal/remove-profile-modal';
 import ResetModal from '@/ui/components/PopupModal/resetModal';
-import { useWallet } from '@/ui/hooks/use-wallet';
-import { useProfiles } from '@/ui/hooks/useProfileHook';
+import { useWallet } from '@onflow/flow-wallet-hooks/use-wallet';
+import { useProfiles } from '@onflow/flow-wallet-hooks/useProfileHook';
 
 import EditAccount from './EditAccount';
 
