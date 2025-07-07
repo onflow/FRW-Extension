@@ -1,0 +1,28 @@
+{
+  "name": "@onflow/flow-wallet-hooks",
+  "version": "2.9.0",
+  "description": "React hooks for Flow Reference Wallet",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest --run"
+  },
+  "dependencies": {
+    "@onflow/flow-wallet-shared": "workspace:*",
+    "@onflow/flow-wallet-reducers": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4",
+    "@types/react": "^18.3.23"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  },
+  "keywords": ["flow", "wallet", "react", "hooks"],
+  "author": "",
+  "license": "LGPL-3.0-or-later"
+}

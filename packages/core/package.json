@@ -1,0 +1,23 @@
+{
+  "name": "@onflow/flow-wallet-core",
+  "version": "2.9.0",
+  "description": "Core business logic for Flow Reference Wallet",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest --run"
+  },
+  "dependencies": {
+    "@onflow/flow-wallet-shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "keywords": ["flow", "wallet", "blockchain"],
+  "author": "",
+  "license": "LGPL-3.0-or-later"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@onflow/flow-wallet-shared",
+  "version": "2.9.0",
+  "description": "Shared types and utilities for Flow Reference Wallet",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest --run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "keywords": ["flow", "wallet", "blockchain", "shared"],
+  "author": "",
+  "license": "LGPL-3.0-or-later"
+}
