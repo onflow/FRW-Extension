@@ -13,7 +13,7 @@
     "useUnknownInCatchVariables": false,
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     },
     "lib": ["ES2021.String", "DOM", "DOM.Iterable"],
     "types": ["chrome", "node", "react", "react-dom"],
@@ -30,12 +30,17 @@
   },
   "exclude": ["./node_modules"],
   "include": [
-    "src",
+    "background",
+    "content-script",
+    "ui",
+    "global.d.ts",
+    "modules.ts",
     "__tests__",
     "build",
     "webpack.config.ts",
     "postcss.config.mjs",
     "svgTransform.js",
-    ".storybook/**/*"
+    ".storybook/**/*",
+    "stories"
   ]
 }

@@ -135,7 +135,7 @@ const config = [
     },
   }, // Background-specific config for chrome extension
   {
-    files: ['**/src/background/**/*.{js,jsx,ts,tsx}'],
+    files: ['**/background/**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-restricted-globals': [
         'error',
@@ -181,7 +181,7 @@ const config = [
     },
   }, // Core folder cannot import outside of core without aliases
   {
-    files: ['**/src/core/**/*.{js,jsx,ts,tsx}'],
+    files: ['**/packages/core/src/**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -216,7 +216,7 @@ const config = [
     },
   }, // Restrict imports from core/service
   {
-    files: ['**/src/core/service/*.{js,jsx,ts,tsx}'],
+    files: ['**/packages/core/src/service/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -354,7 +354,7 @@ const config = [
     },
   }, // UI-specific config to block relative imports outside ui folder
   {
-    files: ['**/src/ui/**/*.{js,jsx,ts,tsx}'],
+    files: ['**/ui/**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -379,11 +379,11 @@ const config = [
                 '**/src/background/*',
                 '**/src/background/**',
                 '**/src/shared/*',
-                '**/src/shared/**',
+                '**/packages/shared/src/**',
                 '**/src/content-script/*',
                 '**/src/content-script/**',
                 '**/src/core/*',
-                '**/src/core/**',
+                '**/packages/core/src/**',
               ],
               message: 'Files in UI folder must use aliases for imports outside UI',
             },
@@ -441,7 +441,7 @@ const config = [
   },
   // Shared folder cannot import outside of shared
   {
-    files: ['**/src/shared/**/*.{js,jsx,ts,tsx}'],
+    files: ['**/packages/shared/src/**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',

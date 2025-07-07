@@ -29,7 +29,6 @@
     "test:unit": "vitest",
     "test:unit:coverage": "vitest --coverage",
     "pub": "pnpx tsx build/release.ts",
-    "prepare": "husky",
     "preinstall": "npx only-allow pnpm",
     "analyze:imports": "pnpx tsx build/analyze-imports.ts",
     "analyze:dependencies": "pnpx tsx build/analyze-dependencies.ts",
