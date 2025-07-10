@@ -372,23 +372,28 @@ const accounts = await keyringService.getAccounts();
 The ESLint rules have been simplified to focus on the essential architectural boundaries:
 
 1. **Background folder**:
+
    - Cannot import from `@/ui/*`
    - All other imports allowed
 
 2. **Core folder**:
+
    - Cannot import from `@/ui/*`
    - Can only import `@/background/webapi/*` from background
    - All other imports allowed
 
 3. **Core services**:
+
    - Same as core, plus:
    - Can only import from `@/core/service/*` or `@/core/utils/*` within core
 
 4. **UI folder**:
+
    - Cannot import from `@/core/*` or `@/background/*`
    - All other imports allowed
 
 5. **Reducers package** (`@onflow/flow-wallet-reducers`):
+
    - Can only import from `@onflow/flow-wallet-shared/*`
    - Must remain pure (no imports from other layers or packages)
 
