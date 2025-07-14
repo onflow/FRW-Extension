@@ -38,7 +38,7 @@ interface MenuDrawerProps {
   walletList: MainAccount[];
   activeAccount: WalletAccount;
   activeParentAccount: MainAccount;
-  network: string;
+  network?: string;
   modeOn: boolean;
   mainAddressLoading: boolean;
   noAddress?: boolean;
@@ -95,6 +95,9 @@ const MenuDrawer = ({
         }
       }, 100);
 
+      if (!network) {
+        throw new Error('Network not yet loaded');
+      }
       await wallet.createNewAccount(network);
     } catch (error) {
       consoleError('Failed to create account:', error);

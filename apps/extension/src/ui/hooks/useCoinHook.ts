@@ -65,6 +65,9 @@ export const useCoins = () => {
   };
 
   const updateTokenFilter = (filter: TokenFilter) => {
+    if (!network) {
+      throw new Error('Network not yet loaded');
+    }
     setTokenFilter(network, currentWallet?.address, filter);
   };
 

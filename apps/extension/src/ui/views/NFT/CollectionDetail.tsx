@@ -1,9 +1,15 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
+import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address';
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
-import { getCachedNftCollection, triggerNftCollectionRefresh } from '@/data-model/cache-data-keys';
+import {
+  getCachedEvmNftCollectionList,
+  getCachedNftCollection,
+  triggerEvmNftCollectionRefresh,
+  triggerNftCollectionRefresh,
+} from '@/data-model/cache-data-keys';
 import CollectionDetailGrid from '@/ui/components/NFTs/CollectionDetailGrid';
 import GridView from '@/ui/components/NFTs/GridView';
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -48,18 +54,39 @@ const NFTCollectionDetail = () => {
   const collection_name = collection_info[1];
   const nftCount = collection_info[2];
 
+  // Check if the collection is an EVM collection
+  const isEvm = useMemo(() => isValidEthereumAddress(address), [address]);
+
   const getCollection = useCallback(
     async (ownerAddress: string, collection: string, offset: number | string = 0) => {
+      if (!network) {
+        return undefined;
+      }
+      if (isEvm) {
+        return await getCachedEvmNftCollectionList(
+          network,
+          ownerAddress,
+          collection,
+          offset as number
+        );
+      }
       return await getCachedNftCollection(network, ownerAddress, collection, offset as number);
     },
-    [network]
+    [network, isEvm]
   );
 
   const refreshCollection = useCallback(
     async (ownerAddress: string, collection: string, offset: number | string = 0) => {
-      triggerNftCollectionRefresh(network, ownerAddress, collection, offset as number);
+      if (!network) {
+        return;
+      }
+      if (isEvm) {
+        triggerEvmNftCollectionRefresh(network, ownerAddress, collection, offset as number);
+      } else {
+        triggerNftCollectionRefresh(network, ownerAddress, collection, offset as number);
+      }
     },
-    [network]
+    [network, isEvm]
   );
 
   const {

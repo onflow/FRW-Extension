@@ -102,6 +102,9 @@ const EthSuggest = (data) => {
     }
     try {
       setLoading(true);
+      if (!network) {
+        throw new Error('Network not yet loaded');
+      }
       await usewallet.addCustomEvmToken(network, coinInfo);
       refreshEvmToken(network);
       setLoading(false);

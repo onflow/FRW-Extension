@@ -10,7 +10,6 @@ import { useProfiles } from '@/ui/hooks/useProfileHook';
 
 import CoinList from '../CoinList';
 import NFTTab from '../NFT';
-import NftEvm from '../NftEvm';
 import TransferList from '../TransferList';
 
 const TabPanel = ({
@@ -186,7 +185,7 @@ const WalletTab = ({ network }) => {
           />
         </TabPanel>
         <TabPanel value={currentTab} index={1}>
-          {activeAccountType === 'evm' ? <NftEvm /> : <NFTTab />}
+          <NFTTab />
         </TabPanel>
         <TabPanel value={currentTab} index={2}>
           <TransferList />

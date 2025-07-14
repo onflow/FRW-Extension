@@ -4,7 +4,10 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import { triggerRefresh } from '@/data-model/cache-data-access';
-import { evmNftCollectionListKey } from '@/data-model/cache-data-keys';
+import {
+  evmNftCollectionListKey,
+  getCachedEvmNftCollectionList,
+} from '@/data-model/cache-data-keys';
 import CollectionDetailGrid from '@/ui/components/NFTs/CollectionDetailGrid';
 import GridView from '@/ui/components/NFTs/GridView';
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -73,13 +76,19 @@ const NftEvmCollectionDetail = () => {
   const getEvmCollection = useCallback(
     async (ownerAddress: string, collection: string, offset?: string | number) => {
       // For EVM, the offset can be a JWT token string or undefined for the first call
-      return await usewallet.getEvmNftCollectionList(ownerAddress, collection, 50, offset as any);
+      if (!network) {
+        return undefined;
+      }
+      return await getCachedEvmNftCollectionList(network, address, collection, offset as number);
     },
-    [usewallet]
+    [network, address]
   );
 
   const refreshCollection = useCallback(
     async (ownerAddress, collection, offset) => {
+      if (!network) {
+        return;
+      }
       triggerRefresh(evmNftCollectionListKey(network, ownerAddress, collection, `${offset}`));
     },
     [network]

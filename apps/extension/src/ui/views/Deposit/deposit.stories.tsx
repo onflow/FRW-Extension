@@ -3,6 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { withRouter } from 'storybook-addon-remix-react-router';
 
+import { type FlowNetwork } from '@onflow/flow-wallet-shared/types';
 import { type ActiveAccountType } from '@onflow/flow-wallet-shared/types/wallet-types';
 
 import { useNetwork as importedMockUseNetwork } from '@/ui/hooks/useNetworkHook.mock';
@@ -29,7 +30,7 @@ export default {
       if (address && network && activeAccountType) {
         importedMockUseNetwork.mockImplementation(() => {
           return {
-            network: network,
+            network: network as FlowNetwork,
             developerMode: false,
             emulatorModeOn: false,
           };
@@ -41,7 +42,7 @@ export default {
             address: address,
           },
           activeAccountType: activeAccountType as ActiveAccountType,
-          network: network,
+          network: network as FlowNetwork,
         });
       }
       return (

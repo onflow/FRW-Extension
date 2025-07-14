@@ -88,7 +88,7 @@ const flowContext = flow
       },
       mapMethod,
     } = ctx;
-    consoleLog('flow - use #3 - check approval', mapMethod, origin, name, icon);
+    consoleLog('flow - use #3 - check approval', mapMethod, origin, name, icon, params);
 
     const [approvalType, condition, { height = 599 } = {}] =
       Reflect.getMetadata('APPROVAL', providerController, mapMethod) || [];

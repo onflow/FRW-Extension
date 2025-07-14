@@ -1,4 +1,4 @@
-type NFTCollection = {
+type EvmNFTCollection = {
   id: string;
   address: string;
   contractName: string;
@@ -11,8 +11,8 @@ type NFTCollection = {
   flowIdentifier: string;
 };
 
-export type EvmNFTIds = {
-  collection: NFTCollection;
+export type EvmCollectionNFTList = {
+  collection: EvmNFTCollection;
   ids: string[];
   count: number;
 };
@@ -33,10 +33,10 @@ type EvmNFTItem = {
   };
 };
 
-export type EvmNFTCollectionList = {
+export type EvmCollectionNftItemList = {
   nfts: EvmNFTItem[];
   nftCount: number;
-  collection: NFTCollection;
+  collection: EvmNFTCollection;
 };
 
 //Cadence NFT types

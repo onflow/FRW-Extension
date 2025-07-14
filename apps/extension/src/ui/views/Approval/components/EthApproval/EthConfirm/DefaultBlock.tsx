@@ -36,11 +36,13 @@ export const DefaultBlock = ({ title, host, data, logo }) => {
 
     // Check for valid UTF-8 encoding
     const decoder = new TextDecoder('utf-8', { fatal: true });
+    let decodedText = '';
     try {
-      return decoder.decode(bytes);
+      decodedText = decoder.decode(bytes);
     } catch (e) {
       return hexString;
     }
+    return decodedText;
   };
 
   const processItem = (item) => {

@@ -119,6 +119,9 @@ const TokenDetail = () => {
 
   // Handle the delete EFT button to remove an EVM Custom Token
   const handleDeleteEFT = async () => {
+    if (!network) {
+      throw new Error('Network is required');
+    }
     if (!tokenInfo?.address) {
       throw new Error('Token address is required');
     }
@@ -266,7 +269,7 @@ const TokenDetail = () => {
         {priceProviders?.length > 0 && <PriceCard token={token} />}
 
         {token === 'flow' && activeAccountType === 'main' && (
-          <StorageUsageCard network={network} address={currentWallet.address} />
+          <StorageUsageCard network={network || ''} address={currentWallet.address} />
         )}
         {tokenInfo && <SecurityCard tokenInfo={tokenInfo} />}
         {isOnRamp && (

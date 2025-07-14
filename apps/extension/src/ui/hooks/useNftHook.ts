@@ -4,7 +4,11 @@ import {
   type NftCollection,
   type NFTModelV2,
 } from '@onflow/flow-wallet-shared/types/network-types';
-import { type CollectionNftList, type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
+import {
+  type EvmCollectionNFTList,
+  type CollectionNftList,
+  type NFTItem,
+} from '@onflow/flow-wallet-shared/types/nft-types';
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import {
@@ -12,8 +16,7 @@ import {
   type ChildAccountNFTsStore,
   evmNftCollectionListKey,
   type EvmNftCollectionListStore,
-  evmNftIdsKey,
-  type EvmNftIdsStore,
+  evmNftCollectionsIdsKey,
   nftCatalogCollectionsKey,
   nftCollectionKey,
   nftCollectionListKey,
@@ -28,11 +31,7 @@ interface UseNftHookProps {
     collection: string,
     offset?: number | string
   ) => Promise<any>;
-  refreshCollection?: (
-    ownerAddress: string,
-    collection: string,
-    offset?: number | string
-  ) => Promise<any>;
+  refreshCollection?: (ownerAddress: string, collection: string, offset?: number) => Promise<void>;
   ownerAddress: string;
   collectionName: string;
   isEvm: boolean;
@@ -172,6 +171,9 @@ export const useNftHook = ({
 
     try {
       const initialRes = await getCollection(ownerAddress, collectionName);
+      if (!initialRes) {
+        return;
+      }
       setInfo(initialRes.collection);
       total.current = nftCount || initialRes.nftCount;
 
@@ -300,6 +302,7 @@ export const useSingleCollection = (
   return collection;
 };
 
+// Cadence collection IDs (NFT Catalog)
 export const useNftCatalogCollections = (network?: string, address?: string) => {
   const collections = useCachedData<CollectionNftList[]>(
     network && address ? nftCatalogCollectionsKey(network, address) : null
@@ -308,9 +311,10 @@ export const useNftCatalogCollections = (network?: string, address?: string) => 
   return collections;
 };
 
-export const useEvmNftIds = (network?: string, address?: string) => {
-  const evmNftIds = useCachedData<EvmNftIdsStore>(
-    network && address ? evmNftIdsKey(network, address) : null
+// EVM collection IDs
+export const useEvmNftCollectionIds = (network?: string, address?: string) => {
+  const evmNftIds = useCachedData<EvmCollectionNFTList[]>(
+    network && address ? evmNftCollectionsIdsKey(network, address) : null
   );
   return evmNftIds;
 };

@@ -19,8 +19,8 @@ import {
   type UserInfoResponse,
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
-  type EvmNFTCollectionList,
-  type EvmNFTIds,
+  type EvmCollectionNftItemList,
+  type EvmCollectionNFTList,
   type NFTCollectionData,
   type CollectionNftList,
 } from '@onflow/flow-wallet-shared/types/nft-types';
@@ -262,11 +262,11 @@ export const getCachedChildAccountNfts = async (network: string, parentAddress: 
 };
 
 // EVM NFTs
-export const evmNftIdsKey = (network: string, address: string) =>
+export const evmNftCollectionsIdsKey = (network: string, address: string) =>
   `evm-nft-collection-ids-${network}-${address}`;
 
-export const evmNftIdsRefreshRegex = refreshKey(evmNftIdsKey);
-export type EvmNftIdsStore = EvmNFTIds[];
+export const evmNftCollectionIdsRefreshRegex = refreshKey(evmNftCollectionsIdsKey);
+export type EvmCollectionNftIdsStore = EvmCollectionNFTList[];
 
 export const evmNftCollectionListKey = (
   network: string,
@@ -276,7 +276,7 @@ export const evmNftCollectionListKey = (
 ) => `evm-nft-collection-list-${network}-${address}-${collectionIdentifier}-${offset}`;
 
 export const evmNftCollectionListRefreshRegex = refreshKey(evmNftCollectionListKey);
-export type EvmNftCollectionListStore = EvmNFTCollectionList[];
+export type EvmNftCollectionListStore = EvmCollectionNftItemList[];
 
 export const getCachedEvmNftCollectionList = async (
   network: string,
@@ -287,6 +287,15 @@ export const getCachedEvmNftCollectionList = async (
   return getCachedData<EvmNftCollectionListStore>(
     evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`)
   );
+};
+
+export const triggerEvmNftCollectionRefresh = (
+  network: string,
+  address: string,
+  collectionIdentifier: string,
+  offset: number
+) => {
+  triggerRefresh(evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`));
 };
 /**
  * Fungible Token information

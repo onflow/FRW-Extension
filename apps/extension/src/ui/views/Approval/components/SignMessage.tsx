@@ -184,7 +184,7 @@ const SignMessage = ({ params: { icon, origin, tabId, type } }: ConnectProps) =>
 
   return (
     <>
-      {showSwitch ? (
+      {showSwitch && currentNetwork ? (
         <ShowSwitch
           currentNetwork={currentNetwork}
           msgNetwork={msgNetwork}

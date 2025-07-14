@@ -5,7 +5,7 @@ import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
 import { useWallet } from '@/ui/hooks/use-wallet';
 
 interface DashboardSummaryProps {
-  network: string;
+  network?: string;
   balance?: string;
   currencyCode?: string;
   currencySymbol?: string;
@@ -30,6 +30,9 @@ export const DashboardTotal: React.FC<DashboardSummaryProps> = ({
     addressCreationInProgress === undefined;
 
   const handleAddAddress = () => {
+    if (!network) {
+      throw new Error('Network not yet loaded');
+    }
     wallet.createNewAccount(network);
   };
   return (

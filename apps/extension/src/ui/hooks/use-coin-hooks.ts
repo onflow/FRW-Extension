@@ -54,7 +54,7 @@ export const useChildAccountFt = (
   );
 };
 
-export const useAllTokenInfo = (network: string, chainType: string) => {
+export const useAllTokenInfo = (network: string | undefined | null, chainType: string) => {
   return useCachedData<CustomFungibleTokenInfo[]>(
     network && chainType ? tokenListKey(network, chainType) : null
   );
@@ -64,6 +64,6 @@ export const refreshEvmToken = (network: string) => {
   return triggerRefresh(tokenListKey(network, 'evm'));
 };
 
-export const useEvmCustomTokens = (network: string) => {
-  return useUserData<EvmCustomTokenInfo[]>(evmCustomTokenKey(network));
+export const useEvmCustomTokens = (network: string | undefined | null) => {
+  return useUserData<EvmCustomTokenInfo[]>(network && evmCustomTokenKey(network));
 };

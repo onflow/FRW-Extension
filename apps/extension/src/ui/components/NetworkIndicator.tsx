@@ -4,10 +4,10 @@ export const NetworkIndicator = ({
   network,
   emulatorMode,
 }: {
-  network: string;
+  network?: string;
   emulatorMode: boolean;
 }) => {
-  if (network !== 'testnet' && !emulatorMode) {
+  if (!network || (network !== 'testnet' && !emulatorMode)) {
     // Don't show anything
     return null;
   }

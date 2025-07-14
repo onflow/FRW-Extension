@@ -30,6 +30,12 @@ export type UserWalletStore = {
 export const getUserWalletsData = async (): Promise<UserWalletStore | undefined> => {
   return await getUserData<UserWalletStore>(userWalletsKey);
 };
+
+export const developerModeKey = 'developerMode';
+export const getDeveloperModeData = async (): Promise<boolean | undefined> => {
+  return await getUserData<boolean>(developerModeKey);
+};
+
 // Profile Current Account - the user selected account on a given network
 export const activeAccountsKey = (network: string, publicKey: string) =>
   `active-accounts-${network}-${publicKey}`;

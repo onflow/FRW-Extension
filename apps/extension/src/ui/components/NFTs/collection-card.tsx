@@ -16,7 +16,7 @@ export const CollectionCard = ({
   isAccessible,
 }: {
   name: string;
-  logo: string;
+  logo?: string | null;
   count: number;
   index: number;
   contractName: string;

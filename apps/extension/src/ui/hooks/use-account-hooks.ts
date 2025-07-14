@@ -28,6 +28,7 @@ import {
 import {
   activeAccountsKey,
   type ActiveAccountsStore,
+  developerModeKey,
   userWalletsKey,
   type UserWalletStore,
 } from '@/data-model/user-data-keys';
@@ -130,6 +131,10 @@ export const useActiveAccountType = (
 
 export const useUserWallets = () => {
   return useUserData<UserWalletStore>(userWalletsKey);
+};
+
+export const useDeveloperMode = () => {
+  return useUserData<boolean>(developerModeKey) || false;
 };
 
 export const useCurrentId = () => {

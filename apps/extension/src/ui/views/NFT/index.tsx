@@ -2,14 +2,17 @@ import { Box, Button } from '@mui/material';
 import React, { useCallback } from 'react';
 import { Link } from 'react-router';
 
-import { type CollectionNftList } from '@onflow/flow-wallet-shared/types/nft-types';
+import {
+  type CollectionNftList,
+  type EvmCollectionNFTList,
+} from '@onflow/flow-wallet-shared/types/nft-types';
 
 import { refreshNftCatalogCollections } from '@/data-model/cache-data-keys';
 import { CollectionCard } from '@/ui/components/NFTs/collection-card';
 import EmptyStatus from '@/ui/components/NFTs/EmptyStatus';
 import ListSkeleton from '@/ui/components/NFTs/ListSkeleton';
 import { useChildAccountAllowTypes } from '@/ui/hooks/use-account-hooks';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
+import { useEvmNftCollectionIds, useNftCatalogCollections } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 
 const extractContractAddress = (collection) => {
@@ -17,7 +20,7 @@ const extractContractAddress = (collection) => {
 };
 
 const checkContractAddressInCollections = (
-  collectionNftList: CollectionNftList,
+  collectionNftList: EvmCollectionNFTList | CollectionNftList,
   activeCollectionIds?: string[]
 ) => {
   const contractAddressWithout0x = collectionNftList.collection.contract_name;
@@ -37,14 +40,28 @@ const NFTTab = () => {
     activeAccountType === 'child' ? currentWallet.address : undefined
   );
 
-  // Get the list of NFT Collections for the current wallet
-  const nftCollectionsList = useNftCatalogCollections(network, currentWallet.address);
-  const collectionLoading = nftCollectionsList === undefined;
+  // Get the list of NFT Collections for the current wallet (Cadence)
+  const nftCollectionsList = useNftCatalogCollections(
+    network,
+    activeAccountType === 'evm' ? undefined : currentWallet.address
+  );
+
+  // Get the list of NFT Collections for the current wallet (EVM)
+  const evmNftCollectionList = useEvmNftCollectionIds(
+    network,
+    activeAccountType === 'evm' ? currentWallet.address : undefined
+  );
+
+  const collectionList = nftCollectionsList || evmNftCollectionList;
+  const collectionLoading = collectionList === undefined;
 
   const isCollectionEmpty = nftCollectionsList?.length === 0;
   const ownerAddress = currentWallet.address;
 
   const handleEvmRefresh = useCallback(() => {
+    if (!network) {
+      throw new Error('Network not yet loaded');
+    }
     refreshNftCatalogCollections(network, currentWallet.address);
   }, [network, currentWallet.address]);
 
@@ -56,21 +73,24 @@ const NFTTab = () => {
         ) : isCollectionEmpty ? (
           <EmptyStatus />
         ) : (
-          nftCollectionsList.map((collectionNftList, index) => (
-            <CollectionCard
-              key={collectionNftList.collection.id}
-              name={collectionNftList.collection.name}
-              logo={collectionNftList.collection.logo}
-              count={collectionNftList.count}
-              index={index}
-              contractName={collectionNftList.collection.id}
-              ownerAddress={ownerAddress}
-              isAccessible={
-                activeAccountType !== 'child' ||
-                checkContractAddressInCollections(collectionNftList, activeCollections)
-              }
-            />
-          ))
+          collectionList?.map(
+            (collectionNftList: EvmCollectionNFTList | CollectionNftList, index: number) => (
+              <CollectionCard
+                key={collectionNftList.collection.id}
+                name={collectionNftList.collection.name}
+                logo={collectionNftList.collection.logo || undefined}
+                count={collectionNftList.count}
+                index={index}
+                contractName={collectionNftList.collection.id}
+                ownerAddress={ownerAddress}
+                isAccessible={
+                  activeAccountType === 'child'
+                    ? checkContractAddressInCollections(collectionNftList, activeCollections)
+                    : true // otherwise if Evm or Main, all collections are accessible
+                }
+              />
+            )
+          )
         )}
       </Box>
       {/* Add Collection button for Cadence accounts */}

@@ -17,7 +17,13 @@ export const SWAP_LINK_EVM_MAINNET =
 export const SWAP_LINK_EVM_TESTNET =
   process.env.SWAP_LINK_EVM_TESTNET || 'https://swap.kittypunch.xyz/swap';
 
-export const getSwapLink = (network: string, accountType: ActiveAccountType): string => {
+export const getSwapLink = (
+  network: string | undefined | null,
+  accountType: ActiveAccountType
+): string => {
+  if (!network) {
+    return '';
+  }
   if (accountType === 'evm') {
     return network === 'mainnet' ? SWAP_LINK_EVM_MAINNET : SWAP_LINK_EVM_TESTNET;
   }

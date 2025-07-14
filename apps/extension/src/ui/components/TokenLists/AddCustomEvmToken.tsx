@@ -134,6 +134,9 @@ const AddCustomEvmToken = () => {
     }
     try {
       setLoading(true);
+      if (!network) {
+        throw new Error('Network not yet loaded');
+      }
       await usewallet.addCustomEvmToken(network, fungibleTokenInfo);
       refreshEvmToken(network);
     } catch (error) {

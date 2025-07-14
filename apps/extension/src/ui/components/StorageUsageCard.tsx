@@ -27,7 +27,7 @@ const determineUnit = (used: number) => {
 };
 
 export const StorageUsageCard: React.FC<{
-  network: string;
+  network?: string;
   address: string;
   backgroundColor?: string;
 }> = ({ network, address, backgroundColor = COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A }) => {

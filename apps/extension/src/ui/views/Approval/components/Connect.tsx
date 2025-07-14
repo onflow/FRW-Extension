@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { MAINNET_CHAIN_ID, TESTNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
 
 // TODO: TB - move all this to the background
-// eslint-disable-next-line no-restricted-imports
+
 import {
   authnServiceDefinition,
   serviceDefinition,
@@ -371,7 +371,7 @@ const Connect = ({ params: { /*icon, origin,*/ tabId } }: ConnectProps) => {
 
   return (
     <>
-      {showSwitch ? (
+      {showSwitch && currentNetwork ? (
         <ShowSwitch
           currentNetwork={currentNetwork}
           msgNetwork={msgNetwork}

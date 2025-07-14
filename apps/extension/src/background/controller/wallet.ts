@@ -142,8 +142,8 @@ import {
   coinListKey,
   evmNftCollectionListKey,
   type EvmNftCollectionListStore,
-  evmNftIdsKey,
-  type EvmNftIdsStore,
+  evmNftCollectionsIdsKey,
+  type EvmCollectionNftIdsStore,
   getCachedNftCollection,
   getCachedScripts,
   mainAccountsKey,
@@ -3534,7 +3534,9 @@ export class WalletController extends BaseController {
       throw new Error('Invalid Ethereum address');
     }
     const network = await this.getNetwork();
-    const cacheData = await getValidData<EvmNftIdsStore>(evmNftIdsKey(network, address));
+    const cacheData = await getValidData<EvmCollectionNftIdsStore>(
+      evmNftCollectionsIdsKey(network, address)
+    );
     if (cacheData) {
       return cacheData;
     }

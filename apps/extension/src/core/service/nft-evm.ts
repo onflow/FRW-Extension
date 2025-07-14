@@ -3,8 +3,8 @@ import { isValidEthereumAddress } from '@onflow/flow-wallet-shared/utils/address
 import {
   evmNftCollectionListKey,
   evmNftCollectionListRefreshRegex,
-  evmNftIdsKey,
-  evmNftIdsRefreshRegex,
+  evmNftCollectionsIdsKey,
+  evmNftCollectionIdsRefreshRegex,
 } from '@/data-model/cache-data-keys';
 
 import { openapiService } from '.';
@@ -14,7 +14,7 @@ import { fclConfirmNetwork } from '../utils/fclConfig';
 class EvmNfts {
   init = async () => {
     registerRefreshListener(evmNftCollectionListRefreshRegex, this.loadEvmCollectionList);
-    registerRefreshListener(evmNftIdsRefreshRegex, this.loadEvmNftIds);
+    registerRefreshListener(evmNftCollectionIdsRefreshRegex, this.loadEvmNftIds);
   };
 
   loadEvmNftIds = async (network: string, address: string) => {
@@ -25,7 +25,7 @@ class EvmNfts {
     }
     const result = await openapiService.EvmNFTID(network, address);
 
-    setCachedData(evmNftIdsKey(network, address), result);
+    setCachedData(evmNftCollectionsIdsKey(network, address), result);
     return result;
   };
 
