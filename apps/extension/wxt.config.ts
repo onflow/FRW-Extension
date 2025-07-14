@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { defineConfig } from 'wxt';
 import react from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
@@ -7,6 +6,7 @@ import wasm from 'vite-plugin-wasm';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import { consoleLog, consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 // Load environment variables
 const mode = process.env.NODE_ENV || 'development';
@@ -125,7 +125,7 @@ export default defineConfig({
   hooks: {
     'build:manifestGenerated': async (wxt, manifest) => {
       // Add any additional manifest modifications here
-      console.log('Manifest generated:', manifest.version);
+      consoleLog('Manifest generated:', manifest.version);
     },
 
     'build:before': async ({ mode }) => {
@@ -172,9 +172,9 @@ export default defineConfig({
           const response = await fetch('http://localhost:8097');
           const devToolsScript = await response.text();
           fs.writeFileSync(path.resolve(publicDir, 'react-devtools.js'), devToolsScript);
-          console.log('React DevTools fetched successfully');
+          consoleLog('React DevTools fetched successfully');
         } catch (e) {
-          console.log('React DevTools not available:', e.message);
+          consoleLog('React DevTools not available:', e.message);
         }
       }
     },
