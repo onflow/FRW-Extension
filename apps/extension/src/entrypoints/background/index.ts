@@ -1,4 +1,4 @@
-import { defineBackground } from 'wxt/browser';
+import { defineBackground } from '#imports';
 import { consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
 
 export default defineBackground({

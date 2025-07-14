@@ -87,7 +87,7 @@ export default defineConfig({
 
     optimizeDeps: {
       exclude: ['@trustwallet/wallet-core'],
-      include: ['dayjs', 'buffer', 'process'],
+      include: ['dayjs', 'buffer', 'process', 'react', 'react-dom', 'react-router'],
     },
 
     define: {
@@ -118,7 +118,7 @@ export default defineConfig({
     },
   }),
 
-  runner: {
+  webExt: {
     startUrls: mode === 'development' ? ['https://localhost:3000'] : undefined,
   },
 
