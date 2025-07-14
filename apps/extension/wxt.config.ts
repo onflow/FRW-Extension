@@ -2,11 +2,11 @@ import { defineConfig } from 'wxt';
 import react from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import inject from '@rollup/plugin-inject';
+import commonjs from '@rollup/plugin-commonjs';
 import wasm from 'vite-plugin-wasm';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { consoleLog, consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 // Load environment variables
 const mode = process.env.NODE_ENV || 'development';
@@ -50,8 +50,15 @@ export default defineConfig({
 
   vite: () => ({
     plugins: [
-      react(),
+      react({
+        jsxRuntime: 'automatic',
+      }),
       wasm(),
+      commonjs({
+        include: [/node_modules/],
+        transformMixedEsModules: true,
+        requireReturnsDefault: 'auto',
+      }),
       nodePolyfills({
         include: ['crypto', 'stream', 'os', 'path', 'url', 'https', 'zlib', 'util', 'vm'],
         globals: {
@@ -73,11 +80,16 @@ export default defineConfig({
         '@onflow/flow-wallet-reducers': path.resolve(__dirname, '../../packages/ui/src/reducers'),
         moment: 'dayjs',
       },
+      dedupe: ['react', 'react-dom'],
     },
 
     build: {
       target: 'esnext',
       sourcemap: mode === 'development' ? 'inline' : false,
+      commonjsOptions: {
+        include: [/node_modules/],
+        transformMixedEsModules: true,
+      },
       rollupOptions: {
         output: {
           format: 'es',
@@ -87,7 +99,19 @@ export default defineConfig({
 
     optimizeDeps: {
       exclude: ['@trustwallet/wallet-core'],
-      include: ['dayjs', 'buffer', 'process', 'react', 'react-dom', 'react-router'],
+      include: [
+        'dayjs',
+        'buffer',
+        'process',
+        'react',
+        'react-dom',
+        'react-router',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+      ],
+      esbuildOptions: {
+        target: 'es2020',
+      },
     },
 
     define: {
@@ -123,12 +147,12 @@ export default defineConfig({
   },
 
   hooks: {
-    'build:manifestGenerated': async (wxt, manifest) => {
+    'build:manifestGenerated': async (_wxt, manifest) => {
       // Add any additional manifest modifications here
-      consoleLog('Manifest generated:', manifest.version);
+      // Log manifest version during build
     },
 
-    'build:before': async ({ mode }) => {
+    'build:before': async (wxt) => {
       // Copy static assets
       const publicDir = path.resolve(__dirname, 'public');
       if (!fs.existsSync(publicDir)) {
@@ -167,14 +191,14 @@ export default defineConfig({
       }
 
       // Handle React DevTools for development
-      if (mode === 'development') {
+      if (wxt.config.mode === 'development') {
         try {
           const response = await fetch('http://localhost:8097');
           const devToolsScript = await response.text();
           fs.writeFileSync(path.resolve(publicDir, 'react-devtools.js'), devToolsScript);
-          consoleLog('React DevTools fetched successfully');
+          // React DevTools fetched successfully
         } catch (e) {
-          consoleLog('React DevTools not available:', e.message);
+          // React DevTools not available
         }
       }
     },

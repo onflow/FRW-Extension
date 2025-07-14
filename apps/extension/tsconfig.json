@@ -37,6 +37,7 @@
     "__tests__",
     "build",
     "webpack.config.ts",
+    "wxt.config.ts",
     "postcss.config.mjs",
     "svgTransform.js",
     ".storybook/**/*"
