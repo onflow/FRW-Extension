@@ -6,10 +6,9 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useStat
 import { useNavigate } from 'react-router';
 
 import placeholder from '@/ui/assets/image/placeholder.png';
+import EmptyStatus from '@/ui/components/NFTs/EmptyStatus';
 import ListSkeleton from '@/ui/components/NFTs/ListSkeleton';
 import { useWallet } from '@/ui/hooks/use-wallet';
-
-import EmptyStatus from '../EmptyStatus';
 
 interface ListTabProps {
   data: any;

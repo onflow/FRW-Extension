@@ -4,7 +4,7 @@ import { withRouter } from 'storybook-addon-remix-react-router';
 
 import emojisJson from '@onflow/flow-wallet-shared/constant/emoji.json';
 import { MAINNET_CHAIN_ID } from '@onflow/flow-wallet-shared/types/network-types';
-import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import { type CollectionNftList } from '@onflow/flow-wallet-shared/types/nft-types';
 import {
   type Emoji,
   type MainAccount,
@@ -156,7 +156,7 @@ const meta: Meta<typeof AccountListing> = {
             if (typeof address === 'string' && mockData.nfts) {
               return [
                 { collection: { name: 'test' }, ids: ['test'], count: mockData.nfts[address] },
-              ] as NFTCollections[];
+              ] as CollectionNftList[];
             }
             return [];
           }

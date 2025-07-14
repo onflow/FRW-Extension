@@ -1,71 +1,80 @@
 import { Box, Button } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Link } from 'react-router';
 
-import { type ActiveAccountType } from '@onflow/flow-wallet-shared/types/wallet-types';
+import { type CollectionNftList } from '@onflow/flow-wallet-shared/types/nft-types';
 
-import { useWallet } from '@/ui/hooks/use-wallet';
+import { refreshNftCatalogCollections } from '@/data-model/cache-data-keys';
+import { CollectionCard } from '@/ui/components/NFTs/collection-card';
+import EmptyStatus from '@/ui/components/NFTs/EmptyStatus';
+import ListSkeleton from '@/ui/components/NFTs/ListSkeleton';
+import { useChildAccountAllowTypes } from '@/ui/hooks/use-account-hooks';
+import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 
-import ListTab from './ListTab';
+const extractContractAddress = (collection) => {
+  return collection.split('.')[2];
+};
+
+const checkContractAddressInCollections = (
+  collectionNftList: CollectionNftList,
+  activeCollectionIds?: string[]
+) => {
+  const contractAddressWithout0x = collectionNftList.collection.contract_name;
+  const isActiveCollect = activeCollectionIds?.some(
+    (collection) => extractContractAddress(collection) === contractAddressWithout0x
+  );
+  return isActiveCollect ?? false;
+};
 
 const NFTTab = () => {
-  const wallet = useWallet();
+  const { currentWallet, parentWallet, activeAccountType, network } = useProfiles();
 
-  const [nftCount, setCount] = useState<number>(0);
-  const [accessible, setAccessible] = useState<any>([]);
-  const [activeCollection, setActiveCollection] = useState<any>([]);
-  const [isActive, setIsActive] = useState(true);
-  const listTabRef = useRef<{ reload: () => void }>(null);
-  const [childType, setChildType] = useState<ActiveAccountType>('main');
-  const [childTypeLoaded, setChildTypeLoaded] = useState<boolean>(false);
+  // This will load the type of assets that the parent can access within the child account if a child account is active
+  const activeCollections = useChildAccountAllowTypes(
+    network,
+    activeAccountType === 'child' ? parentWallet.address : undefined,
+    activeAccountType === 'child' ? currentWallet.address : undefined
+  );
 
-  const { currentWallet, parentWallet, activeAccountType } = useProfiles();
+  // Get the list of NFT Collections for the current wallet
+  const nftCollectionsList = useNftCatalogCollections(network, currentWallet.address);
+  const collectionLoading = nftCollectionsList === undefined;
 
-  const address = currentWallet.address;
+  const isCollectionEmpty = nftCollectionsList?.length === 0;
+  const ownerAddress = currentWallet.address;
 
-  const refreshButtonClicked = () => {
-    listTabRef.current?.reload();
-  };
-  useEffect(() => {
-    const loadNFTs = async () => {
-      const accountType = activeAccountType;
-      setChildTypeLoaded(true);
-      if (accountType === 'child' && address) {
-        setChildType(accountType);
-
-        const parentaddress = parentWallet.address;
-        if (!parentaddress) {
-          throw new Error('Parent address not found');
-        }
-        const childAddress = address;
-        const activec = await wallet.getChildAccountAllowTypes(parentaddress, childAddress);
-        setActiveCollection(activec);
-        const nftResult = await wallet.checkAccessibleNft(parentaddress);
-        if (nftResult) {
-          setAccessible(nftResult);
-        }
-        setIsActive(false);
-      } else {
-        setIsActive(true);
-      }
-      // setAddress(address);
-    };
-    loadNFTs();
-  }, [activeAccountType, address, wallet, parentWallet]);
+  const handleEvmRefresh = useCallback(() => {
+    refreshNftCatalogCollections(network, currentWallet.address);
+  }, [network, currentWallet.address]);
 
   return (
     <div id="scrollableTab">
-      <ListTab
-        setCount={setCount}
-        data={{ ownerAddress: address }}
-        ref={listTabRef}
-        accessible={accessible}
-        isActive={isActive}
-        activeCollection={activeCollection}
-      />
-
-      {childTypeLoaded && childType === 'main' && (
+      <Box padding="0 8px">
+        {collectionLoading ? (
+          <ListSkeleton />
+        ) : isCollectionEmpty ? (
+          <EmptyStatus />
+        ) : (
+          nftCollectionsList.map((collectionNftList, index) => (
+            <CollectionCard
+              key={collectionNftList.collection.id}
+              name={collectionNftList.collection.name}
+              logo={collectionNftList.collection.logo}
+              count={collectionNftList.count}
+              index={index}
+              contractName={collectionNftList.collection.contract_name}
+              ownerAddress={ownerAddress}
+              isAccessible={
+                activeAccountType !== 'child' ||
+                checkContractAddressInCollections(collectionNftList, activeCollections)
+              }
+            />
+          ))
+        )}
+      </Box>
+      {/* Add Collection button for Cadence accounts */}
+      {activeAccountType === 'main' && (
         <Box
           sx={{
             display: 'flex',
@@ -96,6 +105,7 @@ const NFTTab = () => {
           </Button>
         </Box>
       )}
+      {/* Refresh button for evm */}
       {activeAccountType === 'evm' && (
         <Box
           sx={{
@@ -106,7 +116,7 @@ const NFTTab = () => {
           }}
         >
           <Button
-            onClick={refreshButtonClicked}
+            onClick={handleEvmRefresh}
             variant="outlined"
             sx={{
               borderRadius: '20px',

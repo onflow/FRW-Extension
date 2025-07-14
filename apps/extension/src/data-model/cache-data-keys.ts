@@ -22,7 +22,7 @@ import {
   type EvmNFTCollectionList,
   type EvmNFTIds,
   type NFTCollectionData,
-  type NFTCollections,
+  type CollectionNftList,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 import { type NetworkScripts } from '@onflow/flow-wallet-shared/types/script-types';
 import { type TransferItem } from '@onflow/flow-wallet-shared/types/transaction-types';
@@ -210,7 +210,7 @@ export const nftCatalogCollectionsKey = (network: string, address: string) =>
   `nft-catalog-collections-${network}-${address}`;
 
 export const nftCatalogCollectionsRefreshRegex = refreshKey(nftCatalogCollectionsKey);
-export type NftCatalogCollectionsStore = NFTCollections[];
+export type NftCatalogCollectionsStore = CollectionNftList[];
 
 export const getCachedNftCatalogCollections = async (network: string, address: string) => {
   return getCachedData<NftCatalogCollectionsStore>(nftCatalogCollectionsKey(network, address));

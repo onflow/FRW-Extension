@@ -14,7 +14,7 @@ import {
 import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
-import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import { type CollectionNftList } from '@onflow/flow-wallet-shared/types/nft-types';
 
 import { EditIcon } from '@/ui/assets/icons/settings/Edit';
 import { LLHeader, LLSecondaryButton } from '@/ui/components';
@@ -51,9 +51,9 @@ const NftContent = ({
   hideEmpty,
   navigateWithState,
 }: {
-  availableNftCollection: NFTCollections[];
+  availableNftCollection: CollectionNftList[];
   hideEmpty: boolean;
-  navigateWithState: (data: NFTCollections) => void;
+  navigateWithState: (data: CollectionNftList) => void;
 }) => {
   const filteredNftCollection = hideEmpty
     ? availableNftCollection.filter((item) => item.count > 0)
@@ -172,7 +172,7 @@ const LinkedDetail = () => {
   const availableFt = useChildAccountFt(network, parentAddress, childAccountAddress);
   const description = useChildAccountDescription(childAccountAddress || '');
 
-  const availableNftCollection: NFTCollections[] | undefined = useMemo(() => {
+  const availableNftCollection: CollectionNftList[] | undefined = useMemo(() => {
     if (!nftCollectionsList || !childAccountAllowTypes) {
       return undefined;
     }
@@ -246,7 +246,7 @@ const LinkedDetail = () => {
     setHide(!prevEmpty);
   };
 
-  const navigateWithState = (data: NFTCollections) => {
+  const navigateWithState = (data: CollectionNftList) => {
     const state = { nft: data };
     localStorage.setItem('nftLinkedState', JSON.stringify(state));
     const storagePath = data.collection.path.storage_path.split('/')[2];

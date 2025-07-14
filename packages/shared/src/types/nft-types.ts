@@ -67,8 +67,10 @@ type Collection = {
   socials: CollectionSocials;
   nftTypeId: string;
 };
-
-export type NFTCollections = {
+/**
+ * A list of NFTs for a specific collection
+ */
+export type CollectionNftList = {
   collection: Collection;
   ids: string[];
   count: number;

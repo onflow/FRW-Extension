@@ -6,7 +6,7 @@ import {
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
   type NFTCollectionData,
-  type NFTCollections,
+  type CollectionNftList,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 
 import {
@@ -14,6 +14,7 @@ import {
   childAccountAllowTypesRefreshRegex,
   childAccountNftsKey,
   childAccountNFTsRefreshRegex,
+  type ChildAccountNFTsStore,
   nftCatalogCollectionsKey,
   nftCatalogCollectionsRefreshRegex,
   nftCollectionKey,
@@ -38,7 +39,36 @@ class NFT {
     registerRefreshListener(nftListRefreshRegex, this.loadNftList);
   };
 
-  loadChildAccountNFTs = async (network: string, parentAddress: string) => {
+  /**
+   * Gets all accessible NFTs for a specific child account
+   *
+   * The getAccessibleChildAccountNFTs script is a comprehensive NFT discovery and inventory function
+   * that provides a complete view of all NFTs accessible through child accounts.
+   *
+   * Parents get a bird's-eye view of all NFTs they can manage across all child accounts
+   *
+   * @param network - The network to get the NFTs for
+   * @param parentAddress - The address of the parent account
+   * @returns ChildAccountNFTsStore or undefined if the network is switched.
+   *
+   * Returns comprehensive inventory: A nested structure showing all NFTs across all child accounts
+   *
+   * Example:
+   * {
+   *  "0x123": {
+   *    "ExampleNFT.NFT": [1, 2, 3, 5, 8],
+   *    "CryptoKitties.Kitty": [42, 1337]
+   *  },
+   *  "0x456": {
+   *    "FlowToken.NFT": [100, 101, 102],
+   *    "ExampleNFT.NFT": [10, 11]
+   *  }
+   * }
+   */
+  loadChildAccountNFTs = async (
+    network: string,
+    parentAddress: string
+  ): Promise<ChildAccountNFTsStore | undefined> => {
     if (!(await fclConfirmNetwork(network))) {
       // Do nothing if the network is switched
       // Don't update the cache
@@ -56,6 +86,19 @@ class NFT {
     return result;
   };
 
+  /**
+   * Gets all accessible provider types (NFT and FT) for a specific child account
+   * The getChildAccountAllowTypes script is a query function that discovers what types of assets a parent account can access within a specific child account. It returns an array of strings containing the type identifiers of all accessible asset types
+   * What Are "Accessible Provider Types"?
+   * The "accessible provider types" are the specific token/asset types that the parent can withdraw from the child account. These are represented as type identifiers (strings) that identify:
+   * - NFT Collections: Like "ExampleNFT.Collection", "FlowToken.NFT", etc.
+   * - Fungible Token Vaults: Like "FlowToken.Vault", "USDC.Vault", etc.
+   * This script is crucial for determining what assets a parent can access within a child account.
+   * @param network - The network to get the allow types for
+   * @param parentAddress - The address of the parent account
+   * @param childAddress - The address of the child account
+   * @returns The allow types for the child account
+   */
   loadChildAccountAllowTypes = async (
     network: string,
     parentAddress: string,
@@ -78,7 +121,7 @@ class NFT {
   loadNftCatalogCollections = async (
     network: string,
     address: string
-  ): Promise<NFTCollections[]> => {
+  ): Promise<CollectionNftList[]> => {
     if (!(await fclConfirmNetwork(network))) {
       // Do nothing if the network is switched
       // Don't update the cache
@@ -156,8 +199,8 @@ class NFT {
   getNftCatalogCollections = async (
     network: string,
     address: string
-  ): Promise<NFTCollections[] | undefined> => {
-    const collections = await getValidData<NFTCollections[]>(
+  ): Promise<CollectionNftList[] | undefined> => {
+    const collections = await getValidData<CollectionNftList[]>(
       nftCatalogCollectionsKey(network, address)
     );
     if (!collections) {

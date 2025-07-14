@@ -12,7 +12,7 @@ import { consoleError, consoleWarn } from '@onflow/flow-wallet-shared/utils/cons
 
 import { AccountAvatar } from '@/ui/components/account/account-avatar';
 import IconCopy from '@/ui/components/iconfont/IconCopy';
-import NewsView from '@/ui/components/news/NewsView';
+import { NewsView } from '@/ui/components/news/NewsView';
 import StorageExceededAlert from '@/ui/components/StorageExceededAlert';
 import { useNews } from '@/ui/hooks/use-news';
 import { useWallet, useWalletLoaded } from '@/ui/hooks/use-wallet';

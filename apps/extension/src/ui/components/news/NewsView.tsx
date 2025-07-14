@@ -76,5 +76,3 @@ export const NewsView: React.FC = () => {
     </Box>
   );
 };
-
-export default NewsView;

@@ -41,7 +41,7 @@ import {
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
   type NFTCollectionData,
-  type NFTCollections,
+  type CollectionNftList,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 import { type CategoryScripts } from '@onflow/flow-wallet-shared/types/script-types';
 import { type TokenInfo } from '@onflow/flow-wallet-shared/types/token-info';
@@ -3271,7 +3271,9 @@ export class WalletController extends BaseController {
 
   getCollectionCache = async (address: string) => {
     const network = await this.getNetwork();
-    const list = await getValidData<NFTCollections[]>(nftCatalogCollectionsKey(network, address));
+    const list = await getValidData<CollectionNftList[]>(
+      nftCatalogCollectionsKey(network, address)
+    );
     if (!list || list.length === 0) {
       return await this.refreshCollection(address);
     }

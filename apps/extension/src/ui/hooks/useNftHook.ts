@@ -4,7 +4,7 @@ import {
   type NftCollection,
   type NFTModelV2,
 } from '@onflow/flow-wallet-shared/types/network-types';
-import { type NFTCollections, type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
+import { type CollectionNftList, type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import {
@@ -285,7 +285,7 @@ export const useNftHook = ({
 };
 
 export const useNftCatalogCollections = (network?: string, address?: string) => {
-  const collections = useCachedData<NFTCollections[]>(
+  const collections = useCachedData<CollectionNftList[]>(
     network && address ? nftCatalogCollectionsKey(network, address) : null
   );
 

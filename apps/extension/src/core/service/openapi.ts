@@ -47,7 +47,7 @@ import {
   type StorageInfo,
   type UserInfoResponse,
 } from '@onflow/flow-wallet-shared/types/network-types';
-import { type NFTCollections } from '@onflow/flow-wallet-shared/types/nft-types';
+import { type CollectionNftList } from '@onflow/flow-wallet-shared/types/nft-types';
 import { type NetworkScripts } from '@onflow/flow-wallet-shared/types/script-types';
 import type { TokenInfo } from '@onflow/flow-wallet-shared/types/token-info';
 import {
@@ -1590,7 +1590,10 @@ export class OpenApiService {
     return data;
   };
 
-  nftCatalogCollections = async (address: string, network: string): Promise<NFTCollections[]> => {
+  nftCatalogCollections = async (
+    address: string,
+    network: string
+  ): Promise<CollectionNftList[]> => {
     const { data } = await this.sendRequest(
       'GET',
       `/api/v2/nft/id?address=${address}&network=${network}`,
