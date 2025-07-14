@@ -3,9 +3,11 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
+import { getCachedNftCollection, triggerNftCollectionRefresh } from '@/data-model/cache-data-keys';
 import CollectionDetailGrid from '@/ui/components/NFTs/CollectionDetailGrid';
 import GridView from '@/ui/components/NFTs/GridView';
 import { useWallet } from '@/ui/hooks/use-wallet';
+import { useNetwork } from '@/ui/hooks/useNetworkHook';
 import { useNftHook } from '@/ui/hooks/useNftHook';
 
 // import InfiniteScroll from 'react-infinite-scroller';
@@ -30,11 +32,12 @@ interface SquareImage {
 
 interface CollectionDetailState {
   collection: any;
-  ownerAddress: any;
+  ownerAddress: string;
   accessible: any;
 }
 
 const NFTCollectionDetail = () => {
+  const { network } = useNetwork();
   const usewallet = useWallet();
   const location = useParams();
   const uselocation = useLocation();
@@ -46,17 +49,17 @@ const NFTCollectionDetail = () => {
   const nftCount = collection_info[2];
 
   const getCollection = useCallback(
-    async (ownerAddress, collection, offset) => {
-      return await usewallet.getSingleCollection(ownerAddress, collection, offset);
+    async (ownerAddress: string, collection: string, offset: number | string = 0) => {
+      return await getCachedNftCollection(network, ownerAddress, collection, offset as number);
     },
-    [usewallet]
+    [network]
   );
 
   const refreshCollection = useCallback(
-    async (ownerAddress, collection, offset) => {
-      return await usewallet.refreshSingleCollection(ownerAddress, collection, offset);
+    async (ownerAddress: string, collection: string, offset: number | string = 0) => {
+      triggerNftCollectionRefresh(network, ownerAddress, collection, offset as number);
     },
-    [usewallet]
+    [network]
   );
 
   const {

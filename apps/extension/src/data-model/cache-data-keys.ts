@@ -206,6 +206,15 @@ export const getCachedNftCollection = async (
   );
 };
 
+export const triggerNftCollectionRefresh = (
+  network: string,
+  address: string,
+  collectionId: string,
+  offset: number
+) => {
+  triggerRefresh(nftCollectionKey(network, address, collectionId, `${offset}`));
+};
+
 export const nftCatalogCollectionsKey = (network: string, address: string) =>
   `nft-catalog-collections-${network}-${address}`;
 

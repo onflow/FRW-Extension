@@ -15,6 +15,7 @@ import {
   evmNftIdsKey,
   type EvmNftIdsStore,
   nftCatalogCollectionsKey,
+  nftCollectionKey,
   nftCollectionListKey,
   nftListKey,
 } from '@/data-model/cache-data-keys';
@@ -282,6 +283,21 @@ export const useNftHook = ({
     loadAllPages,
     refreshCollectionImpl,
   };
+};
+
+export const useSingleCollection = (
+  network?: string,
+  address?: string,
+  collectionId?: string,
+  offset?: number
+) => {
+  const collection = useCachedData<NftCollection>(
+    network && address && collectionId && offset
+      ? nftCollectionKey(network, address, collectionId, `${offset || 0}`)
+      : null
+  );
+
+  return collection;
 };
 
 export const useNftCatalogCollections = (network?: string, address?: string) => {

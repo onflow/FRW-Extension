@@ -51,7 +51,6 @@ export const CollectionCard = ({
         display: 'flex',
         width: '100%',
         height: '64px',
-        margin: '12px auto',
         boxShadow: 'none',
         border: '1px solid rgba(255, 255, 255, 0.12)',
       }}

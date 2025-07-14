@@ -50,7 +50,7 @@ const NFTTab = () => {
 
   return (
     <div id="scrollableTab">
-      <Box padding="0 8px">
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px' }}>
         {collectionLoading ? (
           <ListSkeleton />
         ) : isCollectionEmpty ? (
@@ -63,7 +63,7 @@ const NFTTab = () => {
               logo={collectionNftList.collection.logo}
               count={collectionNftList.count}
               index={index}
-              contractName={collectionNftList.collection.contract_name}
+              contractName={collectionNftList.collection.id}
               ownerAddress={ownerAddress}
               isAccessible={
                 activeAccountType !== 'child' ||
