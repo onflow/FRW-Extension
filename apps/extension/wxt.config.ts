@@ -68,7 +68,7 @@ export default defineConfig({
       }),
       inject({
         Buffer: ['buffer', 'Buffer'],
-        process: 'process',
+        process: 'process/browser',
         dayjs: 'dayjs',
       }),
     ],
@@ -79,6 +79,7 @@ export default defineConfig({
         '@onflow/flow-wallet-shared': path.resolve(__dirname, '../../packages/shared/src'),
         '@onflow/flow-wallet-reducers': path.resolve(__dirname, '../../packages/ui/src/reducers'),
         moment: 'dayjs',
+        process: 'process/browser',
       },
       dedupe: ['react', 'react-dom'],
     },
@@ -103,6 +104,7 @@ export default defineConfig({
         'dayjs',
         'buffer',
         'process',
+        'process/browser',
         'react',
         'react-dom',
         'react-router',
@@ -119,6 +121,8 @@ export default defineConfig({
       'process.env.version': JSON.stringify(pkg.version),
       'process.env.release': JSON.stringify(pkg.version),
       'process.env.BUILD_ENV': JSON.stringify(process.env.BUILD_ENV || mode),
+      'process.env.DEPLOYMENT_ENV': JSON.stringify(process.env.DEPLOYMENT_ENV || mode),
+      'process.env.IS_BETA': JSON.stringify(process.env.IS_BETA || 'false'),
       // Add Firebase config
       'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
       'process.env.FIREBASE_AUTH_DOMAIN': JSON.stringify(process.env.FIREBASE_AUTH_DOMAIN),
