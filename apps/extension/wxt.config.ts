@@ -2,7 +2,6 @@ import { defineConfig } from 'wxt';
 import react from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import inject from '@rollup/plugin-inject';
-import commonjs from '@rollup/plugin-commonjs';
 import wasm from 'vite-plugin-wasm';
 import path from 'path';
 import fs from 'fs';
@@ -54,11 +53,6 @@ export default defineConfig({
         jsxRuntime: 'automatic',
       }),
       wasm(),
-      commonjs({
-        include: [/node_modules/],
-        transformMixedEsModules: true,
-        requireReturnsDefault: 'auto',
-      }),
       nodePolyfills({
         include: ['crypto', 'stream', 'os', 'path', 'url', 'https', 'zlib', 'util', 'vm'],
         globals: {
@@ -68,7 +62,6 @@ export default defineConfig({
       }),
       inject({
         Buffer: ['buffer', 'Buffer'],
-        process: 'process/browser',
         dayjs: 'dayjs',
       }),
     ],
@@ -79,7 +72,6 @@ export default defineConfig({
         '@onflow/flow-wallet-shared': path.resolve(__dirname, '../../packages/shared/src'),
         '@onflow/flow-wallet-reducers': path.resolve(__dirname, '../../packages/ui/src/reducers'),
         moment: 'dayjs',
-        process: 'process/browser',
       },
       dedupe: ['react', 'react-dom'],
     },
@@ -87,10 +79,6 @@ export default defineConfig({
     build: {
       target: 'esnext',
       sourcemap: mode === 'development' ? 'inline' : false,
-      commonjsOptions: {
-        include: [/node_modules/],
-        transformMixedEsModules: true,
-      },
       rollupOptions: {
         output: {
           format: 'es',
@@ -100,20 +88,8 @@ export default defineConfig({
 
     optimizeDeps: {
       exclude: ['@trustwallet/wallet-core'],
-      include: [
-        'dayjs',
-        'buffer',
-        'process',
-        'process/browser',
-        'react',
-        'react-dom',
-        'react-router',
-        'react/jsx-runtime',
-        'react/jsx-dev-runtime',
-      ],
-      esbuildOptions: {
-        target: 'es2020',
-      },
+      include: ['react', 'react-dom', 'react-router', 'bip39'],
+      force: true,
     },
 
     define: {
@@ -151,7 +127,7 @@ export default defineConfig({
   },
 
   hooks: {
-    'build:manifestGenerated': async (_wxt, manifest) => {
+    'build:manifestGenerated': async (_wxt, _manifest) => {
       // Add any additional manifest modifications here
       // Log manifest version during build
     },
@@ -201,7 +177,7 @@ export default defineConfig({
           const devToolsScript = await response.text();
           fs.writeFileSync(path.resolve(publicDir, 'react-devtools.js'), devToolsScript);
           // React DevTools fetched successfully
-        } catch (e) {
+        } catch {
           // React DevTools not available
         }
       }
