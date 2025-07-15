@@ -86,6 +86,11 @@ export default defineConfig({
       },
     },
 
+    // Disable problematic features for service workers
+    worker: {
+      format: 'es',
+    },
+
     optimizeDeps: {
       exclude: ['@trustwallet/wallet-core'],
       include: [
@@ -105,6 +110,8 @@ export default defineConfig({
       'process.env.BUILD_ENV': JSON.stringify(process.env.BUILD_ENV || mode),
       'process.env.DEPLOYMENT_ENV': JSON.stringify(process.env.DEPLOYMENT_ENV || mode),
       'process.env.IS_BETA': JSON.stringify(process.env.IS_BETA || 'false'),
+      // Provide fallback for service worker context
+      'globalThis.window': 'globalThis',
       // Add Firebase config
       'process.env.FB_API_KEY': JSON.stringify(process.env.FB_API_KEY),
       'process.env.FB_AUTH_DOMAIN': JSON.stringify(process.env.FB_AUTH_DOMAIN),
