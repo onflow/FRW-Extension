@@ -11,7 +11,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import React, { useEffect, useState } from 'react';
 
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
@@ -279,7 +280,7 @@ const ApiTestPage: React.FC = () => {
   const testGroups = createTestGroups(commonParams);
 
   const generateNewMnemonic = () => {
-    const newMnemonic = bip39.generateMnemonic();
+    const newMnemonic = bip39.generateMnemonic(wordlist);
     setCommonParams((prev) => ({
       ...prev,
       mnemonicGenerated: newMnemonic,

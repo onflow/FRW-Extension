@@ -14,12 +14,37 @@ const config = [
       '**/test-results/**',
       '**/_raw/**',
       '**/storybook-static/**',
+      '**/.output/**',
+      '**/.wxt/**',
     ],
   },
   // JavaScript and TypeScript files
   {
     ...baseConfig,
     files: ['**/*.{js,jsx,ts,tsx}'],
+  },
+  // WXT entrypoints specific config
+  {
+    ...baseConfig,
+    files: ['**/src/entrypoints/**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      ...baseConfig.languageOptions,
+      globals: {
+        ...baseConfig.languageOptions.globals,
+        // Add WXT globals
+        'webextension-polyfill': 'readonly',
+      },
+    },
+    rules: {
+      ...baseConfig.rules,
+      // Allow #imports virtual module for WXT
+      'import/no-unresolved': [
+        'error',
+        {
+          ignore: ['#imports'],
+        },
+      ],
+    },
   },
   // Test files specific config
   {
