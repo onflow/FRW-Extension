@@ -2,7 +2,8 @@ import { Box } from '@mui/material';
 import { Core } from '@walletconnect/core';
 import SignClient from '@walletconnect/sign-client';
 import { type SessionTypes } from '@walletconnect/types';
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import HDWallet from 'ethereum-hdwallet';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -61,7 +62,7 @@ const Sync = () => {
   const navigate = useNavigate();
   const usewallet = useWallet();
   const [activeTab, setActiveTab] = useState<StepType>(STEPS.QR);
-  const [mnemonic] = useState(bip39.generateMnemonic());
+  const [mnemonic] = useState(bip39.generateMnemonic(wordlist));
   const [uri, setUri] = useState('');
   const [loadingString, setLoadingString] = useState<string | null>(null);
   const [secondLine, setSecondLine] = useState<string>('');

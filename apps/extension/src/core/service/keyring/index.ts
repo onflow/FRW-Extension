@@ -1,6 +1,7 @@
 /// fork from https://github.com/MetaMask/KeyringController/blob/master/index.js
 
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import encryptor from 'browser-passworder';
 import * as ethUtil from 'ethereumjs-util';
 import { EventEmitter } from 'events';
@@ -512,7 +513,7 @@ class KeyringService extends EventEmitter {
   }
 
   generateMnemonic(): string {
-    return bip39.generateMnemonic();
+    return bip39.generateMnemonic(wordlist);
   }
 
   getKeyringByType(type: string) {
@@ -542,7 +543,7 @@ class KeyringService extends EventEmitter {
     // Verify the password
     await this.verifyOrBoot(password);
     // Validate mnemonic first
-    if (!bip39.validateMnemonic(seed)) {
+    if (!bip39.validateMnemonic(seed, wordlist)) {
       throw new Error('mnemonic phrase is invalid');
     }
     // Clear the current keyrings as the new keyring will replace it

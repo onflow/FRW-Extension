@@ -1,5 +1,6 @@
 import aesjs from 'aes-js';
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 
 import { consoleError, consoleWarn } from '@onflow/flow-wallet-shared/utils/console-log';
 
@@ -366,7 +367,7 @@ class GoogleDriveService {
       }
 
       const decryptedMnemonic = this.decrypt(backup.data, password);
-      return bip39.validateMnemonic(decryptedMnemonic);
+      return bip39.validateMnemonic(decryptedMnemonic, wordlist);
     } catch (err) {
       consoleError('testProfileBackupDecryption - error', err);
       // Silently handle decryption errors
@@ -405,7 +406,7 @@ class GoogleDriveService {
           try {
             // Verify the old password and decrypt
             const decryptedMnemonic = this.decrypt(item.data, oldPassword);
-            if (!bip39.validateMnemonic(decryptedMnemonic)) {
+            if (!bip39.validateMnemonic(decryptedMnemonic, wordlist)) {
               throw new Error(`Decrypted mnemonic is invalid for ${item.username}`);
             }
 

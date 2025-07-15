@@ -1,11 +1,11 @@
 import { defineConfig } from 'wxt';
-import react from '@vitejs/plugin-react';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import inject from '@rollup/plugin-inject';
-import wasm from 'vite-plugin-wasm';
-import path from 'path';
-import fs from 'fs';
+import react from '@vitejs/plugin-react';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import wasm from 'vite-plugin-wasm';
 
 // Load environment variables
 const mode = process.env.NODE_ENV || 'development';
@@ -88,7 +88,13 @@ export default defineConfig({
 
     optimizeDeps: {
       exclude: ['@trustwallet/wallet-core'],
-      include: ['react', 'react-dom', 'react-router', 'bip39'],
+      include: [
+        'react', 
+        'react-dom', 
+        'react-router',
+        '@scure/bip39',
+        '@scure/bip39/wordlists/english'
+      ],
       force: true,
     },
 
@@ -115,7 +121,7 @@ export default defineConfig({
     },
 
     server: {
-      port: 3000,
+      port: 3001,
       hmr: {
         overlay: true,
       },
@@ -123,7 +129,7 @@ export default defineConfig({
   }),
 
   webExt: {
-    startUrls: mode === 'development' ? ['https://localhost:3000'] : undefined,
+    startUrls: mode === 'development' ? ['https://localhost:3001'] : undefined,
   },
 
   hooks: {

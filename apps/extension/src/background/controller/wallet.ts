@@ -1,7 +1,8 @@
 import * as fcl from '@onflow/fcl';
 import type { AccountKey, Account as FclAccount } from '@onflow/typedefs';
 import BN from 'bignumber.js';
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { ethErrors } from 'eth-rpc-errors';
 import * as ethUtil from 'ethereumjs-util';
 import { getApp } from 'firebase/app';
@@ -3347,7 +3348,7 @@ export class WalletController extends BaseController {
   };
 
   uploadMnemonicToGoogleDrive = async (mnemonic: string, username: string, password: string) => {
-    const isValidMnemonic = bip39.validateMnemonic(mnemonic);
+    const isValidMnemonic = bip39.validateMnemonic(mnemonic, wordlist);
     if (!isValidMnemonic) {
       throw new Error('Invalid mnemonic');
     }
