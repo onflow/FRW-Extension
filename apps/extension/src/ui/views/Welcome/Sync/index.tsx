@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { Core } from '@walletconnect/core';
 import SignClient from '@walletconnect/sign-client';
 import { type SessionTypes } from '@walletconnect/types';
-import * as bip39 from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
 import HDWallet from 'ethereum-hdwallet';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
