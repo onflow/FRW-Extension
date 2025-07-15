@@ -1,5 +1,5 @@
 import { Dialog, type DialogProps } from '@mui/material';
-import { type SxProps, type Theme } from '@mui/system';
+import { type SxProps, type Theme, useTheme } from '@mui/system';
 import React from 'react';
 
 interface CustomDialogProps extends DialogProps {
@@ -8,6 +8,7 @@ interface CustomDialogProps extends DialogProps {
 }
 
 export const CustomDialog = ({ sx, PaperProps, ...props }: CustomDialogProps) => {
+  const theme = useTheme();
   return (
     <Dialog
       {...props}
@@ -22,7 +23,7 @@ export const CustomDialog = ({ sx, PaperProps, ...props }: CustomDialogProps) =>
           borderRadius: '24px',
           height: 'auto',
           padding: '40px',
-          backgroundColor: '#222222',
+          backgroundColor: theme.palette.background.paper,
           backgroundImage: 'none',
           ...PaperProps?.sx, // Allow Paper sx override
         },

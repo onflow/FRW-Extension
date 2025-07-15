@@ -1,4 +1,5 @@
 import { ListItem, ListItemButton, ListItemIcon, Typography, CardMedia } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 interface ProfileButtonProps {
@@ -13,6 +14,7 @@ interface ProfileButtonProps {
  * It redirect the extension to the profile creation and recovery page when clicked.
  */
 export const ProfileButton = ({ icon, text, onClick, dataTestId }: ProfileButtonProps) => {
+  const theme = useTheme();
   return (
     <ListItem disablePadding onClick={onClick} data-testid={dataTestId}>
       <ListItemButton sx={{ padding: '16px', margin: '0' }}>
@@ -34,7 +36,7 @@ export const ProfileButton = ({ icon, text, onClick, dataTestId }: ProfileButton
           component="div"
           display="inline"
           sx={{
-            color: 'rgba(255, 255, 255, 0.80)',
+            color: theme.palette.text.primary,
             fontFamily: 'Inter',
             fontSize: '15px',
             fontStyle: 'normal',

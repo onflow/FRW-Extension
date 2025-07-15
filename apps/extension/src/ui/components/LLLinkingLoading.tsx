@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -7,15 +8,16 @@ import { LLPrimaryButton } from '@/ui/components';
 
 export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [count, setCount] = useState(0);
   const colorArray = [
-    'rgba(94,94,94,0.3)',
-    'rgba(94,94,94,0.4)',
-    'rgba(94,94,94,0.5)',
-    'rgba(94,94,94,0.6)',
-    'rgba(94,94,94,0.7)',
-    'rgba(94,94,94,0.8)',
-    'rgba(94,94,94,0.9)',
+    theme.palette.text.secondary + '4D', // 0.3 alpha
+    theme.palette.text.secondary + '66', // 0.4 alpha
+    theme.palette.text.secondary + '80', // 0.5 alpha
+    theme.palette.text.secondary + '99', // 0.6 alpha
+    theme.palette.text.secondary + 'B3', // 0.7 alpha
+    theme.palette.text.secondary + 'CC', // 0.8 alpha
+    theme.palette.text.secondary + 'E6', // 0.9 alpha
   ];
 
   const startCount = () => {
@@ -51,7 +53,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
             borderRadius: '12px',
             height: '100%',
             width: '100%',
-            background: 'linear-gradient(0deg, #32484C, #11271D)',
+            background: `linear-gradient(0deg, #32484C, ${theme.palette.primary.dark || '#11271D'})`,
           }}
         >
           <Box
@@ -72,7 +74,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
                   height: '60px',
                   width: '60px',
                   borderRadius: '30px',
-                  backgroundColor: 'text.secondary',
+                  backgroundColor: theme.palette.text.secondary,
                   objectFit: 'cover',
                 }}
                 src={image}
@@ -80,7 +82,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
               <Typography
                 sx={{
                   fontSize: '14px',
-                  color: '#f2f2f2',
+                  color: theme.palette.text.primary,
                   marginTop: '10px',
                   width: '100%',
                   textAlign: 'center',
@@ -107,7 +109,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
                         width: '10px',
                         height: '10px',
                         borderRadius: '10px',
-                        backgroundColor: '#41CC5D',
+                        backgroundColor: theme.palette.success.main,
                       }}
                     />
                   ) : (
@@ -131,7 +133,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
                     height: '60px',
                     width: '60px',
                     borderRadius: '30px',
-                    backgroundColor: 'text.secondary',
+                    backgroundColor: theme.palette.text.secondary,
                     objectFit: 'cover',
                   }}
                   src={userInfo.avatar}
@@ -140,7 +142,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
               <Typography
                 sx={{
                   fontSize: '14px',
-                  color: '#f2f2f2',
+                  color: theme.palette.text.primary,
                   marginTop: '10px',
                   width: '100%',
                   textAlign: 'center',
@@ -163,12 +165,12 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
               <img
                 style={{
                   display: 'inline',
-                  backgroundColor: '#00E075',
+                  backgroundColor: theme.palette.success.main,
                   borderRadius: '20px',
                   width: '24px',
                   height: '24px',
                   padding: '3px',
-                  color: '#000',
+                  color: theme.palette.background.paper,
                 }}
                 src={IconCheck}
               />
@@ -176,7 +178,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
                 sx={{
                   fontSize: '16px',
                   marginTop: '7px',
-                  color: '#E6E6E6',
+                  color: theme.palette.text.secondary,
                   fontWeight: 'bold',
                   width: '100%',
                   textAlign: 'center',
@@ -189,7 +191,7 @@ export const LLLinkingLoading = ({ linkingDone, image, accountTitle, userInfo })
             <Typography
               sx={{
                 fontSize: '16px',
-                color: '#E6E6E6',
+                color: theme.palette.text.secondary,
                 fontWeight: 'bold',
                 width: '100%',
                 textAlign: 'center',

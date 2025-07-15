@@ -1,7 +1,6 @@
 import { Box, Typography, Switch } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
-
-import { COLOR_WHITE_ALPHA_80_FFFFFFCC } from '@/ui/style/color';
 
 interface SettingsSwitchCardProps {
   label: string;
@@ -15,38 +14,41 @@ const SettingsSwitchCard: React.FC<SettingsSwitchCardProps> = ({
   checked,
   onChange,
   disabled = false,
-}) => (
-  <Box
-    sx={{
-      margin: '10px auto',
-      backgroundColor: '#282828',
-      padding: '18px',
-      display: 'flex',
-      flexDirection: 'column',
-      borderRadius: '16px',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      gap: '0px',
-    }}
-  >
+}) => {
+  const theme = useTheme();
+  return (
     <Box
       sx={{
-        width: '100%',
+        margin: '10px auto',
+        backgroundColor: theme.palette.background.paper,
+        padding: '18px',
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: 'column',
+        borderRadius: '16px',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        gap: '0px',
       }}
     >
-      <Typography
-        variant="body1"
-        sx={{ color: COLOR_WHITE_ALPHA_80_FFFFFFCC, fontSize: '16px', fontWeight: 400 }}
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
-        {label}
-      </Typography>
-      <Switch checked={checked} onChange={onChange} disabled={disabled} />
+        <Typography
+          variant="body1"
+          sx={{ color: theme.palette.text.secondary, fontSize: '16px', fontWeight: 400 }}
+        >
+          {label}
+        </Typography>
+        <Switch checked={checked} onChange={onChange} disabled={disabled} />
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 export default SettingsSwitchCard;

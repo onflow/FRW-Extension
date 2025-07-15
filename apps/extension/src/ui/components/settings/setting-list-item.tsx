@@ -1,9 +1,9 @@
 import { ListItem, ListItemButton, ListItemText, Typography, Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
 import IconEnd from '@/ui/components/iconfont/IconAVector11Stroke';
-import { COLOR_WHITE_ALPHA_10_FFFFFF1A, COLOR_WHITE_ALPHA_80_FFFFFFCC } from '@/ui/style/color';
 
 interface SettingsListItemUniversalProps {
   to?: string;
@@ -25,6 +25,7 @@ const SettingsListItem: React.FC<SettingsListItemUniversalProps> = ({
   showArrow = true,
 }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
   const baseButtonSx = {
     height: '100%',
     margin: '0 auto',
@@ -39,7 +40,7 @@ const SettingsListItem: React.FC<SettingsListItemUniversalProps> = ({
     ...baseButtonSx,
     padding: '16px',
     height: '56px',
-    '&:hover': { backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A },
+    '&:hover': { backgroundColor: theme.palette.action.hover },
   };
 
   const content = icon ? (
@@ -68,7 +69,7 @@ const SettingsListItem: React.FC<SettingsListItemUniversalProps> = ({
     </Box>
   ) : (
     <>
-      <Typography sx={{ color: COLOR_WHITE_ALPHA_80_FFFFFFCC, fontSize: '16px', fontWeight: 400 }}>
+      <Typography sx={{ color: theme.palette.text.secondary, fontSize: '16px', fontWeight: 400 }}>
         {text}
       </Typography>
       {endIcon ||

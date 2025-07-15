@@ -1,4 +1,5 @@
 import { Box, Drawer, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import ProfileActions from '@/ui/components/profile/profile-actions';
@@ -9,6 +10,7 @@ interface AddProfilePopupProps {
 }
 
 const AddProfilePopup = ({ isOpen, onClose }: AddProfilePopupProps) => {
+  const theme = useTheme();
   return (
     <Drawer
       anchor="bottom"
@@ -22,7 +24,7 @@ const AddProfilePopup = ({ isOpen, onClose }: AddProfilePopupProps) => {
             width: '100%',
             height: 'auto',
             maxHeight: '80%',
-            background: '#121212',
+            background: theme.palette.background.default,
             borderRadius: '18px 18px 0px 0px',
           },
         },
@@ -45,7 +47,7 @@ const AddProfilePopup = ({ isOpen, onClose }: AddProfilePopupProps) => {
           <Box
             sx={{
               borderRadius: '100px',
-              background: 'rgba(217, 217, 217, 0.10)',
+              background: theme.palette.action.disabledBackground,
               width: '54px',
               height: '4px',
             }}

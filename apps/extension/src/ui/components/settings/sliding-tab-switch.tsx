@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 interface SlidingTabSwitchProps {
@@ -18,11 +19,12 @@ const SlidingTabSwitch: React.FC<SlidingTabSwitchProps> = ({
   leftValue = 'one',
   rightValue = 'two',
 }) => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
         display: 'flex',
-        background: '#232323',
+        background: theme.palette.background.card,
         borderRadius: '20px',
         p: '3px',
         width: '100%',
@@ -38,7 +40,7 @@ const SlidingTabSwitch: React.FC<SlidingTabSwitchProps> = ({
           left: value === leftValue ? 3 : 'calc(50% + 3px)',
           width: 'calc(50% - 6px)',
           height: 34,
-          background: '#444',
+          background: theme.palette.action.selected,
           borderRadius: '17px',
           transition: 'left 0.2s',
           zIndex: 1,
@@ -57,7 +59,7 @@ const SlidingTabSwitch: React.FC<SlidingTabSwitchProps> = ({
             flex: 1,
             textAlign: 'center',
             cursor: 'pointer',
-            color: value === leftValue ? '#fff' : '#aaa',
+            color: value === leftValue ? theme.palette.text.primary : theme.palette.text.secondary,
             fontWeight: 600,
             lineHeight: '34px',
             fontSize: '12px',
@@ -72,7 +74,7 @@ const SlidingTabSwitch: React.FC<SlidingTabSwitchProps> = ({
             flex: 1,
             textAlign: 'center',
             cursor: 'pointer',
-            color: value === rightValue ? '#fff' : '#aaa',
+            color: value === rightValue ? theme.palette.text.primary : theme.palette.text.secondary,
             fontWeight: 600,
             lineHeight: '34px',
             fontSize: '12px',

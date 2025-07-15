@@ -1,4 +1,5 @@
 import { Button, CardMedia, Skeleton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 interface IconButtonProps {
@@ -19,6 +20,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   loading = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const theme = useTheme();
 
   return (
     <div
@@ -42,9 +44,9 @@ export const IconButton: React.FC<IconButtonProps> = ({
             minWidth: '38px',
             borderRadius: '50%',
             padding: '0 !important',
-            backgroundColor: '#1DB954', // Spotify-like green color
+            backgroundColor: theme.palette.success.main,
             '&:hover': {
-              backgroundColor: '#1ed760', // Slightly lighter green on hover
+              backgroundColor: theme.palette.success.light,
             },
             display: 'flex',
             justifyContent: 'center',
@@ -59,10 +61,10 @@ export const IconButton: React.FC<IconButtonProps> = ({
             sx={{
               width: '20px',
               height: '20px',
-              color: '#FFFFFF', // This will make the SVG white
+              color: theme.palette.common.white,
               transition: 'color 0.2s ease-in-out',
               '&:hover': {
-                color: '#000000', // This will make the SVG black on hover
+                color: theme.palette.common.black,
               },
             }}
             image={icon}
@@ -73,7 +75,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
         <Typography
           sx={{
             fontSize: '12px',
-            color: '#777E90',
+            color: theme.palette.text.secondary,
             textAlign: 'center',
           }}
         >

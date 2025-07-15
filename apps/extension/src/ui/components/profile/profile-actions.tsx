@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import userCircleCheck from '@/ui/assets/svg/user-circle-check.svg';
@@ -12,6 +13,7 @@ interface ProfileActionsProps {
 
 const ProfileActions = ({ onActionComplete, showImportButton = true }: ProfileActionsProps) => {
   const usewallet = useWallet();
+  const theme = useTheme();
 
   const handleAction = async (action: () => Promise<void>) => {
     await action();
@@ -27,7 +29,7 @@ const ProfileActions = ({ onActionComplete, showImportButton = true }: ProfileAc
         flexDirection: 'column',
         display: 'flex',
         borderRadius: '16px',
-        background: '#2A2A2A',
+        background: theme.palette.background.paper,
         margin: '9px 18px 0',
         overflow: 'hidden',
       }}

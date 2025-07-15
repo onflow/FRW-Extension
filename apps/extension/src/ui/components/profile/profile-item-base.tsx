@@ -9,6 +9,7 @@ import {
   Skeleton,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import { type UserInfoResponse } from '@onflow/flow-wallet-shared/types/network-types';
@@ -41,6 +42,7 @@ export const ProfileItemBase = ({
   rightIcon?: React.ReactNode;
   noPadding?: boolean;
 }) => {
+  const theme = useTheme();
   return (
     <ListItem
       disablePadding
@@ -84,7 +86,7 @@ export const ProfileItemBase = ({
               variant="body1"
               component="div"
               display="inline"
-              sx={{ color: '#fff', fontWeight: '700', fontSize: '14px' }}
+              sx={{ color: theme.palette.text.primary, fontWeight: '700', fontSize: '14px' }}
             >
               {userInfo?.nickname || <Skeleton variant="text" width={120} height={24} />}
             </Typography>
