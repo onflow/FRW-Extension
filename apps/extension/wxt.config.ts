@@ -1,4 +1,3 @@
-import { defineConfig } from 'wxt';
 import inject from '@rollup/plugin-inject';
 import react from '@vitejs/plugin-react';
 import dotenv from 'dotenv';
@@ -6,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import wasm from 'vite-plugin-wasm';
+import { defineConfig } from 'wxt';
 
 // Load environment variables
 const mode = process.env.NODE_ENV || 'development';
@@ -89,11 +89,11 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ['@trustwallet/wallet-core'],
       include: [
-        'react', 
-        'react-dom', 
+        'react',
+        'react-dom',
         'react-router',
         '@scure/bip39',
-        '@scure/bip39/wordlists/english'
+        '@scure/bip39/wordlists/english',
       ],
       force: true,
     },
@@ -106,18 +106,22 @@ export default defineConfig({
       'process.env.DEPLOYMENT_ENV': JSON.stringify(process.env.DEPLOYMENT_ENV || mode),
       'process.env.IS_BETA': JSON.stringify(process.env.IS_BETA || 'false'),
       // Add Firebase config
-      'process.env.FIREBASE_API_KEY': JSON.stringify(process.env.FIREBASE_API_KEY),
-      'process.env.FIREBASE_AUTH_DOMAIN': JSON.stringify(process.env.FIREBASE_AUTH_DOMAIN),
-      'process.env.FIREBASE_PROJECT_ID': JSON.stringify(process.env.FIREBASE_PROJECT_ID),
-      'process.env.FIREBASE_STORAGE_BUCKET': JSON.stringify(process.env.FIREBASE_STORAGE_BUCKET),
-      'process.env.FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(
-        process.env.FIREBASE_MESSAGING_SENDER_ID
-      ),
-      'process.env.FIREBASE_APP_ID': JSON.stringify(process.env.FIREBASE_APP_ID),
+      'process.env.FB_API_KEY': JSON.stringify(process.env.FB_API_KEY),
+      'process.env.FB_AUTH_DOMAIN': JSON.stringify(process.env.FB_AUTH_DOMAIN),
+      'process.env.FB_PROJECTID': JSON.stringify(process.env.FB_PROJECTID),
+      'process.env.FB_STORAGE_BUCKET': JSON.stringify(process.env.FB_STORAGE_BUCKET),
+      'process.env.FB_MESSAGING_SENDER_ID': JSON.stringify(process.env.FB_MESSAGING_SENDER_ID),
+      'process.env.FB_APP_ID': JSON.stringify(process.env.FB_APP_ID),
       // Add other env variables
       'process.env.REOWN_WALLET_PROJECT_ID': JSON.stringify(process.env.REOWN_WALLET_PROJECT_ID),
       'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
       'process.env.DEV_PASSWORD': JSON.stringify(process.env.DEV_PASSWORD),
+      'process.env.WC_PROJECTID': JSON.stringify(process.env.WC_PROJECTID),
+      'process.env.MIXPANEL_TOKEN': JSON.stringify(process.env.MIXPANEL_TOKEN),
+      'process.env.API_GO_SERVER_URL': JSON.stringify(process.env.API_GO_SERVER_URL),
+      'process.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL),
+      'process.env.API_NEWS_PATH': JSON.stringify(process.env.API_NEWS_PATH),
+      'process.env.API_CONFIG_PATH': JSON.stringify(process.env.API_CONFIG_PATH),
     },
 
     server: {

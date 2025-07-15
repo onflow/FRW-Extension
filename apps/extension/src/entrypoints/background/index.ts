@@ -1,5 +1,6 @@
-import { defineBackground } from '#imports';
 import { consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
+
+import { defineBackground } from '#imports';
 
 export default defineBackground({
   type: 'module',
