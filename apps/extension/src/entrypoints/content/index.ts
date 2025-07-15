@@ -2,9 +2,9 @@ import { defineContentScript } from '#imports';
 import { consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
 
 export default defineContentScript({
-  matches: ['<all_urls>'],
+  matches: ['file://*/*', 'http://*/*', 'https://*/*'],
   runAt: 'document_start',
-  allFrames: true,
+  allFrames: false,
 
   main() {
     // Import and initialize the original content script
