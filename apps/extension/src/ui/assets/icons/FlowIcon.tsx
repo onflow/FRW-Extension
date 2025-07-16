@@ -5,9 +5,15 @@ interface FlowIconProps {
   width?: number;
   height?: number;
   color?: string;
+  showWhiteBackground?: boolean;
 }
 
-export const FlowIcon: React.FC<FlowIconProps> = ({ width = 24, height = 24, color }) => {
+export const FlowIcon: React.FC<FlowIconProps> = ({
+  width = 24,
+  height = 24,
+  color,
+  showWhiteBackground = false,
+}) => {
   const theme = useTheme();
   const iconColor = color || theme.palette.primary.main;
 
@@ -16,7 +22,7 @@ export const FlowIcon: React.FC<FlowIconProps> = ({ width = 24, height = 24, col
       width={width}
       height={height}
       viewBox="0 0 24 24"
-      fill="none"
+      fill={showWhiteBackground ? 'white' : 'none'}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path

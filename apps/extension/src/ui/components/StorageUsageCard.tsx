@@ -7,12 +7,20 @@ import React from 'react';
 import { COLOR_DARK_GRAY_1A1A1A } from '@/ui/style/color';
 
 interface StorageUsageCardProps {
-  used: number;
-  total: number;
-  unit: string;
+  used?: number;
+  total?: number;
+  unit?: string;
+  network?: string;
+  address?: string;
 }
 
-const StorageUsageCard: React.FC<StorageUsageCardProps> = ({ used, total, unit }) => {
+const StorageUsageCard: React.FC<StorageUsageCardProps> = ({
+  used = 0,
+  total = 100,
+  unit = 'MB',
+  network,
+  address,
+}) => {
   const theme = useTheme();
   const percentage = (used / total) * 100;
 
