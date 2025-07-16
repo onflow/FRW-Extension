@@ -4,6 +4,8 @@
 
 import { p256 } from '@noble/curves/nist';
 import * as secp256k1 from '@noble/secp256k1';
+import { HDKey } from '@scure/bip32';
+import { mnemonicToSeedSync } from '@scure/bip39';
 import { initWasm as initTrustWallet } from '@trustwallet/wallet-core';
 import { ethers } from 'ethers';
 import { createWalletClient, http } from 'viem';
@@ -29,6 +31,7 @@ class CryptoLibraryBenchmark {
     await this.benchmarkEthers();
     await this.benchmarkNoble();
     await this.benchmarkNobleP256();
+    await this.benchmarkNobleBip32();
     await this.benchmarkViem();
 
     // Display results
@@ -243,6 +246,65 @@ class CryptoLibraryBenchmark {
       const signature = await p256.sign(msgHash, testPrivateKey);
       const publicKey = p256.getPublicKey(testPrivateKey);
       const isValid = p256.verify(signature, msgHash, publicKey);
+      return isValid;
+    });
+  }
+
+  private async benchmarkNobleBip32() {
+    console.log('Benchmarking Noble BIP32...');
+
+    const testMnemonic =
+      'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+    const testMessage = 'Hello, World!';
+    const derivationPath = "m/44'/539'/0'/0/0";
+
+    // HD Wallet Generation
+    await this.measurePerformance('HD Wallet Generation', 'Noble BIP32', () => {
+      const seed = mnemonicToSeedSync(testMnemonic);
+      const hdkey = HDKey.fromMasterSeed(seed);
+      return hdkey;
+    });
+
+    // Key Derivation
+    await this.measurePerformance('Key Derivation', 'Noble BIP32', () => {
+      const seed = mnemonicToSeedSync(testMnemonic);
+      const hdkey = HDKey.fromMasterSeed(seed);
+      const derived = hdkey.derive(derivationPath);
+      return derived;
+    });
+
+    // Signing (uses secp256k1 only)
+    await this.measurePerformance('Signing', 'Noble BIP32', () => {
+      const seed = mnemonicToSeedSync(testMnemonic);
+      const hdkey = HDKey.fromMasterSeed(seed);
+      const derived = hdkey.derive(derivationPath);
+      // Create a proper 32-byte hash
+      const msgHash = new Uint8Array(32);
+      const msgBytes = new TextEncoder().encode(testMessage);
+      msgHash.set(msgBytes.slice(0, 32));
+      const signature = derived.sign(msgHash);
+      return signature;
+    });
+
+    // Public Key Generation
+    await this.measurePerformance('Public Key Generation', 'Noble BIP32', () => {
+      const seed = mnemonicToSeedSync(testMnemonic);
+      const hdkey = HDKey.fromMasterSeed(seed);
+      const derived = hdkey.derive(derivationPath);
+      return derived.publicKey;
+    });
+
+    // Signature Verification
+    await this.measurePerformance('Signature Verification', 'Noble BIP32', () => {
+      const seed = mnemonicToSeedSync(testMnemonic);
+      const hdkey = HDKey.fromMasterSeed(seed);
+      const derived = hdkey.derive(derivationPath);
+      // Create a proper 32-byte hash
+      const msgHash = new Uint8Array(32);
+      const msgBytes = new TextEncoder().encode(testMessage);
+      msgHash.set(msgBytes.slice(0, 32));
+      const signature = derived.sign(msgHash);
+      const isValid = derived.verify(msgHash, signature);
       return isValid;
     });
   }
