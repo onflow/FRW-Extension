@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crypto Library Benchmark Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      .chart-container {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .summary-card h3 {
+        margin-top: 0;
+        color: #666;
+      }
+      .metric {
+        font-size: 2em;
+        font-weight: bold;
+        color: #333;
+      }
+      .library-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.85em;
+        margin: 4px;
+      }
+      .trustwallet {
+        background: #3b99fc;
+        color: white;
+      }
+      .ethers {
+        background: #627eea;
+        color: white;
+      }
+      .noble {
+        background: #ff6b6b;
+        color: white;
+      }
+      .viem {
+        background: #50e3c2;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Crypto Library Performance Benchmark</h1>
+
+      <div class="summary">
+        <div class="summary-card">
+          <h3>Test Environment</h3>
+          <p>Node.js: <span id="nodeVersion">-</span></p>
+          <p>Platform: <span id="platform">-</span></p>
+          <p>Iterations: 100 per test</p>
+        </div>
+        <div class="summary-card">
+          <h3>Libraries Tested</h3>
+          <span class="library-badge trustwallet">TrustWallet Core v4.3.6</span>
+          <span class="library-badge ethers">Ethers.js v6.15.0</span>
+          <span class="library-badge noble">Noble secp256k1 v1.7.2</span>
+          <span class="library-badge viem">Viem (latest)</span>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="performanceChart"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="memoryChart"></canvas>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="overallChart"></canvas>
+      </div>
+    </div>
+
+    <script>
+      // Sample data - replace with actual benchmark results
+      const benchmarkData = {
+        operations: [
+          'HD Wallet Generation',
+          'Key Derivation',
+          'Sign Message',
+          'Public Key Generation',
+        ],
+        libraries: {
+          TrustWallet: {
+            color: '#3B99FC',
+            times: [2.5, 1.8, 0.8, 0.5],
+            memory: [5.2, 3.1, 1.2, 0.8],
+          },
+          'Ethers.js': {
+            color: '#627EEA',
+            times: [3.1, 2.2, 1.1, 0.7],
+            memory: [4.8, 2.9, 1.5, 1.0],
+          },
+          Noble: {
+            color: '#FF6B6B',
+            times: [null, null, 0.6, 0.4],
+            memory: [null, null, 0.8, 0.5],
+          },
+          Viem: {
+            color: '#50E3C2',
+            times: [null, 1.5, 0.9, 0.6],
+            memory: [null, 2.1, 1.1, 0.7],
+          },
+        },
+      };
+
+      // Performance Chart
+      const perfCtx = document.getElementById('performanceChart').getContext('2d');
+      new Chart(perfCtx, {
+        type: 'bar',
+        data: {
+          labels: benchmarkData.operations,
+          datasets: Object.entries(benchmarkData.libraries).map(([name, data]) => ({
+            label: name,
+            data: data.times,
+            backgroundColor: data.color,
+            borderColor: data.color,
+            borderWidth: 1,
+          })),
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Operation Performance (ms)',
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Time (ms)',
+              },
+            },
+          },
+        },
+      });
+
+      // Memory Chart
+      const memCtx = document.getElementById('memoryChart').getContext('2d');
+      new Chart(memCtx, {
+        type: 'bar',
+        data: {
+          labels: benchmarkData.operations,
+          datasets: Object.entries(benchmarkData.libraries).map(([name, data]) => ({
+            label: name,
+            data: data.memory,
+            backgroundColor: data.color,
+            borderColor: data.color,
+            borderWidth: 1,
+          })),
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Memory Usage (MB)',
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Memory (MB)',
+              },
+            },
+          },
+        },
+      });
+
+      // Overall Comparison Chart
+      const overallCtx = document.getElementById('overallChart').getContext('2d');
+      new Chart(overallCtx, {
+        type: 'radar',
+        data: {
+          labels: ['Performance', 'Memory Efficiency', 'Bundle Size', 'Feature Set', 'Ease of Use'],
+          datasets: [
+            {
+              label: 'TrustWallet',
+              data: [70, 50, 20, 95, 60],
+              borderColor: '#3B99FC',
+              backgroundColor: 'rgba(59, 153, 252, 0.2)',
+            },
+            {
+              label: 'Ethers.js',
+              data: [65, 70, 75, 90, 85],
+              borderColor: '#627EEA',
+              backgroundColor: 'rgba(98, 126, 234, 0.2)',
+            },
+            {
+              label: 'Noble',
+              data: [95, 95, 98, 40, 70],
+              borderColor: '#FF6B6B',
+              backgroundColor: 'rgba(255, 107, 107, 0.2)',
+            },
+            {
+              label: 'Viem',
+              data: [85, 85, 90, 75, 90],
+              borderColor: '#50E3C2',
+              backgroundColor: 'rgba(80, 227, 194, 0.2)',
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Overall Library Comparison',
+            },
+          },
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+            },
+          },
+        },
+      });
+
+      // Update environment info
+      document.getElementById('nodeVersion').textContent = 'v18.17.0';
+      document.getElementById('platform').textContent = 'Linux x64';
+    </script>
+  </body>
+</html>
