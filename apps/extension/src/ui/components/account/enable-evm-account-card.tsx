@@ -1,4 +1,5 @@
 import { Typography, Box, Card, CardActionArea, CardMedia } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
@@ -7,7 +8,6 @@ import {
   COLOR_ACCENT_EVM_627EEA,
   COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
   COLOR_DARKMODE_TEXT_PRIMARY_FFFFFF,
-  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
 } from '@/ui/style/color';
 
 export const EnableEvmAccountCard = ({
@@ -18,9 +18,10 @@ export const EnableEvmAccountCard = ({
   showCard: boolean;
 }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const gradientStyle: React.CSSProperties = {
-    background: `linear-gradient(92deg, ${COLOR_GREEN_FLOW_DARKMODE_00EF8B} 63.42%, ${COLOR_ACCENT_EVM_627EEA} 91.99%)`,
+    background: `linear-gradient(92deg, ${theme.palette.primary.main} 63.42%, ${COLOR_ACCENT_EVM_627EEA} 91.99%)`,
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     display: 'inline',
@@ -73,7 +74,7 @@ export const EnableEvmAccountCard = ({
           </Typography>
           <Typography
             sx={{
-              color: ' rgba(255, 255, 255, 0.80)',
+              color: 'rgba(255, 255, 255, 0.80)',
               fontSize: '10px',
               fontStyle: 'normal',
               fontWeight: 400,

@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, Typography } from '@mui/material';
+import { Box, Button, FormControl, Typography, useTheme } from '@mui/material';
 import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -16,6 +16,7 @@ const SettingsPassword = ({
   verifiedUrl: string;
   children?: ReactNode;
 }) => {
+  const theme = useTheme();
   const wallet = useWallet();
   const navigate = useNavigate();
   const [password, setPassword] = useState(DEFAULT_PASSWORD);
@@ -108,7 +109,7 @@ const SettingsPassword = ({
             onClick={goBack}
             size="large"
             sx={{
-              backgroundColor: '#333333',
+              backgroundColor: theme.palette.info3.main,
               display: 'flex',
               flexGrow: 1,
               height: '48px',
@@ -122,7 +123,7 @@ const SettingsPassword = ({
                 fontWeight: '600',
                 fontSize: '14px',
                 fontFamily: 'Inter',
-                fontColor: '#E6E6E6',
+                fontColor: theme.palette.primary.light,
               }}
             >
               {chrome.i18n.getMessage('Cancel')}

@@ -7,6 +7,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useEffect } from 'react';
 
 import { type Contact } from '@onflow/flow-wallet-shared/types/network-types';
@@ -24,6 +25,7 @@ export const FWMoveDropdown: React.FC<FWMoveDropdownProps> = ({
   setSelectedChildAccount,
   isLoading = false,
 }) => {
+  const theme = useTheme();
   const [selectedChild, setSelectedChild] = React.useState(
     contacts.length > 0 ? contacts[0].address : ''
   );
@@ -76,7 +78,7 @@ export const FWMoveDropdown: React.FC<FWMoveDropdownProps> = ({
                       sx={{
                         mr: '4px',
                         color: 'primary.main',
-                        backgroundColor: '#484848',
+                        backgroundColor: theme.palette.profile.darkGray,
                         width: '32px',
                         height: '32px',
                         display: 'flex',
@@ -102,13 +104,23 @@ export const FWMoveDropdown: React.FC<FWMoveDropdownProps> = ({
                 </Box>
 
                 <Typography
-                  sx={{ textAlign: 'start', color: '#FFFFFF', fontSize: '14px', fontWeight: '600' }}
+                  sx={{
+                    textAlign: 'start',
+                    color: theme.palette.text.primary,
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
                 >
                   {contact.contact_name}
                 </Typography>
                 <Typography
-                  sx={{ lineHeight: '1', textAlign: 'start', fontSize: '12px', fontWeight: '400' }}
-                  color="#FFFFFFCC"
+                  sx={{
+                    lineHeight: '1',
+                    textAlign: 'start',
+                    fontSize: '12px',
+                    fontWeight: '400',
+                    color: theme.palette.text.secondary,
+                  }}
                 >
                   {formatAddress(contact.address)}
                 </Typography>

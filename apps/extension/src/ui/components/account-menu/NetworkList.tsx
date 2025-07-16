@@ -13,7 +13,7 @@ import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import networkLink from '@/ui/assets/svg/networkLink.svg';
 import { useWallet } from '@/ui/hooks/use-wallet';
-import { networkColor } from '@/ui/style/color';
+import { networkColor, COLOR_VERY_DARK_GRAY_222222 } from '@/ui/style/color';
 
 const bgColor = (network: string) => {
   return `${networkColor(network)}14`;
@@ -139,7 +139,7 @@ const NetworkList = ({
           MenuProps={{
             PaperProps: {
               sx: {
-                backgroundColor: '#222222',
+                backgroundColor: COLOR_VERY_DARK_GRAY_222222,
                 borderRadius: '8px',
                 marginTop: '4px',
                 zIndex: 2000,

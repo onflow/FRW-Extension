@@ -1,4 +1,5 @@
 import { Avatar, Box, FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useEffect } from 'react';
 
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -11,6 +12,7 @@ export const FWDropDownProfile = ({
   isLoading = false,
 }) => {
   const usewallet = useWallet();
+  const theme = useTheme();
 
   const contactKeys = Object.keys(contacts);
   const [selectedChild, setSelectedChild] = React.useState(
@@ -63,7 +65,7 @@ export const FWDropDownProfile = ({
                       sx={{
                         mr: '4px',
                         color: 'primary.main',
-                        backgroundColor: '#484848',
+                        backgroundColor: theme.palette.profile.darkGray,
                         width: '20px',
                         height: '20px',
                         display: 'flex',
@@ -90,7 +92,7 @@ export const FWDropDownProfile = ({
                   <Typography
                     sx={{
                       textAlign: 'start',
-                      color: '#FFFFFF',
+                      color: theme.palette.text.primary,
                       fontSize: '12px',
                       fontWeight: '400',
                     }}
@@ -100,7 +102,7 @@ export const FWDropDownProfile = ({
                 </Box>
                 <Typography
                   sx={{ lineHeight: '1', textAlign: 'start', fontSize: '10px', fontWeight: '400' }}
-                  color="#FFFFFFCC"
+                  color={theme.palette.text.secondary}
                 >
                   {formatAddress(address)}
                 </Typography>

@@ -1,4 +1,4 @@
-import { Box, Drawer, Stack, Typography } from '@mui/material';
+import { Box, Drawer, Stack, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
 import { LLPrimaryButton, LLSecondaryButton } from '@/ui/components';
@@ -12,6 +12,7 @@ interface DeleteBackupProps {
 }
 
 export const LLDeleteBackupPopup = (props: DeleteBackupProps) => {
+  const theme = useTheme();
   const onCancelBtnClicked = () => {
     props.handleCancelBtnClicked();
   };
@@ -52,7 +53,7 @@ export const LLDeleteBackupPopup = (props: DeleteBackupProps) => {
               fontSize: '14px',
               fontFamily: 'Inter',
               fontStyle: 'normal',
-              color: '#BABABA',
+              color: theme.palette.text.secondary,
               textAlign: 'center',
               margin: '18px 36px 52px',
               cursor: 'pointer',

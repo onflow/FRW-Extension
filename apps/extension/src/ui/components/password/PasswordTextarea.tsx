@@ -1,5 +1,6 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { TextField, InputAdornment, IconButton, type TextFieldProps } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { COLOR_DARKMODE_WHITE_3pc } from '@/ui/style/color';
@@ -24,6 +25,7 @@ const PasswordTextarea = ({
   sx, // Allow sx prop for styling
   ...rest // Pass through any other TextFieldProps
 }: PasswordTextareaProps) => {
+  const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => {
@@ -40,7 +42,7 @@ const PasswordTextarea = ({
     marginBottom: '16px',
     borderRadius: '16px',
     overflow: 'hidden',
-    border: '1px solid #767676',
+    border: `1px solid ${theme.palette.darkGray.main}`,
 
     // Remove any extra spacing
     '& .MuiOutlinedInput-root': {
@@ -51,7 +53,7 @@ const PasswordTextarea = ({
     '& .MuiInputBase-root': {
       borderRadius: '16px',
       backgroundColor: COLOR_DARKMODE_WHITE_3pc,
-      color: '#fff',
+      color: theme.palette.text.primary,
       fontFamily: 'Inter',
       fontSize: '16px',
       fontWeight: 400,
@@ -65,10 +67,10 @@ const PasswordTextarea = ({
       fontSize: '16px',
       fontFamily: 'Inter',
       fontWeight: 400,
-      color: '#fff',
+      color: theme.palette.text.primary,
       WebkitTextSecurity: showPassword ? 'none' : 'disc',
       '&::placeholder': {
-        color: '#767676',
+        color: theme.palette.darkGray.main,
         opacity: 1,
       },
     },
@@ -88,7 +90,7 @@ const PasswordTextarea = ({
     },
 
     '& .MuiIconButton-root': {
-      color: '#fff',
+      color: theme.palette.text.primary,
       padding: '8px',
     },
   };

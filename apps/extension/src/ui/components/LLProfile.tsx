@@ -1,9 +1,11 @@
-import { Avatar, Box, Skeleton, Typography } from '@mui/material';
+import { Box, Skeleton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import { formatAddress, isEmoji } from '@/ui/utils';
 
 export const LLProfile = ({ contact, isLoading = false }) => {
+  const theme = useTheme();
   const getName = (name: string) => {
     if (!name) {
       return '0x';
@@ -24,6 +26,7 @@ export const LLProfile = ({ contact, isLoading = false }) => {
           px: '0',
           py: '8px',
           alignItems: 'center',
+          backgroundColor: theme.palette.profile.darkGray,
         }}
       >
         {!isLoading ? (
@@ -42,18 +45,22 @@ export const LLProfile = ({ contact, isLoading = false }) => {
               <Typography sx={{ fontSize: '28px', fontWeight: '600' }}>{contact.avatar}</Typography>
             </Box>
           ) : (
-            <Avatar
-              alt={contact.contact_name}
-              src={contact.avatar}
+            <Typography
               sx={{
+                mr: '13px',
                 color: 'primary.main',
-                backgroundColor: '#484848',
+                backgroundColor: theme.palette.profile.darkGray,
                 width: '40px',
                 height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                fontSize: '24px',
               }}
             >
               {getName(contact.contact_name)}
-            </Avatar>
+            </Typography>
           )
         ) : (
           <Skeleton variant="circular" width={40} height={40} />

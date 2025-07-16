@@ -1,15 +1,18 @@
-import { Button, DialogActions, Typography } from '@mui/material';
+import { Button, DialogActions, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
 import { CustomDialog } from '../custom-dialog';
 
 const ResetModal = ({ setShowAction, isOpen, onOpenChange, errorName, errorMessage }) => {
+  const theme = useTheme();
   return (
     <CustomDialog open={isOpen} onClose={() => setShowAction(false)}>
       <Typography sx={{ color: 'testnet.main', fontSize: '24px', fontWeight: '700' }}>
         {errorName}
       </Typography>
-      <Typography sx={{ color: '#BABABA', margin: '20px 0 40px', fontSize: '16px' }}>
+      <Typography
+        sx={{ color: theme.palette.text.secondary, margin: '20px 0 40px', fontSize: '16px' }}
+      >
         {errorMessage}
       </Typography>
       <DialogActions sx={{ display: 'flex', flexDirection: 'row' }}>

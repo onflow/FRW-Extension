@@ -1,4 +1,5 @@
 import { Box, Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { Link } from 'react-router';
 
@@ -6,12 +7,6 @@ import { IconScan } from '@/ui/assets/icons/IconScan';
 import { KeyIcon } from '@/ui/assets/icons/KeyIcon';
 import { LockIcon } from '@/ui/assets/icons/LockIcon';
 import { UserPlus } from '@/ui/assets/icons/UserPlus';
-import {
-  COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
-  COLOR_DARKMODE_TEXT_PRIMARY_FFFFFF,
-  COLOR_DARKMODE_WHITE_10pc,
-  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
-} from '@/ui/style/color';
 
 const ImportStep = ({
   step,
@@ -22,6 +17,8 @@ const ImportStep = ({
   step: number;
   description: string;
 }) => {
+  const theme = useTheme();
+
   return (
     <Box
       sx={{
@@ -40,7 +37,7 @@ const ImportStep = ({
       </Typography>
       <Typography
         variant="body1"
-        color={COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80}
+        color={theme.palette.text.primary}
         sx={{ fontSize: '14px', fontWeight: 400, textAlign: 'center' }}
       >
         {description}
@@ -48,12 +45,15 @@ const ImportStep = ({
     </Box>
   );
 };
+
 /**
  * Steps that describe the process of importing a profile from a mobile app.
  * @param isLogin - Whether the user is logged in.
  * @returns A component that displays the mobile app import steps.
  */
-const MobileAppImportSteps = ({ isLogin = false }: { isLogin: boolean }) => {
+const MobileAppImportSteps = ({ isLogin = false }: { isLogin?: boolean }) => {
+  const theme = useTheme();
+
   return (
     <>
       <Box
@@ -68,20 +68,20 @@ const MobileAppImportSteps = ({ isLogin = false }: { isLogin: boolean }) => {
           flexShrink: '0',
           alignSelf: 'stretch',
           borderRadius: '16px',
-          background: COLOR_DARKMODE_WHITE_10pc,
+          background: theme.palette.background.paper,
         }}
       >
         <Box>
           <Typography
             variant="body1"
-            color={COLOR_DARKMODE_TEXT_PRIMARY_FFFFFF}
+            color={theme.palette.text.primary}
             sx={{ fontSize: '24px', fontWeight: 600, lineHeight: '120%' }}
           >
             {chrome.i18n.getMessage('Mobile_overview')}
           </Typography>
           <Typography
             variant="body1"
-            color={COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80}
+            color={theme.palette.text.primary}
             sx={{ fontSize: '14px', fontWeight: 400, lineHeight: '120%' }}
           >
             {chrome.i18n.getMessage(
@@ -91,7 +91,7 @@ const MobileAppImportSteps = ({ isLogin = false }: { isLogin: boolean }) => {
         </Box>
         <Box
           sx={{
-            borderBottom: `1px solid ${COLOR_DARKMODE_WHITE_10pc}`,
+            borderBottom: `1px solid ${theme.palette.background.paper}`,
             width: '100%',
           }}
         ></Box>
@@ -107,12 +107,12 @@ const MobileAppImportSteps = ({ isLogin = false }: { isLogin: boolean }) => {
         >
           <ImportStep
             step={1}
-            icon={<KeyIcon width={34} height={34} color={COLOR_GREEN_FLOW_DARKMODE_00EF8B} />}
+            icon={<KeyIcon width={34} height={34} color={theme.palette.primary.main} />}
             description={chrome.i18n.getMessage('Import_from_Mobile_Step_1')}
           />
           <ImportStep
             step={2}
-            icon={<LockIcon width={34} height={34} color={COLOR_GREEN_FLOW_DARKMODE_00EF8B} />}
+            icon={<LockIcon width={34} height={34} color={theme.palette.primary.main} />}
             description={
               isLogin
                 ? chrome.i18n.getMessage('Import_from_Mobile_Step_2_verify')
@@ -121,12 +121,12 @@ const MobileAppImportSteps = ({ isLogin = false }: { isLogin: boolean }) => {
           />
           <ImportStep
             step={3}
-            icon={<IconScan width={34} height={34} color={COLOR_GREEN_FLOW_DARKMODE_00EF8B} />}
+            icon={<IconScan width={34} height={34} color={theme.palette.primary.main} />}
             description={chrome.i18n.getMessage('Import_from_Mobile_Step_3')}
           />
           <ImportStep
             step={4}
-            icon={<UserPlus width={34} height={34} color={COLOR_GREEN_FLOW_DARKMODE_00EF8B} />}
+            icon={<UserPlus width={34} height={34} color={theme.palette.primary.main} />}
             description={chrome.i18n.getMessage('Import_from_Mobile_Step_4')}
           />
         </Box>

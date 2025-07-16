@@ -1,4 +1,5 @@
 import { List, ListSubheader, ButtonBase, Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import { LLContactCard, LLContactEth, FWContactCard } from '@/ui/components';
@@ -6,6 +7,8 @@ import { useContacts } from '@/ui/hooks/useContactHook';
 
 const AccountsList = ({ handleClick }) => {
   const { cadenceAccounts, evmAccounts, childAccountsContacts } = useContacts();
+  const theme = useTheme();
+
   return (
     <Box sx={{ height: '100%' }}>
       {cadenceAccounts?.length > 0 && (
@@ -14,7 +17,7 @@ const AccountsList = ({ handleClick }) => {
             lineHeight: '18px',
             marginTop: '0px',
             marginBottom: '0px',
-            backgroundColor: '#000000',
+            backgroundColor: theme.palette.common.black,
             textTransform: 'capitalize',
             py: '4px',
           }}
@@ -42,7 +45,7 @@ const AccountsList = ({ handleClick }) => {
             lineHeight: '18px',
             marginTop: '0px',
             marginBottom: '0px',
-            backgroundColor: '#000000',
+            backgroundColor: theme.palette.common.black,
             textTransform: 'capitalize',
             py: '4px',
           }}

@@ -2,6 +2,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import LockOpenRoundedIcon from '@mui/icons-material/LockOpenRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import { Button, Typography, IconButton } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useState } from 'react';
 
@@ -10,6 +11,7 @@ import SlideRelative from '@/ui/components/SlideRelative';
 import { COLOR_DARKMODE_WHITE_3pc } from '@/ui/style/color';
 
 const RecoveryPhrase = ({ handleSwitchTab, mnemonic }) => {
+  const theme = useTheme();
   const [canGoNext, setCanGoNext] = useState(false);
   const [isCoverBlur, coverBlur] = useState(true);
 
@@ -29,7 +31,7 @@ const RecoveryPhrase = ({ handleSwitchTab, mnemonic }) => {
 
       <Box
         sx={{
-          border: '2px solid #5E5E5E',
+          border: `2px solid ${theme.palette.darkGray.main}`,
           borderRadius: '12px',
           mt: '8px',
           position: 'relative',
@@ -84,7 +86,11 @@ const RecoveryPhrase = ({ handleSwitchTab, mnemonic }) => {
                 >
                   {i + 1}
                 </Box>
-                <Typography key={'key_' + i} variant="body1" sx={{ color: '#f9f9f9' }}>
+                <Typography
+                  key={'key_' + i}
+                  variant="body1"
+                  sx={{ color: theme.palette.text.primary }}
+                >
                   {word}
                 </Typography>
               </Box>
@@ -204,7 +210,8 @@ const RecoveryPhrase = ({ handleSwitchTab, mnemonic }) => {
             {/* <CardMedia style={{ color:'#E54040', width:'24px',height:'24px', margin: '0 12px 0' }} image={empty} />   */}
             <InfoIcon
               fontSize="medium"
-              style={{ margin: '0px 12px auto 12px', color: '#E54040' }}
+              color="error"
+              style={{ margin: '0px 12px auto 12px', color: theme.palette.error.main }}
             />
             <Typography variant="body1" color="error.main" sx={{ fontSize: '14px' }}>
               {chrome.i18n.getMessage('Please__notice__that__If__you__lose__you__can__not__access')}

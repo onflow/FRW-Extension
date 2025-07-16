@@ -1,5 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Input, InputAdornment } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
@@ -23,6 +24,7 @@ const NftSearch: React.FC<NftSearchProps> = ({
   placeholder = 'Search NFT',
   sx = {},
 }) => {
+  const theme = useTheme();
   const filterNFTs = useMemo(() => {
     if (!searchTerm.trim()) {
       return items;
@@ -81,7 +83,7 @@ const NftSearch: React.FC<NftSearchProps> = ({
         disableUnderline
         sx={{
           height: '32px',
-          backgroundColor: '#282828',
+          backgroundColor: theme.palette.background.paper,
           zIndex: 999,
           borderRadius: '8px',
           boxSizing: 'border-box',
@@ -106,20 +108,30 @@ const NftSearch: React.FC<NftSearchProps> = ({
         endAdornment={
           searchTerm && (
             <InputAdornment position="end">
-              <IconButton
-                onClick={handleClearSearch}
+              <Box
                 sx={{
+                  backgroundColor: theme.palette.text.primary + '0F',
                   width: '20px',
                   height: '20px',
                   borderRadius: '20px',
-                  backgroundColor: '#FFFFFF0F',
                   cursor: 'pointer',
                 }}
               >
-                <CloseIcon
-                  sx={{ color: 'icon.navi', cursor: 'pointer', width: '14px', height: '14px' }}
-                />
-              </IconButton>
+                <IconButton
+                  onClick={handleClearSearch}
+                  sx={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '20px',
+                    backgroundColor: theme.palette.text.primary + '0F',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <CloseIcon
+                    sx={{ color: 'icon.navi', cursor: 'pointer', width: '14px', height: '14px' }}
+                  />
+                </IconButton>
+              </Box>
             </InputAdornment>
           )
         }

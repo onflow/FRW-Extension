@@ -15,6 +15,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -53,6 +54,7 @@ const CollectionDetailGrid: React.FC<CollectionDetailProps> = ({
   const navigate = useNavigate();
   const [filteredList, setFilteredList] = useState<any[]>([]);
   const [searchOpen, setSearchOpen] = useState(false);
+  const theme = useTheme();
 
   return (
     <div className="page" id="scrollableDiv" style={{ overflow: 'auto' }}>
@@ -93,7 +95,7 @@ const CollectionDetailGrid: React.FC<CollectionDetailProps> = ({
             <Grid
               sx={{
                 justifyContent: 'center',
-                backgroundColor: '#121212',
+                backgroundColor: theme.palette.background.default,
                 width: '108px',
                 height: '108px',
               }}
@@ -256,7 +258,7 @@ const CollectionDetailGrid: React.FC<CollectionDetailProps> = ({
                           width: '48%',
                           marginBottom: '16px',
                           borderRadius: '12px',
-                          backgroundColor: 'transparent',
+                          backgroundColor: theme.palette.background.paper,
                         }}
                         elevation={0}
                       />
@@ -291,7 +293,7 @@ const CollectionDetailGrid: React.FC<CollectionDetailProps> = ({
             <Card
               sx={{
                 borderRadius: '12px',
-                backgroundColor: '#1a1a1a',
+                backgroundColor: theme.palette.background.paper,
                 overflow: 'hidden',
                 '&:hover': { cursor: 'pointer' },
               }}

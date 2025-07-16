@@ -11,6 +11,7 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
@@ -32,11 +33,6 @@ import { useChildAccountFt } from '@/ui/hooks/use-coin-hooks';
 import { useWallet } from '@/ui/hooks/use-wallet';
 import { useNftCatalogCollections, useNftCollectionList } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
-import {
-  COLOR_GRAY_808080,
-  COLOR_WHITE_ALPHA_40_FFFFFF66,
-  COLOR_WHITE_ALPHA_80_FFFFFFCC,
-} from '@/ui/style/color';
 
 import EditAccount from './Linked/EditAccount';
 import UnlinkAccount from './Linked/UnlinkAccount';
@@ -263,6 +259,8 @@ const LinkedDetail = () => {
     }
   };
 
+  const theme = useTheme();
+
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column' }}>
       <LLHeader
@@ -278,7 +276,7 @@ const LinkedDetail = () => {
           flexDirection: 'column',
           justifyContent: 'space-between',
           flexGrow: 1,
-          color: COLOR_WHITE_ALPHA_80_FFFFFFCC,
+          color: theme.palette.text.secondary,
         }}
       >
         <Box>
@@ -321,13 +319,13 @@ const LinkedDetail = () => {
                 sx={{
                   fontSize: '12px',
                   textTransform: 'capitalize',
-                  color: COLOR_GRAY_808080,
+                  color: theme.palette.text.secondary,
                   marginBottom: '4px',
                 }}
               >
                 {chrome.i18n.getMessage('Description')}
               </Typography>
-              <Typography sx={{ fontSize: '16px', color: COLOR_WHITE_ALPHA_80_FFFFFFCC }}>
+              <Typography sx={{ fontSize: '16px', color: theme.palette.text.secondary }}>
                 {description || 'No Description'}
               </Typography>
             </Box>
@@ -360,7 +358,7 @@ const LinkedDetail = () => {
                 sx={{
                   fontSize: '16px',
                   textTransform: 'capitalize',
-                  color: COLOR_WHITE_ALPHA_80_FFFFFFCC,
+                  color: theme.palette.text.secondary,
                 }}
               >
                 {chrome.i18n.getMessage('Accessible')}
@@ -374,7 +372,7 @@ const LinkedDetail = () => {
                       variant="body2"
                       sx={{
                         fontSize: '12px',
-                        color: COLOR_WHITE_ALPHA_40_FFFFFF66,
+                        color: theme.palette.text.secondary,
                         marginRight: '0px',
                       }}
                     >

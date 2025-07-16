@@ -10,7 +10,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
@@ -131,6 +131,7 @@ const PriceCard = ({ token }) => {
   const [change, setChange] = useState(0);
   const [price, setPrice] = useState(0);
   const mountedRef = useRef(true);
+  const theme = useTheme();
 
   const priceProviders = useMemo(() => {
     return getPriceProvider(token);
@@ -243,7 +244,7 @@ const PriceCard = ({ token }) => {
             backgroundColor: 'neutral.main',
             borderRadius: '8px',
             padding: '5px',
-            border: '1px solid #4C4C4C',
+            border: `1px solid ${theme.palette.darkGray.main}`,
           }}
         >
           <Typography
@@ -294,7 +295,7 @@ const PriceCard = ({ token }) => {
               <Box
                 sx={{
                   display: 'flex',
-                  backgroundColor: isUp() ? '#182810' : '#271716',
+                  backgroundColor: isUp() ? theme.palette.success.light : theme.palette.error.light,
                   py: '1px',
                   pl: '2px',
                   pr: '6px',
@@ -387,8 +388,8 @@ const PriceCard = ({ token }) => {
           {/* <CartesianGrid  /> */}
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#41CC5D" stopOpacity={0.5} />
-              <stop offset="95%" stopColor="#121212" stopOpacity={0.1} />
+              <stop offset="5%" stopColor={theme.palette.success.main} stopOpacity={0.5} />
+              <stop offset="95%" stopColor={theme.palette.background.default} stopOpacity={0.1} />
             </linearGradient>
           </defs>
           <YAxis
@@ -409,7 +410,7 @@ const PriceCard = ({ token }) => {
           <Area
             type="monotone"
             dataKey="price"
-            stroke="#41CC5D"
+            stroke={theme.palette.success.main}
             fillOpacity={1}
             fill="url(#colorUv)"
           />

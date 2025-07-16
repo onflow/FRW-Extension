@@ -1,7 +1,7 @@
 import { Alert, Button, FormGroup, Snackbar, Typography } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 
@@ -11,16 +11,16 @@ import CancelIcon from '@/ui/components/iconfont/IconClose';
 import { PasswordInput } from '@/ui/components/password/PasswordInput';
 import { useWallet } from '@/ui/hooks/use-wallet';
 
-const BpIcon = styled('span')(() => ({
+const BpIcon = styled('span')(({ theme }) => ({
   borderRadius: 8,
   width: 24,
   height: 24,
-  border: '1px solid #41CC5D',
+  border: `1px solid ${theme.palette.success.main}`,
   backgroundColor: 'transparent',
 }));
 
-const BpCheckedIcon = styled(BpIcon)({
-  backgroundColor: '#41CC5D',
+const BpCheckedIcon = styled(BpIcon)(({ theme }) => ({
+  backgroundColor: theme.palette.success.main,
   backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
   '&:before': {
     display: 'block',
@@ -33,12 +33,13 @@ const BpCheckedIcon = styled(BpIcon)({
     content: '""',
   },
   'input:hover ~ &': {
-    backgroundColor: '#41CC5D',
+    backgroundColor: theme.palette.success.main,
   },
-});
+}));
 
 const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPassword }) => {
   const usewallet = useWallet();
+  const theme = useTheme();
 
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -69,7 +70,7 @@ const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPasswo
           alignItems: 'center',
         }}
       >
-        <CheckCircleIcon size={24} color={'#41CC5D'} style={{ margin: '8px' }} />
+        <CheckCircleIcon size={24} color={theme.palette.success.main} style={{ margin: '8px' }} />
         <Typography variant="body1" color="success.main">
           {message}
         </Typography>
@@ -90,7 +91,7 @@ const GoogleRecoverPassword = ({ handleSwitchTab, mnemonic, username, lastPasswo
           alignItems: 'center',
         }}
       >
-        <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
+        <CancelIcon size={24} color={theme.palette.error.main} style={{ margin: '8px' }} />
         <Typography variant="body1" color="error.main">
           {message}
         </Typography>

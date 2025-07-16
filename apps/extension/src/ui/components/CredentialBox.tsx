@@ -1,10 +1,11 @@
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import React from 'react';
 
 import IconCopy from '@/ui/components/iconfont/IconCopy';
 
 export const CredentialBox = ({ data }) => {
+  const theme = useTheme();
   return (
     <>
       <Box
@@ -15,7 +16,7 @@ export const CredentialBox = ({ data }) => {
           padding: '5px 16px',
           lineBreak: 'anywhere',
           marginTop: '0px',
-          backgroundColor: '#333333',
+          backgroundColor: theme.palette.darkGray.main,
         }}
       >
         <Typography

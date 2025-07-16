@@ -1,4 +1,5 @@
 import { Box, Skeleton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -16,6 +17,7 @@ export const FRWProfile = ({ contact, isLoading = false, isEvm = false, fromEvm 
   const { currentWallet, evmWallet } = useProfiles();
   const [emoji, setEmoji] = useState(tempEmoji);
   const [isload, setLoad] = useState(true);
+  const theme = useTheme();
 
   const getEmoji = useCallback(async () => {
     setLoad(true);
@@ -73,7 +75,13 @@ export const FRWProfile = ({ contact, isLoading = false, isEvm = false, fromEvm 
           <Skeleton variant="circular" width={40} height={40} />
         )}
         {!isLoading && !isload ? (
-          <Typography sx={{ textAlign: 'start', color: '#FFFFFF', fontSize: '12px' }}>
+          <Typography
+            sx={{
+              textAlign: 'start',
+              color: theme.palette.text.primary,
+              fontSize: '12px',
+            }}
+          >
             {isEmoji(contact.avatar) ? contact.contact_name : emoji.name}
           </Typography>
         ) : (
@@ -82,8 +90,13 @@ export const FRWProfile = ({ contact, isLoading = false, isEvm = false, fromEvm 
 
         {!isLoading && !isload ? (
           <Typography
-            sx={{ lineHeight: '1', textAlign: 'start', fontSize: '12px', fontWeight: '400' }}
-            color="#FFFFFFCC"
+            sx={{
+              lineHeight: '1',
+              textAlign: 'start',
+              fontSize: '12px',
+              fontWeight: '400',
+              color: theme.palette.text.secondary,
+            }}
           >
             {`${formatAddress(contact.address)}`}
           </Typography>

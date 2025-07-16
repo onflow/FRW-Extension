@@ -9,7 +9,7 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import {
@@ -53,6 +53,7 @@ const TokenItem: React.FC<TokenItemProps> = ({
   showSwitch = false,
 }) => {
   const currency = useCurrency();
+  const theme = useTheme();
   const handleClick = () => {
     if (onClick) {
       onClick(token, enabled);
@@ -81,9 +82,9 @@ const TokenItem: React.FC<TokenItemProps> = ({
         mx: '8px',
         py: '4px',
         my: '8px',
-        backgroundColor: '#000000',
+        backgroundColor: theme.palette.common.black,
         borderRadius: '12px',
-        border: '1px solid #2A2A2A',
+        border: `1px solid ${theme.palette.darkGray.main}`,
       }}
       onClick={showSwitch ? undefined : handleClick}
       disableRipple={showSwitch}
@@ -115,50 +116,62 @@ const TokenItem: React.FC<TokenItemProps> = ({
         <ListItemAvatar>
           <TokenAvatar symbol={token.symbol} src={token.logoURI} width={36} height={36} />
         </ListItemAvatar>
-        <ListItemText
-          primary={
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 1,
-                  WebkitBoxOrient: 'vertical',
-                  maxWidth: '210px',
-                }}
-              >
-                {token.name}
-              </Typography>
-              {token.isVerified && (
-                <img
-                  src={VerifiedIcon}
-                  alt="Verified"
-                  style={{
-                    height: '16px',
-                    width: '16px',
-                    backgroundColor: '#282828',
-                    borderRadius: '18px',
-                    marginLeft: token.name.length * 8 > 210 ? '-12px' : '4px',
-                    marginRight: '18px',
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            flex: 1,
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: '12px',
+            p: '12px',
+          }}
+        >
+          <ListItemText
+            primary={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: 'vertical',
+                    maxWidth: '210px',
                   }}
+                >
+                  {token.name}
+                </Typography>
+                {token.isVerified && (
+                  <img
+                    src={VerifiedIcon}
+                    alt="Verified"
+                    style={{
+                      height: '16px',
+                      width: '16px',
+                      backgroundColor: theme.palette.background.paper,
+                      borderRadius: '18px',
+                      marginLeft: token.name.length * 8 > 210 ? '-12px' : '4px',
+                      marginRight: '18px',
+                    }}
+                  />
+                )}
+              </Box>
+            }
+            secondary={
+              showSwitch ? (
+                <CurrencyValue
+                  value={token.total?.toString() ?? ''}
+                  currencyCode={currency?.code ?? ''}
+                  currencySymbol={currency?.symbol ?? ''}
                 />
-              )}
-            </Box>
-          }
-          secondary={
-            showSwitch ? (
-              <CurrencyValue
-                value={token.total?.toString() ?? ''}
-                currencyCode={currency?.code ?? ''}
-                currencySymbol={currency?.symbol ?? ''}
-              />
-            ) : (
-              token.symbol.toUpperCase()
-            )
-          }
-        />
+              ) : (
+                token.symbol.toUpperCase()
+              )
+            }
+          />
+        </Box>
       </CustomListItem>
     </ListItemButton>
   );

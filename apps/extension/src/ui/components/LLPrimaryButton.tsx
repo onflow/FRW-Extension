@@ -1,24 +1,25 @@
 import Button, { type ButtonProps } from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import React from 'react';
 
 interface LLPrimaryButtonProps extends ButtonProps {
   label: string | JSX.Element;
 }
 
-const CustomButton = styled(Button)<ButtonProps>(() => ({
+const CustomButton = styled(Button)<ButtonProps>(({ theme }) => ({
   '&:disabled': {
-    backgroundColor: '#E5E5E54D',
-    color: '#000000CC',
+    backgroundColor: theme.palette.text.primary + '4D',
+    color: theme.palette.common.black + 'CC',
   },
   '&:hover': {
-    backgroundColor: '#E5E5E5B3',
-    color: '#000000CC',
+    backgroundColor: theme.palette.text.primary + 'B3',
+    color: theme.palette.common.black + 'CC',
   },
 }));
 
 export const LLPrimaryButton = (props: LLPrimaryButtonProps) => {
   const { label, ...inherentProps } = props;
+  const theme = useTheme();
 
   return (
     <CustomButton
@@ -30,6 +31,8 @@ export const LLPrimaryButton = (props: LLPrimaryButtonProps) => {
         borderRadius: 2,
         fontWeight: '600',
         height: '48px',
+        backgroundColor: theme.palette.text.primary + '4D',
+        color: theme.palette.common.black + 'CC',
       }}
       {...inherentProps}
     >

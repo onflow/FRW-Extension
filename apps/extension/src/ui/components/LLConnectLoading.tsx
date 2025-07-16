@@ -1,8 +1,10 @@
 import { Box } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
+import { useTheme } from '@mui/material/styles';
 import React, { useState, useEffect } from 'react';
 
 export const LLConnectLoading = ({ logo }) => {
+  const theme = useTheme();
   const [count, setCount] = useState(0);
   const colorArray = [
     'rgba(94,94,94,0.3)',
@@ -47,6 +49,7 @@ export const LLConnectLoading = ({ logo }) => {
         alignItems: 'center',
         justifyContent: 'center',
         display: 'flex',
+        backgroundColor: theme.palette.success.main,
       }}
     >
       <Box

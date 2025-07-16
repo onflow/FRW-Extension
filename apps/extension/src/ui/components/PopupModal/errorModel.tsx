@@ -1,4 +1,5 @@
 import { Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
@@ -6,6 +7,7 @@ import { CustomDialog } from '../custom-dialog';
 
 const ErrorModel = ({ isOpen, onOpenChange, errorName, errorMessage, isGoback = false }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleSubmit = () => {
     navigate(-1);
@@ -16,7 +18,13 @@ const ErrorModel = ({ isOpen, onOpenChange, errorName, errorMessage, isGoback = 
       <Typography sx={{ color: 'testnet.main', fontSize: '24px', fontWeight: '700' }}>
         {errorName}
       </Typography>
-      <Typography sx={{ color: '#BABABA', margin: '20px 0 40px', fontSize: '16px' }}>
+      <Typography
+        sx={{
+          color: theme.palette.text.secondary,
+          margin: '20px 0 40px',
+          fontSize: '16px',
+        }}
+      >
         {errorMessage}
       </Typography>
       <Button

@@ -1,4 +1,4 @@
-import { Typography, CircularProgress } from '@mui/material';
+import { Typography, CircularProgress, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import React from 'react';
 
@@ -15,6 +15,7 @@ interface LLFormHelperTextProps {
 }
 
 const genHelperText = (
+  theme: any,
   isValidating: boolean,
   isValid: boolean,
   errorMsg?: string,
@@ -40,7 +41,7 @@ const genHelperText = (
         alignItems: 'center',
       }}
     >
-      <CheckCircleIcon size={24} color={'#41CC5D'} style={{ margin: '8px' }} />
+      <CheckCircleIcon size={24} color={theme.palette.success.main} style={{ margin: '8px' }} />
       <Typography variant="body2" color="text.success">
         {successMsg || chrome.i18n.getMessage('Sounds_good')}
       </Typography>
@@ -53,7 +54,7 @@ const genHelperText = (
         alignItems: 'center',
       }}
     >
-      <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
+      <CancelIcon size={24} color={theme.palette.error.main} style={{ margin: '8px' }} />
       <Typography variant="body2" color="text.error">
         {errorMsg}
       </Typography>
@@ -63,6 +64,7 @@ const genHelperText = (
 
 export const LLFormHelperText = (props: LLFormHelperTextProps) => {
   const { inputValue, isValidating, isValid, errorMsg, successMsg } = props;
+  const theme = useTheme();
 
   const msgBgColor = () => {
     if (isValidating && !isValid) return 'neutral.light';
@@ -80,7 +82,9 @@ export const LLFormHelperText = (props: LLFormHelperTextProps) => {
             borderRadius: '0 0 12px 12px',
           }}
         >
-          <Box sx={{ p: '4px' }}>{genHelperText(isValidating, isValid, errorMsg, successMsg)}</Box>
+          <Box sx={{ p: '4px' }}>
+            {genHelperText(theme, isValidating, isValid, errorMsg, successMsg)}
+          </Box>
         </Box>
       </SlideRelative>
     </>

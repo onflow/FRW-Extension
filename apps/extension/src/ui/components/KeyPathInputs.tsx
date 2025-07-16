@@ -7,7 +7,7 @@ import {
   TextareaAutosize,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import Expand from '@/ui/assets/svg/expand.svg';
@@ -39,6 +39,7 @@ const KeyPathInput = ({
   setPhrase: (phrase: string) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const theme = useTheme();
 
   const handleAccordionChange = () => (event, isExpanded) => {
     setExpanded(isExpanded ? true : false);
@@ -83,7 +84,7 @@ const KeyPathInput = ({
               position: 'absolute',
               top: '20px',
               left: '20px',
-              color: '#E6E6E6',
+              color: theme.palette.text.secondary,
               backgroundColor: 'transparent',
               pointerEvents: 'none',
               fontSize: '18px',
@@ -121,7 +122,7 @@ const KeyPathInput = ({
               position: 'absolute',
               top: '20px',
               left: '20px',
-              color: '#E6E6E6',
+              color: theme.palette.text.secondary,
               backgroundColor: 'transparent',
               pointerEvents: 'none',
               fontSize: '18px',

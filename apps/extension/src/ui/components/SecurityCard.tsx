@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import type {
@@ -13,10 +14,11 @@ import { isValidFlowAddress } from '@onflow/flow-wallet-shared/utils/address';
 export const SecurityCard: React.FC<{
   tokenInfo: CoinItem | CustomFungibleTokenInfo | EvmCustomTokenInfo;
 }> = ({ tokenInfo }) => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
-        backgroundColor: '#121212',
+        backgroundColor: theme.palette.background.default,
         borderRadius: '12px',
         p: 2,
         mb: 2,

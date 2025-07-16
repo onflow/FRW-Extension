@@ -1,4 +1,5 @@
 import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 
 import { type PublicKeyAccount } from '@onflow/flow-wallet-shared/types/wallet-types';
@@ -11,10 +12,6 @@ import MobileAppImportSteps from '@/ui/components/import-components/mobile-app-i
 import SeedPhraseImport from '@/ui/components/import-components/SeedPhraseImport';
 import ErrorModel from '@/ui/components/PopupModal/errorModel';
 import { useWallet } from '@/ui/hooks/use-wallet';
-import {
-  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
-  COLOR_GREEN_FLOW_DARKMODE_00EF8B_10pc,
-} from '@/ui/style/color';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -109,6 +106,8 @@ const ImportTabs = ({
     textTransform: 'none',
   };
 
+  const theme = useTheme();
+
   return (
     <Box sx={{ padding: '0 16px 16px' }}>
       <Box sx={{ padding: '20px 24px' }}>
@@ -126,8 +125,8 @@ const ImportTabs = ({
           padding: '0px 24px',
           '& .Mui-selected': {
             borderRadius: '16px',
-            color: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
-            background: COLOR_GREEN_FLOW_DARKMODE_00EF8B_10pc,
+            color: theme.palette.primary.main,
+            background: `${theme.palette.primary.main}10`,
             border: 'none',
           },
           '& .MuiTab-root': {

@@ -1,65 +1,65 @@
-import { Card, Box, Skeleton } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
-const LoadingSkeleton = () => (
-  <Box>
-    {[...Array(3)].map((_, index) => (
-      <Card
-        key={index}
-        sx={{
-          backgroundColor: '#000000',
-          display: 'flex',
-          width: '100%',
-          height: '72px',
-          margin: '12px auto',
-          boxShadow: 'none',
-          padding: 'auto',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '12px',
-        }}
-      >
-        <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', p: 1 }}>
+const LoadingSkeleton = () => {
+  const theme = useTheme();
+
+  return (
+    <Box
+      sx={{
+        backgroundColor: theme.palette.common.black,
+        display: 'flex',
+        width: '100%',
+        height: '72px',
+        margin: '12px auto',
+        boxShadow: 'none',
+        padding: 'auto',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+        borderRadius: '12px',
+      }}
+    >
+      <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', p: 1 }}>
+        <Skeleton
+          variant="rectangular"
+          sx={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            bgcolor: 'rgba(255, 255, 255, 0.08)',
+          }}
+        />
+        <Box sx={{ flex: 1, ml: 1 }}>
           <Skeleton
-            variant="rectangular"
+            variant="text"
             sx={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
+              width: '140px',
+              height: '24px',
               bgcolor: 'rgba(255, 255, 255, 0.08)',
             }}
           />
-          <Box sx={{ flex: 1, ml: 1 }}>
-            <Skeleton
-              variant="text"
-              sx={{
-                width: '140px',
-                height: '24px',
-                bgcolor: 'rgba(255, 255, 255, 0.08)',
-              }}
-            />
-            <Skeleton
-              variant="text"
-              sx={{
-                width: '80px',
-                height: '20px',
-                bgcolor: 'rgba(255, 255, 255, 0.08)',
-              }}
-            />
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Skeleton
-              variant="circular"
-              sx={{
-                width: '24px',
-                height: '24px',
-                bgcolor: 'rgba(255, 255, 255, 0.08)',
-              }}
-            />
-          </Box>
+          <Skeleton
+            variant="text"
+            sx={{
+              width: '80px',
+              height: '20px',
+              bgcolor: 'rgba(255, 255, 255, 0.08)',
+            }}
+          />
         </Box>
-      </Card>
-    ))}
-  </Box>
-);
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Skeleton
+            variant="circular"
+            sx={{
+              width: '24px',
+              height: '24px',
+              bgcolor: 'rgba(255, 255, 255, 0.08)',
+            }}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
 export default LoadingSkeleton;

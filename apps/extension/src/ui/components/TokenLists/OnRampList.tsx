@@ -2,6 +2,7 @@ import { generateOnRampURL } from '@coinbase/cbpay-js';
 import CloseIcon from '@mui/icons-material/Close';
 import { ButtonBase, IconButton, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -17,6 +18,7 @@ import { useWallet } from '@/ui/hooks/use-wallet';
 export const OnRampList = ({ close }) => {
   const wallet = useWallet();
   const [address, setAddress] = useState<string | null>(null);
+  const theme = useTheme();
 
   const loadAddress = useCallback(async () => {
     const address = await wallet.getCurrentAddress();
@@ -89,14 +91,24 @@ export const OnRampList = ({ close }) => {
       </Grid>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px', mx: '18px' }}>
         <ButtonBase
-          sx={{ width: '100%', backgroundColor: '#242424', borderRadius: '12px', height: '80px' }}
+          sx={{
+            width: '100%',
+            backgroundColor: theme.palette.darkGray.card,
+            borderRadius: '12px',
+            height: '80px',
+          }}
           onClick={loadMoonPay}
         >
           <img src={MoonPay} style={{ height: '40px' }} />
         </ButtonBase>
 
         <ButtonBase
-          sx={{ width: '100%', backgroundColor: '#0052FF', borderRadius: '8px', height: '80px' }}
+          sx={{
+            width: '100%',
+            backgroundColor: theme.palette.blue.primary,
+            borderRadius: '8px',
+            height: '80px',
+          }}
           onClick={loadCoinbasePay}
         >
           <img src={Coinbase} style={{ height: '50px' }} />

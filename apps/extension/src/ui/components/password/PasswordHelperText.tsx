@@ -1,43 +1,51 @@
 import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Box, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
-
-import { COLOR_SUCCESS_GREEN_41CC5D, COLOR_ERROR_RED_E54040 } from '@/ui/style/color';
 
 interface PasswordHelperTextProps {
   variant: 'success' | 'error';
-  message: string;
+  text: string;
 }
 
-export const PasswordHelperText: React.FC<PasswordHelperTextProps> = ({
-  message,
-  variant,
-}: PasswordHelperTextProps) => (
-  <Box
-    sx={{
-      width: '95%',
-      backgroundColor: variant === 'success' ? 'success.light' : 'error.light',
-      mx: 'auto',
-      borderRadius: '0 0 12px 12px',
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: '24px',
-    }}
-  >
-    {variant === 'success' ? (
-      <CheckCircleOutlineIcon
-        sx={{ fontSize: 14, color: COLOR_SUCCESS_GREEN_41CC5D, margin: '8px' }}
-      />
-    ) : (
-      <CancelIcon sx={{ fontSize: 14, color: COLOR_ERROR_RED_E54040, margin: '8px' }} />
-    )}
-    <Typography
-      variant="body2"
-      color={variant === 'success' ? COLOR_SUCCESS_GREEN_41CC5D : COLOR_ERROR_RED_E54040}
+const PasswordHelperText: React.FC<PasswordHelperTextProps> = ({ variant, text }) => {
+  const theme = useTheme();
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        marginTop: 1,
+      }}
     >
-      {message}
-    </Typography>
-  </Box>
-);
+      {variant === 'success' ? (
+        <CheckCircleIcon
+          sx={{
+            fontSize: 14,
+            color: theme.palette.success.main,
+            margin: '8px',
+          }}
+        />
+      ) : (
+        <CancelIcon
+          sx={{
+            fontSize: 14,
+            color: theme.palette.error.main,
+            margin: '8px',
+          }}
+        />
+      )}
+      <Typography
+        variant="body2"
+        color={variant === 'success' ? theme.palette.success.main : theme.palette.error.main}
+      >
+        {text}
+      </Typography>
+    </Box>
+  );
+};
+
+export default PasswordHelperText;

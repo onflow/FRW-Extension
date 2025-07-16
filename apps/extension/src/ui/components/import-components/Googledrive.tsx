@@ -1,4 +1,5 @@
 import { Box, Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
@@ -7,10 +8,10 @@ import { LLSpinner } from '@/ui/components';
 import BrowserWarning from '@/ui/components/BrowserWarning';
 import IconGoogleDrive from '@/ui/components/iconfont/IconGoogleDrive';
 import { useWallet } from '@/ui/hooks/use-wallet';
-import { COLOR_DARKMODE_WHITE_3pc } from '@/ui/style/color';
 
 const Googledrive = ({ setErrorMessage, setShowError, handleGoogleAccountsFound }) => {
   const wallets = useWallet();
+  const theme = useTheme();
 
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +46,7 @@ const Googledrive = ({ setErrorMessage, setShowError, handleGoogleAccountsFound 
           flexDirection: 'column',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: COLOR_DARKMODE_WHITE_3pc,
+          backgroundColor: theme.palette.text.primary,
           borderRadius: '16px',
           py: '40px',
         }}
@@ -84,7 +85,10 @@ const Googledrive = ({ setErrorMessage, setShowError, handleGoogleAccountsFound 
           onClick={getGoogle}
           startIcon={loading && <LLSpinner size={20} />}
         >
-          <Typography variant="body1" sx={{ color: '#222', fontSize: '20px', fontWeight: '600' }}>
+          <Typography
+            variant="body1"
+            sx={{ color: theme.palette.background.paper, fontSize: '20px', fontWeight: '600' }}
+          >
             {chrome.i18n.getMessage('Connect')}
           </Typography>
         </Button>

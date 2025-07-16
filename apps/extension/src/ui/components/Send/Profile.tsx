@@ -1,9 +1,10 @@
-import { Avatar, Box, Skeleton, Typography } from '@mui/material';
+import { Avatar, Box, Skeleton, Typography, useTheme } from '@mui/material';
 import React from 'react';
 
 import { formatAddress, isEmoji } from '@/ui/utils';
 
 export const Profile = ({ contact, isLoading = false }) => {
+  const theme = useTheme();
   const getName = (name: string) => {
     if (!name) {
       return '0x';
@@ -47,7 +48,7 @@ export const Profile = ({ contact, isLoading = false }) => {
               src={contact.avatar}
               sx={{
                 color: 'primary.main',
-                backgroundColor: '#484848',
+                backgroundColor: theme.palette.profile.darkGray,
                 width: '40px',
                 height: '40px',
               }}

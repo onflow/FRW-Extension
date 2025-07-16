@@ -10,6 +10,7 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -39,6 +40,7 @@ const FetchAvatar = ({ username }) => {
 };
 
 const GoogleAccounts = ({ handleSwitchTab, accounts, setUsername }) => {
+  const theme = useTheme();
   return (
     <>
       <Box className="registerBox">
@@ -54,6 +56,7 @@ const GoogleAccounts = ({ handleSwitchTab, accounts, setUsername }) => {
 
         <Box
           sx={{
+            border: `2px solid ${theme.palette.darkGray.main}`,
             borderRadius: '12px',
             my: '32px',
             position: 'relative',
@@ -78,7 +81,7 @@ const GoogleAccounts = ({ handleSwitchTab, accounts, setUsername }) => {
                         border: '2px solid #5E5E5E',
                         width: '100%',
                         borderRadius: '12px',
-                        backgroundColor: '#333333',
+                        backgroundColor: theme.palette.darkGray.main,
                         transition: 'all .3s linear',
                         py: '8px',
                         px: '16px',

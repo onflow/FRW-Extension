@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 export const NetworkIndicator = ({
@@ -7,6 +8,7 @@ export const NetworkIndicator = ({
   network: string;
   emulatorMode: boolean;
 }) => {
+  const theme = useTheme();
   if (network !== 'testnet' && !emulatorMode) {
     // Don't show anything
     return null;
@@ -20,8 +22,12 @@ export const NetworkIndicator = ({
       ? chrome.i18n.getMessage('Testnet')
       : chrome.i18n.getMessage('Mainnet');
 
-  const foregroundColor = emulatorMode ? '#ff3d00' : '#FF8A00';
-  const backgroundColor = emulatorMode ? '#ff4c0029' : '#FF8A0029';
+  const foregroundColor = emulatorMode
+    ? theme.palette.orange.emulator
+    : theme.palette.orange.warning;
+  const backgroundColor = emulatorMode
+    ? theme.palette.orange.emulatorAlpha
+    : theme.palette.orange.testnetAlpha;
 
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>

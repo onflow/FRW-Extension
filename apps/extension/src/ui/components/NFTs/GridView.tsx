@@ -1,4 +1,5 @@
 import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
@@ -19,6 +20,7 @@ interface GridViewProps {
 }
 
 const GridView = (props: GridViewProps) => {
+  const theme = useTheme();
   const {
     data,
     accessible,
@@ -91,7 +93,7 @@ const GridView = (props: GridViewProps) => {
         ) : (
           <div
             style={{
-              background: '#222222',
+              background: theme.palette.background.paper,
               height: '100%',
               width: '100%',
               borderRadius: '8px',
@@ -186,8 +188,8 @@ const GridView = (props: GridViewProps) => {
         padding: '8px',
         display: 'inline-block',
         '&:hover': {
-          color: '#222222',
-          backgroundColor: '#222222',
+          color: theme.palette.background.paper,
+          backgroundColor: theme.palette.background.paper,
         },
       }}
       elevation={0}
@@ -199,8 +201,8 @@ const GridView = (props: GridViewProps) => {
           height: '100%',
           borderRadius: '8px',
           '&:hover': {
-            color: '#222222',
-            backgroundColor: '#222222',
+            color: theme.palette.background.paper,
+            backgroundColor: theme.palette.background.paper,
           },
         }}
         to={detailPath}
@@ -225,7 +227,7 @@ const GridView = (props: GridViewProps) => {
         >
           <Typography
             sx={{
-              color: '#E6E6E6',
+              color: theme.palette.text.secondary,
               fontSize: '14px',
               fontWeight: '700',
             }}

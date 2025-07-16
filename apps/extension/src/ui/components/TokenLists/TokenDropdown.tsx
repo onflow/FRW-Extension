@@ -1,10 +1,11 @@
-import { Box, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import IconCreate from '@/ui/components/iconfont/IconCreate';
 
 const TokenDropdown = () => {
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
@@ -34,7 +35,7 @@ const TokenDropdown = () => {
     <Box sx={{ display: 'flex', px: '12px', pt: '4px' }}>
       <Box sx={{ flexGrow: 1 }} />
       <IconButton onClick={handleMenuOpen}>
-        <IconCreate size={16} color="#787878" />
+        <IconCreate size={16} color={theme.palette.icon.navi} />
       </IconButton>
 
       {/* Dropdown Menu */}
@@ -46,9 +47,9 @@ const TokenDropdown = () => {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
           sx: {
-            bgcolor: '#333333',
+            bgcolor: theme.palette.info3.main,
             padding: '8px', // Outer padding
-            color: '#FFFFFF',
+            color: theme.palette.primary.light,
           },
         }}
       >

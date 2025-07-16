@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { KEY_TYPE } from '@onflow/flow-wallet-shared/constant/algo-constants';
@@ -32,6 +33,7 @@ const JsonImport = ({
   isSignLoading: boolean;
 }) => {
   const usewallet = useWallet();
+  const theme = useTheme();
   const [isLoading, setLoading] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
   const [json, setJson] = useState('');
@@ -150,7 +152,7 @@ const JsonImport = ({
               borderRadius: '16px',
               backgroundColor: COLOR_DARKMODE_WHITE_3pc,
               padding: '20px 0',
-              color: '#fff',
+              color: theme.palette.text.primary,
               marginBottom: '16px',
               resize: 'none',
               fontSize: '16px',
@@ -174,7 +176,7 @@ const JsonImport = ({
             borderRadius: '16px',
             backgroundColor: COLOR_DARKMODE_WHITE_3pc,
             padding: '20px',
-            color: '#fff',
+            color: theme.palette.text.primary,
             marginBottom: '16px',
             resize: 'none',
             fontSize: '16px',

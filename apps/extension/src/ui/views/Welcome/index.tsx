@@ -1,4 +1,5 @@
 import { Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React from 'react';
 import { Link } from 'react-router';
@@ -9,7 +10,6 @@ import welcomeWallet from '@/ui/assets/svg/welcomeWallet.svg';
 import LandingComponents from '@/ui/components/LandingPages/LandingComponents';
 import {
   COLOR_DARK_GRAY_1A1A1A,
-  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
   COLOR_WHITE_ALPHA_80_FFFFFFCC,
   COLOR_GRADIENT_GREEN_00EF8B_00,
   COLOR_GRADIENT_GREEN_00EF8B_20,
@@ -18,6 +18,8 @@ import {
 import { translateToComponents } from '@/ui/utils/i18n-components';
 
 const Welcome = () => {
+  const theme = useTheme();
+
   return (
     <LandingComponents
       activeIndex={0}
@@ -124,11 +126,11 @@ const Welcome = () => {
               alignItems: 'center',
               justifyContent: 'center',
               textTransform: 'capitalize',
-              border: `1px solid ${COLOR_GREEN_FLOW_DARKMODE_00EF8B}`,
+              border: `1px solid ${theme.palette.primary.main}`,
               backgroundColor: 'transparent',
               flexDirection: 'column',
               '&:hover': {
-                backgroundColor: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+                backgroundColor: theme.palette.primary.main,
                 opacity: 0.8,
                 color: COLOR_DARK_GRAY_1A1A1A,
               },
@@ -167,7 +169,7 @@ const Welcome = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    color: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+                    color: theme.palette.primary.main,
                     textDecoration: 'none',
                   }}
                 >
@@ -180,7 +182,7 @@ const Welcome = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    color: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+                    color: theme.palette.primary.main,
                     textDecoration: 'none',
                   }}
                 >
@@ -199,29 +201,7 @@ const Welcome = () => {
             alignItems: 'center',
           }}
         >
-          <img
-            src={welcomeWallet}
-            style={{
-              borderRadius: '24px',
-              width: '170px',
-            }}
-          />
-
-          <Typography
-            variant="body1"
-            sx={{
-              color: 'text.secondary',
-              pt: '16px',
-              fontSize: '16px',
-              textAlign: 'center',
-              fontWeight: '400',
-            }}
-          >
-            {chrome.i18n.getMessage('A_crypto_wallet_on_Flow')}{' '}
-            <Box component="span" sx={{ color: 'primary.light' }}>
-              {chrome.i18n.getMessage('Explorers_Collectors_and_Gamers')}
-            </Box>
-          </Typography>
+          <img src={welcomeWallet} alt="Welcome Wallet" />
         </Box>
       </Box>
     </LandingComponents>

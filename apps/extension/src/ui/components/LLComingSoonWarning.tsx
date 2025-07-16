@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, Alert, Collapse } from '@mui/material';
+import { IconButton, Alert, Collapse, useTheme } from '@mui/material';
 import React from 'react';
 
 interface ComingSoonProps {
@@ -7,7 +7,8 @@ interface ComingSoonProps {
   handleCloseIconClicked: () => void;
 }
 
-const LLComingSoon = (props: ComingSoonProps) => {
+const LLComingSoonWarning = (props: ComingSoonProps) => {
+  const theme = useTheme();
   const onCloseBtnClicked = () => {
     props.handleCloseIconClicked();
   };
@@ -20,7 +21,7 @@ const LLComingSoon = (props: ComingSoonProps) => {
       <Alert
         variant="filled"
         severity="info"
-        sx={{ backgroundColor: '#41CC5D' }}
+        sx={{ backgroundColor: theme.palette.success.main }}
         action={
           <IconButton aria-label="close" color="inherit" size="small" onClick={onCloseBtnClicked}>
             <CloseIcon fontSize="inherit" />
@@ -33,4 +34,4 @@ const LLComingSoon = (props: ComingSoonProps) => {
   );
 };
 
-export default LLComingSoon;
+export default LLComingSoonWarning;

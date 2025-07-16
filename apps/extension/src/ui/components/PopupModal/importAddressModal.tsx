@@ -8,11 +8,13 @@ import {
   FormControl,
   Select,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import { CustomDialog } from '../custom-dialog';
 
 const ImportAddressModal = ({ isOpen, onOpenChange, accounts, handleAddressSelection }) => {
+  const theme = useTheme();
   const [selectedAddress, setSelectedAddress] = React.useState(accounts[0]?.address || '');
 
   const handleChange = (event) => {
@@ -30,7 +32,13 @@ const ImportAddressModal = ({ isOpen, onOpenChange, accounts, handleAddressSelec
         {accounts.length} {chrome.i18n.getMessage('Accounts_Found_on_Chain')}
       </DialogTitle>
       <DialogContent sx={{ overflow: 'hidden' }}>
-        <Typography sx={{ color: '#BABABA', margin: '20px 0 20px', fontSize: '16px' }}>
+        <Typography
+          sx={{
+            color: theme.palette.text.secondary,
+            margin: '20px 0 20px',
+            fontSize: '16px',
+          }}
+        >
           {chrome.i18n.getMessage('Choose_an_account_you_want_to_import')}
         </Typography>
         <form id="address" onSubmit={handleSubmit}>
@@ -83,7 +91,11 @@ const ImportAddressModal = ({ isOpen, onOpenChange, accounts, handleAddressSelec
             marginTop: '8px',
           }}
         >
-          <Typography variant="subtitle1" color="#E6E6E6" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            variant="subtitle1"
+            color={theme.palette.text.secondary}
+            sx={{ fontWeight: 'bold' }}
+          >
             {chrome.i18n.getMessage('Maybe_Next_Time')}
           </Typography>
         </Button>

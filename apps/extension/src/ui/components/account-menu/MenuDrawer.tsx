@@ -7,6 +7,7 @@ import {
   ListItemButton,
   ListItemIcon,
   Typography,
+  useTheme,
 } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -26,7 +27,6 @@ import { ProfileItemBase } from '@/ui/components/profile/profile-item-base';
 import { MenuItem } from '@/ui/components/sidebar/menu-item';
 import { useFeatureFlag } from '@/ui/hooks/use-feature-flags';
 import { useWallet } from '@/ui/hooks/use-wallet';
-import { COLOR_WHITE_ALPHA_10_FFFFFF1A, COLOR_WHITE_ALPHA_40_FFFFFF66 } from '@/ui/style/color';
 
 import AddAccountPopup from './AddAccountPopup';
 
@@ -56,6 +56,7 @@ const MenuDrawer = ({
   mainAddressLoading,
   noAddress,
 }: MenuDrawerProps) => {
+  const theme = useTheme();
   const wallet = useWallet();
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -118,11 +119,13 @@ const MenuDrawer = ({
       open={drawer}
       onClose={toggleDrawer}
       sx={{ zIndex: '1400 !important' }}
-      PaperProps={{ sx: { width: '75%', maxWidth: '400px', background: '#0A0A0B' } }}
+      PaperProps={{
+        sx: { width: '75%', maxWidth: '400px', background: theme.palette.darkBackground.main },
+      }}
     >
       <List
         sx={{
-          backgroundColor: '#0A0A0B',
+          backgroundColor: theme.palette.darkBackground.main,
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -184,7 +187,7 @@ const MenuDrawer = ({
             px: '0',
             marginTop: '24px',
             marginBottom: '8px',
-            borderTop: `1px solid ${COLOR_WHITE_ALPHA_40_FFFFFF66}`,
+            borderTop: `1px solid ${theme.palette.text.secondary}`,
             paddingTop: '8px',
           }}
         >
@@ -202,7 +205,7 @@ const MenuDrawer = ({
                       justifyContent: 'center',
                       marginRight: '16px',
                       borderRadius: '40px',
-                      backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                      backgroundColor: theme.palette.text.secondary,
                     }}
                   >
                     <CircularProgress size={24} />
@@ -211,7 +214,7 @@ const MenuDrawer = ({
                     variant="body1"
                     component="div"
                     display="inline"
-                    sx={{ fontSize: '16px', color: '#FFFFFFCC', opacity: 0.7 }}
+                    sx={{ fontSize: '16px', color: theme.palette.text.primary, opacity: 0.7 }}
                   >
                     Creating...
                   </Typography>

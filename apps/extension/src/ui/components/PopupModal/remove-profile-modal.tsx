@@ -1,6 +1,7 @@
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import { Box, Button, CircularProgress, DialogActions, Skeleton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
@@ -36,6 +37,7 @@ const RemoveProfileModal: React.FC<RemoveProfileModalProps> = ({
   const [backupCheckError, setBackupCheckError] = useState<string>('');
   const [hasBackup, setHasBackup] = useState<boolean>(false);
   const wallet = useWallet();
+  const theme = useTheme();
 
   const checkBackup = useCallback(async () => {
     setIsCheckingBackup(true); // Set loading true
@@ -69,7 +71,13 @@ const RemoveProfileModal: React.FC<RemoveProfileModalProps> = ({
   return (
     <CustomDialog open={isOpen} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography sx={{ color: '#FF6D24', fontSize: '24px', fontWeight: '700' }}>
+        <Typography
+          sx={{
+            color: theme.palette.orange.warning,
+            fontSize: '24px',
+            fontWeight: '700',
+          }}
+        >
           {chrome.i18n.getMessage('Remove__Profile')}
         </Typography>
 
@@ -83,12 +91,14 @@ const RemoveProfileModal: React.FC<RemoveProfileModalProps> = ({
               mb: 2,
               py: 2,
               px: 3,
-              backgroundColor: '#2C2C2C',
+              backgroundColor: theme.palette.background.paper,
               borderRadius: '8px',
             }}
           >
             <Typography sx={{ fontWeight: 'bold', fontSize: '16px' }}>{profileName}</Typography>
-            <Typography sx={{ color: '#BABABA', fontSize: '14px' }}>@{profileUsername}</Typography>
+            <Typography sx={{ color: theme.palette.text.secondary, fontSize: '14px' }}>
+              @{profileUsername}
+            </Typography>
           </Box>
         )}
 
@@ -96,7 +106,10 @@ const RemoveProfileModal: React.FC<RemoveProfileModalProps> = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
-            color: !isCheckingBackup && backupCheckError ? '#FF6D24' : '#41CC5D',
+            color:
+              !isCheckingBackup && backupCheckError
+                ? theme.palette.orange.warning
+                : theme.palette.success.main,
             mt: 1,
             mb: 1,
           }}
@@ -115,7 +128,7 @@ const RemoveProfileModal: React.FC<RemoveProfileModalProps> = ({
           </Typography>
         </Box>
 
-        <Typography sx={{ color: '#BABABA', fontSize: '16px' }}>
+        <Typography sx={{ color: theme.palette.text.secondary, fontSize: '16px' }}>
           {chrome.i18n.getMessage('Remove_profile_warning_simplified')}
         </Typography>
 

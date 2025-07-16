@@ -1,5 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, IconButton, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router';
 
@@ -9,6 +9,7 @@ interface StorageExceededAlertProps {
 }
 
 const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClose }) => {
+  const theme = useTheme();
   const navigate = useNavigate();
 
   const handleBuyFlow = () => {
@@ -37,7 +38,7 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
         sx={{
           width: '90%',
           maxWidth: '400px',
-          backgroundColor: '#1C1C1C',
+          backgroundColor: theme.palette.darkGray.light,
           borderRadius: '16px',
           padding: '24px',
           position: 'relative',
@@ -49,7 +50,7 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
             position: 'absolute',
             right: '16px',
             top: '16px',
-            color: '#FFFFFF',
+            color: theme.palette.primary.light,
           }}
         >
           <CloseIcon />
@@ -60,7 +61,7 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
           sx={{
             fontSize: '24px',
             fontWeight: 'bold',
-            color: '#FFFFFF',
+            color: theme.palette.primary.light,
             textAlign: 'center',
             mb: 3,
           }}
@@ -71,7 +72,7 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
         <Typography
           sx={{
             fontSize: '16px',
-            color: '#FFFFFF',
+            color: theme.palette.primary.light,
             textAlign: 'center',
             mb: 2,
           }}
@@ -82,7 +83,7 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
         <Typography
           sx={{
             fontSize: '16px',
-            color: '#FF8A00',
+            color: theme.palette.orange.warning,
             textAlign: 'center',
             mb: 3,
           }}
@@ -96,7 +97,7 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
           target="_blank"
           sx={{
             fontSize: '16px',
-            color: '#3898FF',
+            color: theme.palette.blue.secondary,
             textAlign: 'center',
             display: 'block',
             mb: 3,
@@ -121,10 +122,10 @@ const StorageExceededAlert: React.FC<StorageExceededAlertProps> = ({ open, onClo
             sx={{
               height: '48px',
               borderRadius: '12px',
-              backgroundColor: '#333333',
-              color: '#FFFFFF',
+              backgroundColor: theme.palette.info3.main,
+              color: theme.palette.primary.light,
               '&:hover': {
-                backgroundColor: '#444444',
+                backgroundColor: theme.palette.darkGray.dark,
               },
             }}
           >

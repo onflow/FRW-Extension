@@ -1,5 +1,6 @@
 import { Box, Dialog, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import { type NFTItem } from '@onflow/flow-wallet-shared/types/nft-types';
@@ -31,6 +32,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
   isLoadingAll,
   loadingMore,
 }) => {
+  const theme = useTheme();
   const [filteredList, setFilteredList] = useState<NFTItem[]>([]);
 
   return (
@@ -103,7 +105,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
               sx={{
                 width: '144px',
                 height: '8px',
-                backgroundColor: '#FFFFFF29',
+                backgroundColor: theme.palette.text.primary + '29',
                 borderRadius: '4px',
                 overflow: 'hidden',
               }}
@@ -112,7 +114,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
                 sx={{
                   width: `${(items.length / total) * 100}%`,
                   height: '100%',
-                  backgroundColor: '#0AC26C',
+                  backgroundColor: theme.palette.success.main,
                   borderRadius: '4px',
                   transition: 'width 0.3s ease',
                 }}

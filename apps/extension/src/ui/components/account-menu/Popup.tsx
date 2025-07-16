@@ -1,4 +1,5 @@
 import { Box, Drawer, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 
 import type { UserInfoResponse } from '@onflow/flow-wallet-shared/types/network-types';
@@ -21,6 +22,7 @@ interface TransferConfirmationProps {
 
 const Popup = (props: TransferConfirmationProps) => {
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const theme = useTheme();
 
   return (
     <Drawer
@@ -34,7 +36,7 @@ const Popup = (props: TransferConfirmationProps) => {
           width: '100%',
           height: 'auto',
           maxHeight: '80%',
-          background: '#121212',
+          background: theme.palette.background.default,
           borderRadius: '18px 18px 0px 0px',
         },
       }}

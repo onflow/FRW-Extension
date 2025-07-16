@@ -1,5 +1,6 @@
 import InfoIcon from '@mui/icons-material/Info';
 import { Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useState } from 'react';
 
@@ -24,6 +25,7 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
   password,
 }) => {
   const wallet = useWallet();
+  const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [backupErr, setBackupErr] = useState(false);
 
@@ -61,7 +63,7 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
           mt: '32px',
           position: 'relative',
           overflow: 'hidden',
-          backgroundColor: '#333333',
+          backgroundColor: theme.palette.darkGray.main,
         }}
       >
         <Box
@@ -72,7 +74,7 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
             height: '32px',
             width: '108px',
             backgroundColor: 'success.main',
-            color: '#FFFFFF',
+            color: theme.palette.text.primary,
             textAlign: 'center',
             lineHeight: '32px',
             borderBottomLeftRadius: '12px',
@@ -91,7 +93,7 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
           }}
         >
           <IconGoogleDrive size={36} style={{ marginBottom: '12px' }} />
-          <Typography variant="body1" sx={{ color: '#fff' }}>
+          <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
             {chrome.i18n.getMessage('Connect__To')}
             <span style={{ fontWeight: 'bold' }}>{chrome.i18n.getMessage('Google__Drive')}</span>
             {chrome.i18n.getMessage('to_back_up_your_wallet')}
@@ -154,13 +156,17 @@ const GoogleBackup: React.FC<GoogleBackupProps> = ({
         sx={{
           cursor: 'pointer',
           textAlign: 'center',
-          backgroundColor: '#333333',
+          backgroundColor: theme.palette.darkGray.main,
           height: '56px',
           borderRadius: '12px',
           textTransform: 'capitalize',
         }}
       >
-        <Typography variant="subtitle1" color="#E6E6E6" sx={{ fontWeight: 'bold' }}>
+        <Typography
+          variant="subtitle1"
+          color={theme.palette.text.secondary}
+          sx={{ fontWeight: 'bold' }}
+        >
           {chrome.i18n.getMessage('Maybe_Next_Time')}
         </Typography>
       </Button>

@@ -14,7 +14,7 @@ import {
 import React, { useCallback, useState } from 'react';
 import zxcvbn from 'zxcvbn';
 
-import { PasswordHelperText } from './PasswordHelperText';
+import PasswordHelperText from './PasswordHelperText';
 // Password Indicator Component
 interface PasswordIndicatorProps {
   value: string;
@@ -135,12 +135,12 @@ export const PasswordInput = ({
           width: '100%',
           padding: '16px',
           zIndex: '999',
-          backgroundColor: '#282828',
-          border: '2px solid #4C4C4C',
+          backgroundColor: theme.palette.background.paper,
+          border: `2px solid ${theme.palette.darkGray.main}`,
           borderRadius: '12px',
           boxSizing: 'border-box',
           '&.Mui-focused': {
-            border: '2px solid #FAFAFA',
+            border: `2px solid ${theme.palette.text.primary}`,
             boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
           },
           // Make sure base sx is applied
@@ -158,7 +158,7 @@ export const PasswordInput = ({
       <Box height="24px">
         <Collapse in={!!errorText || !!helperText} orientation="vertical">
           <PasswordHelperText
-            message={errorText || helperText || ''}
+            text={errorText || helperText || ''}
             variant={!!errorText ? 'error' : 'success'}
           />
         </Collapse>

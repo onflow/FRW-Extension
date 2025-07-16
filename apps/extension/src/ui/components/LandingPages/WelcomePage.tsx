@@ -1,4 +1,5 @@
 import { Typography, Button, CardMedia } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React from 'react';
 import { Link } from 'react-router';
@@ -16,6 +17,8 @@ interface WelcomeLayoutProps {
 }
 
 const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, importPath }) => {
+  const theme = useTheme();
+
   return (
     <Box
       sx={{
@@ -25,6 +28,7 @@ const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, imp
         height: '100vh',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <RegisterHeader />
@@ -81,7 +85,7 @@ const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, imp
                 fontWeight: '700',
                 fontSize: '40px',
                 WebkitBackgroundClip: 'text',
-                color: '#fff',
+                color: theme.palette.text.primary,
                 lineHeight: '56px',
               }}
             >
@@ -149,7 +153,7 @@ const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, imp
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 textTransform: 'capitalize',
-                border: '1px solid #E5E5E5',
+                border: `1px solid ${theme.palette.text.secondary}`,
                 marginBottom: '16px',
                 backgroundColor: 'transparent',
                 paddingLeft: '32px',
@@ -165,7 +169,7 @@ const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, imp
                 sx={{
                   fontWeight: '600',
                   fontSize: '14px',
-                  color: '#FFF',
+                  color: theme.palette.text.primary,
                   '&:hover': {
                     color: 'background.paper',
                   },
@@ -189,7 +193,7 @@ const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, imp
                 alignItems: 'center',
                 justifyContent: 'center',
                 textTransform: 'capitalize',
-                border: '1px solid #E5E5E5',
+                border: `1px solid ${theme.palette.text.secondary}`,
                 backgroundColor: 'transparent',
                 flexDirection: 'column',
                 paddingLeft: '32px',
@@ -216,7 +220,7 @@ const WelcomePage: React.FC<WelcomeLayoutProps> = ({ registerPath, syncPath, imp
                   sx={{
                     fontWeight: '600',
                     fontSize: '14px',
-                    color: '#FFF',
+                    color: theme.palette.text.primary,
                   }}
                 >
                   {chrome.i18n.getMessage('Import__Wallet')}

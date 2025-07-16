@@ -1,5 +1,6 @@
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { Avatar, Box, CardMedia, IconButton, Skeleton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -11,6 +12,7 @@ import { formatAddress, isEmoji } from '@/ui/utils';
 
 export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoading = false }) => {
   const wallet = useWallet();
+  const theme = useTheme();
 
   const navigate = useNavigate();
   const [contactAdd, setContactAdd] = useState(false);
@@ -63,6 +65,7 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
           py: '8px',
           // borderRadius: '16px',
           alignItems: 'center',
+          backgroundColor: theme.palette.profile.darkGray,
           ':hover': {
             backgroundColor: 'neutral.main',
           },
@@ -74,7 +77,7 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
               sx={{
                 mr: '13px',
                 color: 'primary.main',
-                backgroundColor: '#484848',
+                backgroundColor: theme.palette.profile.darkGray,
                 width: '40px',
                 height: '40px',
                 display: 'flex',
@@ -93,7 +96,7 @@ export const LLContactCard = ({ contact, hideCloseButton, isSend = false, isLoad
               sx={{
                 mr: '13px',
                 color: 'primary.main',
-                backgroundColor: '#484848',
+                backgroundColor: theme.palette.profile.darkGray,
                 width: '40px',
                 height: '40px',
               }}

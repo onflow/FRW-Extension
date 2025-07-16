@@ -2,7 +2,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AppBar, Button, Drawer, IconButton, Skeleton, Toolbar, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import { StyledEngineProvider } from '@mui/material/styles';
+import { StyledEngineProvider, useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
@@ -28,6 +28,7 @@ import SwitchAccountCover from '../../components/account-menu/SwitchAccountCover
 const Header = ({ _loading = false }) => {
   const usewallet = useWallet();
   const walletLoaded = useWalletLoaded();
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -277,7 +278,7 @@ const Header = ({ _loading = false }) => {
                         position: 'absolute',
                         top: '-2px',
                         right: '-2px',
-                        backgroundColor: '#4CAF50',
+                        backgroundColor: theme.palette.success.main,
                         color: 'black',
                         borderRadius: '50%',
                         minWidth: '18px',
@@ -324,7 +325,12 @@ const Header = ({ _loading = false }) => {
     <StyledEngineProvider injectFirst>
       <SwitchAccountCover open={switchLoading} />
       <AppBar position="relative" sx={{ zIndex: 1399 }} elevation={0}>
-        <Toolbar sx={{ px: '12px', backgroundColor: '#282828' }}>
+        <Toolbar
+          sx={{
+            px: '12px',
+            backgroundColor: theme.palette.background.paper,
+          }}
+        >
           <MenuDrawer
             drawer={drawer}
             toggleDrawer={toggleDrawer}

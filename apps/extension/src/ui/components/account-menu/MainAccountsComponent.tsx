@@ -1,5 +1,13 @@
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { Box, ListItem, ListItemButton, ListItemIcon, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import React from 'react';
 
 import {
@@ -32,6 +40,7 @@ interface MainAccountsProps {
 }
 
 const MainAccountsComponent = (props: MainAccountsProps) => {
+  const theme = useTheme();
   const balance = useAccountBalance(props.network, props.address);
   const isBalanceLoading = balance === undefined || balance === null;
 
@@ -102,7 +111,7 @@ const MainAccountsComponent = (props: MainAccountsProps) => {
                       <FiberManualRecordIcon
                         style={{
                           fontSize: '10px',
-                          color: '#40C900',
+                          color: theme.palette.success.main,
                           marginLeft: '10px',
                         }}
                       />

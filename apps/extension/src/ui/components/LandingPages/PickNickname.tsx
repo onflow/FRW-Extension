@@ -7,6 +7,7 @@ import {
   InputAdornment,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -30,6 +31,7 @@ const PickNickname = ({
   setNickname: (username: string) => void;
 }) => {
   const wallet = useWallet();
+  const theme = useTheme();
   const [isLoading, setLoading] = useState(false);
   const [usernameValid, setUsernameValid] = useState(false);
 
@@ -62,13 +64,13 @@ const PickNickname = ({
           alignItems: 'center',
         }}
       >
-        <CheckCircleIcon size={24} color="#41CC5D" style={{ margin: '8px' }} />
+        <CheckCircleIcon size={24} color={theme.palette.success.main} style={{ margin: '8px' }} />
         <Typography variant="body1" color="success.main">
           {chrome.i18n.getMessage('Sounds_good')}
         </Typography>
       </Box>
     ),
-    []
+    [theme]
   );
   const usernameLoading = useMemo(
     () => (
@@ -201,11 +203,11 @@ const PickNickname = ({
                 padding: '16px',
                 zIndex: '999',
                 backgroundColor: COLOR_DARKMODE_WHITE_3pc,
-                border: '2px solid #4C4C4C',
+                border: `2px solid ${theme.palette.darkGray.main}`,
                 borderRadius: '12px',
                 boxSizing: 'border-box',
                 '&.Mui-focused': {
-                  border: '2px solid #FAFAFA',
+                  border: `2px solid ${theme.palette.text.primary}`,
                   boxShadow: '0px 8px 12px 4px rgba(76, 76, 76, 0.24)',
                 },
               }}
@@ -224,10 +226,10 @@ const PickNickname = ({
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
-                    sx={{ color: '#e3e3e3', padding: '0px' }}
+                    sx={{ color: theme.palette.text.secondary, padding: '0px' }}
                     onClick={handleClearUsername}
                   >
-                    <CancelIcon size={24} color={'#E3E3E3'} />
+                    <CancelIcon size={24} color={theme.palette.text.secondary} />
                   </IconButton>
                 </InputAdornment>
               }
@@ -244,7 +246,24 @@ const PickNickname = ({
                 <Box sx={{ p: '4px' }}>
                   {!errorMessage && isLoading && usernameLoading}
                   {!errorMessage && !isLoading && usernameCorrect}
-                  {errorMessage && usernameError(errorMessage)}
+                  {errorMessage && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <CancelIcon
+                        size={24}
+                        color={theme.palette.error.main}
+                        style={{ margin: '8px' }}
+                      />
+                      <Typography variant="body1" color="error.main">
+                        {errorMessage}
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               </Box>
             </SlideRelative>

@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, useTheme } from '@mui/material';
 import React from 'react';
 
 interface SwitchAccountCoverProps {
@@ -6,6 +6,7 @@ interface SwitchAccountCoverProps {
 }
 
 const SwitchAccountCover: React.FC<SwitchAccountCoverProps> = ({ open }) => {
+  const theme = useTheme();
   if (!open) return null;
 
   return (
@@ -23,7 +24,7 @@ const SwitchAccountCover: React.FC<SwitchAccountCoverProps> = ({ open }) => {
         zIndex: 9999,
       }}
     >
-      <CircularProgress sx={{ color: '#0AC26C' }} />
+      <CircularProgress sx={{ color: theme.palette.success.main }} />
     </Box>
   );
 };

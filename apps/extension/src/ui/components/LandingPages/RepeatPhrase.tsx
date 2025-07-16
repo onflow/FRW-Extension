@@ -1,5 +1,6 @@
 import InfoIcon from '@mui/icons-material/Info';
 import { Button, Skeleton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -18,6 +19,7 @@ const chunkArray = (myArray: any[], chunk_size: number) => {
 };
 
 const RepeatPhrase = ({ handleSwitchTab, mnemonic }) => {
+  const theme = useTheme();
   const [incorrect, setIncorrect] = useState(false);
   const [chosenIndex, setChosen] = useState<number[]>([]);
   const [selectedPhrase, setSelect] = useState<any[]>([]);
@@ -137,11 +139,11 @@ const RepeatPhrase = ({ handleSwitchTab, mnemonic }) => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       borderRadius: '12px',
-                      border: '2px solid #5E5E5E',
+                      border: `2px solid ${theme.palette.darkGray.main}`,
                       px: '0',
                       margin: '3px 0',
                       height: '56px',
-                      backgroundColor: '#333333',
+                      backgroundColor: theme.palette.darkGray.main,
                       transition: 'all .3s linear',
                     }}
                   >
@@ -161,14 +163,14 @@ const RepeatPhrase = ({ handleSwitchTab, mnemonic }) => {
                               height: '100%',
                               width: '100%',
                               borderRadius: '8px',
-                              backgroundColor: `${selectedPhrase[i] === v ? '#fff' : 'none'}`,
+                              backgroundColor: `${selectedPhrase[i] === v ? theme.palette.common.white : 'none'}`,
                             }}
                           >
                             <Typography
                               variant="body1"
                               sx={{
                                 fontWeight: 700,
-                                color: `${selectedPhrase[i] === v ? '#000' : 'text.primary'}`,
+                                color: `${selectedPhrase[i] === v ? theme.palette.common.black : 'text.primary'}`,
                               }}
                             >
                               {v}

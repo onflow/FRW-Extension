@@ -1,6 +1,7 @@
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import PhoneAndroidRoundedIcon from '@mui/icons-material/PhoneAndroidRounded';
 import { Button, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React from 'react';
 
@@ -9,58 +10,77 @@ interface RegisterHeaderProps {
 }
 
 const RegisterHeader = ({ showAppButton = false }: RegisterHeaderProps) => {
+  const theme = useTheme();
   return (
     <>
       <Box
         sx={{
           display: 'flex',
-          width: '100%',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
           px: '32px',
           pt: '40px',
+          bgcolor: theme.palette.success.main,
         }}
       >
-        {showAppButton && (
-          <Button
-            variant="text"
+        <Button
+          variant="contained"
+          color="secondary"
+          size="large"
+          sx={{
+            display: 'flex',
+            width: '332px',
+            height: '48px',
+            borderRadius: '24px',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            textTransform: 'capitalize',
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.darkGray.main,
+            marginBottom: '16px',
+            paddingLeft: '32px',
+          }}
+          startIcon={<PhoneAndroidRoundedIcon sx={{ color: theme.palette.darkGray.main }} />}
+        >
+          <Typography
             sx={{
-              color: '#F9F9F9',
-              backgroundColor: '#404040',
-              px: '16px',
-              py: '8px',
-              borderRadius: '12px',
+              color: theme.palette.text.primary,
               textTransform: 'capitalize',
-              ':hover': {
-                bgcolor: '#6E6E6E',
-              },
+              marginLeft: '5px',
             }}
-            startIcon={<PhoneAndroidRoundedIcon sx={{ color: '#5e5e5e' }} />}
           >
-            {chrome.i18n.getMessage('Try__Our__New__App')}
-          </Button>
-        )}
-
-        <div style={{ flexGrow: 1 }}></div>
+            {chrome.i18n.getMessage('Download_Mobile_App')}
+          </Typography>
+        </Button>
 
         <Button
-          variant="text"
+          variant="contained"
+          color="secondary"
+          size="large"
           sx={{
-            color: '#F9F9F9',
-            backgroundColor: '#404040',
-            px: '16px',
-            py: '8px',
-            borderRadius: '12px',
+            display: 'flex',
+            width: '332px',
+            height: '48px',
+            borderRadius: '24px',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
             textTransform: 'capitalize',
-            ':hover': {
-              bgcolor: '#41CC5D',
-            },
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.darkGray.main,
+            bgcolor: theme.palette.darkGray.main,
           }}
-          startIcon={<HelpOutlineRoundedIcon sx={{ color: '#5e5e5e' }} />}
+          startIcon={<HelpOutlineRoundedIcon sx={{ color: theme.palette.darkGray.main }} />}
         >
-          <a href="https://wallet.flow.com/contact" target="_blank">
-            <Typography sx={{ color: '#F9F9F9', textTransform: 'capitalize', marginLeft: '5px' }}>
-              {chrome.i18n.getMessage('Need__Help')}
-            </Typography>
-          </a>
+          <Typography
+            sx={{
+              color: theme.palette.text.primary,
+              textTransform: 'capitalize',
+              marginLeft: '5px',
+            }}
+          >
+            {chrome.i18n.getMessage('Get_Help')}
+          </Typography>
         </Button>
       </Box>
     </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, useTheme } from '@mui/material';
 import React from 'react';
 
 interface WarningSnackbarProps {
@@ -18,6 +18,7 @@ export default function WarningSnackbar({
   message,
   sx,
 }: WarningSnackbarProps) {
+  const theme = useTheme();
   return (
     <Snackbar
       open={open}
@@ -37,7 +38,7 @@ export default function WarningSnackbar({
         variant="filled"
         severity="warning"
         sx={{
-          color: '#FFFFFF',
+          color: theme.palette.primary.light,
           padding: '8px 16px',
           fontSize: '12px',
           fontWeight: '400',

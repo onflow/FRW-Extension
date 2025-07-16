@@ -1,4 +1,4 @@
-import { Box, Drawer } from '@mui/material';
+import { Box, Drawer, useTheme } from '@mui/material';
 import React from 'react';
 
 import createNew from '@/ui/assets/svg/create-new.svg';
@@ -16,6 +16,7 @@ interface TransferConfirmationProps {
 }
 
 const AddAccountPopup = (props: TransferConfirmationProps) => {
+  const theme = useTheme();
   const usewallet = useWallet();
 
   return (
@@ -45,7 +46,7 @@ const AddAccountPopup = (props: TransferConfirmationProps) => {
             flexDirection: 'column',
             display: 'flex',
             borderRadius: '16px',
-            background: '#2A2A2A',
+            background: theme.palette.darkGray.main,
             overflow: 'hidden',
           }}
         >
