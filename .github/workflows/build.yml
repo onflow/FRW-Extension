@@ -130,8 +130,10 @@ jobs:
             create_env_file "apps/extension/.env.dev"
           fi
 
-      - name: Run tests
-        run: pnpm -F flow-wallet-extension test:run
+      - name: Run tests for all packages
+        run: |
+          echo "Running tests for all packages..."
+          pnpm test:run
 
       - name: Build
         run: |
