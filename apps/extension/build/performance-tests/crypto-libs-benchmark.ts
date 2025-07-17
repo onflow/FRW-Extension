@@ -1,16 +1,21 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unused-imports/no-unused-vars */
 
 import { p256 } from '@noble/curves/nist';
-import * as secp256k1 from '@noble/secp256k1';
+import { secp256k1 } from '@noble/curves/secp256k1';
 import { HDKey } from '@scure/bip32';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { initWasm as initTrustWallet } from '@trustwallet/wallet-core';
 import { ethers } from 'ethers';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { mainnet } from 'viem/chains';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface BenchmarkResult {
   library: string;
@@ -18,6 +23,16 @@ interface BenchmarkResult {
   timeMs: number;
   gasEstimate?: number;
   memoryUsed?: number;
+}
+
+interface BenchmarkRun {
+  timestamp: string;
+  results: BenchmarkResult[];
+  systemInfo: {
+    platform: string;
+    nodeVersion: string;
+    arch: string;
+  };
 }
 
 class CryptoLibraryBenchmark {
@@ -36,6 +51,9 @@ class CryptoLibraryBenchmark {
 
     // Display results
     this.displayResults();
+
+    // Save results to JSON file
+    await this.saveResults();
 
     return this.results;
   }
@@ -334,6 +352,49 @@ class CryptoLibraryBenchmark {
       const account = privateKeyToAccount(testPrivateKey);
       return account.address;
     });
+  }
+
+  private async saveResults() {
+    const benchmarkRun: BenchmarkRun = {
+      timestamp: new Date().toISOString(),
+      results: this.results,
+      systemInfo: {
+        platform: process.platform,
+        nodeVersion: process.version,
+        arch: process.arch,
+      },
+    };
+
+    // Save to JSON file in the same directory
+    const outputPath = path.join(__dirname, 'benchmark-results.json');
+
+    try {
+      // Read existing results if file exists
+      let allRuns: BenchmarkRun[] = [];
+      if (fs.existsSync(outputPath)) {
+        const existingData = fs.readFileSync(outputPath, 'utf8');
+        allRuns = JSON.parse(existingData);
+      }
+
+      // Add new run
+      allRuns.push(benchmarkRun);
+
+      // Keep only last 10 runs
+      if (allRuns.length > 10) {
+        allRuns = allRuns.slice(-10);
+      }
+
+      // Write back to file
+      fs.writeFileSync(outputPath, JSON.stringify(allRuns, null, 2));
+      console.log(`\nBenchmark results saved to: ${outputPath}`);
+
+      // Also save a "latest" file for easy access by the visualization
+      const latestPath = path.join(__dirname, 'benchmark-latest.json');
+      fs.writeFileSync(latestPath, JSON.stringify(benchmarkRun, null, 2));
+      console.log(`Latest results saved to: ${latestPath}`);
+    } catch (error) {
+      console.error('Error saving benchmark results:', error);
+    }
   }
 
   private displayResults() {

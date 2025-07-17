@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crypto Library Benchmark Results</title>
+    <title>Crypto Library Benchmark Results (Standalone)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       body {
@@ -68,24 +68,9 @@
         padding: 40px;
         color: #666;
       }
-      .refresh-btn {
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        margin: 10px auto;
-        display: block;
-      }
-      .refresh-btn:hover {
-        background: #0056b3;
-      }
       .file-input-container {
         text-align: center;
         margin: 20px 0;
-        display: none;
       }
       .file-input {
         padding: 10px;
@@ -98,91 +83,46 @@
       .file-input:hover {
         background: #f0f8ff;
       }
+      .instructions {
+        background: #e7f3ff;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>Crypto Library Benchmark Results</h1>
-      <div class="metadata" id="metadata">
-        <p>Loading benchmark data...</p>
-      </div>
-      <button class="refresh-btn" onclick="loadBenchmarkData()">Refresh Data</button>
+      <h1>Crypto Library Benchmark Results (Standalone)</h1>
 
-      <div class="file-input-container" id="fileInputContainer">
-        <p>Running locally? Load the JSON file directly:</p>
+      <div class="instructions">
+        <p>
+          <strong>Instructions:</strong> Click below to load the benchmark-latest.json file from
+          your benchmark run.
+        </p>
+        <p>This standalone version works with file:// protocol and doesn't require a web server.</p>
+      </div>
+
+      <div class="file-input-container">
         <label class="file-input">
           <input type="file" id="fileInput" accept=".json" style="display: none" />
           Load benchmark-latest.json
         </label>
       </div>
 
+      <div class="metadata" id="metadata">
+        <p>No data loaded yet</p>
+      </div>
+
       <div id="content">
-        <div class="loading">Loading benchmark results...</div>
+        <div class="loading">Please load a benchmark results file...</div>
       </div>
     </div>
 
     <script>
       let charts = [];
-      let autoRefreshInterval = null;
 
-      // Check if we're running locally
-      const isFileProtocol = window.location.protocol === 'file:';
-
-      async function loadBenchmarkData() {
-        const contentDiv = document.getElementById('content');
-        const metadataDiv = document.getElementById('metadata');
-
-        try {
-          // Try to load the latest benchmark results
-          const response = await fetch('./benchmark-latest.json');
-          if (!response.ok) {
-            throw new Error('No benchmark data found. Please run the benchmark first.');
-          }
-
-          const data = await response.json();
-          displayResults(data);
-
-          // Update metadata
-          const date = new Date(data.timestamp);
-          metadataDiv.innerHTML = `
-                    <p>Last run: ${date.toLocaleString()}</p>
-                    <p>Platform: ${data.systemInfo.platform} | Node: ${data.systemInfo.nodeVersion} | Architecture: ${data.systemInfo.arch}</p>
-                `;
-
-          // Hide file input if fetch works
-          document.getElementById('fileInputContainer').style.display = 'none';
-        } catch (error) {
-          // If fetch fails and we're on file protocol, show file input
-          if (isFileProtocol) {
-            document.getElementById('fileInputContainer').style.display = 'block';
-            contentDiv.innerHTML = `
-                        <div class="error">
-                            <h3>Running from file:// protocol</h3>
-                            <p>Direct file access is blocked by browser security. Please use the file picker above to load the benchmark results.</p>
-                            <p>Alternatively, run a local web server: <code>python3 -m http.server 8000</code></p>
-                        </div>
-                    `;
-            metadataDiv.innerHTML = '<p>No data available - please load a file</p>';
-
-            // Stop auto-refresh on file protocol
-            if (autoRefreshInterval) {
-              clearInterval(autoRefreshInterval);
-              autoRefreshInterval = null;
-            }
-          } else {
-            contentDiv.innerHTML = `
-                        <div class="error">
-                            <h3>Error Loading Data</h3>
-                            <p>${error.message}</p>
-                            <p>Make sure to run the benchmark first: <code>pnpm benchmark:crypto</code></p>
-                        </div>
-                    `;
-            metadataDiv.innerHTML = '<p>No data available</p>';
-          }
-        }
-      }
-
-      // File input handler
       document.getElementById('fileInput').addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
@@ -323,12 +263,15 @@
         });
       }
 
-      // Load data on page load
-      loadBenchmarkData();
-
-      // Auto-refresh every 30 seconds (only if not file protocol)
-      if (!isFileProtocol) {
-        autoRefreshInterval = setInterval(loadBenchmarkData, 30000);
+      // Also try to load from embedded data if available
+      if (typeof BENCHMARK_DATA !== 'undefined') {
+        displayResults(BENCHMARK_DATA);
+        document.getElementById('metadata').innerHTML = `
+                <p>Last run: ${new Date(BENCHMARK_DATA.timestamp).toLocaleString()}</p>
+                <p>Platform: ${BENCHMARK_DATA.systemInfo.platform} | Node: ${BENCHMARK_DATA.systemInfo.nodeVersion} | Architecture: ${BENCHMARK_DATA.systemInfo.arch}</p>
+            `;
+        document.querySelector('.instructions').style.display = 'none';
+        document.querySelector('.file-input-container').style.display = 'none';
       }
     </script>
   </body>

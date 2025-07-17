@@ -29,7 +29,7 @@
     "pre-commit": "pnpm lint-staged",
     "analyze:imports": "pnpx tsx build/analyze-imports.ts",
     "analyze:dependencies": "pnpx tsx build/analyze-dependencies.ts",
-    "benchmark:crypto": "pnpx tsx src/performance-tests/run-benchmark.ts",
+    "benchmark:crypto": "pnpx tsx build/performance-tests/run-benchmark.ts",
     "analyze:fetch": "./build/fetch-project-data.sh",
     "analyze:project": "pnpx tsx build/analyze-project.ts",
     "analyze:priority": "pnpm analyze:fetch && pnpm analyze:project",
