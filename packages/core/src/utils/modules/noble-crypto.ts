@@ -190,7 +190,7 @@ export const verifySignatureNoble = async (
 
   try {
     return p256.verify(signature, messageHash, pubKeyBuffer);
-  } catch (_error) {
+  } catch {
     // Failed to verify signature
     return false;
   }
