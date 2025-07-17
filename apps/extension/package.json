@@ -52,7 +52,6 @@
     "@mui/material": "^7.2.0",
     "@mui/system": "^7.2.0",
     "@noble/curves": "^1.9.3",
-    "@noble/secp256k1": "^1.7.2",
     "@onflow/fcl": "^1.19.0",
     "@onflow/flow-wallet-core": "workspace:*",
     "@onflow/flow-wallet-data-model": "workspace:*",
