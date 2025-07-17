@@ -113,9 +113,6 @@ importers:
       '@reown/walletkit':
         specifier: ^1.2.8
         version: 1.2.8(typescript@5.8.3)(zod@3.25.76)
-      '@trustwallet/wallet-core':
-        specifier: ^4.3.6
-        version: 4.3.6
       '@tsparticles/engine':
         specifier: ^3.8.1
         version: 3.8.1
@@ -2645,9 +2642,6 @@ packages:
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
-
-  '@trustwallet/wallet-core@4.3.6':
-    resolution: {integrity: sha512-X+n2CzDhIfUtnQtqqM3Su6XmBdzUijMu8uQEnA9yQWfOv7d33LfaQ9vNbzvpFk4I52K7n6AWLaylM1unuIuTJQ==}
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -10875,10 +10869,6 @@ snapshots:
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.0)':
     dependencies:
       '@testing-library/dom': 10.4.0
-
-  '@trustwallet/wallet-core@4.3.6':
-    dependencies:
-      protobufjs: 7.5.3
 
   '@tsconfig/node10@1.0.11': {}
 

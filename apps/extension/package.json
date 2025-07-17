@@ -59,7 +59,6 @@
     "@onflow/flow-wallet-reducers": "workspace:*",
     "@onflow/flow-wallet-shared": "workspace:*",
     "@reown/walletkit": "^1.2.8",
-    "@trustwallet/wallet-core": "^4.3.6",
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/react": "^3.0.0",
     "@walletconnect/core": "^2.21.4",

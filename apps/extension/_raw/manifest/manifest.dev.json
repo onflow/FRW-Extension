@@ -44,11 +44,7 @@
   "host_permissions": ["https://api.mixpanel.com/*"],
   "web_accessible_resources": [
     {
-      "resources": [
-        "node_modules/@trustwallet/wallet-core/dist/lib/wallet-core.wasm",
-        "pageProvider.js",
-        "user-media-permission.html"
-      ],
+      "resources": ["pageProvider.js", "user-media-permission.html"],
       "matches": ["<all_urls>"]
     },
     {
