@@ -73,7 +73,17 @@ class P256HDKey {
     const n = p256.CURVE.n;
     const parentKeyNum = BigInt('0x' + Buffer.from(this.privateKey).toString('hex'));
     const childKeyNum = BigInt('0x' + Buffer.from(IL).toString('hex'));
+
+    // Check if childKeyNum is zero or equals n (invalid according to BIP32)
+    if (childKeyNum === 0n || childKeyNum >= n) {
+      throw new Error('Invalid child key derivation');
+    }
     const newKeyNum = (parentKeyNum + childKeyNum) % n;
+
+    // Ensure the derived key is within valid range (1 to n-1)
+    if (newKeyNum <= 0n || newKeyNum >= n) {
+      throw new Error('Invalid derived private key');
+    }
 
     // Convert back to bytes (32 bytes, big-endian)
     const newKey = new Uint8Array(32);
@@ -250,6 +260,10 @@ export const verifySignatureNoble = async (
   message: unknown,
   publicKeyHex?: string
 ): Promise<boolean> => {
+  // Type validation for message
+  if (typeof message !== 'string' && typeof message !== 'object') {
+    throw new Error('Message must be either a string or an object');
+  }
   const scriptsPublicKey = publicKeyHex || process.env.SCRIPTS_PUBLIC_KEY;
   if (!scriptsPublicKey) {
     throw new Error('Public key is required for signature verification');

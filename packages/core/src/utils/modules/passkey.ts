@@ -1,6 +1,6 @@
 import { p256 } from '@noble/curves/nist';
 import { HDKey } from '@scure/bip32';
-import { mnemonicToSeed, generateMnemonic } from '@scure/bip39';
+import { mnemonicToSeed, generateMnemonic, entropyToMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 
 import {
@@ -108,7 +108,7 @@ const getPKfromLogin = async (result) => {
   }
 
   // Generate mnemonic from entropy
-  const mnemonic = generateMnemonic(wordlist, 256); // Note: This generates a random mnemonic
+  const mnemonic = entropyToMnemonic(entropy, wordlist); // Note: This generates a random mnemonic
   // For deterministic generation from entropy, we'd need to implement BIP39 entropy to mnemonic conversion
 
   // Create HD wallet from mnemonic

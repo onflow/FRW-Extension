@@ -80,7 +80,17 @@ export async function decryptJsonKeystore(
     const mac = keccak_256(macData);
     const expectedMac = Buffer.from(crypto.mac, 'hex');
 
-    if (!Buffer.from(mac).equals(expectedMac)) {
+    const macArray = new Uint8Array(mac);
+    const expectedMacArray = new Uint8Array(expectedMac);
+
+    // Better constant-time comparison
+    let result = macArray.length ^ expectedMacArray.length; // XOR lengths
+    for (let i = 0; i < Math.min(macArray.length, expectedMacArray.length); i++) {
+      result |= macArray[i] ^ expectedMacArray[i]; // XOR each byte
+    }
+    const mismatch = result !== 0;
+
+    if (mismatch) {
       throw new Error('Invalid password - MAC verification failed');
     }
 
