@@ -1,9 +1,10 @@
 import { p256 } from '@noble/curves/nist';
 import { secp256k1 } from '@noble/curves/secp256k1';
-import { sha256 } from '@noble/hashes/sha2';
+import { hmac } from '@noble/hashes/hmac';
+import { sha256, sha512 } from '@noble/hashes/sha2';
 import { sha3_256 } from '@noble/hashes/sha3';
 import { HDKey } from '@scure/bip32';
-import { mnemonicToSeed } from '@scure/bip39';
+import { mnemonicToSeedSync } from '@scure/bip39';
 
 import {
   HASH_ALGO_NUM_SHA2_256,
@@ -13,36 +14,112 @@ import {
 } from '@onflow/flow-wallet-shared/constant/algo-constants';
 import { type PublicPrivateKeyTuple } from '@onflow/flow-wallet-shared/types/key-types';
 
-/**
- * Create HD wallet from mnemonic and get keys for a specific derivation path
- * @param mnemonic - BIP39 mnemonic phrase
- * @param passphrase - Optional passphrase
- * @param derivationPath - BIP44 derivation path
- * @returns PublicPrivateKeyTuple with P256 and SECP256K1 keys
- */
-export const seedWithPathAndPhrase2PublicPrivateKeyNoble = async (
-  mnemonic: string,
-  derivationPath: string,
-  passphrase: string = ''
-): Promise<PublicPrivateKeyTuple> => {
-  // Convert mnemonic to seed
-  const seed = await mnemonicToSeed(mnemonic, passphrase);
+// Custom BIP32 implementation for P256 curve to match TrustWallet
+class P256HDKey {
+  private privateKey: Uint8Array;
+  private chainCode: Uint8Array;
 
-  // Create HD key from seed
-  const hdkey = HDKey.fromMasterSeed(seed);
-
-  // Derive key at path
-  const derived = hdkey.derive(derivationPath);
-
-  if (!derived.privateKey) {
-    throw new Error('Failed to derive private key');
+  constructor(privateKey: Uint8Array, chainCode: Uint8Array) {
+    this.privateKey = privateKey;
+    this.chainCode = chainCode;
   }
 
-  // Get private key
+  static fromMasterSeed(seed: Uint8Array): P256HDKey {
+    // BIP32 master key generation using "Nist256p1 seed" as key
+    const I = hmac(sha512, Buffer.from('Nist256p1 seed', 'utf8'), seed);
+    const IL = I.slice(0, 32); // Private key
+    const IR = I.slice(32); // Chain code
+    return new P256HDKey(IL, IR);
+  }
+
+  derive(path: string): P256HDKey {
+    const segments = path.split('/').slice(1); // Remove 'm'
+    let key = new P256HDKey(this.privateKey, this.chainCode);
+
+    for (const segment of segments) {
+      const isHardened = segment.endsWith("'");
+      const index = parseInt(isHardened ? segment.slice(0, -1) : segment, 10);
+      key = key.deriveChild(index + (isHardened ? 0x80000000 : 0));
+    }
+
+    return key;
+  }
+
+  private deriveChild(index: number): P256HDKey {
+    const isHardened = index >= 0x80000000;
+    const data = new Uint8Array(37);
+
+    if (isHardened) {
+      // Hardened: 0x00 || private key || index
+      data[0] = 0x00;
+      data.set(this.privateKey, 1);
+    } else {
+      // Non-hardened: public key || index
+      const pubKey = p256.getPublicKey(this.privateKey, true);
+      data.set(pubKey, 0);
+    }
+
+    // Add index (big-endian)
+    data[33] = (index >> 24) & 0xff;
+    data[34] = (index >> 16) & 0xff;
+    data[35] = (index >> 8) & 0xff;
+    data[36] = index & 0xff;
+
+    const I = hmac(sha512, this.chainCode, data);
+    const IL = I.slice(0, 32);
+    const IR = I.slice(32);
+
+    // Add parent key to child key (mod n)
+    const n = p256.CURVE.n;
+    const parentKeyNum = BigInt('0x' + Buffer.from(this.privateKey).toString('hex'));
+    const childKeyNum = BigInt('0x' + Buffer.from(IL).toString('hex'));
+    const newKeyNum = (parentKeyNum + childKeyNum) % n;
+
+    // Convert back to bytes (32 bytes, big-endian)
+    const newKey = new Uint8Array(32);
+    const hexStr = newKeyNum.toString(16).padStart(64, '0');
+    for (let i = 0; i < 32; i++) {
+      newKey[i] = parseInt(hexStr.slice(i * 2, (i + 1) * 2), 16);
+    }
+
+    return new P256HDKey(newKey, IR);
+  }
+
+  getPrivateKey(): Uint8Array {
+    return this.privateKey;
+  }
+}
+
+/**
+ * Derives a key pair from a mnemonic and path.
+ * @param mnemonic - The mnemonic phrase
+ * @param path - The derivation path
+ * @param passphrase - Optional passphrase
+ * @returns The derived key pair
+ */
+export function seedWithPathAndPhrase2PublicPrivateKeyNoble(
+  mnemonic: string,
+  path: string,
+  passphrase: string = ''
+): PublicPrivateKeyTuple {
+  const seed = mnemonicToSeedSync(mnemonic, passphrase);
+
+  // P256 derivation using BIP32 with P256 curve (matching TrustWallet)
+  const p256HDKey = P256HDKey.fromMasterSeed(seed);
+  const p256Derived = p256HDKey.derive(path);
+  const p256PrivateKey = p256Derived.getPrivateKey();
+
+  // SECP256K1 derivation using standard BIP32
+  const hdkey = HDKey.fromMasterSeed(seed);
+  const derived = hdkey.derive(path);
+
+  if (!derived.privateKey) {
+    throw new Error('Could not derive secp256k1 private key');
+  }
   const privateKey = derived.privateKey;
 
-  // Generate public keys for both curves
-  const p256PubKey = p256.getPublicKey(privateKey, false);
+  // Generate public keys using their respective private keys
+  const p256PubKey = p256.getPublicKey(p256PrivateKey, false);
   const secp256k1PubKey = secp256k1.getPublicKey(privateKey, false);
 
   // Convert to uncompressed format and remove the '04' prefix
@@ -52,25 +129,22 @@ export const seedWithPathAndPhrase2PublicPrivateKeyNoble = async (
   return {
     P256: {
       pubK: p256PubKeyHex,
-      pk: Buffer.from(privateKey).toString('hex'),
+      pk: Buffer.from(p256PrivateKey).toString('hex'),
     },
     SECP256K1: {
       pubK: secp256k1PubKeyHex,
       pk: Buffer.from(privateKey).toString('hex'),
     },
   };
-};
+}
 
 /**
  * Get public key from private key for a specific algorithm
  * @param pk - Private key in hex
  * @param signAlgo - Signing algorithm (P256 or SECP256K1)
- * @returns Public key in hex without '04' prefix
+ * @returns Public key in hex
  */
-export const getPublicKeyFromPrivateKeyNoble = async (
-  pk: string,
-  signAlgo: number
-): Promise<string> => {
+export function getPublicKeyFromPrivateKeyNoble(pk: string, signAlgo: number): string {
   const privateKey = Buffer.from(pk, 'hex');
 
   if (signAlgo === SIGN_ALGO_NUM_ECDSA_P256) {
@@ -82,7 +156,7 @@ export const getPublicKeyFromPrivateKeyNoble = async (
   } else {
     throw new Error(`Unsupported signAlgo: ${signAlgo}`);
   }
-};
+}
 
 /**
  * Sign a message with a private key
