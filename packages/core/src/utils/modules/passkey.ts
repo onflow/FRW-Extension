@@ -1,6 +1,7 @@
 import { p256 } from '@noble/curves/nist';
 import { HDKey } from '@scure/bip32';
 import { mnemonicToSeed, generateMnemonic } from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 
 import {
   FLOW_BIP44_PATH,
@@ -17,7 +18,7 @@ import {
   decodeClientDataJSON,
 } from './WebAuthnDecoder';
 
-function getRandomBytes(length) {
+function getRandomBytes(length: number) {
   const array = new Uint8Array(length ?? 32);
   crypto.getRandomValues(array);
   return array;
@@ -107,7 +108,7 @@ const getPKfromLogin = async (result) => {
   }
 
   // Generate mnemonic from entropy
-  const mnemonic = generateMnemonic(256); // Note: This generates a random mnemonic
+  const mnemonic = generateMnemonic(wordlist, 256); // Note: This generates a random mnemonic
   // For deterministic generation from entropy, we'd need to implement BIP39 entropy to mnemonic conversion
 
   // Create HD wallet from mnemonic
@@ -120,7 +121,7 @@ const getPKfromLogin = async (result) => {
   }
 
   const privateKey = derived.privateKey;
-  const publicKey = p256.getPublicKey(privateKey);
+  const publicKey = p256.getPublicKey(privateKey, false);
 
   const json = decodeClientDataJSON(result.response.clientDataJSON);
 
@@ -164,7 +165,7 @@ const getPKfromRegister = async ({ userId }) => {
   }
 
   const privateKey = derived.privateKey;
-  const publicKey = p256.getPublicKey(privateKey);
+  const publicKey = p256.getPublicKey(privateKey, false);
 
   return {
     type: KEY_TYPE.PASSKEY,

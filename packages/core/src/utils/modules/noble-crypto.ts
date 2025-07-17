@@ -42,8 +42,8 @@ export const seedWithPathAndPhrase2PublicPrivateKeyNoble = async (
   const privateKey = derived.privateKey;
 
   // Generate public keys for both curves
-  const p256PubKey = p256.getPublicKey(privateKey);
-  const secp256k1PubKey = secp256k1.getPublicKey(privateKey);
+  const p256PubKey = p256.getPublicKey(privateKey, false);
+  const secp256k1PubKey = secp256k1.getPublicKey(privateKey, false);
 
   // Convert to uncompressed format and remove the '04' prefix
   const p256PubKeyHex = Buffer.from(p256PubKey).toString('hex').replace(/^04/, '');
@@ -74,10 +74,10 @@ export const getPublicKeyFromPrivateKeyNoble = async (
   const privateKey = Buffer.from(pk, 'hex');
 
   if (signAlgo === SIGN_ALGO_NUM_ECDSA_P256) {
-    const pubKey = p256.getPublicKey(privateKey);
+    const pubKey = p256.getPublicKey(privateKey, false);
     return Buffer.from(pubKey).toString('hex').replace(/^04/, '');
   } else if (signAlgo === SIGN_ALGO_NUM_ECDSA_secp256k1) {
-    const pubKey = secp256k1.getPublicKey(privateKey);
+    const pubKey = secp256k1.getPublicKey(privateKey, false);
     return Buffer.from(pubKey).toString('hex').replace(/^04/, '');
   } else {
     throw new Error(`Unsupported signAlgo: ${signAlgo}`);

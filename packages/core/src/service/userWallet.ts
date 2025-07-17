@@ -1111,7 +1111,9 @@ class UserWallet {
     // TODO: Look into the logic for this
     // We want to us a secp256k1 public key in this logic
     // We should be able to use the public key from the account key request...
-    const publicKey = Buffer.from(secp256k1.getPublicKey(privateKey).slice(1)).toString('hex');
+    const publicKey = Buffer.from(secp256k1.getPublicKey(privateKey, false).slice(1)).toString(
+      'hex'
+    );
     if (accountKey.public_key === publicKey) {
       const signature = secp256k1.sign(messageHash, privateKey);
       const realSignature = signature.toCompactHex();
