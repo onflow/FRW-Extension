@@ -1,4 +1,4 @@
-import { p256 } from '@noble/curves/p256';
+import { p256 } from '@noble/curves/nist';
 import { HDKey } from '@scure/bip32';
 import { mnemonicToSeed, generateMnemonic } from '@scure/bip39';
 

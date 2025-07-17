@@ -1,6 +1,6 @@
-import { p256 } from '@noble/curves/p256';
+import { p256 } from '@noble/curves/nist';
 import { secp256k1 } from '@noble/curves/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
+import { sha256 } from '@noble/hashes/sha2';
 import { sha3_256 } from '@noble/hashes/sha3';
 import { HDKey } from '@scure/bip32';
 import { mnemonicToSeed } from '@scure/bip39';
@@ -122,10 +122,9 @@ export const signWithKeyNoble = async (
   // Sign based on algorithm
   if (signAlgo === SIGN_ALGO_NUM_ECDSA_P256) {
     const signature = p256.sign(digestToSign, privateKey);
-    const signatureBytes = signature.toCompactRawBytes();
 
     // P256 doesn't have recovery ID, so just return the signature
-    return Buffer.from(signatureBytes).toString('hex');
+    return signature.toCompactHex();
   } else if (signAlgo === SIGN_ALGO_NUM_ECDSA_secp256k1) {
     const signature = secp256k1.sign(digestToSign, privateKey);
 
