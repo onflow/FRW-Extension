@@ -1,5 +1,3 @@
-import { initWasm } from '@trustwallet/wallet-core';
-
 import storage from '@onflow/flow-wallet-extension-shared/storage';
 import {
   FLOW_BIP44_PATH,
@@ -14,6 +12,7 @@ import {
 import { CURRENT_ID_KEY } from '@onflow/flow-wallet-shared/types/keyring-types';
 import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 
+import { decryptJsonKeystore } from './keystore-decrypt';
 import {
   seedWithPathAndPhrase2PublicPrivateKeyNoble,
   getPublicKeyFromPrivateKeyNoble,
@@ -24,13 +23,15 @@ import {
 
 const jsonToKey = async (json: string, password: string) => {
   try {
-    const { StoredKey, PrivateKey } = await initWasm();
-    // It appears StoredKey.importJSON expects a Buffer, not a string
-    const jsonBuffer = Buffer.from(json);
-    const keystore = StoredKey.importJSON(jsonBuffer);
-    const privateKeyData = keystore.decryptPrivateKey(Buffer.from(password));
-    const privateKey = PrivateKey.createWithData(privateKeyData);
-    return privateKey;
+    const privateKeyData = await decryptJsonKeystore(json, password);
+    if (!privateKeyData) {
+      return null;
+    }
+    // Return an object that mimics the TrustWallet PrivateKey interface
+    // with a data() method that returns the private key bytes
+    return {
+      data: () => privateKeyData,
+    };
   } catch (error) {
     consoleError(error);
     return null;

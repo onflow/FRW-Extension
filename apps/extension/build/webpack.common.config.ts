@@ -40,8 +40,6 @@ const config = (env: { config: 'dev' | 'pro' | 'none' }): webpack.Configuration 
     },
     experiments: {
       topLevelAwait: true,
-      asyncWebAssembly: true,
-      syncWebAssembly: true,
     },
     module: {
       rules: [
@@ -104,11 +102,6 @@ const config = (env: { config: 'dev' | 'pro' | 'none' }): webpack.Configuration 
           },
         },
         {
-          test: /\.wasm$/,
-          type: 'webassembly/async',
-          include: /node_modules/,
-        },
-        {
           test: /\.md$/,
           use: 'raw-loader',
         },
@@ -124,11 +117,7 @@ const config = (env: { config: 'dev' | 'pro' | 'none' }): webpack.Configuration 
     plugins: [
       new CopyPlugin({
         patterns: [
-          {
-            from: '../../node_modules/@trustwallet/wallet-core/dist/lib/wallet-core.wasm',
-            to: 'wallet-core.wasm',
-          },
-          // Add this pattern to copy the manifest.json from _raw to dist
+          // Copy locales
           {
             from: '_raw/_locales',
             to: '_locales',
