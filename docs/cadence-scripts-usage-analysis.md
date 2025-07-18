@@ -10,7 +10,7 @@ This document provides a comprehensive analysis of how `getScripts` is used thro
 
 ### Core Implementation
 
-**Location**: `src/background/service/openapi.ts:2335`
+**Location**: `src/core/service/openapi.ts:2335`
 
 ```typescript
 export const getScripts = async (network: string, category: string, scriptName: string) => {

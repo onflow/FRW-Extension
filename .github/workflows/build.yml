@@ -2,6 +2,7 @@ name: Extension Build
 
 on:
   push:
+  workflow_dispatch:
 
 jobs:
   determine-env:
@@ -121,23 +122,23 @@ jobs:
           EOF
           }
 
-          # Always create .env.pro
-          create_env_file ".env.pro"
+          # Always create .env.pro in extension directory
+          create_env_file "apps/extension/.env.pro"
 
           # Create .env.dev if environment is development
           if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" || "${{ needs.determine-env.outputs.env_name }}" == "staging" ]]; then
-            create_env_file ".env.dev"
+            create_env_file "apps/extension/.env.dev"
           fi
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm -F flow-wallet-extension test:run
 
       - name: Build
         run: |
           if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" || "${{ needs.determine-env.outputs.env_name }}" == "staging" ]]; then
-            pnpm run build:dev-ci
+            pnpm -F flow-wallet-extension build:dev-ci
           else
-            pnpm run build:ci
+            pnpm -F flow-wallet-extension build:ci
           fi
         env:
           CI: true
@@ -151,12 +152,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: extension-build
-          path: dist/
+          path: apps/extension/dist/
 
       - name: Check build size
         run: |
           echo "Build size:"
-          du -sh dist/
+          du -sh apps/extension/dist/
 
   test:
     needs: [determine-env, build]
@@ -185,11 +186,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: extension-build
-          path: dist/
+          path: apps/extension/dist/
 
       - name: Create .env.test file
         run: |
-          cat << EOF > .env.test
+          cat << EOF > apps/extension/.env.test
           # Test secrets
           TEST_PASSWORD="${{ secrets.TEST_PASSWORD }}"
           TEST_SEED_PHRASE_RECEIVER="${{ secrets.TEST_SEED_PHRASE_RECEIVER }}"
@@ -212,72 +213,52 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps chromium
       - name: Run Playwright tests
-        run: pnpm test:e2e
+        run: pnpm -F flow-wallet-extension test:e2e
         env:
           CI: true
           HEADLESS: true
       - name: Sanitize Playwright Report
         if: always()
-        run: pnpm tsx build/sanitize-playwright.ts
+        run: cd apps/extension && pnpm tsx build/sanitize-playwright.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: playwright-report/
+          path: apps/extension/playwright-report/
           retention-days: 30
 
-  deploy-storybook-and-reports:
-    needs: [test] # Depends on the Playwright test job
+  deploy-reports:
+    needs: [test]
     runs-on: ubuntu-latest
-    if: always() # Run even if tests fail to publish what's available
-    strategy:
-      matrix:
-        node-version: [22.x]
+    if: always()
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch all history for tags
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
       - name: Download Playwright Report
         uses: actions/download-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/ # Download to this path
+          path: playwright-report
 
-      - name: Create .nojekyll file
-        run: touch playwright-report/.nojekyll
-
-      - name: Deploy Playwright Report
-        uses: peaceiris/actions-gh-pages@v4
-        if: always() # Deploy even if tests fail
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./playwright-report
-          destination_dir: reports/run-${{ github.run_id }}
-          keep_files: true
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
-      - name: Build Storybook
-        run: pnpm build-storybook # Assumes output is storybook-static
-
-      - name: Publish to Chromatic
-        uses: chromaui/action@v1
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBuildDir: storybook-static # Directory with Storybook and reports
-          exitZeroOnChanges: true # Optional: useful for PR checks
-          # workingDir: . # Not needed if storybookBuildDir is set correctly
+          project_id: ${{ secrets.PROJECT_ID }}
+
+      - name: Upload reports to GCS
+        run: |
+          RUN_DIR="reports/run-${{ github.run_id }}"
+          gsutil -m cp -r playwright-report/* gs://${{ vars.GCS_BUCKET_NAME }}/$RUN_DIR/
+          echo "REPORT_URL=https://storage.googleapis.com/${{ vars.GCS_BUCKET_NAME }}/$RUN_DIR/index.html" >> $GITHUB_ENV
 
       - name: Add Job Summary
         if: always()
@@ -291,6 +272,40 @@ jobs:
           echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
-          echo "- 📋 **[View Full Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/reports/run-${{ github.run_id }}/)**" >> $GITHUB_STEP_SUMMARY
+          echo "- 📋 **[View Full Report](${{ env.REPORT_URL }})**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "> 💡 **Tip**: Click the report link above to view detailed test results, traces, and screenshots!" >> $GITHUB_STEP_SUMMARY
+
+  deploy-storybook:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: always()
+    strategy:
+      matrix:
+        node-version: [22.x]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Storybook
+        run: pnpm -F flow-wallet-extension build-storybook
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: apps/extension/storybook-static
+          exitZeroOnChanges: true

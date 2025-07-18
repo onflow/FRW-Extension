@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="362" height="337" viewBox="0 0 362 337" fill="none">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#00EF8B" flood-opacity="1" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path d="M295.626 161.618H402.703V268.693H295.626V161.618ZM295.626 161.618H188.622M295.626 161.618L295.62 148.191C295.662 126.024 313.644 108.076 335.812 108.076H456.236V1H335.812C254.554 1.0836 188.702 66.9344 188.619 148.191L188.622 161.618M295.626 161.618L295.623 268.617M188.622 268.617H148.43C126.232 268.617 108.238 286.612 108.238 308.809C108.238 331.006 126.232 349 148.43 349C170.627 349 188.622 331.006 188.622 308.809V268.617ZM188.622 268.617V161.618M188.622 268.617H295.623M188.622 161.618H148.43C67.137 161.618 1.23633 227.517 1.23633 308.809C1.23633 390.1 67.137 456 148.43 456C229.722 456 295.623 390.1 295.623 308.809V268.617" stroke="#00EF8B" stroke-width="2" filter="url(#glow)"/>
+</svg>

@@ -36,21 +36,18 @@ Flow Reference Wallet (FRW) is a Chrome extension that serves as a digital walle
 The extension follows a strict separation of concerns:
 
 1. **Background Service Worker** (`src/background/`)
-
    - Handles all blockchain interactions, key management, and secure operations
    - Cannot access DOM or window objects
    - Communicates via Chrome runtime messaging
    - Main controller: `src/background/controller/wallet.ts`
 
 2. **UI Layer** (`src/ui/`)
-
    - React-based popup interface
    - Communicates with background via `WalletController` proxy
    - Uses MUI v7 for component library
    - Routing with React Router v5
 
 3. **Content Scripts** (`src/content-script/`)
-
    - Injects wallet provider into web pages
    - Handles dApp communication
    - Implements Flow FCL and Ethereum provider interfaces
@@ -69,7 +66,6 @@ The extension follows a strict separation of concerns:
 ## Environment Setup
 
 1. **Required Environment Variables** (in `.env.dev`):
-
    - Firebase configuration keys
    - API endpoints
    - Feature flags
@@ -173,7 +169,6 @@ The extension implements a sophisticated caching system to optimize API calls an
    ```
 
 3. **Batch Operations** (`registerBatchRefreshListener`):
-
    - Collects multiple refresh requests within a time window
    - Executes batch API calls for efficiency
    - Used for fetching multiple tokens, NFTs, etc.

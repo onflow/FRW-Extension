@@ -4,7 +4,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "never"
+    "source.organizeImports": "never" // Let ESLint handle import ordering
   },
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,

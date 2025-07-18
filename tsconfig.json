@@ -1,44 +1,22 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "bundler",
-    "noImplicitAny": false,
-    "checkJs": true,
-    "strict": true,
     "esModuleInterop": true,
-    "useUnknownInCatchVariables": false,
+    "strict": true,
     "resolveJsonModule": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "ui/*": ["./src/ui/*"],
-      "background/*": ["./src/background/*"],
-      "consts": ["./src/constant/index"]
-    },
-    "lib": ["ES2021.String", "DOM", "DOM.Iterable"],
-    "types": ["chrome", "node", "react", "react-dom"],
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "plugins": [
-      {
-        "transform": "typescript-transform-paths",
-        "afterDeclarations": true
-      }
-    ],
-    "outDir": "./dist"
+    "allowJs": true
   },
-  "exclude": ["./node_modules"],
-  "include": [
-    "src",
-    "__tests__",
-    "build",
-    "webpack.config.ts",
-    "postcss.config.mjs",
-    "svgTransform.js",
-    ".storybook/**/*"
-  ]
+  "references": [
+    { "path": "./apps/extension" },
+    { "path": "./packages/shared" },
+    { "path": "./packages/reducers" }
+  ],
+  "files": [],
+  "include": [],
+  "exclude": ["node_modules"]
 }

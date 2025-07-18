@@ -12,29 +12,28 @@ yarn.lock
 .env.pro
 .env.*
 dist.zip
-_raw/manifest.json
-_raw/react-devtools.js
+apps/extension/_raw/manifest.json
+apps/extension/_raw/react-devtools.js
 yarn-error.log
 dist2
-src/background/utils/firebase.config.json
 dist.rar
 dist.7z
+**/firebase.config.json
 .cursorrules
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+test-results
+playwright-report
+blob-report
+playwright
 dependency-usage.md
 extension-dependencies.md
 emulator-account.pkey
 flow.json
 coverage
 .github-data
-playwright/.auth
 
 **/.claude/settings.local.json
 
 *storybook.log
 storybook-static
 
-/docs-archive/
+docs-archive

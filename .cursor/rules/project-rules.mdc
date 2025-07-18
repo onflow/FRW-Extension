@@ -42,7 +42,7 @@ pnpm add <package-name>
 ## Directory Structure
 
 - **`src/background`**: Contains the code for the extension's background script.
-    - **`service/`**: Houses various services that run in the background, like API calls and wallet logic. See [userWallet.ts](mdc:src/background/service/userWallet.ts).
+    - **`service/`**: Houses various services that run in the background, like API calls and wallet logic. See [userWallet.ts](mdc:src/core/service/userWallet.ts).
     - **`utils/`**: Utilities for the background script.
 - **`src/ui`**: Contains all UI-related code.
     - **`components/`**: Shared, reusable React components. See [FRWProfile.tsx](mdc:src/ui/components/FRWProfile.tsx).
@@ -64,7 +64,7 @@ To maintain consistency, please adhere to the following naming conventions for n
 
 - **Flow Interaction**: The [@onflow/fcl](mdc:https:/github.com/onflow/fcl-js) library is used for all interactions with the Flow blockchain.
 - **State Management**: The application uses a combination of React hooks, and data cache storage using chrome storage.
-- **Firebase**: Used for remote configuration. See [firebaseConfig.ts](mdc:src/background/utils/firebaseConfig.ts).
+- **Firebase**: Used for remote configuration. See [firebaseConfig.ts](mdc:src/core/utils/firebaseConfig.ts).
 - **Internationalization (i18n)**: Text is managed in [messages.json](mdc:src/messages.json) and loaded via `i18n.ts`.
 
 ## Data Caching
@@ -89,7 +89,7 @@ The extension uses a custom stale-while-revalidate caching system designed for t
 - **`docs/cache-data-model.md`**: The primary documentation for this system.
 - **`src/shared/utils/cache-data-keys.ts`**: Defines keys and data types for temporary session data.
 - **`src/shared/utils/user-data-keys.ts`**: Defines keys and data types for persistent user data.
-- **`src/background/utils/data-cache.ts`**: Contains the core logic for the caching mechanism, including `registerRefreshListener` for single items and `registerBatchRefreshListener` for batching multiple requests.
+- **`src/core/utils/data-cache.ts`**: Contains the core logic for the caching mechanism, including `registerRefreshListener` for single items and `registerBatchRefreshListener` for batching multiple requests.
 
 ### Implementation Pattern
 

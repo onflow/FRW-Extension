@@ -81,7 +81,7 @@ export const getCachedNewData = async (param1: string, param2: string) => {
 - Loaders should not rely on any global or state - they should only use the arguments passed. e.g. never call anything in a loader to get the current state of something that is then used to load data.
 
 ```typescript
-import { registerRefreshListener } from '@/background/utils/data-cache';
+import { registerRefreshListener } from '@/core/utils/data-cache';
 
 const loadYourData = async (param1: string, param2: string): Promise<SomeData> => {
   const data = await fetchSomeData(param1, param2);
@@ -161,7 +161,7 @@ Use batch refresh when:
 1. **Use `registerBatchRefreshListener` instead of `registerRefreshListener`**:
 
 ```typescript
-import { registerBatchRefreshListener } from '@/background/utils/data-cache';
+import { registerBatchRefreshListener } from '@/core/utils/data-cache';
 
 registerBatchRefreshListener(
   accountBalanceRefreshRegex,
@@ -183,7 +183,6 @@ registerBatchRefreshListener(
 ```
 
 2. **Parameters Explained**:
-
    - `keyRegex`: The refresh key regex pattern (must include `-refresh` suffix)
    - `batchLoader`: Function that loads data for multiple items at once
    - `getBatchKey`: Function to extract the batch key from regex matches
