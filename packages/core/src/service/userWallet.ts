@@ -1,7 +1,8 @@
-import * as secp from '@noble/secp256k1';
+import { secp256k1 } from '@noble/curves/secp256k1';
+import { sha256 } from '@noble/hashes/sha2';
+import { keccak_256 } from '@noble/hashes/sha3';
 import * as fcl from '@onflow/fcl';
 import type { Account as FclAccount } from '@onflow/typedefs';
-import * as ethUtil from 'ethereumjs-util';
 import { getApp } from 'firebase/app';
 import { getAuth, signInAnonymously } from 'firebase/auth/web-extension';
 import { TransactionError } from 'web3';
@@ -1271,10 +1272,9 @@ class UserWallet {
       Buffer.from(value.padEnd(pad * 2, 0), 'hex').toString('hex');
     const USER_DOMAIN_TAG = rightPaddedHexBuffer(Buffer.from('FLOW-V0.0-user').toString('hex'), 32);
 
-    const hex = secp.utils.bytesToHex;
     const message = USER_DOMAIN_TAG + Buffer.from(idToken, 'utf8').toString('hex');
 
-    const messageHash = await secp.utils.sha256(Buffer.from(message, 'hex'));
+    const messageHash = await sha256(Buffer.from(message, 'hex'));
 
     // Get the private key tuple
     const publicPrivateKeyTuple = await seed2PublicPrivateKey(mnemonic);
@@ -1285,10 +1285,12 @@ class UserWallet {
     // TODO: Look into the logic for this
     // We want to us a secp256k1 public key in this logic
     // We should be able to use the public key from the account key request...
-    const publicKey = hex(secp.getPublicKey(privateKey).slice(1));
+    const publicKey = Buffer.from(secp256k1.getPublicKey(privateKey, false).slice(1)).toString(
+      'hex'
+    );
     if (accountKey.public_key === publicKey) {
-      const signature = await secp.sign(messageHash, privateKey);
-      const realSignature = secp.Signature.fromHex(signature).toCompactHex();
+      const signature = secp256k1.sign(messageHash, privateKey);
+      const realSignature = signature.toCompactHex();
       return openapiService.loginV3(accountKey, deviceInfo, realSignature, replaceUser);
     } else {
       return false;
@@ -1720,6 +1722,30 @@ const childAccountMapToWalletAccounts = (
 };
 
 /**
+ * Convert an address to ERC-55 checksum format using Noble
+ * @param address - The address to convert (with or without 0x prefix)
+ * @returns The checksummed address with 0x prefix
+ */
+const toChecksumAddress = (address: string): string => {
+  // Remove 0x prefix if present and convert to lowercase
+  const addr = address.toLowerCase().replace(/^0x/i, '');
+
+  // Get the keccak hash of the lowercase address
+  const hash = keccak_256(addr);
+  const hashHex = Buffer.from(hash).toString('hex');
+
+  // Build the checksummed address
+  let checksummed = '0x';
+  for (let i = 0; i < addr.length; i++) {
+    const char = addr[i];
+    const hashByte = parseInt(hashHex[i], 16);
+    checksummed += hashByte >= 8 ? char.toUpperCase() : char;
+  }
+
+  return checksummed;
+};
+
+/**
  * Convert an EVM address to a wallet account
  * @param network - The network to load the accounts for
  * @param evmAddress - The EVM address to convert to a wallet account
@@ -1740,7 +1766,7 @@ const evmAddressToWalletAccount = (network: string, evmAddress?: EvmAddress): Wa
 
   // This is the COA address we get straight from the script
   // This is where we encode the address in ERC-55 format
-  const checksummedAddress = ethUtil.toChecksumAddress(ensureEvmAddressPrefix(evmAddress));
+  const checksummedAddress = toChecksumAddress(ensureEvmAddressPrefix(evmAddress));
 
   // The index of the evm wallet - always 0 as we only support one evm wallet
   const index = 0;

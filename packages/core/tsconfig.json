@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "moduleResolution": "bundler",
     "declaration": true,
     "declarationMap": true,
@@ -10,25 +10,34 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "noImplicitAny": false,
+    "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "outDir": "./dist",
-    "rootDir": "./",
     "composite": true,
     "paths": {
       "@onflow/flow-wallet-shared/*": ["../shared/src/*"],
       "@onflow/flow-wallet-extension-shared/*": ["../extension-shared/src/*"],
       "@onflow/flow-wallet-data-model/*": ["../data-model/src/*"],
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["chrome", "node"]
   },
+
   "include": ["src/**/*", "tsup.config.ts", "vitest.config.ts", "vitest.init.ts"],
   "exclude": ["node_modules", "dist"],
 
   "references": [
     {
       "path": "../data-model"
+    },
+    {
+      "path": "../extension-shared"
+    },
+    {
+      "path": "../shared"
     }
   ]
 }
