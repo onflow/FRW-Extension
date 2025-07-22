@@ -5,36 +5,35 @@ import {
   type NFTModelV2,
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
-  type EvmCollectionNFTList,
-  type CollectionNftList,
+  type EvmCollectionDetails,
+  type CadenceCollectionDetails,
   type NFTItem,
 } from '@onflow/flow-wallet-shared/types/nft-types';
-import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
+import { consoleError, consoleLog } from '@onflow/flow-wallet-shared/utils/console-log';
 
 import {
   childAccountNftsKey,
   type ChildAccountNFTsStore,
   evmNftCollectionListKey,
   type EvmNftCollectionListStore,
-  evmNftCollectionsIdsKey,
+  evmNftCollectionsDetailsPageKey,
+  getCachedEvmCollectionNftItemListPage,
+  getCachedCollectionNftItemsPage,
   nftCatalogCollectionsKey,
-  nftCollectionKey,
+  collectionNftItemsPageKey,
   nftCollectionListKey,
   nftListKey,
+  triggerEvmCollectionNftItemsPageRefresh,
+  triggerNftCollectionRefresh,
 } from '@/data-model/cache-data-keys';
 
 import { useCachedData } from './use-data';
 
 interface UseNftHookProps {
-  getCollection: (
-    ownerAddress: string,
-    collection: string,
-    offset?: number | string
-  ) => Promise<any>;
-  refreshCollection?: (ownerAddress: string, collection: string, offset?: number) => Promise<void>;
+  network?: string;
   ownerAddress: string;
   collectionName: string;
-  isEvm: boolean;
+
   nftCount?: number;
 }
 
@@ -57,13 +56,59 @@ interface UseNftHookResult {
 }
 
 export const useNftHook = ({
-  getCollection,
-  refreshCollection,
+  network,
   ownerAddress,
   collectionName,
-  isEvm,
+
   nftCount,
 }: UseNftHookProps): UseNftHookResult => {
+  // Check if the collection is an EVM collection
+
+  const isEvm = useMemo(() => isValidEthereumAddress(address), [address]);
+
+  const getCollection = useCallback(
+    async (ownerAddress: string, collection: string, offset: number | string = 0) => {
+      consoleLog('getCollection', network, ownerAddress, collection, offset);
+      if (!network) {
+        return undefined;
+      }
+      if (isEvm) {
+        return await getCachedEvmCollectionNftItemListPage(
+          network,
+          ownerAddress,
+          collection,
+          offset as number
+        );
+      }
+      return await getCachedCollectionNftItemsPage(
+        network,
+        ownerAddress,
+        collection,
+        offset as number
+      );
+    },
+    [network, isEvm]
+  );
+
+  const refreshCollection = useCallback(
+    async (ownerAddress: string, collection: string, offset: number | string = 0) => {
+      if (!network) {
+        return;
+      }
+      if (isEvm) {
+        triggerEvmCollectionNftItemsPageRefresh(
+          network,
+          ownerAddress,
+          collection,
+          offset as number
+        );
+      } else {
+        triggerNftCollectionRefresh(network, ownerAddress, collection, offset as number);
+      }
+    },
+    [network, isEvm]
+  );
+
   const [list, setLists] = useState<NFTItem[]>([]);
   const [allNfts, setAllNfts] = useState<NFTItem[]>([]);
   const [filteredList, setFilteredList] = useState<NFTItem[]>([]);
@@ -76,17 +121,16 @@ export const useNftHook = ({
 
   const allNftsRef = useRef<NFTItem[]>([]);
   const evmOffset = useRef<string>('');
-  const hasAttemptedLoadAll = useRef(false);
+  //const hasAttemptedLoadAll = useRef(false);
   const total = useRef<number>(0);
-  const initialized = useRef(false);
 
   // Reset the ref when collection changes
   useEffect(() => {
     allNftsRef.current = [];
     setAllNfts([]);
-    hasAttemptedLoadAll.current = false;
+    //hasAttemptedLoadAll.current = false;
     evmOffset.current = ''; // Reset the EVM offset when collection changes
-  }, [ownerAddress, collectionName]);
+  }, [ownerAddress, collectionName, network]);
 
   const evmNextPage = useCallback(
     async (currentPage: number): Promise<{ newItemsCount: number; nextPage: number } | null> => {
@@ -99,7 +143,7 @@ export const useNftHook = ({
 
         const res = await getCollection(ownerAddress, collectionName, offsetToUse);
 
-        if (res.nfts && res.nfts.length > 0) {
+        if (res?.nfts && res?.nfts?.length > 0) {
           setLists((prev) => {
             // Simple array concat since each page has unique items
             const newList = [...prev, ...res.nfts];
@@ -108,8 +152,8 @@ export const useNftHook = ({
         }
 
         // Store the next offset (JWT token) for the next page
-        if (res.offset && typeof res.offset === 'string') {
-          evmOffset.current = res.offset;
+        if (res?.offset && typeof res?.offset === 'string') {
+          evmOffset.current = res?.offset;
         } else {
           // No more pages available
           setLoadingMore(false);
@@ -121,7 +165,7 @@ export const useNftHook = ({
 
         // Continue if we got a full page
         return {
-          newItemsCount: res.nfts?.length || 0,
+          newItemsCount: res?.nfts?.length || 0,
           nextPage: currentPage + 1,
         };
       } catch (error) {
@@ -135,10 +179,6 @@ export const useNftHook = ({
 
   const cadenceNextPage = useCallback(
     async (currentPage: number): Promise<{ newItemsCount: number; nextPage: number } | null> => {
-      if (!hasAttemptedLoadAll.current) {
-        return null;
-      }
-
       try {
         const offsetToUse = currentPage * 50;
         if (total.current <= offsetToUse) {
@@ -147,8 +187,8 @@ export const useNftHook = ({
 
         getCollection(ownerAddress, collectionName, offsetToUse as any)
           .then((res) => {
-            if (res.nfts?.length > 0) {
-              setLists((prev) => [...prev, ...res.nfts]);
+            if (res?.nfts?.length > 0) {
+              setLists((prev) => [...prev, ...res?.nfts]);
             }
           })
           .catch((error) => consoleError('Error in cadenceNextPage:', error));
@@ -163,27 +203,26 @@ export const useNftHook = ({
   );
 
   const loadAllPages = useCallback(async (): Promise<void> => {
-    if (loadingMore || isLoadingAll || hasAttemptedLoadAll.current) {
+    if (loadingMore || isLoadingAll) {
       return;
     }
 
     setIsLoadingAll(true);
 
     try {
+      consoleLog('loadAllPages', network, ownerAddress, collectionName);
       const initialRes = await getCollection(ownerAddress, collectionName);
       if (!initialRes) {
         return;
       }
-      setInfo(initialRes.collection);
-      total.current = nftCount || initialRes.nftCount;
+      setInfo(initialRes?.collection);
+      total.current = nftCount || initialRes?.nftCount;
 
       const maxPages = Math.ceil(total.current / 50);
 
       if (!isEvm) {
-        hasAttemptedLoadAll.current = true;
         const requests = Array.from({ length: maxPages }, (_, i) => i).map((page) =>
           setTimeout(() => {
-            if (!hasAttemptedLoadAll.current) return;
             cadenceNextPage(page);
           }, page * 10)
         );
@@ -214,6 +253,7 @@ export const useNftHook = ({
     cadenceNextPage,
     nftCount,
     list,
+    network,
   ]);
 
   useEffect(() => {
@@ -240,17 +280,16 @@ export const useNftHook = ({
 
   // Initialize and load all NFTs
   useEffect(() => {
-    if (!ownerAddress || !collectionName || initialized.current) {
+    if (!ownerAddress || !collectionName) {
       return;
     }
 
     const initialize = async () => {
-      initialized.current = true;
       await loadAllPages();
     };
 
     initialize();
-  }, [ownerAddress, collectionName, loadAllPages]);
+  }, [ownerAddress, collectionName, loadAllPages, network]);
 
   const refreshCollectionImpl = useCallback(async (): Promise<void> => {
     setLoading(true);
@@ -258,9 +297,9 @@ export const useNftHook = ({
       // Use the provided refreshCollection function if available, otherwise fall back to getCollection
       const fetchFunction = refreshCollection || getCollection;
       const res = await fetchFunction(ownerAddress, collectionName);
-      setInfo(res.collection);
-      total.current = res.nftCount;
-      setLists(res.nfts);
+      setInfo(res?.collection);
+      total.current = res?.nftCount;
+      setLists(res?.nfts);
     } catch (err) {
       consoleError('Error in refreshCollectionImpl:', err);
     } finally {
@@ -295,7 +334,7 @@ export const useSingleCollection = (
 ) => {
   const collection = useCachedData<NftCollection>(
     network && address && collectionId && offset
-      ? nftCollectionKey(network, address, collectionId, `${offset || 0}`)
+      ? collectionNftItemsPageKey(network, address, collectionId, `${offset || 0}`)
       : null
   );
 
@@ -304,7 +343,7 @@ export const useSingleCollection = (
 
 // Cadence collection IDs (NFT Catalog)
 export const useNftCatalogCollections = (network?: string, address?: string) => {
-  const collections = useCachedData<CollectionNftList[]>(
+  const collections = useCachedData<CadenceCollectionDetails[]>(
     network && address ? nftCatalogCollectionsKey(network, address) : null
   );
 
@@ -313,8 +352,8 @@ export const useNftCatalogCollections = (network?: string, address?: string) => 
 
 // EVM collection IDs
 export const useEvmNftCollectionIds = (network?: string, address?: string) => {
-  const evmNftIds = useCachedData<EvmCollectionNFTList[]>(
-    network && address ? evmNftCollectionsIdsKey(network, address) : null
+  const evmNftIds = useCachedData<EvmCollectionDetails[]>(
+    network && address ? evmNftCollectionsDetailsPageKey(network, address) : null
   );
   return evmNftIds;
 };

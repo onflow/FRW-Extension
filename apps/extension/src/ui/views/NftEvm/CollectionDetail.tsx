@@ -6,7 +6,7 @@ import { consoleError } from '@onflow/flow-wallet-shared/utils/console-log';
 import { triggerRefresh } from '@/data-model/cache-data-access';
 import {
   evmNftCollectionListKey,
-  getCachedEvmNftCollectionList,
+  getCachedEvmCollectionNftItemListPage,
 } from '@/data-model/cache-data-keys';
 import CollectionDetailGrid from '@/ui/components/NFTs/CollectionDetailGrid';
 import GridView from '@/ui/components/NFTs/GridView';
@@ -79,7 +79,12 @@ const NftEvmCollectionDetail = () => {
       if (!network) {
         return undefined;
       }
-      return await getCachedEvmNftCollectionList(network, address, collection, offset as number);
+      return await getCachedEvmCollectionNftItemListPage(
+        network,
+        address,
+        collection,
+        offset as number
+      );
     },
     [network, address]
   );

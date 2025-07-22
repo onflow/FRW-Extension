@@ -1,44 +1,3 @@
-type EvmNFTCollection = {
-  id: string;
-  address: string;
-  contractName: string;
-  contract_name: string;
-  evmAddress: string;
-  name: string;
-  logo: string | null;
-  banner: string | null;
-  description: string | null;
-  flowIdentifier: string;
-};
-
-export type EvmCollectionNFTList = {
-  collection: EvmNFTCollection;
-  ids: string[];
-  count: number;
-};
-
-type EvmNFTItem = {
-  id: string;
-  name: string;
-  description: string;
-  thumbnail: string;
-  externalURL: string;
-  collectionName: string;
-  contractAddress: string;
-  postMedia: {
-    image: string;
-    isSvg: boolean;
-    description: string;
-    title: string;
-  };
-};
-
-export type EvmCollectionNftItemList = {
-  nfts: EvmNFTItem[];
-  nftCount: number;
-  collection: EvmNFTCollection;
-};
-
 //Cadence NFT types
 type CollectionPath = {
   storage_path: string;
@@ -68,13 +27,15 @@ type Collection = {
   nftTypeId: string;
 };
 /**
- * A list of NFTs for a specific collection
+ * The details of a Cadence collection with its NFT ids and count
  */
-export type CollectionNftList = {
+export type CadenceCollectionDetails = {
   collection: Collection;
   ids: string[];
   count: number;
 };
+
+export type CadenceCollectionDetailsList = CadenceCollectionDetails[];
 
 type NFTTrait = {
   name: string;
@@ -122,8 +83,60 @@ export type NFTItem = {
   flowIdentifier: string;
 };
 
-export type NFTCollectionData = {
+export type CollectionNftItemList = {
   nftCount: number;
   nfts: NFTItem[];
   collection: Collection;
+};
+export type CollectionNftItemListPage = CollectionNftItemList & {
+  offset: string | number | null;
+};
+
+/**
+ * EVM NFTtypes
+ */
+type EvmNFTCollection = {
+  id: string;
+  address: string;
+  contractName: string;
+  contract_name: string;
+  evmAddress: string;
+  name: string;
+  logo: string | null;
+  banner: string | null;
+  description: string | null;
+  flowIdentifier: string;
+};
+
+// An Evm collection with its NFT ids and count
+export type EvmCollectionDetails = {
+  collection: EvmNFTCollection;
+  ids: string[];
+  count: number;
+};
+
+type EvmNFTItem = {
+  id: string;
+  name: string;
+  description: string;
+  thumbnail: string;
+  externalURL: string;
+  collectionName: string;
+  contractAddress: string;
+  postMedia: {
+    image: string;
+    isSvg: boolean;
+    description: string;
+    title: string;
+  };
+};
+
+export type EvmCollectionNftItemList = {
+  nftCount: number;
+  nfts: EvmNFTItem[];
+  collection: EvmNFTCollection;
+};
+
+export type EvmCollectionNftItemListPage = EvmCollectionNftItemList & {
+  offset: string | null; // For EVM, offset can be a JWT token string or a number, null if no more pages
 };

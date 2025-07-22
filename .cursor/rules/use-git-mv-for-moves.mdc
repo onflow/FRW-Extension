@@ -1,0 +1,8 @@
+---
+description: Moving files or folders
+alwaysApply: false
+---
+
+# Use Git MV for File Moves
+
+To preserve Git history and ensure features like Timeline in Cursor/VS Code work correctly across renames, always use `git mv old-path new-path` when moving or renaming files instead of manual file operations.

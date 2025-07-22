@@ -19,10 +19,12 @@ import {
   type UserInfoResponse,
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
+  type EvmCollectionDetails,
+  type CadenceCollectionDetails,
+  type EvmCollectionNftItemListPage,
+  type CollectionNftItemListPage,
+  type CollectionNftItemList,
   type EvmCollectionNftItemList,
-  type EvmCollectionNFTList,
-  type NFTCollectionData,
-  type CollectionNftList,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 import { type NetworkScripts } from '@onflow/flow-wallet-shared/types/script-types';
 import { type TransferItem } from '@onflow/flow-wallet-shared/types/transaction-types';
@@ -173,6 +175,8 @@ export type TransferListStore = {
 
 // NFTs
 
+export const NFT_LIST_PAGE_SIZE = 50;
+
 export const nftListKey = (network: string, chainType: string) =>
   `nft-list-${network}-${chainType}`;
 export const nftListRefreshRegex = refreshKey(nftListKey);
@@ -185,41 +189,51 @@ export type NftCollectionListStore = NftCollection[];
 export const getCachedNftCollectionList = async (network: string) => {
   return getCachedData<NftCollectionListStore>(nftCollectionListKey(network));
 };
-export const nftCollectionKey = (
+export const collectionNftItemsPageKey = (
   network: string,
   address: string,
   collectionId: string,
   offset: string
-) => `nft-collection-${network}-${address}-${collectionId}-${offset}`;
+) => `collection-nft-items-${network}-${address}-${collectionId}-${offset}`;
 
-export const nftCollectionRefreshRegex = refreshKey(nftCollectionKey);
-export type NftCollectionStore = NFTCollectionData;
+export const collectionNftItemsPageRefreshRegex = refreshKey(collectionNftItemsPageKey);
+export type CollectionNftItemsPageStore = CollectionNftItemListPage;
 
-export const getCachedNftCollection = async (
+export const getCachedCollectionNftItemsPage = async (
   network: string,
   address: string,
   collectionId: string,
   offset: number
 ) => {
-  return getCachedData<NFTCollectionData>(
-    nftCollectionKey(network, address, collectionId, `${offset}`)
+  return getCachedData<CollectionNftItemsPageStore>(
+    collectionNftItemsPageKey(network, address, collectionId, `${offset}`)
   );
 };
 
-export const triggerNftCollectionRefresh = (
+export const entireCadenceCollectionNftItemsKey = (
   network: string,
   address: string,
-  collectionId: string,
-  offset: number
+  collectionIdentifier: string
+) => `entire-cadence-collection-nft-items-${network}-${address}-${collectionIdentifier}`;
+export const entireCadenceCollectionNftItemsRefreshRegex = refreshKey(
+  entireCadenceCollectionNftItemsKey
+);
+
+export type CollectionNftItemsStore = CollectionNftItemList;
+
+export const triggerEntireCadenceCollectionNftItemsRefresh = (
+  network: string,
+  address: string,
+  collectionIdentifier: string
 ) => {
-  triggerRefresh(nftCollectionKey(network, address, collectionId, `${offset}`));
+  triggerRefresh(entireCadenceCollectionNftItemsKey(network, address, collectionIdentifier));
 };
 
 export const nftCatalogCollectionsKey = (network: string, address: string) =>
   `nft-catalog-collections-${network}-${address}`;
 
 export const nftCatalogCollectionsRefreshRegex = refreshKey(nftCatalogCollectionsKey);
-export type NftCatalogCollectionsStore = CollectionNftList[];
+export type NftCatalogCollectionsStore = CadenceCollectionDetails[];
 
 export const getCachedNftCatalogCollections = async (network: string, address: string) => {
   return getCachedData<NftCatalogCollectionsStore>(nftCatalogCollectionsKey(network, address));
@@ -262,41 +276,59 @@ export const getCachedChildAccountNfts = async (network: string, parentAddress: 
 };
 
 // EVM NFTs
-export const evmNftCollectionsIdsKey = (network: string, address: string) =>
-  `evm-nft-collection-ids-${network}-${address}`;
 
-export const evmNftCollectionIdsRefreshRegex = refreshKey(evmNftCollectionsIdsKey);
-export type EvmCollectionNftIdsStore = EvmCollectionNFTList[];
+// The list of Evm collections with their details and NFT ids
+export const evmCollectionDetailsKey = (network: string, address: string) =>
+  `evm-collection-details-${network}-${address}`;
 
-export const evmNftCollectionListKey = (
+export const evmCollectionDetailsRefreshRegex = refreshKey(evmCollectionDetailsKey);
+export type EvmCollectionDetailsStore = EvmCollectionDetails[];
+
+export const evmCollectionNftItemsPageKey = (
   network: string,
   address: string,
   collectionIdentifier: string,
   offset: string
-) => `evm-nft-collection-list-${network}-${address}-${collectionIdentifier}-${offset}`;
+) => `evm-collection-nft-items-page-${network}-${address}-${collectionIdentifier}-${offset}`;
 
-export const evmNftCollectionListRefreshRegex = refreshKey(evmNftCollectionListKey);
-export type EvmNftCollectionListStore = EvmCollectionNftItemList[];
+export const evmCollectionNftItemsPageRefreshRegex = refreshKey(evmCollectionNftItemsPageKey);
+export type EvmCollectionNftItemsPageStore = EvmCollectionNftItemListPage;
 
-export const getCachedEvmNftCollectionList = async (
+export const getCachedEvmCollectionNftItemListPage = async (
   network: string,
   address: string,
   collectionIdentifier: string,
   offset: number
 ) => {
-  return getCachedData<EvmNftCollectionListStore>(
-    evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`)
+  return getCachedData<EvmCollectionNftItemsPageStore>(
+    evmCollectionNftItemsPageKey(network, address, collectionIdentifier, `${offset}`)
   );
 };
-
-export const triggerEvmNftCollectionRefresh = (
+export const triggerEvmCollectionNftItemsPageRefresh = (
   network: string,
   address: string,
   collectionIdentifier: string,
   offset: number
 ) => {
-  triggerRefresh(evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`));
+  triggerRefresh(evmCollectionNftItemsPageKey(network, address, collectionIdentifier, `${offset}`));
 };
+
+export const entireEvmCollectionNftItemsKey = (
+  network: string,
+  address: string,
+  collectionIdentifier: string
+) => `entire-evm-collection-nft-items-${network}-${address}-${collectionIdentifier}`;
+export const entireEvmCollectionNftItemsRefreshRegex = refreshKey(entireEvmCollectionNftItemsKey);
+export type EntireEvmCollectionNftItemsStore = EvmCollectionNftItemList;
+
+export const triggerEntireEvmCollectionNftItemsRefresh = (
+  network: string,
+  address: string,
+  collectionIdentifier: string
+) => {
+  triggerRefresh(entireEvmCollectionNftItemsKey(network, address, collectionIdentifier));
+};
+
 /**
  * Fungible Token information
  */

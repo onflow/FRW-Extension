@@ -47,7 +47,11 @@ import {
   type StorageInfo,
   type UserInfoResponse,
 } from '@onflow/flow-wallet-shared/types/network-types';
-import { type CollectionNftList } from '@onflow/flow-wallet-shared/types/nft-types';
+import {
+  type EvmCollectionDetails,
+  type CadenceCollectionDetails,
+  type EvmCollectionNftItemListPage,
+} from '@onflow/flow-wallet-shared/types/nft-types';
 import { type NetworkScripts } from '@onflow/flow-wallet-shared/types/script-types';
 import type { TokenInfo } from '@onflow/flow-wallet-shared/types/token-info';
 import {
@@ -1593,7 +1597,7 @@ export class OpenApiService {
   nftCatalogCollections = async (
     address: string,
     network: string
-  ): Promise<CollectionNftList[]> => {
+  ): Promise<CadenceCollectionDetails[]> => {
     const { data } = await this.sendRequest(
       'GET',
       `/api/v2/nft/id?address=${address}&network=${network}`,
@@ -1670,12 +1674,21 @@ export class OpenApiService {
     return res;
   };
 
-  EvmNFTcollectionList = async (
+  /** Get specific collection NFT under flow-EVM address with pagination
+   *
+   * @param address
+   * @param collectionIdentifier
+   * @param limit
+   * @param offset
+   * @returns EvmCollectionNftItemList
+   **/
+
+  fetchEvmCollectionNftItemListPage = async (
     address: string,
     collectionIdentifier: string,
     limit = 24,
     offset: string | number = 0
-  ) => {
+  ): Promise<EvmCollectionNftItemListPage> => {
     const network = await userWalletService.getNetwork();
     const { data } = await this.sendRequest(
       'GET',
@@ -1687,7 +1700,12 @@ export class OpenApiService {
     return data;
   };
 
-  EvmNFTID = async (network: string, address: string) => {
+  // Get all NFT collections for an address
+
+  fetchEvmNftCollectionDetailsList = async (
+    network: string,
+    address: string
+  ): Promise<EvmCollectionDetails[]> => {
     const { data } = await this.sendRequest(
       'GET',
       `/api/v3/evm/nft/id?network=${network}&address=${address}`,

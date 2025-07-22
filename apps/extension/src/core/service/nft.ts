@@ -5,8 +5,8 @@ import {
   type NFTModelV2,
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
-  type NFTCollectionData,
-  type CollectionNftList,
+  type CollectionNftItems,
+  type CadenceCollectionDetails,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 
 import {
@@ -17,12 +17,13 @@ import {
   type ChildAccountNFTsStore,
   nftCatalogCollectionsKey,
   nftCatalogCollectionsRefreshRegex,
-  nftCollectionKey,
+  collectionNftItemsPageKey,
   nftCollectionListKey,
   nftCollectionListRefreshRegex,
-  nftCollectionRefreshRegex,
+  collectionNftItemsPageRefreshRegex,
   nftListKey,
   nftListRefreshRegex,
+  entireCadenceCollectionNftItemsRefreshRegex,
 } from '@/data-model/cache-data-keys';
 
 import openapiService, { getScripts } from './openapi';
@@ -32,7 +33,12 @@ import { fclConfirmNetwork } from '../utils/fclConfig';
 class NFT {
   init = async () => {
     registerRefreshListener(nftCatalogCollectionsRefreshRegex, this.loadNftCatalogCollections);
-    registerRefreshListener(nftCollectionRefreshRegex, this.loadSingleNftCollection);
+    registerRefreshListener(collectionNftItemsPageRefreshRegex, this.loadSingleNftCollection);
+    registerRefreshListener(
+      entireCadenceCollectionNftItemsRefreshRegex,
+      this.loadEntireCadenceNftCollectionList
+    );
+
     registerRefreshListener(childAccountAllowTypesRefreshRegex, this.loadChildAccountAllowTypes);
     registerRefreshListener(childAccountNFTsRefreshRegex, this.loadChildAccountNFTs);
     registerRefreshListener(nftCollectionListRefreshRegex, this.loadNftCollectionList);
@@ -121,7 +127,7 @@ class NFT {
   loadNftCatalogCollections = async (
     network: string,
     address: string
-  ): Promise<CollectionNftList[]> => {
+  ): Promise<CadenceCollectionDetails[]> => {
     if (!(await fclConfirmNetwork(network))) {
       // Do nothing if the network is switched
       // Don't update the cache
@@ -138,12 +144,20 @@ class NFT {
     return sortedList;
   };
 
+  /**
+   * Load a single NFT collection with pagination
+   * @param network
+   * @param address
+   * @param collectionId - The collection ID
+   * @param offset - The offset
+   * @returns The NFT collection items
+   */
   loadSingleNftCollection = async (
     network: string,
     address: string,
     collectionId: string,
     offset: string
-  ): Promise<NFTCollectionData | undefined> => {
+  ): Promise<> => {
     if (!(await fclConfirmNetwork(network))) {
       // Do nothing if the network is switched
       // Don't update the cache
@@ -167,8 +181,23 @@ class NFT {
     const unique_nfts = getUniqueListBy(data.nfts, 'unique_id');
     data.nfts = unique_nfts;
 
-    setCachedData(nftCollectionKey(network, address, collectionId, `${offset}`), data);
+    setCachedData(collectionNftItemsPageKey(network, address, collectionId, `${offset}`), data);
 
+    return data;
+  };
+
+  loadEntireCadenceNftCollectionList = async (
+    network: string,
+    address: string,
+    collectionIdentifier: string
+  ): Promise<CollectionNftItems | undefined> => {
+    if (!(await fclConfirmNetwork(network))) {
+      // Do nothing if the network is switched
+      // Don't update the cache
+      return undefined;
+    }
+    const data = await openapiService.getNFTV2CollectionList(network);
+    setCachedData(entireCadenceNftCollectionListKey(network, address, collectionIdentifier), data);
     return data;
   };
 
@@ -186,9 +215,9 @@ class NFT {
     address: string,
     collectionId: string,
     offset: number
-  ): Promise<NFTCollectionData | undefined> => {
-    const cachedData = await getValidData<NFTCollectionData>(
-      nftCollectionKey(network, address, collectionId, `${offset}`)
+  ): Promise<CollectionNftItems | undefined> => {
+    const cachedData = await getValidData<CollectionNftItems>(
+      collectionNftItemsPageKey(network, address, collectionId, `${offset}`)
     );
     if (!cachedData) {
       return this.loadSingleNftCollection(network, address, collectionId, `${offset}`);
@@ -199,8 +228,8 @@ class NFT {
   getNftCatalogCollections = async (
     network: string,
     address: string
-  ): Promise<CollectionNftList[] | undefined> => {
-    const collections = await getValidData<CollectionNftList[]>(
+  ): Promise<CadenceCollectionDetails[] | undefined> => {
+    const collections = await getValidData<CadenceCollectionDetails[]>(
       nftCatalogCollectionsKey(network, address)
     );
     if (!collections) {

@@ -334,7 +334,7 @@ const Header = ({ _loading = false }) => {
             activeParentAccount={parentWallet}
             walletList={walletList}
             network={network}
-            modeOn={developerMode}
+            modeOn={!!developerMode}
             mainAddressLoading={mainAddressLoading}
             noAddress={noAddress ?? false}
           />

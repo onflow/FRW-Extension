@@ -40,8 +40,8 @@ import {
   type UserInfoResponse,
 } from '@onflow/flow-wallet-shared/types/network-types';
 import {
-  type NFTCollectionData,
-  type CollectionNftList,
+  type CollectionNftItems,
+  type CadenceCollectionDetails,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 import { type CategoryScripts } from '@onflow/flow-wallet-shared/types/script-types';
 import { type TokenInfo } from '@onflow/flow-wallet-shared/types/token-info';
@@ -142,9 +142,9 @@ import {
   coinListKey,
   evmNftCollectionListKey,
   type EvmNftCollectionListStore,
-  evmNftCollectionsIdsKey,
+  evmNftCollectionsDetailsPageKey,
   type EvmCollectionNftIdsStore,
-  getCachedNftCollection,
+  getCachedCollectionNftItemsPage,
   getCachedScripts,
   mainAccountsKey,
   nftCatalogCollectionsKey,
@@ -1181,13 +1181,13 @@ export class WalletController extends BaseController {
   reqeustEvmNft = async () => {
     const address = await this.getEvmAddress();
     const network = await this.getNetwork();
-    const evmList = await openapiService.EvmNFTID(network, address);
+    const evmList = await openapiService.EvmNftCollectionDetails(network, address);
     return evmList;
   };
 
   EvmNFTcollectionList = async (collection) => {
     const address = await this.getEvmAddress();
-    const evmList = await openapiService.EvmNFTcollectionList(address, collection);
+    const evmList = await openapiService.fetchEvmCollectionNftItemList(address, collection);
     return evmList;
   };
 
@@ -3250,9 +3250,9 @@ export class WalletController extends BaseController {
     address: string,
     collectionId: string,
     offset = 0
-  ): Promise<NFTCollectionData | undefined> => {
+  ): Promise<CollectionNftItems | undefined> => {
     const network = await this.getNetwork();
-    const list = await getCachedNftCollection(network, address, collectionId, offset);
+    const list = await getCachedCollectionNftItemsPage(network, address, collectionId, offset);
     if (!list) {
       return this.refreshSingleCollection(address, collectionId, offset);
     }
@@ -3263,7 +3263,7 @@ export class WalletController extends BaseController {
     address: string,
     collectionId: string,
     offset: number
-  ): Promise<NFTCollectionData | undefined> => {
+  ): Promise<CollectionNftItems | undefined> => {
     const network = await this.getNetwork();
 
     return nftService.loadSingleNftCollection(network, address, collectionId, `${offset || 0}`);
@@ -3271,7 +3271,7 @@ export class WalletController extends BaseController {
 
   getCollectionCache = async (address: string) => {
     const network = await this.getNetwork();
-    const list = await getValidData<CollectionNftList[]>(
+    const list = await getValidData<CadenceCollectionDetails[]>(
       nftCatalogCollectionsKey(network, address)
     );
     if (!list || list.length === 0) {
@@ -3535,7 +3535,7 @@ export class WalletController extends BaseController {
     }
     const network = await this.getNetwork();
     const cacheData = await getValidData<EvmCollectionNftIdsStore>(
-      evmNftCollectionsIdsKey(network, address)
+      evmNftCollectionsDetailsPageKey(network, address)
     );
     if (cacheData) {
       return cacheData;

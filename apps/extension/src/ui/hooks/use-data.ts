@@ -58,6 +58,7 @@ export const useUserData = <T>(key: string | undefined | null): T | undefined =>
     const fetchData = async () => {
       if (!key) return;
       const data = await storage.get(key);
+
       if (mounted) {
         setDataState({ key, data });
       }

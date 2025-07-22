@@ -3,8 +3,8 @@ import React, { useCallback } from 'react';
 import { Link } from 'react-router';
 
 import {
-  type CollectionNftList,
-  type EvmCollectionNFTList,
+  type CadenceCollectionDetails,
+  type EvmCollectionDetails,
 } from '@onflow/flow-wallet-shared/types/nft-types';
 
 import { refreshNftCatalogCollections } from '@/data-model/cache-data-keys';
@@ -20,7 +20,7 @@ const extractContractAddress = (collection) => {
 };
 
 const checkContractAddressInCollections = (
-  collectionNftList: EvmCollectionNFTList | CollectionNftList,
+  collectionNftList: EvmCollectionDetails | CadenceCollectionDetails,
   activeCollectionIds?: string[]
 ) => {
   const contractAddressWithout0x = collectionNftList.collection.contract_name;
@@ -74,7 +74,7 @@ const NFTTab = () => {
           <EmptyStatus />
         ) : (
           collectionList?.map(
-            (collectionNftList: EvmCollectionNFTList | CollectionNftList, index: number) => (
+            (collectionNftList: EvmCollectionDetails | CadenceCollectionDetails, index: number) => (
               <CollectionCard
                 key={collectionNftList.collection.id}
                 name={collectionNftList.collection.name}
