@@ -123,22 +123,28 @@ jobs:
           }
 
           # Always create .env.pro in extension directory
-          create_env_file "apps/extension/.env.pro"
+          create_env_file ".env.pro"
 
           # Create .env.dev if environment is development
           if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" || "${{ needs.determine-env.outputs.env_name }}" == "staging" ]]; then
-            create_env_file "apps/extension/.env.dev"
+            create_env_file ".env.dev"
           fi
 
       - name: Run tests
-        run: pnpm -F flow-wallet-extension test:run
+        run: pnpm test:run
+
+      - name: Build packages
+        run: |
+          echo "Building all packages..."
+          pnpm -F './packages/**' build
+          echo "All packages built successfully"
 
       - name: Build
         run: |
           if [[ "${{ needs.determine-env.outputs.env_name }}" == "development" || "${{ needs.determine-env.outputs.env_name }}" == "staging" ]]; then
-            pnpm -F flow-wallet-extension build:dev-ci
+            pnpm build:dev-ci
           else
-            pnpm -F flow-wallet-extension build:ci
+            pnpm build:ci
           fi
         env:
           CI: true
@@ -152,12 +158,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: extension-build
-          path: apps/extension/dist/
+          path: dist/
 
       - name: Check build size
         run: |
           echo "Build size:"
-          du -sh apps/extension/dist/
+          du -sh dist/
 
   test:
     needs: [determine-env, build]
@@ -186,11 +192,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: extension-build
-          path: apps/extension/dist/
+          path: dist/
 
       - name: Create .env.test file
         run: |
-          cat << EOF > apps/extension/.env.test
+          cat << EOF > .env.test
           # Test secrets
           TEST_PASSWORD="${{ secrets.TEST_PASSWORD }}"
           TEST_SEED_PHRASE_RECEIVER="${{ secrets.TEST_SEED_PHRASE_RECEIVER }}"
@@ -213,18 +219,18 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps chromium
       - name: Run Playwright tests
-        run: pnpm -F flow-wallet-extension test:e2e
+        run: pnpm test:e2e
         env:
           CI: true
           HEADLESS: true
       - name: Sanitize Playwright Report
         if: always()
-        run: cd apps/extension && pnpm tsx build/sanitize-playwright.ts
+        run: pnpm tsx build/sanitize-playwright.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: apps/extension/playwright-report/
+          path: playwright-report/
           retention-days: 30
 
   deploy-reports:
@@ -301,11 +307,11 @@ jobs:
         run: pnpm install
 
       - name: Build Storybook
-        run: pnpm -F flow-wallet-extension build-storybook
+        run: pnpm build-storybook
 
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBuildDir: apps/extension/storybook-static
+          storybookBuildDir: storybook-static
           exitZeroOnChanges: true

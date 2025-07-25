@@ -30,9 +30,12 @@ export const baseConfig = {
   },
   settings: {
     'import/resolver': {
-      typescript: true,
+      typescript: {
+        alwaysTryTypes: true,
+      },
       node: true,
     },
+    'import/extensions': ['.ts', '.tsx', '.js', '.jsx', '.json'],
     react: {
       version: 'detect',
     },
@@ -68,7 +71,7 @@ export const baseConfig = {
         groups: [['builtin', 'external'], 'internal', ['parent', 'sibling', 'index']],
         pathGroups: [
           {
-            pattern: '@onflow/flow-wallet-shared/**',
+            pattern: '@onflow/frw-*/**',
             group: 'external',
             position: 'after',
           },

@@ -63,7 +63,7 @@ alwaysApply: true
 
 ## 5. Import/Dependency Rules
 
-- Use path aliases for cross-folder imports (e.g., `@/folder/*`, `@onflow/flow-wallet-shared/*`).
+- Use path aliases for cross-folder imports (e.g., `@/folder/*`, `@onflow/frw-shared/*`).
 - Enforce strict layer boundaries (UI ↔ Core/Background separation).
 - Shared and reducers packages must remain pure and isolated (no side effects, no project imports).
 
@@ -167,7 +167,7 @@ To add new data to the cache:
 
 ## 5. Import/Dependency Rules
 
-- Use path aliases for cross-folder imports (e.g., `@/folder/*`, `@onflow/flow-wallet-shared/*`).
+- Use path aliases for cross-folder imports (e.g., `@/folder/*`, `@onflow/frw-shared/*`).
 - Enforce strict layer boundaries (UI ↔ Core/Background separation).
 - Shared and reducers packages must remain pure and isolated (no side effects, no project imports).
 

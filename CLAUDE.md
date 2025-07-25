@@ -9,8 +9,8 @@ Flow Reference Wallet (FRW) is a Chrome extension that serves as a digital walle
 The project is organized as a **pnpm monorepo** with the following structure:
 
 - `apps/extension/` - The main Chrome extension application
-- `packages/shared/` - Shared types, constants, and utilities (`@onflow/flow-wallet-shared`)
-- `packages/reducers/` - State management reducers (`@onflow/flow-wallet-reducers`)
+- `packages/shared/` - Shared types, constants, and utilities (`@onflow/frw-shared`)
+- `packages/reducers/` - State management reducers (`@onflow/frw-reducers`)
 
 ## Development Commands
 
@@ -18,9 +18,9 @@ The project is organized as a **pnpm monorepo** with the following structure:
 
 All commands use pnpm workspace filters and run from the root directory:
 
-- **Development**: `pnpm dev` - Runs `pnpm -F flow-wallet-extension build:dev` (file watching enabled)
+- **Development**: `pnpm dev` - Runs `pnpm -F frw-extension build:dev` (file watching enabled)
 - **Development (Windows)**: `pnpm winDev` - Windows-specific development build
-- **Production**: `pnpm build` - Production build (`pnpm -F flow-wallet-extension build:pro`)
+- **Production**: `pnpm build` - Production build (`pnpm -F frw-extension build:pro`)
 - **Test Build**: Extension-specific test build: `cd apps/extension && pnpm build:test`
 
 Note: The extension-specific commands are still available in `apps/extension/` directory:
@@ -60,13 +60,13 @@ Note: The extension-specific commands are still available in `apps/extension/` d
 │       ├── _raw/              # Extension static files
 │       └── build/             # Build configuration
 ├── packages/
-│   ├── shared/            # @onflow/flow-wallet-shared
+│   ├── shared/            # @onflow/frw-shared
 │   │   ├── src/
 │   │   │   ├── types/     # TypeScript type definitions
 │   │   │   ├── constant/  # Shared constants
 │   │   │   └── utils/     # Utility functions
 │   │   └── package.json
-│   └── reducers/          # @onflow/flow-wallet-reducers
+│   └── reducers/          # @onflow/frw-reducers
 │       ├── src/           # State reducers
 │       └── package.json
 └── pnpm-workspace.yaml    # Workspace configuration
@@ -100,12 +100,12 @@ The extension (in `apps/extension/`) follows a strict separation of concerns:
 
 5. **Shared Package** (`packages/shared/`)
    - Common types, utilities, and constants
-   - Published as `@onflow/flow-wallet-shared`
+   - Published as `@onflow/frw-shared`
    - Used across all packages and apps
 
 6. **Reducers Package** (`packages/reducers/`)
    - State management reducers
-   - Published as `@onflow/flow-wallet-reducers`
+   - Published as `@onflow/frw-reducers`
    - Pure functions for predictable state management
 
 ### State Management
@@ -175,11 +175,11 @@ The extension (in `apps/extension/`) follows a strict separation of concerns:
 
 ```typescript
 // Import from shared package
-import { SomeType } from '@onflow/flow-wallet-shared/types';
-import { formatAddress } from '@onflow/flow-wallet-shared/utils';
+import { SomeType } from '@onflow/frw-shared/types';
+import { formatAddress } from '@onflow/frw-shared/utils';
 
 // Import from reducers package
-import { accountReducer } from '@onflow/flow-wallet-reducers';
+import { accountReducer } from '@onflow/frw-reducers';
 
 // Import within extension (use aliases)
 import { WalletController } from '@/background/controller/wallet';
@@ -276,7 +276,7 @@ The extension implements a sophisticated caching system to optimize API calls an
 
 - Root workspace manages shared dev dependencies
 - Each package has its own dependencies
-- Use workspace protocol: `"@onflow/flow-wallet-shared": "workspace:*"`
+- Use workspace protocol: `"@onflow/frw-shared": "workspace:*"`
 
 ### Common Tasks
 
@@ -285,8 +285,8 @@ The extension implements a sophisticated caching system to optimize API calls an
 pnpm install
 
 # Add dependency to specific workspace
-pnpm -F flow-wallet-extension add <package-name>
-pnpm -F @onflow/flow-wallet-shared add <package-name>
+pnpm -F frw-extension add <package-name>
+pnpm -F @onflow/frw-shared add <package-name>
 
 # Run command in specific workspace
 pnpm -F <workspace-name> <command>
@@ -303,7 +303,7 @@ pnpm test
 The project enforces strict architectural boundaries via ESLint:
 
 1. **UI Layer** (`apps/extension/src/ui/`):
-   - Cannot import from `@/core/*` or `@/background/*`
+   - Cannot import from `@onflow/frw-core/*` or `@/background/*`
    - Must communicate with background via messaging
 
 2. **Core Layer** (`apps/extension/src/core/`):

@@ -1,22 +1,42 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "bundler",
-    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "composite": false,
+    "checkJs": true,
     "strict": true,
+    "esModuleInterop": true,
+    "useUnknownInCatchVariables": false,
     "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["ES2021.String", "DOM", "DOM.Iterable"],
+    "types": ["chrome", "node", "react", "react-dom"],
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
-    "allowJs": true
+    "allowJs": true,
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ],
+    "outDir": "./dist"
   },
-  "references": [
-    { "path": "./apps/extension" },
-    { "path": "./packages/shared" },
-    { "path": "./packages/reducers" }
-  ],
-  "files": [],
-  "include": [],
-  "exclude": ["node_modules"]
+  "exclude": ["./node_modules"],
+  "include": [
+    "src",
+    "__tests__",
+    "build",
+    "webpack.config.ts",
+    "postcss.config.mjs",
+    "svgTransform.js",
+    ".storybook/**/*"
+  ]
 }

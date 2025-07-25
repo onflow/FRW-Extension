@@ -13,8 +13,8 @@ yarn.lock
 .env.*
 !.env.example
 dist.zip
-apps/extension/_raw/manifest.json
-apps/extension/_raw/react-devtools.js
+_raw/manifest.json
+_raw/react-devtools.js
 yarn-error.log
 dist2
 dist.rar
@@ -38,3 +38,4 @@ coverage
 storybook-static
 
 docs-archive
+.eslintcache

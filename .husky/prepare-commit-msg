@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Exit peacefully if we're in a detached HEAD state
 if ! git symbolic-ref --quiet HEAD; then
   exit 0
@@ -7,10 +7,12 @@ fi
 BRANCH_NAME=$(git symbolic-ref --short HEAD)
 
 # Skip if branch name starts with "cursor". These are created by background agents.
-if [[ $BRANCH_NAME == cursor* ]]; then
-  echo "Skipping commit message for cursor branch"
-  exit 0
-fi
+case "$BRANCH_NAME" in
+  cursor*)
+    echo "Skipping commit message for cursor branch"
+    exit 0
+    ;;
+esac
 
 # Extract issue number from branch name (assuming format like "546-feature-remove-background-colour")
 ISSUE_NUMBER=$(echo $BRANCH_NAME | grep -o '^[0-9]\+')
@@ -21,7 +23,7 @@ COMMIT_MSG=$(cat "$1")
 # Only append "Closes #issue" if:
 # 1. Issue number exists in the branch name
 # 2. It's not already in the commit message
-if [[ ! -z "$ISSUE_NUMBER" && ! "$COMMIT_MSG" =~ "Closes #$ISSUE_NUMBER" ]]; then
+if [ -n "$ISSUE_NUMBER" ] && ! echo "$COMMIT_MSG" | grep -q "Closes #$ISSUE_NUMBER"; then
   echo "$COMMIT_MSG" > "$1"
   echo "" >> "$1"  # Add a blank line
   echo "Closes #$ISSUE_NUMBER" >> "$1"

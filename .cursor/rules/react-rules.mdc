@@ -1,6 +1,6 @@
 ---
-globs: *.tsx,*.ts
 description: React best practices and conventions for UI code
+globs: *.tsx,**/ui/**/*.ts
 alwaysApply: false
 ---
 
