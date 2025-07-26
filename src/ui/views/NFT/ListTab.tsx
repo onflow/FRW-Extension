@@ -13,13 +13,13 @@ import { refreshNftCatalogCollections } from '@onflow/frw-data-model';
 import React, { forwardRef, useImperativeHandle } from 'react';
 import { useNavigate } from 'react-router';
 
-import { type NFTCollections } from '@onflow/frw-shared/types';
+import { type NftCollectionAndIds } from '@onflow/frw-shared/types';
 
 import placeholder from '@/ui/assets/image/placeholder.png';
 import ListSkeleton from '@/ui/components/NFTs/ListSkeleton';
 import { useWallet } from '@/ui/hooks/use-wallet';
 import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
+import { useCadenceNftCollectionsAndIds } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 
 import EmptyStatus from '../EmptyStatus';
@@ -31,19 +31,12 @@ interface ListTabProps {
   activeCollection: any;
 }
 
-interface State {
-  collectionLoading: boolean;
-  collections: NFTCollections[];
-  isCollectionEmpty: boolean;
-  ownerAddress: string;
-}
-
 const CollectionView = ({
   name,
   logo,
   count,
   index,
-  contract_name,
+  contractName,
   ownerAddress,
   isAccessible,
 }: {
@@ -51,16 +44,16 @@ const CollectionView = ({
   logo: string;
   count: number;
   index: number;
-  contract_name: string;
+  contractName: string;
   ownerAddress: string;
   isAccessible: boolean;
 }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/dashboard/nested/collectiondetail/${ownerAddress}.${contract_name}.${count}`, {
+    navigate(`/dashboard/nested/collectiondetail/${ownerAddress}.${contractName}.${count}`, {
       state: {
-        collection: { name, logo, count, index, contract_name, ownerAddress, isAccessible },
+        collection: { name, logo, count, index, contractName, ownerAddress, isAccessible },
         ownerAddress,
         accessible: isAccessible,
       },
@@ -155,10 +148,10 @@ const extractContractAddress = (collection) => {
 };
 
 const checkContractAddressInCollections = (
-  nftCollections: NFTCollections,
+  nftCollections: NftCollectionAndIds,
   activeCollection: any
 ) => {
-  const contractAddressWithout0x = nftCollections.collection.contract_name;
+  const contractAddressWithout0x = nftCollections.collection.contractName;
   const isActiveCollect = activeCollection.some((collection) => {
     const extractedAddress = extractContractAddress(collection);
     if (extractedAddress === contractAddressWithout0x) {
@@ -174,7 +167,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
 
   const { currentWallet } = useProfiles();
   const { network } = useNetwork();
-  const nftCollectionsList = useNftCatalogCollections(network, currentWallet.address);
+  const nftCollectionsList = useCadenceNftCollectionsAndIds(network, currentWallet.address);
   const collectionLoading = nftCollectionsList === undefined;
 
   const isCollectionEmpty = nftCollectionsList?.length === 0;
@@ -206,7 +199,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
             logo={collections.collection.logo}
             count={collections.count}
             index={index}
-            contract_name={collections.collection.id}
+            contractName={collections.collection.id}
             ownerAddress={ownerAddress}
             isAccessible={
               props.isActive ||

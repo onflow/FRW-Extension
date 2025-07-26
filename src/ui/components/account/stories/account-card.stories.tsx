@@ -6,7 +6,7 @@ import { type WalletAccount } from '@onflow/frw-shared/types';
 const { emojis } = emojisJson;
 
 import { useAccountBalance } from '../../../hooks/use-account-hooks.mock';
-import { useNftCatalogCollections } from '../../../hooks/useNftHook.mock';
+import { useCadenceNftCollectionsAndIds } from '../../../hooks/useNftHook.mock';
 import { AccountCard } from '../account-card';
 
 const mainWalletAccount: WalletAccount = {
@@ -64,7 +64,7 @@ type Story = StoryObj<typeof AccountCard>;
 export const Default: Story = {
   beforeEach: () => {
     useAccountBalance.mockReturnValue(mainWalletAccount.balance);
-    useNftCatalogCollections.mockReturnValue([]);
+    useCadenceNftCollectionsAndIds.mockReturnValue([]);
   },
   args: {
     network: 'mainnet',
@@ -75,26 +75,25 @@ export const Default: Story = {
 export const SmallFlow: Story = {
   beforeEach: () => {
     useAccountBalance.mockReturnValue('0.00000001');
-    useNftCatalogCollections.mockReturnValue([
+    useCadenceNftCollectionsAndIds.mockReturnValue([
       {
         count: 12,
         collection: {
           name: 'Test Collection',
           id: 'test',
-          contract_name: 'test',
+          contractName: 'test',
           address: 'test',
           logo: 'test',
           description: 'test',
           banner: 'test',
+          evmAddress: 'test',
           path: {
-            storage_path: 'test',
-            public_path: 'test',
-            private_path: 'test',
+            storagePath: 'test',
+            publicPath: 'test',
           },
-          nftTypeId: 'test',
           socials: {
-            twitter: { url: 'test' },
-            discord: { url: 'test' },
+            twitter: 'test',
+            discord: 'test',
           },
         },
         ids: ['test'],

@@ -47,7 +47,7 @@ const NFTCollectionDetail = () => {
 
   const getCollection = useCallback(
     async (ownerAddress, collection, offset) => {
-      return await usewallet.getSingleCollection(ownerAddress, collection, offset);
+      return await usewallet.getCadenceCollectionNfts(ownerAddress, collection, offset);
     },
     [usewallet]
   );
@@ -100,7 +100,7 @@ const NFTCollectionDetail = () => {
         data={data}
         blockList={[]}
         accessible={uselocation.state ? uselocation.state.accessible : []}
-        key={data.unique_id}
+        key={`${data.collectionName}_${data.id}`}
         index={index}
         ownerAddress={address}
         collectionInfo={info}

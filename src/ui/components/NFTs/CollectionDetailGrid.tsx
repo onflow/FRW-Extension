@@ -106,7 +106,7 @@ const CollectionDetailGrid: React.FC<CollectionDetailProps> = ({
             </Grid>
             <Grid sx={{ ml: 0, pl: '18px' }}>
               <Typography component="div" color="text.primary" variant="h6">
-                {truncate(info?.name || info.contract_name, 16)}
+                {truncate(info?.name || info.contractName, 16)}
               </Typography>
 
               <Tooltip title={chrome.i18n.getMessage('Refresh')} arrow>

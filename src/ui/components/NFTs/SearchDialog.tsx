@@ -2,17 +2,17 @@ import { Box, Dialog, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 
-import { type NFTItem } from '@onflow/frw-shared/types';
+import { type Nft } from '@onflow/frw-shared/types';
 
 import NftSearch from './NftSearch';
 
 interface SearchDialogProps {
   open: boolean;
   onClose: () => void;
-  items: NFTItem[];
+  items: Nft[];
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  onFilteredResults: (results: NFTItem[]) => void;
+  onFilteredResults: (results: Nft[]) => void;
   createGridCard: (item: any, index: number) => JSX.Element;
   total: number;
   isLoadingAll: boolean;
@@ -31,7 +31,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
   isLoadingAll,
   loadingMore,
 }) => {
-  const [filteredList, setFilteredList] = useState<NFTItem[]>([]);
+  const [filteredList, setFilteredList] = useState<Nft[]>([]);
 
   return (
     <Dialog

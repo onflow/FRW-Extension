@@ -87,7 +87,7 @@ const mockEVMAccount: MainAccount = {
   childAccounts: [],
 };
 
-const mockEmoji: Emoji = {
+const _mockEmoji: Emoji = {
   emoji: '🥥',
   name: 'Coconut',
   bgcolor: '#FFE4C4',
@@ -133,16 +133,16 @@ type Story = StoryObj<typeof AccountDetail>;
 export const Default: Story = {
   render: () => {
     // Mock all the hooks
-    (useMainAccount as any).mockReturnValue(mockMainAccount);
-    (useNetwork as any).mockReturnValue({
+    useMainAccount.mockReturnValue(mockMainAccount);
+    useNetwork.mockReturnValue({
       network: 'mainnet',
       developerMode: false,
       emulatorModeOn: false,
     });
-    (useWallet as any).mockReturnValue(mockUseWallet);
-    (useFeatureFlag as any).mockReturnValue(true);
-    (useAccountHidden as any).mockReturnValue(false);
-    (toggleAccountHidden as any).mockImplementation(() => Promise.resolve());
+    useWallet.mockReturnValue(mockUseWallet);
+    useFeatureFlag.mockReturnValue(true);
+    useAccountHidden.mockReturnValue(false);
+    toggleAccountHidden.mockImplementation(() => Promise.resolve(false));
 
     return <AccountDetail />;
   },
@@ -162,16 +162,16 @@ export const Default: Story = {
 export const EVMAccount: Story = {
   render: () => {
     // Mock for EVM account
-    (useMainAccount as any).mockReturnValue(mockEVMAccount);
-    (useNetwork as any).mockReturnValue({
+    useMainAccount.mockReturnValue(mockEVMAccount);
+    useNetwork.mockReturnValue({
       network: 'mainnet',
       developerMode: false,
       emulatorModeOn: false,
     });
-    (useWallet as any).mockReturnValue(mockUseWallet);
-    (useFeatureFlag as any).mockReturnValue(true);
-    (useAccountHidden as any).mockReturnValue(false);
-    (toggleAccountHidden as any).mockImplementation(() => Promise.resolve());
+    useWallet.mockReturnValue(mockUseWallet);
+    useFeatureFlag.mockReturnValue(true);
+    useAccountHidden.mockReturnValue(false);
+    toggleAccountHidden.mockImplementation(() => Promise.resolve(false));
 
     return <AccountDetail />;
   },
@@ -195,16 +195,16 @@ export const WithoutKeyphrase: Story = {
       checkMnemonics: () => Promise.resolve(false),
     };
 
-    (useMainAccount as any).mockReturnValue(mockMainAccount);
-    (useNetwork as any).mockReturnValue({
+    useMainAccount.mockReturnValue(mockMainAccount);
+    useNetwork.mockReturnValue({
       network: 'mainnet',
       developerMode: false,
       emulatorModeOn: false,
     });
-    (useWallet as any).mockReturnValue(mockWalletWithoutKeyphrase);
-    (useFeatureFlag as any).mockReturnValue(true);
-    (useAccountHidden as any).mockReturnValue(false);
-    (toggleAccountHidden as any).mockImplementation(() => Promise.resolve());
+    useWallet.mockReturnValue(mockWalletWithoutKeyphrase);
+    useFeatureFlag.mockReturnValue(true);
+    useAccountHidden.mockReturnValue(false);
+    toggleAccountHidden.mockImplementation(() => Promise.resolve(false));
 
     return <AccountDetail />;
   },

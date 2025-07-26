@@ -16,7 +16,7 @@ import { isValidEthereumAddress } from '@onflow/frw-shared/utils';
 import { CopyIcon } from '@/ui/assets/icons/CopyIcon';
 import { LinkIcon } from '@/ui/assets/icons/LinkIcon';
 import { useAccountBalance } from '@/ui/hooks/use-account-hooks';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
+import { useCadenceNftCollectionsAndIds } from '@/ui/hooks/useNftHook';
 import {
   COLOR_ACCENT_EVM_627EEA,
   COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
@@ -70,7 +70,7 @@ export const AccountCard = ({
   const isChildAccount = hasParentAccount && !isEvmAccount;
 
   // Only show NFTs for child accounts
-  const nftCatalogCollections = useNftCatalogCollections(
+  const nftCatalogCollections = useCadenceNftCollectionsAndIds(
     network,
     isChildAccount ? address : undefined
   );

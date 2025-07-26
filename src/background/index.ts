@@ -4,7 +4,6 @@ import {
   authenticationService,
   addressBookService,
   coinListService,
-  evmNftService,
   googleSafeHostService,
   keyringService,
   newsService,
@@ -117,7 +116,6 @@ async function restoreAppState() {
   await userWalletService.init();
   await transactionActivityService.init();
   await nftService.init();
-  await evmNftService.init();
   await googleDriveService.init({
     baseURL: 'https://www.googleapis.com/',
     backupName: process.env.GD_BACKUP_NAME!,

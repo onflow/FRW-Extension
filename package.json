@@ -36,7 +36,8 @@
     "emulate:mainnet": "flow emulator --chain-id mainnet --rpc-host access.mainnet.nodes.onflow.org:9000",
     "gh:login": "gh auth login -s project && gh auth status",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "build:zip": "pnpm build && node scripts/build-zip.js"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs}": "eslint --cache",
@@ -53,11 +54,11 @@
     "@mui/system": "^7.2.0",
     "@noble/secp256k1": "^1.7.2",
     "@onflow/fcl": "^1.19.0",
-    "@onflow/frw-core": "^0.2.1",
-    "@onflow/frw-data-model": "^0.2.1",
-    "@onflow/frw-extension-shared": "^0.2.2",
-    "@onflow/frw-reducers": "^0.2.1",
-    "@onflow/frw-shared": "^0.2.1",
+    "@onflow/frw-core": "^0.2.4",
+    "@onflow/frw-data-model": "^0.2.4",
+    "@onflow/frw-extension-shared": "^0.2.5",
+    "@onflow/frw-reducers": "^0.2.4",
+    "@onflow/frw-shared": "^0.2.4",
     "@reown/walletkit": "^1.2.8",
     "@trustwallet/wallet-core": "^4.3.6",
     "@tsparticles/engine": "^3.8.1",

@@ -2,13 +2,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Input, InputAdornment } from '@mui/material';
 import React, { useCallback, useEffect, useMemo } from 'react';
 
-import { type NFTItem } from '@onflow/frw-shared/types';
+import { type Nft } from '@onflow/frw-shared/types';
 
 import { ReactComponent as SearchIcon } from '@/ui/assets/svg/searchIcon.svg';
 
 interface NftSearchProps {
-  items: NFTItem[];
-  onFilteredResults: (filtered: NFTItem[]) => void;
+  items: Nft[];
+  onFilteredResults: (filtered: Nft[]) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   placeholder?: string;

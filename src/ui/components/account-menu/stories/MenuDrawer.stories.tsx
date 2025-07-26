@@ -11,7 +11,7 @@ import {
 } from '@onflow/frw-shared/types';
 
 import { useFeatureFlag as importedMockUseFeatureFlag } from '@/ui/hooks/use-feature-flags.mock';
-import { useNftCatalogCollections as importedMockUseNftCatalogCollections } from '@/ui/hooks/useNftHook.mock';
+import { useCadenceNftCollectionsAndIds as importedMockUseCadenceNftCollectionsAndIds } from '@/ui/hooks/useNftHook.mock';
 import {
   useProfiles as importedMockUseProfiles,
   USE_PROFILES_MOCK,
@@ -160,7 +160,7 @@ const meta: Meta<typeof MenuDrawer> = {
     (Story, context) => {
       // Reset mocks
 
-      importedMockUseNftCatalogCollections.mockReset();
+      importedMockUseCadenceNftCollectionsAndIds.mockReset();
       importedMockUseProfiles.mockReset();
       importedMockUseFeatureFlag.mockReset();
       const { mockData, pendingTransactions, featureFlags } = context.parameters;
@@ -171,7 +171,7 @@ const meta: Meta<typeof MenuDrawer> = {
       });
 
       if (mockData) {
-        importedMockUseNftCatalogCollections.mockImplementation(() => {
+        importedMockUseCadenceNftCollectionsAndIds.mockImplementation(() => {
           return [];
         });
         importedMockUseProfiles.mockReturnValue({

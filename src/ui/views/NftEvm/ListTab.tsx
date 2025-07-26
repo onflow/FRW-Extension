@@ -86,7 +86,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
   const CollectionView = (data) => {
     const handleClick = () => {
       navigate(
-        `/dashboard/nested/evm/collectiondetail/${data.ownerAddress}.${data.contract_name}.${data.count}`,
+        `/dashboard/nested/evm/collectiondetail/${data.ownerAddress}.${data.contractName}.${data.count}`,
         {
           state: {
             collection: data,
@@ -169,7 +169,7 @@ const ListTab = forwardRef((props: ListTabProps, ref) => {
         key={props.collection ? props.collection.name : props.name}
         count={props.count}
         index={index}
-        contract_name={props.collection ? props.collection.id : props.id}
+        contractName={props.collection ? props.collection.id : props.id}
         ownerAddress={ownerAddress}
       />
     );

@@ -10,7 +10,7 @@ import WarningSnackbar from '@/ui/components/WarningSnackbar';
 import { WarningStorageLowSnackbar } from '@/ui/components/WarningStorageLowSnackbar';
 import { useWallet } from '@/ui/hooks/use-wallet';
 import { useNetwork } from '@/ui/hooks/useNetworkHook';
-import { useNftCatalogCollections } from '@/ui/hooks/useNftHook';
+import { useCadenceNftCollectionsAndIds } from '@/ui/hooks/useNftHook';
 import { useProfiles } from '@/ui/hooks/useProfileHook';
 import { useStorageCheck } from '@/ui/hooks/useStorageCheck';
 
@@ -32,7 +32,7 @@ const MoveToChild = (props: MoveBoardProps) => {
   const { currentWallet } = useProfiles();
 
   const { network } = useNetwork();
-  const nftCollections = useNftCatalogCollections(network, currentWallet.address);
+  const nftCollections = useCadenceNftCollectionsAndIds(network, currentWallet.address);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [cadenceNft, setCadenceNft] = useState<any>(null);
@@ -85,16 +85,22 @@ const MoveToChild = (props: MoveBoardProps) => {
       const cadenceResult = nftCollections;
       if (cadenceResult && cadenceResult.length > 0 && cadenceResult[0].collection) {
         setSelected(cadenceResult![0].collection.id);
-        const extractedObjects = cadenceResult!.map((obj) => {
-          return {
-            CollectionName: obj.collection.contract_name,
-            NftCount: obj.count,
-            id: obj.collection.id,
-            address: obj.collection.address,
-            logo: obj.collection.logo,
-            nftTypeId: obj.collection.nftTypeId,
-          };
-        });
+        const extractedObjects = cadenceResult!
+          .map((obj) => {
+            const flowIdentifierParts = obj.collection.flowIdentifier?.split('.');
+            if (!flowIdentifierParts) {
+              return null;
+            }
+            return {
+              CollectionName: obj.collection.contractName,
+              NftCount: obj.count,
+              id: obj.collection.id,
+              address: obj.collection.address,
+              logo: obj.collection.logo,
+              flowIdentifier: obj.collection.flowIdentifier,
+            };
+          })
+          .filter((item) => item !== null);
 
         setCollectionList(extractedObjects);
         setCadenceNft(cadenceResult);
@@ -112,7 +118,11 @@ const MoveToChild = (props: MoveBoardProps) => {
     if (selectedCollection) {
       try {
         const address = await usewallet.getCurrentAddress();
-        const cadenceResult = await usewallet.getSingleCollection(address!, selectedCollection, 0);
+        const cadenceResult = await usewallet.getCadenceCollectionNfts(
+          address!,
+          selectedCollection,
+          0
+        );
         setCollectionDetail(cadenceResult);
       } catch (error) {
         consoleError('Error requesting collection info:', error);
@@ -160,7 +170,7 @@ const MoveToChild = (props: MoveBoardProps) => {
             txId,
             true,
             `Move complete`,
-            `You have moved ${nftIdArray.length} ${collectionDetail.collection.contract_name} to your evm address. \nClick to view this transaction.`
+            `You have moved ${nftIdArray.length} ${collectionDetail.collection.contractName} to your evm address. \nClick to view this transaction.`
           );
           props.handleReturnHome();
           props.handleCloseIconClicked();
@@ -185,7 +195,7 @@ const MoveToChild = (props: MoveBoardProps) => {
           txId,
           true,
           `Move complete`,
-          `You have moved ${nftIdArray.length} ${collectionDetail.collection.contract_name} to your evm address. \nClick to view this transaction.`
+          `You have moved ${nftIdArray.length} ${collectionDetail.collection.contractName} to your evm address. \nClick to view this transaction.`
         );
         props.handleReturnHome();
         props.handleCloseIconClicked();

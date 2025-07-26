@@ -3,7 +3,6 @@ import {
   addressBookService,
   transactionService,
   coinListService,
-  evmNftService,
   googleDriveService,
   keyringService,
   analyticsService,
@@ -23,26 +22,22 @@ import {
 } from '@onflow/frw-core';
 import {
   getValidData,
-  registerRefreshListener,
   setCachedData,
   childAccountDescKey,
   type ChildAccountFtStore,
-  childAccountNftsKey,
-  type ChildAccountNFTsStore,
-  getCachedNftCollection,
-  nftCatalogCollectionsKey,
-  registerStatusKey,
-  registerStatusRefreshRegex,
+  cadenceNftCollectionsAndIdsKey,
   walletLoadedKey,
-  walletLoadedRefreshRegex,
   CURRENT_ID_KEY,
   setLocalData,
   removeLocalData,
   clearLocalData,
   getLocalData,
+  triggerRefresh,
+  cadenceCollectionNftsKey,
+  registerRefreshListener,
+  walletLoadedRefreshRegex,
 } from '@onflow/frw-data-model';
 import type { AccountKey, Account as FclAccount } from '@onflow/typedefs';
-import BN from 'bignumber.js';
 
 import { retryOperation } from '@onflow/frw-core/utils';
 import { eventBus } from '@onflow/frw-extension-shared/messaging';
@@ -64,8 +59,6 @@ import {
   type FlowNetwork,
   type NFTModelV2,
   type UserInfoResponse,
-  type NFTCollectionData,
-  type NFTCollections,
   type NetworkScripts,
   type TokenInfo,
   type TrackingEvents,
@@ -82,6 +75,8 @@ import {
   type PublicKeyAccount,
   type WalletAccount,
   type WalletAddress,
+  type CollectionNfts,
+  type NftCollectionAndIds,
 } from '@onflow/frw-shared/types';
 import {
   isValidAddress,
@@ -113,16 +108,6 @@ export class WalletController extends BaseController {
 
   constructor() {
     super();
-
-    registerRefreshListener(registerStatusRefreshRegex, async (pubKey: string) => {
-      // The ttl is set to 2 minutes. After that we set the cache to false
-      setCachedData(registerStatusKey(pubKey), false, 120_000);
-    });
-
-    registerRefreshListener(walletLoadedRefreshRegex, async () => {
-      // This should never be called normally...
-      setCachedData(walletLoadedKey(), this.loaded, 1_000_000_000); // Really long ttl
-    });
   }
   // Adding as tests load the extension really, really fast
   // It's possible to call the wallet controller before services are loaded
@@ -131,6 +116,10 @@ export class WalletController extends BaseController {
   setLoaded = async (loaded: boolean) => {
     this.loaded = loaded;
     if (loaded) {
+      registerRefreshListener(walletLoadedRefreshRegex, async () => {
+        // This should never be called normally...
+        setCachedData(walletLoadedKey(), true, 1_000_000_000); // Really long ttl
+      });
       setCachedData(walletLoadedKey(), true, 1_000_000_000); // Really long ttl
     }
   };
@@ -636,15 +625,9 @@ export class WalletController extends BaseController {
     return await userInfoService.updateUserInfo(nickname, avatar);
   };
 
-  checkAccessibleNft = async (parentAddress: string) => {
-    const network = userWalletService.getNetwork();
-    const validData = getValidData<ChildAccountNFTsStore>(
-      childAccountNftsKey(network, parentAddress)
-    );
-    if (validData) {
-      return validData;
-    }
-    return await nftService.loadChildAccountNFTs(network, parentAddress);
+  getChildAccountNfts = async (parentAddress: string) => {
+    const network = await this.getNetwork();
+    return await nftService.getChildAccountNfts(network, parentAddress);
   };
 
   checkAccessibleFt = async (childAccount: string): Promise<ChildAccountFtStore | undefined> => {
@@ -687,33 +670,13 @@ export class WalletController extends BaseController {
   reqeustEvmNft = async () => {
     const address = await this.getEvmAddress();
     const network = await this.getNetwork();
-    return await evmNftService.loadEvmNftIds(network, address);
+    return await nftService.loadEvmNftCollectionsAndIds(network, address);
   };
 
   EvmNFTcollectionList = async (collection) => {
     const address = await this.getEvmAddress();
     const network = await this.getNetwork();
-    return await evmNftService.loadEvmCollectionList(network, address, collection, '0');
-  };
-
-  requestCadenceNft = async () => {
-    const network = await this.getNetwork();
-    const address = await this.getCurrentAddress();
-    const NFTList = await openapiService.getNFTCadenceList(address!, network);
-    return NFTList;
-  };
-
-  requestMainNft = async () => {
-    const network = await this.getNetwork();
-    const address = await this.getCurrentAddress();
-    const NFTList = await openapiService.getNFTCadenceList(address!, network);
-    return NFTList;
-  };
-
-  private currencyBalance = (balance: string, price) => {
-    const bnBalance = new BN(balance);
-    const currencyBalance = bnBalance.times(new BN(price));
-    return currencyBalance.toNumber();
+    return await nftService.loadEvmCollectionNfts(network, address, collection, '0');
   };
 
   // addressBook
@@ -1133,7 +1096,7 @@ export class WalletController extends BaseController {
 
   getChildAccountAllowTypes = async (parentAddress: string, childAddress: string) => {
     const network = await this.getNetwork();
-    return await nftService.loadChildAccountAllowTypes(network, parentAddress, childAddress);
+    return await nftService.getChildAccountAllowTypes(network, parentAddress, childAddress);
   };
 
   checkCanMoveChild = async (address: string) => {
@@ -1332,32 +1295,29 @@ export class WalletController extends BaseController {
     return await storageManagementService.clearLocalStorage();
   };
 
-  getSingleCollection = async (
+  getCadenceCollectionNfts = async (
     address: string,
     collectionId: string,
     offset = 0
-  ): Promise<NFTCollectionData | undefined> => {
+  ): Promise<CollectionNfts | undefined> => {
     const network = await this.getNetwork();
-    const list = await getCachedNftCollection(network, address, collectionId, offset);
-    if (!list) {
-      return this.refreshSingleCollection(address, collectionId, offset);
-    }
-    return list;
+    return await nftService.getCadenceCollectionNfts(network, address, collectionId, offset);
   };
 
   refreshSingleCollection = async (
     address: string,
     collectionId: string,
     offset: number
-  ): Promise<NFTCollectionData | undefined> => {
+  ): Promise<void> => {
     const network = await this.getNetwork();
-
-    return nftService.loadSingleNftCollection(network, address, collectionId, `${offset || 0}`);
+    triggerRefresh(cadenceCollectionNftsKey(network, address, collectionId, `${offset || 0}`));
   };
 
   getCollectionCache = async (address: string) => {
     const network = await this.getNetwork();
-    const list = await getValidData<NFTCollections[]>(nftCatalogCollectionsKey(network, address));
+    const list = await getValidData<NftCollectionAndIds[]>(
+      cadenceNftCollectionsAndIdsKey(network, address)
+    );
     if (!list || list.length === 0) {
       return await this.refreshCollection(address);
     }
@@ -1369,13 +1329,7 @@ export class WalletController extends BaseController {
   refreshCollection = async (address: string) => {
     const network = await this.getNetwork();
 
-    return nftService.loadNftCatalogCollections(network, address);
-  };
-
-  getNftCollectionList = async () => {
-    const network = await this.getNetwork();
-    const data = (await openapiService.getNFTV2CollectionList(network)) ?? [];
-    return data;
+    return nftService.loadCadenceNftCollectionsAndIds(network, address);
   };
 
   getCadenceScripts = async (): Promise<NetworkScripts> => {
@@ -1577,7 +1531,7 @@ export class WalletController extends BaseController {
 
   getEvmNftId = async (address: string) => {
     const network = await this.getNetwork();
-    return await evmNftService.getEvmNftId(network, address);
+    return await nftService.getEvmNftCollectionsAndIds(network, address);
   };
 
   getEvmNftCollectionList = async (
@@ -1587,17 +1541,11 @@ export class WalletController extends BaseController {
     offset = '0'
   ) => {
     const network = await this.getNetwork();
-    return await evmNftService.getEvmNftCollectionList(
-      network,
-      address,
-      collectionIdentifier,
-      _limit,
-      offset
-    );
+    return await nftService.getEvmCollectionNfts(network, address, collectionIdentifier, offset);
   };
 
   clearEvmNFTList = async () => {
-    await evmNftService.clearEvmNfts();
+    await nftService.clear();
   };
 
   getKeyringIds = async () => {

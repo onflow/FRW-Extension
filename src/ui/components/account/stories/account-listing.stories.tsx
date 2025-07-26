@@ -7,12 +7,12 @@ import {
   type Emoji,
   type MainAccount,
   type WalletAccount,
-  type NFTCollections,
+  type NftCollectionAndIds,
 } from '@onflow/frw-shared/types';
 
 import { AccountListing } from '@/ui/components/account/account-listing';
 import {
-  useNftCatalogCollections as importedMockUseNftCatalogCollections, // Aliased import from the mock file
+  useCadenceNftCollectionsAndIds as importedMockUseCadenceNftCollectionsAndIds, // Aliased import from the mock file
 } from '@/ui/hooks/useNftHook.mock';
 import {
   USE_PROFILES_MOCK,
@@ -146,16 +146,16 @@ const meta: Meta<typeof AccountListing> = {
   decorators: [
     withRouter,
     (Story, context) => {
-      importedMockUseNftCatalogCollections.mockReset();
+      importedMockUseCadenceNftCollectionsAndIds.mockReset();
       importedMockUseProfiles.mockReset();
       const { mockData } = context.parameters;
       if (mockData) {
-        importedMockUseNftCatalogCollections.mockImplementation(
+        importedMockUseCadenceNftCollectionsAndIds.mockImplementation(
           (network?: string, address?: string) => {
             if (typeof address === 'string' && mockData.nfts) {
               return [
                 { collection: { name: 'test' }, ids: ['test'], count: mockData.nfts[address] },
-              ] as NFTCollections[];
+              ] as NftCollectionAndIds[];
             }
             return [];
           }

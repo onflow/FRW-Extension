@@ -77,17 +77,22 @@ const MoveEvm = (props: MoveBoardProps) => {
     const filteredData = tokensWithNfts.filter((item) => item.collection.flowIdentifier);
     if (filteredData.length > 0) {
       setSelected(filteredData[0].collection.id);
-      const extractedObjects = filteredData.map((obj) => {
-        const flowIdentifierParts = obj.collection.flowIdentifier.split('.');
-        return {
-          CollectionName: flowIdentifierParts[2],
-          NftCount: obj.count,
-          id: obj.collection.id,
-          address: flowIdentifierParts[1],
-          logo: obj.collection.logo,
-          flowIdentifier: obj?.collection?.flowIdentifier || '',
-        };
-      });
+      const extractedObjects = filteredData
+        .map((obj) => {
+          const flowIdentifierParts = obj.collection.flowIdentifier?.split('.');
+          if (!flowIdentifierParts) {
+            return null;
+          }
+          return {
+            CollectionName: flowIdentifierParts[2],
+            NftCount: obj.count,
+            id: obj.collection.id,
+            address: flowIdentifierParts[1],
+            logo: obj.collection.logo,
+            flowIdentifier: obj?.collection?.flowIdentifier || '',
+          };
+        })
+        .filter((item) => item !== null);
       setCadenceNft(filteredData);
       setCollectionList(extractedObjects);
     } else {

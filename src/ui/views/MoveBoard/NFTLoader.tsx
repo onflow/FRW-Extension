@@ -29,7 +29,7 @@ const NFTLoader: React.FC<NFTLoaderProps> = ({
         return { nfts: [], nftCount: 0 };
       }
 
-      return await usewallet.getSingleCollection(ownerAddress, collection, offset);
+      return await usewallet.getCadenceCollectionNfts(ownerAddress, collection, offset);
     },
     [usewallet, collectionToUse]
   );

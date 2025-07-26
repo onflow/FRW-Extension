@@ -1,21 +1,21 @@
 import {
   childAccountNftsKey,
-  type ChildAccountNFTsStore,
-  evmNftCollectionListKey,
-  type EvmNftCollectionListStore,
-  evmNftIdsKey,
-  type EvmNftIdsStore,
-  nftCatalogCollectionsKey,
-  nftCollectionListKey,
+  evmCollectionNftsKey,
+  evmNftCollectionsAndIdsKey,
+  cadenceNftCollectionsAndIdsKey,
+  fullCadenceNftCollectionListKey,
   nftListKey,
+  cadenceCollectionNftsKey,
 } from '@onflow/frw-data-model';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  type NFTCollections,
-  type NFTItem,
   type NftCollection,
   type NFTModelV2,
+  type NftCollectionAndIds,
+  type CollectionNfts,
+  type ChildAccountNftMap,
+  type Nft,
 } from '@onflow/frw-shared/types';
 import { consoleError } from '@onflow/frw-shared/utils';
 
@@ -39,9 +39,9 @@ interface UseNftHookProps {
 }
 
 interface UseNftHookResult {
-  list: NFTItem[];
-  allNfts: NFTItem[];
-  filteredList: NFTItem[];
+  list: Nft[];
+  allNfts: Nft[];
+  filteredList: Nft[];
   info: any;
   total: number;
   loading: boolean;
@@ -50,7 +50,7 @@ interface UseNftHookResult {
   pageIndex: number;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  setFilteredList: (list: NFTItem[]) => void;
+  setFilteredList: (list: Nft[]) => void;
   nextPage: (currentPage: number) => Promise<{ newItemsCount: number; nextPage: number } | null>;
   loadAllPages: () => Promise<void>;
   refreshCollectionImpl: () => Promise<void>;
@@ -64,9 +64,9 @@ export const useNftHook = ({
   isEvm,
   nftCount,
 }: UseNftHookProps): UseNftHookResult => {
-  const [list, setLists] = useState<NFTItem[]>([]);
-  const [allNfts, setAllNfts] = useState<NFTItem[]>([]);
-  const [filteredList, setFilteredList] = useState<NFTItem[]>([]);
+  const [list, setLists] = useState<Nft[]>([]);
+  const [allNfts, setAllNfts] = useState<Nft[]>([]);
+  const [filteredList, setFilteredList] = useState<Nft[]>([]);
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<any>(null);
   const [pageIndex, setPage] = useState(1);
@@ -74,7 +74,7 @@ export const useNftHook = ({
   const [isLoadingAll, setIsLoadingAll] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const allNftsRef = useRef<NFTItem[]>([]);
+  const allNftsRef = useRef<Nft[]>([]);
   const evmOffset = useRef<string>('');
   const hasAttemptedLoadAll = useRef(false);
   const total = useRef<number>(0);
@@ -283,53 +283,119 @@ export const useNftHook = ({
     refreshCollectionImpl,
   };
 };
-
-export const useNftCatalogCollections = (network?: string, address?: string) => {
-  const collections = useCachedData<NFTCollections[]>(
-    network && address ? nftCatalogCollectionsKey(network, address) : null
-  );
-
-  return collections;
-};
-
-export const useEvmNftIds = (network?: string, address?: string) => {
-  const evmNftIds = useCachedData<EvmNftIdsStore>(
-    network && address ? evmNftIdsKey(network, address) : null
-  );
-  return evmNftIds;
-};
-
-export const useEvmNftCollectionList = (
-  network?: string,
-  address?: string,
-  collectionIdentifier?: string,
-  offset?: number
-) => {
-  const evmNftCollectionList = useCachedData<EvmNftCollectionListStore>(
-    network && address && collectionIdentifier && offset
-      ? evmNftCollectionListKey(network, address, collectionIdentifier, `${offset}`)
-      : null
-  );
-  return evmNftCollectionList;
-};
-
-export const useNftCollectionList = (network?: string) => {
-  const nftCollectionList = useCachedData<NftCollection[]>(
-    network ? nftCollectionListKey(network) : null
-  );
-  return nftCollectionList;
-};
-
-export const useChildAccountNfts = (network?: string, parentAddress?: string) => {
-  const childAccountNFTs = useCachedData<ChildAccountNFTsStore>(
-    network && parentAddress ? childAccountNftsKey(network, parentAddress) : null
-  );
-  return childAccountNFTs;
-};
-
+/**
+ * @deprecated use useFullCadenceNftCollectionList instead
+ */
 export const useAllNftList = (network?: string, chainType?: 'evm' | 'flow') => {
   const allNftList = useCachedData<NFTModelV2[]>(
     network && chainType ? nftListKey(network, chainType) : null
   );
   return allNftList;
+};
+/**
+ * List of all NFT collections on the flow network
+ * @param network - The network to use
+ * @returns NftCollection[]
+ */
+export const useFullCadenceNftCollectionList = (network?: string) => {
+  const nftCollectionList = useCachedData<NftCollection[]>(
+    network ? fullCadenceNftCollectionListKey(network) : null
+  );
+  return nftCollectionList;
+};
+
+/**
+ * List of NFT collections and the ids of the nfts owned in each collection
+ * @param network - The network to use
+ * @param address - The address of the account
+ * @returns NftCollectionAndIds[]
+ */
+export const useCadenceNftCollectionsAndIds = (network?: string, address?: string) => {
+  const collections = useCachedData<NftCollectionAndIds[]>(
+    network && address ? cadenceNftCollectionsAndIdsKey(network, address) : null
+  );
+
+  return collections;
+};
+
+/**
+ * List of NFTs from a specific collection under a Cadence address
+ * @param network - The network to use
+ * @param address - The address of the account
+ * @param collectionId - The id of the collection
+ * @param offset - The offset of the nfts
+ * @returns CollectionNfts
+ */
+export const useCadenceCollectionNfts = (
+  network?: string,
+  address?: string,
+  collectionId?: string,
+  offset?: number
+) => {
+  const collections = useCachedData<CollectionNfts>(
+    network && address && collectionId && offset
+      ? cadenceCollectionNftsKey(network, address, collectionId, `${offset}`)
+      : null
+  );
+
+  return collections;
+};
+
+/**
+ * ------------------------------
+ * EVM NFTs
+ * ------------------------------
+ */
+
+/**
+ * List of NFT collections and the ids of the nfts owned in each collection on the EVM network
+ * @param network - The network to use
+ * @param address - The address of the account
+ * @returns NftCollectionAndIds[]
+ */
+export const useEvmNftCollectionsAndIds = (network?: string, address?: string) => {
+  const evmNftIds = useCachedData<NftCollectionAndIds[]>(
+    network && address ? evmNftCollectionsAndIdsKey(network, address) : null
+  );
+  return evmNftIds;
+};
+
+/**
+ * List of NFTs from a specific collection on the EVM network
+ * @param network - The network to use
+ * @param address - The address of the account
+ * @param collectionIdentifier - The identifier of the collection
+ * @param offset - The offset of the nfts
+ * @returns CollectionNfts
+ */
+export const useEvmCollectionNfts = (
+  network?: string,
+  address?: string,
+  collectionIdentifier?: string,
+  offset?: number
+) => {
+  const evmNftCollectionList = useCachedData<CollectionNfts>(
+    network && address && collectionIdentifier && offset
+      ? evmCollectionNftsKey(network, address, collectionIdentifier, `${offset}`)
+      : null
+  );
+  return evmNftCollectionList;
+};
+
+/**
+ * ------------------------------
+ * Child Account NFTs
+ * ------------------------------
+ */
+/**
+ * List of NFTs owned by a child account
+ * @param network - The network to use
+ * @param parentAddress - The address of the parent account
+ * @returns ChildAccountNftMap
+ */
+export const useChildAccountNfts = (network?: string, parentAddress?: string) => {
+  const childAccountNFTs = useCachedData<ChildAccountNftMap>(
+    network && parentAddress ? childAccountNftsKey(network, parentAddress) : null
+  );
+  return childAccountNFTs;
 };

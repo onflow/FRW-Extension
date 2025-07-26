@@ -88,7 +88,7 @@ const LinkedCollection = (props) => {
 
   const getCollection = useCallback(
     async (ownerAddress, collection, offset = 0) => {
-      return await usewallet.getSingleCollection(ownerAddress, collection, offset);
+      return await usewallet.getCadenceCollectionNfts(ownerAddress, collection, offset);
     },
     [usewallet]
   );
@@ -169,7 +169,7 @@ const LinkedCollection = (props) => {
         data={data}
         blockList={[]}
         accessible={uselocation.state ? uselocation.state.accessible : []}
-        key={data.unique_id}
+        key={`${data.collectionName}_${data.id}`}
         index={index}
         ownerAddress={ownerAddress}
         fromLinked={true}
@@ -222,7 +222,7 @@ const LinkedCollection = (props) => {
               </Grid>
               <Grid sx={{ ml: 0, pl: '18px' }}>
                 <Typography component="div" color="text.primary" variant="h6">
-                  {truncate(info?.name || info.contract_name, 16)}
+                  {truncate(info?.name || info.contractName, 16)}
                 </Typography>
 
                 <Tooltip title={chrome.i18n.getMessage('Refresh')} arrow>
