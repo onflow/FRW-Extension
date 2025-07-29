@@ -1,28 +1,28 @@
-import {
-  Box,
-  Chip,
-  FormControl,
-  IconButton,
-  Input,
-  InputAdornment,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import { Box, FormControl, Input, Typography } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { type TransactionState } from '@onflow/frw-shared/types';
 
+import ArrowIcon from '@/ui/assets/svg/arrow.svg';
+import IconCheckmark from '@/ui/components/iconfont/IconCheckmark';
 import CancelIcon from '@/ui/components/iconfont/IconClose';
 import IconSwitch from '@/ui/components/iconfont/IconSwitch';
+import { ContactCard } from '@/ui/components/Send/ContactCard';
 import SlideRelative from '@/ui/components/SlideRelative';
-import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
 import TokenAvatar from '@/ui/components/TokenLists/TokenAvatar';
-import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
+import { useContact } from '@/ui/hooks/useContactHook';
+import {
+  COLOR_WHITE_ALPHA_10_FFFFFF1A,
+  COLOR_WHITE_FFFFFF,
+  COLOR_SUCCESS_GREEN_41CC5D,
+  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+  COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
+} from '@/ui/style/color';
 
-import TokenDropdownSelect from './Components/token-dropdown-select';
 import TokenSelector from './TokenSelector';
 
 const TransferAmount = ({
@@ -45,6 +45,10 @@ const TransferAmount = ({
   const params = useParams();
   const toAddress = params.toAddress;
   const [showTokenSelector, setShowTokenSelector] = useState(false);
+
+  // Get contact data for To Account section
+  const contactData =
+    useContact(transactionState.toContact?.address || '') || transactionState.toContact || null;
 
   const handleTokenSelect = useCallback(
     (token: any) => {
@@ -69,6 +73,7 @@ const TransferAmount = ({
           display: 'flex',
           flexDirection: 'column',
           gap: '0',
+          alignItems: 'center',
         }}
       >
         <Box
@@ -77,148 +82,361 @@ const TransferAmount = ({
             flexDirection: 'column',
             borderRadius: '16px',
             px: '4px',
-            backgroundColor: 'neutral.main',
             zIndex: 1000,
+            alignItems: 'center',
+            mb: 2,
           }}
         >
           {transactionState.fiatOrCoin === 'fiat' ? (
-            <Box sx={{ width: '100%', display: 'flex' }}>
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '0 14px 0 14px',
-                  fontSize: '16px',
+                  justifyContent: 'space-between',
+                  width: '100%',
                 }}
               >
-                <Typography>$</Typography>
-              </Box>
-              <FormControl sx={{ flex: '1', display: 'flex' }}>
-                <Input
-                  id="textfield"
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <TokenAvatar
+                    symbol={transactionState.tokenInfo.symbol}
+                    src={transactionState.tokenInfo.logoURI}
+                    width={35}
+                    height={35}
+                  />
+                  <FormControl sx={{ display: 'flex', minWidth: '120px' }}>
+                    <Input
+                      id="textfield"
+                      sx={{
+                        height: '26px',
+                        py: '0',
+                        zIndex: '999',
+                        fontSize: '28px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        boxSizing: 'border-box',
+                        color: '#ffffff',
+                        fontWeight: '500',
+                        '& .MuiInput-input': {
+                          padding: '0',
+                          fontSize: '28px',
+                          fontWeight: '500',
+                        },
+                      }}
+                      placeholder={chrome.i18n.getMessage('Amount')}
+                      autoFocus
+                      fullWidth
+                      disableUnderline
+                      autoComplete="off"
+                      value={fiatAmount}
+                      type="number"
+                      onChange={(event) => handleAmountChange(event.target.value)}
+                    />
+                  </FormControl>
+                </Box>
+                <Box
                   sx={{
-                    minHeight: '64px',
-                    paddingRight: '12px',
-                    paddingLeft: '0',
-                    py: '14px',
-                    zIndex: '999',
-                    fontSize: '24px',
-                    backgroundColor: '#282828',
-                    borderRadius: '12px',
-                    boxSizing: 'border-box',
+                    backgroundColor: 'neutral.main',
+                    borderRadius: '39px',
+                    px: 2.5,
+                    py: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    cursor: 'pointer',
+                    minHeight: '35px',
                   }}
-                  placeholder={chrome.i18n.getMessage('Amount')}
-                  autoFocus
-                  fullWidth
-                  disableUnderline
-                  autoComplete="off"
-                  value={fiatAmount}
-                  type="number"
-                  onChange={(event) => handleAmountChange(event.target.value)}
-                  inputProps={{ sx: { fontSize: '24px' } }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <Tooltip
-                        title={
-                          transactionState.tokenInfo.unit === 'flow'
-                            ? chrome.i18n.getMessage('on_Flow_the_balance_cant_less_than_0001_FLOW')
-                            : ''
-                        }
-                        arrow
-                      >
-                        <Chip
-                          label={chrome.i18n.getMessage('Max')}
-                          size="small"
-                          onClick={handleMaxClick}
-                          sx={{ padding: '2px 5px' }}
-                        />
-                      </Tooltip>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
+                  onClick={openTokenSelector}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: COLOR_WHITE_FFFFFF, fontSize: '12px', fontWeight: '600' }}
+                  >
+                    $
+                  </Typography>
+                  <IconCheckmark size={10} color={COLOR_SUCCESS_GREEN_41CC5D} />
+                  <ChevronRightRoundedIcon
+                    sx={{ color: COLOR_WHITE_FFFFFF, fontSize: 14, transform: 'rotate(90deg)' }}
+                  />
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box
+                    sx={{
+                      backgroundColor: 'neutral.main',
+                      borderRadius: '56px',
+                      p: 0.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '25px',
+                      height: '25px',
+                    }}
+                  >
+                    <IconSwitch size={11} />
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}
+                  >
+                    ${fiatAmount || '0'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}
+                  >
+                    {amount || '0'} {transactionState.tokenInfo.symbol}
+                  </Typography>
+                  <Box
+                    sx={{
+                      backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                      borderRadius: '39px',
+                      px: 2.5,
+                      py: 0.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                      },
+                    }}
+                    onClick={handleMaxClick}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: COLOR_WHITE_FFFFFF,
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        letterSpacing: '-0.072px',
+                      }}
+                    >
+                      MAX
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
           ) : (
-            <Box sx={{ width: '100%', display: 'flex', gap: '8px' }}>
-              <TokenDropdownSelect token={transactionState.tokenInfo} onClick={openTokenSelector} />
-              <FormControl sx={{ flex: '1', display: 'flex' }}>
-                <Input
-                  id="textfield"
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <TokenAvatar
+                    symbol={transactionState.tokenInfo.symbol}
+                    src={transactionState.tokenInfo.logoURI}
+                    width={35}
+                    height={35}
+                  />
+                  <FormControl sx={{ display: 'flex', minWidth: '120px' }}>
+                    <Input
+                      id="textfield"
+                      sx={{
+                        height: '26px',
+                        py: '0',
+                        zIndex: '999',
+                        fontSize: '28px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        boxSizing: 'border-box',
+                        color: '#ffffff',
+                        fontWeight: '500',
+                        '& .MuiInput-input': {
+                          padding: '0',
+                          fontSize: '28px',
+                          fontWeight: '500',
+                        },
+                      }}
+                      placeholder={chrome.i18n.getMessage('Amount')}
+                      autoFocus
+                      fullWidth
+                      disableUnderline
+                      autoComplete="off"
+                      value={amount}
+                      onChange={(event) => handleAmountChange(event.target.value)}
+                    />
+                  </FormControl>
+                </Box>
+                <Box
                   sx={{
-                    minHeight: '64px',
-                    paddingRight: '12px',
-                    paddingLeft: '0',
-                    py: '14px',
-                    zIndex: '999',
-                    fontSize: '24px',
-                    backgroundColor: '#282828',
-                    borderRadius: '12px',
-                    boxSizing: 'border-box',
+                    backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                    borderRadius: '39px',
+                    px: 2.5,
+                    py: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    cursor: 'pointer',
+                    minHeight: '35px',
                   }}
-                  placeholder={chrome.i18n.getMessage('Amount')}
-                  autoFocus
-                  fullWidth
-                  disableUnderline
-                  autoComplete="off"
-                  value={amount}
-                  onChange={(event) => handleAmountChange(event.target.value)}
-                  inputProps={{ sx: { fontSize: '24px' } }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <Tooltip
-                        title={
-                          transactionState.tokenInfo.unit === 'flow'
-                            ? chrome.i18n.getMessage('on_Flow_the_balance_cant_less_than_0001_FLOW')
-                            : ''
-                        }
-                        arrow
-                      >
-                        <Chip
-                          label={chrome.i18n.getMessage('Max')}
-                          size="small"
-                          onClick={handleMaxClick}
-                          sx={{ padding: '2px 5px' }}
-                        />
-                      </Tooltip>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
+                  onClick={openTokenSelector}
+                >
+                  <TokenAvatar
+                    symbol={transactionState.tokenInfo.symbol}
+                    src={transactionState.tokenInfo.logoURI}
+                    width={16}
+                    height={16}
+                  />
+                  <Typography
+                    variant="body2"
+                    sx={{ color: COLOR_WHITE_FFFFFF, fontSize: '12px', fontWeight: '600' }}
+                  >
+                    {transactionState.tokenInfo.symbol}
+                  </Typography>
+                  <IconCheckmark size={10} color={COLOR_SUCCESS_GREEN_41CC5D} />
+                  <ChevronRightRoundedIcon
+                    sx={{ color: COLOR_WHITE_FFFFFF, fontSize: 14, transform: 'rotate(90deg)' }}
+                  />
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box
+                    sx={{
+                      backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                      borderRadius: '56px',
+                      p: 0.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '25px',
+                      height: '25px',
+                    }}
+                  >
+                    <IconSwitch size={11} />
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}
+                  >
+                    ${fiatAmount || '0'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}
+                  >
+                    {amount || '0'} {transactionState.tokenInfo.symbol}
+                  </Typography>
+                  <Box
+                    sx={{
+                      backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                      borderRadius: '39px',
+                      px: 2.5,
+                      py: 0.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                      },
+                    }}
+                    onClick={handleMaxClick}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: COLOR_WHITE_FFFFFF,
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        letterSpacing: '-0.072px',
+                      }}
+                    >
+                      MAX
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
           )}
+        </Box>
+
+        {/* Send Button */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            mt: 2,
+            mb: 1,
+          }}
+        >
           <Box
             sx={{
+              backgroundColor: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+              borderRadius: '100px',
+              p: 1,
               display: 'flex',
-              flexDirection: 'row',
               alignItems: 'center',
-              gap: '4px',
-              mx: '12px',
-              mb: '14px',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              width: '48px',
+              height: '48px',
             }}
           >
-            <Typography>≈</Typography>
-            {transactionState.fiatOrCoin === 'fiat' ? (
-              <>
-                <TokenAvatar
-                  symbol={transactionState.tokenInfo.symbol}
-                  src={transactionState.tokenInfo.logoURI}
-                  width={18}
-                  height={18}
-                />{' '}
-                <TokenBalance showFull={true} value={amount} />
-              </>
-            ) : (
-              <CurrencyValue
-                value={fiatAmount}
-                currencyCode={currency?.code ?? ''}
-                currencySymbol={currency?.symbol ?? ''}
-              />
-            )}
-            <IconButton onClick={handleSwitchFiatOrCoin}>
-              <IconSwitch size={14} />
-            </IconButton>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img src={ArrowIcon} alt="Send" width="24" height="24" />
+            </Box>
           </Box>
         </Box>
+
+        {/* To Account Section */}
+        <Box
+          sx={{
+            backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+            borderRadius: '16px',
+            pb: 3,
+            pt: 2,
+            px: 2,
+            mt: 2,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              mb: 1.5,
+              color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
+              fontSize: '12px',
+            }}
+          >
+            To account
+          </Typography>
+          {contactData && (
+            <ContactCard contact={contactData} tokenInfo={transactionState.tokenInfo} />
+          )}
+        </Box>
+
         <SlideRelative direction="down" show={transactionState.balanceExceeded}>
           <Box
             sx={{

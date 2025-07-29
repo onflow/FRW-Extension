@@ -75,6 +75,7 @@ export const AccountAvatar = ({
   spinning = false,
   onClick,
   isPending = false,
+  borderColor,
 }: {
   network?: string;
   emoji?: string;
@@ -85,6 +86,7 @@ export const AccountAvatar = ({
   spinning?: boolean;
   onClick?: () => void;
   isPending?: boolean;
+  borderColor?: string; // Custom border color for special cases
 }) => {
   const loading = !network || (!isPending && (!emoji || !color));
   if (loading) {
@@ -105,7 +107,7 @@ export const AccountAvatar = ({
     outlineStyle: 'solid',
     outlineWidth: spinning || !active ? '0px' : '1px',
     outlineOffset: spinning || !active ? '0px' : '2px',
-    outlineColor: active && !spinning ? networkColor(network) : 'transparent',
+    outlineColor: active && !spinning ? borderColor || networkColor(network) : 'transparent',
     '&:hover': {
       backgroundColor: color ? alpha(color, 0.8) : undefined,
     },

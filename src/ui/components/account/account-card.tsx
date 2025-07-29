@@ -39,6 +39,7 @@ type AccountCardWithCopyProps = {
   showLink?: boolean;
   showCard?: boolean;
   isPending?: boolean;
+  backgroundColor?: string; // Custom border color for special cases
   'data-testid'?: string;
 };
 
@@ -59,6 +60,7 @@ export const AccountCard = ({
   showLink = false,
   showCard = false,
   isPending = false,
+  backgroundColor = COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
   'data-testid': dataTestId,
 }: AccountCardProps) => {
   const { name, icon, color, address, nfts } = account || {};
@@ -80,8 +82,8 @@ export const AccountCard = ({
     (isEvmAccount
       ? `evm-account-${address}`
       : hasParentAccount
-        ? `child-account-${address}`
-        : `main-account-${address}`);
+      ? `child-account-${address}`
+      : `main-account-${address}`);
   const accountBalance = useAccountBalance(network, address);
   const balance = accountBalance === undefined ? account?.balance : accountBalance;
 
@@ -98,7 +100,7 @@ export const AccountCard = ({
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: '16px',
-        backgroundColor: showCard ? COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A : 'transparent',
+        backgroundColor: showCard ? backgroundColor : 'transparent',
         overflow: 'hidden',
       }}
       elevation={showCard ? 1 : 0}

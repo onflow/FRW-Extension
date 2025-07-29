@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Divider, Typography } from '@mui/material';
 import BN from 'bignumber.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -7,16 +7,20 @@ import { type TransactionState } from '@onflow/frw-shared/types';
 import { isValidAddress, isValidEthereumAddress, consoleError } from '@onflow/frw-shared/utils';
 
 import { LLHeader } from '@/ui/components';
-import CancelIcon from '@/ui/components/iconfont/IconClose';
-import { ContactCard } from '@/ui/components/Send/ContactCard';
-import SlideRelative from '@/ui/components/SlideRelative';
+import { AccountCard } from '@/ui/components/account/account-card';
 import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
 import TokenAvatar from '@/ui/components/TokenLists/TokenAvatar';
 import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
+import { useActiveAccounts, useMainAccount, useUserWallets } from '@/ui/hooks/use-account-hooks';
 import { useWallet } from '@/ui/hooks/use-wallet';
 import { useContact } from '@/ui/hooks/useContactHook';
 import { useNetwork } from '@/ui/hooks/useNetworkHook';
+import {
+  COLOR_WHITE_ALPHA_10_FFFFFF1A,
+  COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
+  COLOR_DARKMODE_WHITE_10pc,
+} from '@/ui/style/color';
 
 import TransferAmount from './TransferAmount';
 import TransferConfirmation from './TransferConfirmation';
@@ -44,6 +48,12 @@ const SendToCadenceOrEvm = ({
     useContact(transactionState.toContact?.address || '') || transactionState.toContact || null;
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
   const [validated, setValidated] = useState<boolean | null>(null);
+
+  // Get current account data for From Account section
+  const userWallets = useUserWallets();
+  const activeAccounts = useActiveAccounts(network, userWallets?.currentPubkey);
+  const currentAccount = useMainAccount(network, activeAccounts?.currentAddress);
+  const parentAccount = useMainAccount(network, activeAccounts?.parentAddress);
 
   useEffect(() => {
     // validate the address when the to address changes
@@ -77,60 +87,87 @@ const SendToCadenceOrEvm = ({
   return (
     <div className="page">
       <>
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px' }}>
           <LLHeader title={chrome.i18n.getMessage('Send_to')} help={true} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', px: '16px' }}>
-            <Box>
-              <Box sx={{ zIndex: 999, backgroundColor: '#121212' }}>
-                {transactionState.toContact && (
-                  <ContactCard contact={contactData} tokenInfo={transactionState.tokenInfo} />
-                )}
-              </Box>
-
-              <SlideRelative show={validated !== null && !validated} direction="down">
-                <Box
-                  sx={{
-                    width: '95%',
-                    backgroundColor: 'error.light',
-                    mx: 'auto',
-                    borderRadius: '0 0 12px 12px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-                    <Typography variant="body1" color="text.secondary">
-                      {chrome.i18n.getMessage('Invalid_address_in')}
-                      {` ${network}`}
-                    </Typography>
-                  </Box>
-                </Box>
-              </SlideRelative>
-            </Box>
-
-            <Typography
-              variant="body1"
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Box
               sx={{
-                alignSelf: 'start',
-                fontSize: '14px',
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                px: '16px',
+                borderRadius: '16px',
+                backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
               }}
             >
-              {chrome.i18n.getMessage('Transfer__Amount')}
-            </Typography>
-            {transactionState.tokenInfo.unit && (
-              <TransferAmount
-                transactionState={transactionState}
-                handleAmountChange={handleAmountChange}
-                handleTokenChange={handleTokenChange}
-                handleSwitchFiatOrCoin={handleSwitchFiatOrCoin}
-                handleMaxClick={handleMaxClick}
-              />
-            )}
+              {/* From Account Section */}
+              {currentAccount && (
+                <Box
+                  sx={{
+                    pb: 3,
+                    pt: 2,
+                    mb: 0,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      mb: 1.5,
+                      color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
+                      fontSize: '12px',
+                    }}
+                  >
+                    From Account
+                  </Typography>
+                  <AccountCard
+                    network={network}
+                    account={currentAccount}
+                    parentAccount={parentAccount}
+                    active={true}
+                    showCard={false}
+                  />
+                </Box>
+              )}
+
+              <Divider sx={{ backgroundColor: COLOR_DARKMODE_WHITE_10pc, margin: '12px 0' }} />
+
+              {/* Send Tokens Section */}
+              <Box
+                sx={{
+                  pb: 3,
+                  pt: 0.5,
+                  height: '168px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
+                    fontSize: '12px',
+                    mb: 1.5,
+                  }}
+                >
+                  Send Tokens
+                </Typography>
+                {transactionState.tokenInfo.unit && (
+                  <TransferAmount
+                    transactionState={transactionState}
+                    handleAmountChange={handleAmountChange}
+                    handleTokenChange={handleTokenChange}
+                    handleSwitchFiatOrCoin={handleSwitchFiatOrCoin}
+                    handleMaxClick={handleMaxClick}
+                  />
+                )}
+              </Box>
+            </Box>
 
             {transactionState.tokenInfo.unit && (
               <>
