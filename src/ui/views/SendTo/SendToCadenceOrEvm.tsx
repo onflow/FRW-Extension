@@ -95,75 +95,119 @@ const SendToCadenceOrEvm = ({
               flexDirection: 'column',
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                px: '16px',
-                borderRadius: '16px',
-                backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
-              }}
-            >
-              {/* From Account Section */}
-              {currentAccount && (
+            <Box>
+              <Box
+                sx={{
+                  backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                  px: '16px',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%',
+                }}
+              >
+                {/* From Account Section */}
+                {currentAccount && (
+                  <Box
+                    sx={{
+                      pb: 3,
+                      pt: 2,
+                      mb: 0,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        mb: 1.5,
+                        color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
+                        fontSize: '12px',
+                      }}
+                    >
+                      From Account
+                    </Typography>
+                    <AccountCard
+                      network={network}
+                      account={currentAccount}
+                      parentAccount={parentAccount}
+                      active={true}
+                      showCard={false}
+                    />
+                  </Box>
+                )}
+
+                <Divider sx={{ backgroundColor: COLOR_DARKMODE_WHITE_10pc, margin: '12px 0' }} />
+
+                {/* Send Tokens Section */}
                 <Box
                   sx={{
                     pb: 3,
-                    pt: 2,
-                    mb: 0,
+                    pt: 0.5,
+                    height: '168px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
                   }}
                 >
                   <Typography
                     variant="body2"
                     sx={{
-                      mb: 1.5,
                       color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
                       fontSize: '12px',
+                      mb: 1.5,
                     }}
                   >
-                    From Account
+                    Send Tokens
                   </Typography>
-                  <AccountCard
-                    network={network}
-                    account={currentAccount}
-                    parentAccount={parentAccount}
-                    active={true}
-                    showCard={false}
-                  />
+                  {transactionState.tokenInfo.unit && (
+                    <TransferAmount
+                      transactionState={transactionState}
+                      handleAmountChange={handleAmountChange}
+                      handleTokenChange={handleTokenChange}
+                      handleSwitchFiatOrCoin={handleSwitchFiatOrCoin}
+                      handleMaxClick={handleMaxClick}
+                    />
+                  )}
                 </Box>
-              )}
-
-              <Divider sx={{ backgroundColor: COLOR_DARKMODE_WHITE_10pc, margin: '12px 0' }} />
-
-              {/* Send Tokens Section */}
+              </Box>
+              {/* To Account Section */}
               <Box
                 sx={{
-                  pb: 3,
-                  pt: 0.5,
-                  height: '168px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
+                  backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
+                  borderRadius: '16px',
+                  pb: 2,
+                  pt: 2,
+                  px: 2,
+                  mt: '4px',
+                  mb: 3,
+                  width: '100%',
+                  maxWidth: '100%',
+                  boxSizing: 'border-box',
+                  position: 'relative',
+                  zIndex: 1,
                 }}
               >
                 <Typography
                   variant="body2"
                   sx={{
+                    mb: 1.5,
                     color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
                     fontSize: '12px',
-                    mb: 1.5,
                   }}
                 >
-                  Send Tokens
+                  To account
                 </Typography>
-                {transactionState.tokenInfo.unit && (
-                  <TransferAmount
-                    transactionState={transactionState}
-                    handleAmountChange={handleAmountChange}
-                    handleTokenChange={handleTokenChange}
-                    handleSwitchFiatOrCoin={handleSwitchFiatOrCoin}
-                    handleMaxClick={handleMaxClick}
+                {contactData && (
+                  <AccountCard
+                    account={{
+                      id: parseInt(contactData.id?.toString() || '0'),
+                      name: contactData.contact_name || contactData.username || 'Unknown',
+                      address: contactData.address,
+                      icon: contactData.avatar || '👤',
+                      color: '#484848',
+                      chain: 747,
+                    }}
+                    showCard={false}
+                    showLink={false}
                   />
                 )}
               </Box>

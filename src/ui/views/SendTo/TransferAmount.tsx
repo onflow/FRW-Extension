@@ -9,7 +9,6 @@ import ArrowIcon from '@/ui/assets/svg/arrow.svg';
 import IconCheckmark from '@/ui/components/iconfont/IconCheckmark';
 import CancelIcon from '@/ui/components/iconfont/IconClose';
 import IconSwitch from '@/ui/components/iconfont/IconSwitch';
-import { ContactCard } from '@/ui/components/Send/ContactCard';
 import SlideRelative from '@/ui/components/SlideRelative';
 import TokenAvatar from '@/ui/components/TokenLists/TokenAvatar';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
@@ -20,7 +19,6 @@ import {
   COLOR_WHITE_FFFFFF,
   COLOR_SUCCESS_GREEN_41CC5D,
   COLOR_GREEN_FLOW_DARKMODE_00EF8B,
-  COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
 } from '@/ui/style/color';
 
 import TokenSelector from './TokenSelector';
@@ -74,6 +72,7 @@ const TransferAmount = ({
           flexDirection: 'column',
           gap: '0',
           alignItems: 'center',
+          width: '100%',
         }}
       >
         <Box
@@ -85,6 +84,7 @@ const TransferAmount = ({
             zIndex: 1000,
             alignItems: 'center',
             mb: 2,
+            width: '100%',
           }}
         >
           {transactionState.fiatOrCoin === 'fiat' ? (
@@ -377,12 +377,11 @@ const TransferAmount = ({
           )}
         </Box>
 
-        {/* Send Button */}
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'center',
-            mt: 2,
+            mt: 1,
             mb: 1,
           }}
         >
@@ -409,32 +408,6 @@ const TransferAmount = ({
               <img src={ArrowIcon} alt="Send" width="24" height="24" />
             </Box>
           </Box>
-        </Box>
-
-        {/* To Account Section */}
-        <Box
-          sx={{
-            backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
-            borderRadius: '16px',
-            pb: 3,
-            pt: 2,
-            px: 2,
-            mt: 2,
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              mb: 1.5,
-              color: COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
-              fontSize: '12px',
-            }}
-          >
-            To account
-          </Typography>
-          {contactData && (
-            <ContactCard contact={contactData} tokenInfo={transactionState.tokenInfo} />
-          )}
         </Box>
 
         <SlideRelative direction="down" show={transactionState.balanceExceeded}>
