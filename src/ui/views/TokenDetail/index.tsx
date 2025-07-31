@@ -130,7 +130,7 @@ const TokenDetail = () => {
   const Header = () => {
     return (
       <Box sx={{ display: 'flex', mx: '-12px', position: 'relative', mb: '4px' }}>
-        <IconButton onClick={() => navigate(-1)}>
+        <IconButton onClick={() => navigate('/dashboard')}>
           <ArrowBackIcon sx={{ color: 'icon.navi' }} />
         </IconButton>
         <Box sx={{ flexGrow: 1 }} />

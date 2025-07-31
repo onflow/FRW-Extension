@@ -47,6 +47,20 @@ const config: StorybookConfig = {
         '../src/ui/hooks/useNetworkHook.mock.ts'
       ),
       '@/ui/hooks/use-wallet$': path.resolve(__dirname, '../src/ui/hooks/use-wallet.mock.ts'),
+      '@/ui/hooks/useCoinHook$': path.resolve(__dirname, '../src/ui/hooks/useCoinHook.mock.ts'),
+      '@/ui/hooks/useCoinHook': path.resolve(__dirname, '../src/ui/hooks/useCoinHook.mock.ts'),
+      '@/ui/hooks/useContactHook$': path.resolve(
+        __dirname,
+        '../src/ui/hooks/useContactHook.mock.ts'
+      ),
+      '@/ui/hooks/useContactHook': path.resolve(
+        __dirname,
+        '../src/ui/hooks/useContactHook.mock.ts'
+      ),
+      '@/ui/hooks/useTransferListHook': path.resolve(
+        __dirname,
+        '../src/ui/hooks/useTransferListHook.mock.ts'
+      ),
 
       // Other aliases
       '@': path.resolve(__dirname, '../src'),

@@ -10,4 +10,8 @@ export const useUserData = fn(actual.useUserData)
 // Mock for useCachedData hook
 export const useCachedData = fn(actual.useCachedData)
   .mockName('useCachedData')
-  .mockImplementation(() => undefined);
+  .mockImplementation((key: string | null | undefined) => {
+    // Mock wallet loaded state
+    if (key === 'walletLoaded') return true;
+    return undefined;
+  });

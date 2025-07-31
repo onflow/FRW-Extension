@@ -1,11 +1,8 @@
-import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
   Card,
   CardContent,
   CardMedia,
-  Input,
-  InputAdornment,
   List,
   Skeleton,
   Switch,
@@ -20,6 +17,7 @@ import { type ExtendedTokenInfo } from '@onflow/frw-shared/types';
 
 import VerifiedIcon from '@/ui/assets/svg/verfied-check.svg';
 import { LLHeader } from '@/ui/components';
+import SearchInput from '@/ui/components/search-input';
 import TokenItem from '@/ui/components/TokenLists/TokenItem';
 import { useAllTokenInfo } from '@/ui/hooks/use-coin-hooks';
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -137,39 +135,26 @@ const TokenList = () => {
         >
           <LLHeader title={chrome.i18n.getMessage('Add_Token')} help={false} />
 
-          <Input
-            type="search"
-            value={keyword}
-            onChange={(e) => filter(e)}
-            sx={{
-              minHeight: '46px',
-              zIndex: '999',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              borderRadius: '12px',
-              boxSizing: 'border-box',
-              margin: '2px 18px 10px 18px',
-              border: 'none',
-              color: '#FFFFFF',
-              '& input': {
-                padding: '8px 16px',
-                '&::placeholder': {
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  opacity: 1,
-                },
-              },
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.12)',
-              },
-            }}
-            placeholder={chrome.i18n.getMessage('Search_Token')}
-            autoFocus
-            disableUnderline
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon sx={{ ml: '10px', my: '5px', color: 'rgba(255, 255, 255, 0.6)' }} />
-              </InputAdornment>
-            }
-          />
+          <Box sx={{ px: '18px', py: '10px' }}>
+            <SearchInput
+              value={keyword}
+              onChange={(value) => {
+                setKeyword(value);
+                if (value !== '') {
+                  const results = tokenInfoList.filter((token) => {
+                    return (
+                      token.name.toLowerCase().includes(value.toLowerCase()) ||
+                      token.symbol.toLowerCase().includes(value.toLowerCase())
+                    );
+                  });
+                  setFilteredTokenList(results);
+                } else {
+                  setFilteredTokenList(tokenInfoList);
+                }
+              }}
+              placeholder={chrome.i18n.getMessage('Search_Token')}
+            />
+          </Box>
 
           <Box
             sx={{
