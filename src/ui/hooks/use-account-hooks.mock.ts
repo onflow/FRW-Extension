@@ -20,3 +20,7 @@ export const useChildAccountDescription = fn(actual.useChildAccountDescription).
 export const useCurrentId = fn(actual.useCurrentId).mockName('useCurrentId');
 
 export const useUserInfo = fn(actual.useUserInfo).mockName('useUserInfo');
+
+export const useUserWallets = fn(actual.useUserWallets).mockName('useUserWallets');
+
+export const useActiveAccounts = fn(actual.useActiveAccounts).mockName('useActiveAccounts');

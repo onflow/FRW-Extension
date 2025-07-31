@@ -7,7 +7,12 @@ import { LLHeader } from '@/ui/components';
 import SearchInput from '@/ui/components/search-input';
 import TokenItem from '@/ui/components/TokenLists/TokenItem';
 import { useCoins } from '@/ui/hooks/useCoinHook';
-import { COLOR_PRIMARY_DARK_121212 } from '@/ui/style/color';
+import {
+  COLOR_PRIMARY_DARK_121212,
+  COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3,
+  COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
+  COLOR_DARKMODE_WHITE_10pc,
+} from '@/ui/style/color';
 
 interface TokenSelectorProps {
   open: boolean;
@@ -69,9 +74,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
         },
       }}
     >
-      <DialogContent
-        sx={{ p: '60px 0 0', height: '100%', backgroundColor: COLOR_PRIMARY_DARK_121212 }}
-      >
+      <DialogContent sx={{ p: 0, height: '100%', backgroundColor: COLOR_PRIMARY_DARK_121212 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <LLHeader title={chrome.i18n.getMessage('Tokens')} help={false} onBackClick={onClose} />
           <Box sx={{ px: '16px', py: '16px' }}>
@@ -80,9 +83,16 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
               onChange={handleSearch}
               placeholder={chrome.i18n.getMessage('Search_Token')}
               sx={{
-                backgroundColor: 'action.hover',
+                backgroundColor: COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
+                borderRadius: '12px',
+                '& .MuiInputBase-root': {
+                  color: '#FFFFFF',
+                },
+                '& .MuiInputBase-input::placeholder': {
+                  color: COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3,
+                },
                 '&:hover': {
-                  backgroundColor: 'action.selected',
+                  backgroundColor: '#3A3A3A',
                 },
               }}
             />
@@ -92,7 +102,8 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
             sx={{
               flexGrow: 1,
               overflowY: 'auto',
-              px: '8px',
+              px: '16px',
+              py: '8px',
             }}
           >
             {filteredTokens.map((token) => (
@@ -108,9 +119,13 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
                 showBalance={true}
                 showPrice={true}
                 customSx={{
-                  borderRadius: 0,
+                  borderRadius: '0',
                   border: 'none',
-                  borderBottom: '1px solid #2A2A2A',
+                  marginY: '0',
+                  borderBottom: `1px solid ${COLOR_DARKMODE_WHITE_10pc}`,
+                  '&:hover': {
+                    backgroundColor: COLOR_DARKMODE_WHITE_10pc,
+                  },
                 }}
               />
             ))}

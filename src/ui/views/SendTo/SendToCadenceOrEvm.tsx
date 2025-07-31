@@ -232,7 +232,12 @@ const SendToCadenceOrEvm = ({
                     hideThirdLine={true}
                     secondaryIcon={<EditIcon width={16} height={16} />}
                     // TODO: Open address book selector
-                    onClickSecondary={() => {}}
+                    onClickSecondary={() => {
+                      const tokenName = transactionState.tokenInfo?.unit?.toLowerCase();
+                      if (tokenName) {
+                        navigate(`/dashboard/token/${tokenName}/send`);
+                      }
+                    }}
                   />
                 )}
               </Box>
