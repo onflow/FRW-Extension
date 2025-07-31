@@ -15,6 +15,7 @@ import Recover from './Forgot/Recover';
 import Reset from './Forgot/Reset';
 import InnerRoute from './InnerRoute';
 import SortHat from './SortHat';
+import TamaguiDemo from './TamaguiDemo';
 import Unlock from './Unlock';
 import Welcome from './Welcome';
 import ImportProfile from './Welcome/import-profile';
@@ -45,6 +46,7 @@ const AppRoutes = () => {
       <Route path="/forgot" element={<Forgot />} />
       <Route path="/forgot/recover" element={<Recover />} />
       <Route path="/forgot/reset" element={<Reset />} />
+      <Route path="/tamagui-demo" element={<TamaguiDemo />} />
       <Route path="/dashboard/*" element={<InnerRoute />} />
       <Route
         path="/approval/*"

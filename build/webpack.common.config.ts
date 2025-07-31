@@ -182,6 +182,8 @@ const config = (env: { config: 'dev' | 'pro' | 'none' }): webpack.Configuration 
         moment: 'dayjs',
         'cross-fetch': 'cross-fetch',
         '@': paths.rootResolve('src'),
+        'react-native$': 'react-native-web',
+        'react-native-web$': 'react-native-web',
       },
       plugins: [],
       fallback: {
