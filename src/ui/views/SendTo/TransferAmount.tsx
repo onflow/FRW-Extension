@@ -7,10 +7,9 @@ import { type TransactionState } from '@onflow/frw-shared/types';
 
 import ArrowIcon from '@/ui/assets/svg/arrow.svg';
 import IconCheckmark from '@/ui/components/iconfont/IconCheckmark';
-import CancelIcon from '@/ui/components/iconfont/IconClose';
 import IconSwitch from '@/ui/components/iconfont/IconSwitch';
-import SlideRelative from '@/ui/components/SlideRelative';
 import TokenAvatar from '@/ui/components/TokenLists/TokenAvatar';
+import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useCoins } from '@/ui/hooks/useCoinHook';
 import { useContact } from '@/ui/hooks/useContactHook';
@@ -19,6 +18,7 @@ import {
   COLOR_WHITE_FFFFFF,
   COLOR_SUCCESS_GREEN_41CC5D,
   COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+  COLOR_WHITE_ALPHA_80_FFFFFFCC,
 } from '@/ui/style/color';
 
 import TokenSelector from './TokenSelector';
@@ -337,39 +337,12 @@ const TransferAmount = ({
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}
-                  >
-                    {amount || '0'} {transactionState.tokenInfo.symbol}
-                  </Typography>
-                  <Box
-                    sx={{
-                      backgroundColor: COLOR_WHITE_ALPHA_10_FFFFFF1A,
-                      borderRadius: '39px',
-                      px: 2.5,
-                      py: 0.5,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.2)',
-                      },
-                    }}
-                    onClick={handleMaxClick}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: COLOR_WHITE_FFFFFF,
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        letterSpacing: '-0.072px',
-                      }}
-                    >
-                      MAX
-                    </Typography>
+                  <Box sx={{ color: COLOR_WHITE_ALPHA_80_FFFFFFCC }}>
+                    <TokenBalance
+                      value={String(transactionState.tokenInfo.balance)}
+                      showFull={false}
+                      postFix={transactionState.tokenInfo.unit.toUpperCase()}
+                    />
                   </Box>
                 </Box>
               </Box>
@@ -409,31 +382,6 @@ const TransferAmount = ({
             </Box>
           </Box>
         </Box>
-
-        <SlideRelative direction="down" show={transactionState.balanceExceeded}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              width: '95%',
-              backgroundColor: 'error.light',
-              mx: 'auto',
-              borderRadius: '0 0 12px 12px',
-            }}
-          >
-            <CancelIcon size={24} color={'#E54040'} style={{ margin: '8px' }} />
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ fontSize: transactionState.tokenInfo.unit === 'flow' ? '0.7rem' : '1rem' }}
-            >
-              {transactionState.tokenInfo.unit === 'flow'
-                ? chrome.i18n.getMessage('Insufficient_balance_on_Flow')
-                : chrome.i18n.getMessage('Insufficient_balance')}
-            </Typography>
-          </Box>
-        </SlideRelative>
       </Box>
 
       <TokenSelector

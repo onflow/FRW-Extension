@@ -46,6 +46,7 @@ type AccountCardWithCopyProps = {
 type AccountCardProps = AccountCardWithCopyProps & {
   onClickSecondary?: () => void;
   secondaryIcon?: React.ReactNode;
+  hideThirdLine?: boolean;
 };
 
 export const AccountCard = ({
@@ -62,6 +63,7 @@ export const AccountCard = ({
   isPending = false,
   backgroundColor = COLOR_DARKMODE_BACKGROUND_CARDS_1A1A1A,
   'data-testid': dataTestId,
+  hideThirdLine = false,
 }: AccountCardProps) => {
   const { name, icon, color, address, nfts } = account || {};
   const { icon: parentIcon, color: parentColor } =
@@ -181,27 +183,29 @@ export const AccountCard = ({
           >
             {address ? formatAddress(address) : <Skeleton variant="text" width="120px" />}
           </Typography>
-          <Typography
-            fontStyle="Inter"
-            color={COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3}
-            fontSize="12px"
-            fontWeight="400"
-            lineHeight="17px"
-            noWrap
-          >
-            {isChildAccount ? ( // Child account
-              nftCount !== undefined ? ( // NFT count is available
-                <span>{`${nftCount} NFTs`}</span>
+          {!hideThirdLine && (
+            <Typography
+              fontStyle="Inter"
+              color={COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3}
+              fontSize="12px"
+              fontWeight="400"
+              lineHeight="17px"
+              noWrap
+            >
+              {isChildAccount ? ( // Child account
+                nftCount !== undefined ? ( // NFT count is available
+                  <span>{`${nftCount} NFTs`}</span>
+                ) : (
+                  <Skeleton variant="text" width="130px" />
+                )
+              ) : // Main account or EVM account
+              balance !== undefined ? ( // Balance is available
+                <TokenBalance value={balance} decimals={2} showFull={false} postFix="Flow" />
               ) : (
                 <Skeleton variant="text" width="130px" />
-              )
-            ) : // Main account or EVM account
-            balance !== undefined ? ( // Balance is available
-              <TokenBalance value={balance} decimals={2} showFull={false} postFix="Flow" />
-            ) : (
-              <Skeleton variant="text" width="130px" />
-            )}
-          </Typography>
+              )}
+            </Typography>
+          )}
         </Box>
       </CardActionArea>
       {onClickSecondary && !isPending && (

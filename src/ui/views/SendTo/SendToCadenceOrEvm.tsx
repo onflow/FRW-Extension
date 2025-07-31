@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import BN from 'bignumber.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -6,11 +6,13 @@ import { useNavigate } from 'react-router';
 import { type TransactionState } from '@onflow/frw-shared/types';
 import { isValidAddress, isValidEthereumAddress, consoleError } from '@onflow/frw-shared/utils';
 
+import { EditIcon } from '@/ui/assets/icons/settings/Edit';
 import { LLHeader } from '@/ui/components';
 import { AccountCard } from '@/ui/components/account/account-card';
-import { CurrencyValue } from '@/ui/components/TokenLists/CurrencyValue';
+import { Button } from '@/ui/components/button';
+import CancelIcon from '@/ui/components/iconfont/IconClose';
+import SlideRelative from '@/ui/components/SlideRelative';
 import TokenAvatar from '@/ui/components/TokenLists/TokenAvatar';
-import { TokenBalance } from '@/ui/components/TokenLists/TokenBalance';
 import { useCurrency } from '@/ui/hooks/preference-hooks';
 import { useActiveAccounts, useMainAccount, useUserWallets } from '@/ui/hooks/use-account-hooks';
 import { useWallet } from '@/ui/hooks/use-wallet';
@@ -20,6 +22,11 @@ import {
   COLOR_WHITE_ALPHA_10_FFFFFF1A,
   COLOR_DARKMODE_TEXT_PRIMARY_80_FFFFFF80,
   COLOR_DARKMODE_WHITE_10pc,
+  COLOR_WHITE_FFFFFF,
+  COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+  COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3,
+  COLOR_BLACK_000000,
+  COLOR_ERROR_RED_E54040,
 } from '@/ui/style/color';
 
 import TransferAmount from './TransferAmount';
@@ -88,7 +95,20 @@ const SendToCadenceOrEvm = ({
     <div className="page">
       <>
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px' }}>
-          <LLHeader title={chrome.i18n.getMessage('Send_to')} help={true} />
+          <LLHeader
+            title={chrome.i18n.getMessage('Send_to')}
+            help={true}
+            onBackClick={() => {
+              // Navigate back to the token detail page based on token info
+              const tokenUnit = transactionState.tokenInfo?.unit;
+              const tokenId = transactionState.tokenInfo?.id;
+              if (tokenUnit && tokenId) {
+                navigate(`/dashboard/tokendetail/${tokenUnit.toLowerCase()}/${tokenId}`);
+              } else {
+                navigate('/dashboard');
+              }
+            }}
+          />
           <Box
             sx={{
               display: 'flex',
@@ -198,6 +218,7 @@ const SendToCadenceOrEvm = ({
                 </Typography>
                 {contactData && (
                   <AccountCard
+                    network={network}
                     account={{
                       id: parseInt(contactData.id?.toString() || '0'),
                       name: contactData.contact_name || contactData.username || 'Unknown',
@@ -208,89 +229,118 @@ const SendToCadenceOrEvm = ({
                     }}
                     showCard={false}
                     showLink={false}
+                    hideThirdLine={true}
+                    secondaryIcon={<EditIcon width={16} height={16} />}
+                    // TODO: Open address book selector
+                    onClickSecondary={() => {}}
                   />
                 )}
               </Box>
             </Box>
+          </Box>
 
-            {transactionState.tokenInfo.unit && (
-              <>
+          {/* Transaction Fee Section */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px', mb: '10px' }}>
+            <Box
+              sx={{ display: 'flex', flexDirection: 'row', gap: '4px', alignItems: 'flex-start' }}
+            >
+              <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
                 <Typography
-                  variant="body1"
+                  variant="body2"
                   sx={{
-                    alignSelf: 'start',
+                    color: COLOR_WHITE_FFFFFF,
                     fontSize: '14px',
+                    fontWeight: '400',
                   }}
                 >
-                  {chrome.i18n.getMessage('Available__Balance')}
+                  Transaction Fee
                 </Typography>
-
-                <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <TokenAvatar
-                    symbol={transactionState.tokenInfo.symbol}
-                    src={transactionState.tokenInfo.logoURI}
-                    width={18}
-                    height={18}
-                  />
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      alignSelf: 'start',
-                      fontSize: '15px',
-                    }}
-                  >
-                    <TokenBalance
-                      value={String(transactionState.tokenInfo.balance)}
-                      showFull={true}
-                      postFix={transactionState.tokenInfo.unit.toUpperCase()}
-                    />
-                    {' ≈ '}
-                    <CurrencyValue
-                      value={String(transactionState.tokenInfo.total)}
-                      currencyCode={currency?.code ?? ''}
-                      currencySymbol={currency?.symbol ?? ''}
-                    />
-                  </Typography>
-                </Box>
-              </>
-            )}
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.4)',
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    textDecoration: 'line-through',
+                  }}
+                >
+                  0.001
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: COLOR_WHITE_FFFFFF,
+                    fontSize: '14px',
+                    fontWeight: '500',
+                  }}
+                >
+                  0.00
+                </Typography>
+                <TokenAvatar
+                  symbol={transactionState.tokenInfo.symbol}
+                  src={transactionState.tokenInfo.logoURI}
+                  width={18}
+                  height={18}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  fontSize: '14px',
+                  fontWeight: '400',
+                }}
+              >
+                Covered by Flow Wallet
+              </Typography>
+            </Box>
           </Box>
+
+          {/* Error Message */}
+          <SlideRelative direction="down" show={transactionState.balanceExceeded}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '4px',
+                mt: '16px',
+                px: '16px',
+                py: '12px',
+                backgroundColor: `${COLOR_ERROR_RED_E54040}1A`,
+                borderRadius: '12px',
+                border: `1px solid ${COLOR_ERROR_RED_E54040}4D`,
+                width: '100%',
+              }}
+            >
+              <CancelIcon size={20} color={'#E54040'} />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '14px',
+                  color: '#E54040',
+                  fontWeight: '400',
+                }}
+              >
+                {transactionState.tokenInfo.unit === 'flow'
+                  ? chrome.i18n.getMessage('Insufficient_balance_on_Flow')
+                  : chrome.i18n.getMessage('Insufficient_balance')}
+              </Typography>
+            </Box>
+          </SlideRelative>
 
           <Box sx={{ flexGrow: 1 }} />
 
-          <Box sx={{ display: 'flex', gap: '8px', mx: '18px', mb: '35px', mt: '10px' }}>
-            <Button
-              onClick={() => navigate(-1)}
-              variant="contained"
-              // @ts-expect-error custom color
-              color="neutral"
-              size="large"
-              sx={{
-                height: '48px',
-                borderRadius: '8px',
-                flexGrow: 1,
-                textTransform: 'capitalize',
-              }}
-            >
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
-                {chrome.i18n.getMessage('Cancel')}
-              </Typography>
-            </Button>
-
+          <Box sx={{ display: 'flex', gap: '8px', mb: '35px', mt: '10px' }}>
             <Button
               onClick={() => {
                 // Finalize the transfer amount
                 handleFinalizeAmount();
                 setConfirmationOpen(true);
-              }}
-              variant="contained"
-              color="success"
-              size="large"
-              sx={{
-                height: '48px',
-                flexGrow: 1,
-                borderRadius: '8px',
-                textTransform: 'capitalize',
               }}
               disabled={
                 validated === null ||
@@ -298,10 +348,23 @@ const SendToCadenceOrEvm = ({
                 transactionState.amount === null ||
                 new BN(transactionState.amount || '-1').isLessThanOrEqualTo(0)
               }
+              sx={{
+                height: '48px',
+                flexGrow: 1,
+                borderRadius: '8px',
+                backgroundColor: COLOR_WHITE_FFFFFF,
+                color: COLOR_BLACK_000000,
+                '&:hover': {
+                  backgroundColor: COLOR_GREEN_FLOW_DARKMODE_00EF8B,
+                  opacity: 0.8,
+                },
+                '&:disabled': {
+                  backgroundColor: COLOR_DARKMODE_WHITE_10pc,
+                  color: COLOR_DARKMODE_TEXT_SECONDARY_B3B3B3,
+                },
+              }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }} color="text.primary">
-                {chrome.i18n.getMessage('Next')}
-              </Typography>
+              {chrome.i18n.getMessage('Send')}
             </Button>
           </Box>
           {validated !== null && validated && (
