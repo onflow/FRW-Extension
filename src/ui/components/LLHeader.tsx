@@ -9,6 +9,7 @@ interface LLHeaderProps {
   title: string | JSX.Element;
   help: boolean | JSX.Element;
   goBackLink?: string; // Optional link
+  onBackClick?: () => void; // Optional custom back button handler
   right?: React.ReactNode;
 }
 
@@ -16,7 +17,9 @@ export const LLHeader = (props: LLHeaderProps) => {
   //   const { label, ...inherentProps } = props;
   const navigate = useNavigate();
   const handleGoBack = () => {
-    if (props.goBackLink) {
+    if (props.onBackClick) {
+      props.onBackClick();
+    } else if (props.goBackLink) {
       navigate(props.goBackLink);
     } else {
       // Fall back to browser history
@@ -39,7 +42,14 @@ export const LLHeader = (props: LLHeaderProps) => {
         </IconButton>
       </Grid>
       <Grid size={10}>
-        <Typography variant="h1" align="center" py="14px" fontWeight="bold" fontSize="16px">
+        <Typography
+          variant="h1"
+          align="center"
+          py="14px"
+          fontWeight="bold"
+          fontSize="16px"
+          sx={{ textTransform: 'capitalize' }}
+        >
           {props.title}
         </Typography>
       </Grid>
