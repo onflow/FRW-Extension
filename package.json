@@ -1,6 +1,6 @@
 {
   "name": "frw-extension",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "description": "Digital wallet created for everyone.",
   "type": "module",
   "scripts": {
