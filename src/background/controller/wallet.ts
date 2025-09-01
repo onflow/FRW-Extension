@@ -1104,8 +1104,27 @@ export class WalletController extends BaseController {
     ids: number,
     receiver: string
   ): Promise<string> => transactionService.bridgeNftFromEvmToFlow(flowIdentifier, ids, receiver);
-  getAssociatedFlowIdentifier = async (address: string): Promise<string> =>
-    transactionService.getAssociatedFlowIdentifier(address);
+  // getAssociatedFlowIdentifier = async (address: string): Promise<string> =>
+  //   transactionService.getAssociatedFlowIdentifier(address);
+
+  getAssociatedFlowIdentifier = async (address: string): Promise<string> => {
+    const network = await userWalletService.getNetwork();
+    const allScripts = await openapiService.getCadenceScripts();
+    const encodedScript = allScripts.scripts[network]?.bridge?.getAssociatedFlowIdentifier;
+
+    if (!encodedScript) {
+      throw new Error('Script get_associated_flow_identifier not found in bridge category');
+    }
+
+    // Decode the base64 script
+    const script = atob(encodedScript);
+
+    const result = await fcl.query({
+      cadence: script,
+      args: (arg, t) => [arg(address, t.String)],
+    });
+    return result;
+  };
   sendNFT = async (recipient: string, id: number, token: NFTModelV2): Promise<string> =>
     transactionService.sendNFT(recipient, id, token);
   sendNBANFT = async (recipient: string, id: number, token: NFTModelV2): Promise<string> =>
